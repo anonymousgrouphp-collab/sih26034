@@ -1,5 +1,6 @@
 # Member 2 — Deep Learning & Multilingual OCR
 
+**Assigned Engineer:** **Parmarth Kumar** ([@parmarth-kumar](https://github.com/parmarth-kumar))  
 **Assigned Workstream:** Scene Text Detection (DBNet++), Multilingual Recognition (PP-OCRv4), ONNX INT8 CPU Optimization, Tesseract Fallback  
 **Assigned Folder:** `members/member-02-ocr/`  
 **Git Feature Branch:** `feat/m2-ocr`  

@@ -1,4 +1,6 @@
 # Member 4 Tasks — Statutory Rule Engine
+**Assigned Engineer:** **Ambika Bansal** ([@bansalambika12-ship-it](https://github.com/bansalambika12-ship-it))  
+**Branch:** `feat/m4-rule-engine`
 
 ## Sprint Checklist (07–13 September 2026)
 

@@ -1,5 +1,6 @@
 # Member 4 — Statutory Legal Metrology Rule Engine
 
+**Assigned Engineer:** **Ambika Bansal** ([@bansalambika12-ship-it](https://github.com/bansalambika12-ship-it))  
 **Assigned Workstream:** Deterministic Legal Compliance (Packaged Commodities Rules 2011), Table-I Font Schedule, USP Arithmetic, Temporal Epoch Dispatcher & 4-State Epistemic Triage  
 **Assigned Folder:** `members/member-04-rule-engine/`  
 **Git Feature Branch:** `feat/m4-rule-engine`  

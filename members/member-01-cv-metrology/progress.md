@@ -25,3 +25,33 @@ Using OpenCV headless (`opencv-python-headless`) to eliminate GUI server depende
 
 ### Next Step
 Implement core `quality_gate.py` Laplacian blur and specular glare estimation algorithms.
+
+---
+
+## [08 September 2026] [03:18] IST
+
+### Task / Chunk
+Official Workstream Assignment & Workspace Scaffolding.
+
+### Status
+COMPLETE
+
+### Completed
+- Team Lead assigned workstream to **Kunal Raj** ([@kunal-raj-dev](https://github.com/kunal-raj-dev)).
+- Configured dedicated branch `feat/m1-cv-metrology` and verified contract interfaces.
+- Verified test suite and permissive dependencies.
+
+### Tests
+`pytest members/member-01-cv-metrology/tests/ -v` (5 passed in 0.20s)
+
+### Problems
+None.
+
+### Decisions
+Assigned engineer recorded as Kunal Raj. All development proceeds strictly inside `members/member-01-cv-metrology/`.
+
+### Next Step
+Execute Day 1 sprint tasks: implement Laplacian variance and HSV specular glare detector.
+
+### Signing Note
+SIGNED OFF BY: anonymousgrouphp-collab (anonymousgrouphp@gmail.com) — 2026-09-08 03:18 IST [VERIFIED]

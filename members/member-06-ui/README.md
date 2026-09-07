@@ -1,5 +1,6 @@
 # Member 6 — Frontend, Web UX & Integration
 
+**Assigned Engineer:** **Urvashi Rajput** ([@rajputurvashi2006-bit](https://github.com/rajputurvashi2006-bit))  
 **Assigned Workstream:** React 18 SPA, Officer Viewfinder HUD, Split-View Adjudication Canvas, Central Dashboard & Mode B Resilient UX  
 **Assigned Folder:** `members/member-06-ui/`  
 **Git Feature Branch:** `feat/m6-ui`  

@@ -1,5 +1,6 @@
 # Member 3 — Semantic Extraction & NLP
 
+**Assigned Engineer:** **Harsh Patel** ([@anonymousgrouphp-collab](https://github.com/anonymousgrouphp-collab))  
 **Assigned Workstream:** Statutory Entity Normalization (MRP, Net Qty, USP, Mfg Date, Origin, Address, Consumer Care) & Banned Unit Detection  
 **Assigned Folder:** `members/member-03-extraction/`  
 **Git Feature Branch:** `feat/m3-extraction`  

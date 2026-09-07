@@ -1,4 +1,6 @@
 # Member 6 Tasks — Frontend, Web UX & Integration
+**Assigned Engineer:** **Urvashi Rajput** ([@rajputurvashi2006-bit](https://github.com/rajputurvashi2006-bit))  
+**Branch:** `feat/m6-ui`
 
 ## Sprint Checklist (07–13 September 2026)
 

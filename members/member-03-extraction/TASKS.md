@@ -1,4 +1,6 @@
 # Member 3 Tasks — Semantic Extraction & NLP
+**Assigned Engineer:** **Harsh Patel** ([@anonymousgrouphp-collab](https://github.com/anonymousgrouphp-collab))  
+**Branch:** `feat/m3-extraction`
 
 ## Sprint Checklist (07–13 September 2026)
 

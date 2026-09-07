@@ -1,4 +1,6 @@
 # Member 5 Tasks — Backend, Platform & Evidentiary Dossier
+**Assigned Engineer:** **Shailendra Pratap Singh** ([@shailendrapratap1](https://github.com/shailendrapratap1))  
+**Branch:** `feat/m5-evidence`
 
 ## Sprint Checklist (07–13 September 2026)
 

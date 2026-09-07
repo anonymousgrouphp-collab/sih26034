@@ -11,6 +11,17 @@
 
 This document specifies the exact boundaries, inputs, outputs, acceptance criteria, and rules for each of the six developers on the NyayaDrishti-LM engineering team.
 
+### Team Member Assignment Matrix (Authoritative)
+
+| Workstream | Assigned Engineer | GitHub Profile | Assigned Folder | Assigned Branch |
+| :--- | :--- | :--- | :--- | :--- |
+| **Member 1: CV & Metrology** | **Kunal Raj** | [@kunal-raj-dev](https://github.com/kunal-raj-dev) | `members/member-01-cv-metrology/` | `feat/m1-cv-metrology` |
+| **Member 2: Multilingual OCR** | **Parmarth Kumar** | [@parmarth-kumar](https://github.com/parmarth-kumar) | `members/member-02-ocr/` | `feat/m2-ocr` |
+| **Member 3: Semantic Extraction** | **Harsh Patel** | [@anonymousgrouphp-collab](https://github.com/anonymousgrouphp-collab) | `members/member-03-extraction/` | `feat/m3-extraction` |
+| **Member 4: Rule Engine** | **Ambika Bansal** | [@bansalambika12-ship-it](https://github.com/bansalambika12-ship-it) | `members/member-04-rule-engine/` | `feat/m4-rule-engine` |
+| **Member 5: Evidence & Backend** | **Shailendra Pratap Singh** | [@shailendrapratap1](https://github.com/shailendrapratap1) | `members/member-05-evidence/` | `feat/m5-evidence` |
+| **Member 6: Frontend & HUD** | **Urvashi Rajput** | [@rajputurvashi2006-bit](https://github.com/rajputurvashi2006-bit) | `members/member-06-ui/` | `feat/m6-ui` |
+
 ### Work Assignment Governance
 1. **Team Lead Authority:** The **Team Lead manually assigns all work** across the team.
 2. **AI Task Boundaries:** AI coding assistants and autonomous agents must **not** create additional member branches, automatically assign work, or redistribute member tasks. All development proceeds strictly against explicit Team Lead direction.
@@ -60,6 +71,7 @@ Every member must be able to clone the repository, check out their branch, navig
 ## Member 1: Computer Vision, Optics & Metrology
 
 - **Member Designation:** Member 1
+- **Assigned Engineer:** **Kunal Raj** ([@kunal-raj-dev](https://github.com/kunal-raj-dev))
 - **Role:** Lead Computer Vision & Metrology Engineer
 - **Assigned Folder:** `members/member-01-cv-metrology/`
 - **Assigned Git Branch:** `feat/m1-cv-metrology`
@@ -112,6 +124,7 @@ Every member must be able to clone the repository, check out their branch, navig
 ## Member 2: Deep Learning & Multilingual OCR
 
 - **Member Designation:** Member 2
+- **Assigned Engineer:** **Parmarth Kumar** ([@parmarth-kumar](https://github.com/parmarth-kumar))
 - **Role:** Deep Learning & Multilingual OCR Engineer
 - **Assigned Folder:** `members/member-02-ocr/`
 - **Assigned Git Branch:** `feat/m2-ocr`
@@ -157,6 +170,7 @@ Every member must be able to clone the repository, check out their branch, navig
 ## Member 3: Semantic Extraction & NLP
 
 - **Member Designation:** Member 3
+- **Assigned Engineer:** **Harsh Patel** ([@anonymousgrouphp-collab](https://github.com/anonymousgrouphp-collab))
 - **Role:** Information Extraction & NLP Engineer
 - **Assigned Folder:** `members/member-03-extraction/`
 - **Assigned Git Branch:** `feat/m3-extraction`
@@ -206,6 +220,7 @@ Every member must be able to clone the repository, check out their branch, navig
 ## Member 4: Statutory Legal Metrology Rule Engine
 
 - **Member Designation:** Member 4
+- **Assigned Engineer:** **Ambika Bansal** ([@bansalambika12-ship-it](https://github.com/bansalambika12-ship-it))
 - **Role:** Legal Metrology & Rule Engine Architect
 - **Assigned Folder:** `members/member-04-rule-engine/`
 - **Assigned Git Branch:** `feat/m4-rule-engine`
@@ -257,6 +272,7 @@ Every member must be able to clone the repository, check out their branch, navig
 ## Member 5: Backend, Platform & Evidentiary Dossier
 
 - **Member Designation:** Member 5
+- **Assigned Engineer:** **Shailendra Pratap Singh** ([@shailendrapratap1](https://github.com/shailendrapratap1))
 - **Role:** Lead Backend, Platform, Security & Evidentiary Dossier Engineer
 - **Assigned Folder:** `members/member-05-evidence/`
 - **Assigned Git Branch:** `feat/m5-evidence`
@@ -309,6 +325,7 @@ Every member must be able to clone the repository, check out their branch, navig
 ## Member 6: Frontend, Web UX & Integration
 
 - **Member Designation:** Member 6
+- **Assigned Engineer:** **Urvashi Rajput** ([@rajputurvashi2006-bit](https://github.com/rajputurvashi2006-bit))
 - **Role:** Lead Frontend, Web UX & Integration Engineer
 - **Assigned Folder:** `members/member-06-ui/`
 - **Assigned Git Branch:** `feat/m6-ui`

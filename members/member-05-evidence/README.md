@@ -1,5 +1,6 @@
 # Member 5 — Lead Backend, Platform, Security & Evidentiary Dossier
 
+**Assigned Engineer:** **Shailendra Pratap Singh** ([@shailendrapratap1](https://github.com/shailendrapratap1))  
 **Assigned Workstream:** FastAPI Application Server, PostgreSQL 16+ Datastore, Decoupled Storage, SHA-256 Merkle DAG & Section 63 BSA 2023 PDF/A Dossier Generator  
 **Assigned Folder:** `members/member-05-evidence/`  
 **Git Feature Branch:** `feat/m5-evidence`  

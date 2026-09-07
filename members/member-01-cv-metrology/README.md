@@ -1,5 +1,6 @@
 # Member 1 — Computer Vision, Optics & Metrology
 
+**Assigned Engineer:** **Kunal Raj** ([@kunal-raj-dev](https://github.com/kunal-raj-dev))  
 **Assigned Workstream:** Optical Quality Gate, Scale Calibration, Planar Homography, Packaging Geometry & PDP Measurement  
 **Assigned Folder:** `members/member-01-cv-metrology/`  
 **Git Feature Branch:** `feat/m1-cv-metrology`  

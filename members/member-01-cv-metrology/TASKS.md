@@ -1,4 +1,6 @@
 # Member 1 Tasks — CV, Optics & Metrology
+**Assigned Engineer:** **Kunal Raj** ([@kunal-raj-dev](https://github.com/kunal-raj-dev))  
+**Branch:** `feat/m1-cv-metrology`
 
 ## Sprint Checklist (07–13 September 2026)
 

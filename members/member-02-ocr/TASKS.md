@@ -1,4 +1,6 @@
 # Member 2 Tasks — Multilingual OCR Engine
+**Assigned Engineer:** **Parmarth Kumar** ([@parmarth-kumar](https://github.com/parmarth-kumar))  
+**Branch:** `feat/m2-ocr`
 
 ## Sprint Checklist (07–13 September 2026)
 

@@ -32,6 +32,7 @@
 
 #### MEMBER 1: Lead Computer Vision & Metrology Engineer
 
+- **Assigned Engineer:** **Kunal Raj** ([@kunal-raj-dev](https://github.com/kunal-raj-dev))
 - **Role:** Optical Quality, Calibration & Geometric Measurement
 - **Primary Objective:** Deliver sub-millimeter physical scale calibration and optical gating on commodity cameras.
 - **Core Tasks:**
@@ -47,6 +48,7 @@
 
 #### MEMBER 2: Deep Learning & Multilingual OCR Engineer
 
+- **Assigned Engineer:** **Parmarth Kumar** ([@parmarth-kumar](https://github.com/parmarth-kumar))
 - **Role:** Perception Engine & Scene Text Recognition
 - **Primary Objective:** High-speed multilingual text extraction across English and Devanagari Hindi on server and local CPUs.
 - **Core Tasks:**
@@ -61,6 +63,7 @@
 
 #### MEMBER 3: Information Extraction & NLP Engineer
 
+- **Assigned Engineer:** **Harsh Patel** ([@anonymousgrouphp-collab](https://github.com/anonymousgrouphp-collab))
 - **Role:** Semantic Token Linking & Entity Normalization
 - **Primary Objective:** Convert raw OCR tokens into verified statutory packaging entities without hallucinations.
 - **Core Tasks:**
@@ -76,6 +79,7 @@
 
 #### MEMBER 4: Legal Metrology & Rule Engine Architect
 
+- **Assigned Engineer:** **Ambika Bansal** ([@bansalambika12-ship-it](https://github.com/bansalambika12-ship-it))
 - **Role:** Statutory Compliance Logic & Temporal Reasoning
 - **Primary Objective:** Translate the Legal Metrology Act and LMPC Rules into an auditable, deterministic AST engine.
 - **Core Tasks:**
@@ -92,6 +96,7 @@
 
 #### MEMBER 5: Lead Backend, Platform & Database Engineer
 
+- **Assigned Engineer:** **Shailendra Pratap Singh** ([@shailendrapratap1](https://github.com/shailendrapratap1))
 - **Role:** Web Platform, Database Architecture, Security & Evidentiary Dossier
 - **Primary Objective:** Deliver robust, scalable FastAPI web application services, PostgreSQL datastore, and court-ready Section 63 BSA 2023 evidence generator.
 - **Core Tasks:**
@@ -107,6 +112,7 @@
 
 #### MEMBER 6: Lead Frontend, Web UX & Integration Engineer
 
+- **Assigned Engineer:** **Urvashi Rajput** ([@rajputurvashi2006-bit](https://github.com/rajputurvashi2006-bit))
 - **Role:** Web Application SPA, Officer HUD, Central Dashboard & System Packaging
 - **Primary Objective:** Build an intuitive, responsive web application interface for inspectors and controllers with local fallback capabilities.
 - **Core Tasks:**
