@@ -70,7 +70,16 @@ Six developers work on this project at the same time:
 
 ---
 
-## 5. Folder Ownership
+## 5. Work Assignment & Team Lead Authority
+
+- **Manual Assignment Only:** The **Team Lead manually assigns all work** to members.
+- **No Automatic AI Task Assignment:** Antigravity must **not** automatically assign, redistribute, or take ownership of member tasks.
+- **Role of Antigravity:** Antigravity operates strictly as an engineering orchestrator and pair-programming assistant under explicit directions and approvals from the Team Lead.
+- **Task Acceptance:** Developers (human or AI) work only on tasks explicitly designated and assigned by the Team Lead.
+
+---
+
+## 6. Folder Ownership
 
 Every developer owns their specific folder:
 - Member 1 owns `members/member-01-cv-metrology/`
@@ -88,7 +97,7 @@ Rules for folder ownership:
 
 ---
 
-## 6. Branch Rules
+## 7. Branch Rules & Mandatory Pre-Work Sync
 
 We use a strict branching system:
 - `main`: Safe for demos and production. Never push directly to `main`.
@@ -100,17 +109,27 @@ We use a strict branching system:
   - `feat/m4-rule-engine`
   - `feat/m5-evidence`
   - `feat/m6-ui`
+- Hotfix branches: `hotfix/<issue-name>`
 
-Rules:
-- Work starts from `dev`.
-- Always work on your own feature branch.
-- Never force push (`git push --force`) to shared branches.
-- Never rebase or delete someone else's branch.
-- Keep commits small, clear, and focused.
+### Mandatory Pre-Work Branch Sync Protocol
+Before starting **any** new work, every member must execute the following sequence:
+
+```bash
+git fetch origin
+git checkout <their-branch>
+git merge origin/main
+```
+
+### Critical Git Guardrails
+1. **Rebase Restriction:** Rebase may be used **only when the Team Lead explicitly approves it**. Merging `origin/main` is the standard sync mechanism.
+2. **Never Overwrite Uncommitted Work:** Never run destructive commands (`git reset --hard`, `git checkout -f`, `git clean -fd`) that risk losing uncommitted changes. Stash or commit before syncing.
+3. **Never Force-Push:** Never force-push (`git push --force` or `git push --force-with-lease`) unless the **Team Lead explicitly approves it**. If a push is rejected by the remote, stop and report the issue immediately.
+4. **Escalate Cross-Boundary Conflicts:** If merge conflicts involve contracts (`contracts/`), system architecture (`03_FINAL_ARCHITECTURE.md`), legal rules (`02_FINAL_REQUIREMENTS_SPECIFICATION.md`, `16_DECISION_LOG.md`), or another member's code, **STOP immediately and inform the Team Lead**. Do NOT resolve cross-boundary conflicts unilaterally.
+5. **Small & Focused Commits:** Keep commits small, clear, and strictly scoped to your assigned tasks.
 
 ---
 
-## 7. The No-Cross-Dependency Rule
+## 8. The No-Cross-Dependency Rule
 
 This is our golden rule:
 **No member may depend on another member's unfinished code.**
@@ -127,7 +146,7 @@ Every module must run and pass tests completely on its own!
 
 ---
 
-## 8. Contract-First Development
+## 9. Contract-First Development
 
 We build our software using contracts:
 1. The contract defines the data shape in `contracts/`.
@@ -139,7 +158,7 @@ Contracts are shared rules. They protect everyone from surprises.
 
 ---
 
-## 9. Test Fixture Policy
+## 10. Test Fixture Policy
 
 Every member creates local fixtures inside their `fixtures/` directory:
 - File naming format: `fixture_<feature>_<scenario>.<ext>` (e.g., `fixture_blur_fail.json`, `fixture_mrp_valid.json`).
@@ -150,7 +169,7 @@ Every member creates local fixtures inside their `fixtures/` directory:
 
 ---
 
-## 10. Data Non-Assumption Policy
+## 11. Data Non-Assumption Policy
 
 Never invent data. This is strictly prohibited.
 - Do not invent legal rules or fines.
@@ -162,7 +181,7 @@ Never invent data. This is strictly prohibited.
 
 ---
 
-## 11. Legal & Regulatory Safety Rules
+## 12. Legal & Regulatory Safety Rules
 
 Our project deals with government law enforcement.
 We must follow strict legal guardrails:
@@ -175,7 +194,7 @@ We must follow strict legal guardrails:
 
 ---
 
-## 12. Dependency & Licensing Rules
+## 13. Dependency & Licensing Rules
 
 We must protect government intellectual property:
 - **Zero AGPL-3.0 libraries:** Never install or import Ultralytics YOLOv8, YOLOv11, or other AGPL copyleft code.
@@ -185,7 +204,7 @@ We must protect government intellectual property:
 
 ---
 
-## 13. Testing Rules
+## 14. Testing Rules
 
 Every member is responsible for their own tests:
 - Tests go into your `tests/` folder.
@@ -196,7 +215,7 @@ Every member is responsible for their own tests:
 
 ---
 
-## 14. Progress Log Format (`progress.md`)
+## 15. Progress Log Format (`progress.md`)
 
 Every member must keep an updated `progress.md` file in their folder.
 Use this exact format for every entry:
@@ -236,7 +255,7 @@ Always use real dates and times. Never fake timestamps.
 
 ---
 
-## 15. Memory Log Format (`memory.md`)
+## 16. Memory Log Format (`memory.md`)
 
 Every member has a permanent memory file called `memory.md`.
 Use this format to record important discoveries and facts:
@@ -267,7 +286,7 @@ ACTIVE
 
 ---
 
-## 16. Commit Rules
+## 17. Commit Rules
 
 Use clear and standard commit messages:
 - Features: `feat(m<N>): short description` (e.g., `feat(m1): implement Laplacian blur check`)
@@ -279,7 +298,7 @@ Keep each commit small and related to one thing.
 
 ---
 
-## 17. Pull Request (PR) Rules
+## 18. Pull Request (PR) Rules
 
 When opening a Pull Request:
 1. Target the `dev` branch (never target `main` directly).
@@ -308,7 +327,7 @@ When opening a Pull Request:
 
 ---
 
-## 18. Definition of Done (DoD)
+## 19. Definition of Done (DoD)
 
 A task is **DONE** only when:
 1. The code is written and follows clean coding standards.
@@ -322,7 +341,7 @@ A task is **DONE** only when:
 
 ---
 
-## 19. Integration Rules
+## 20. Integration Rules
 
 We only connect modules together after they work standalone:
 - Integration happens in the `integration/` directory.
@@ -332,7 +351,7 @@ We only connect modules together after they work standalone:
 
 ---
 
-## 20. Emergency / Hotfix Process
+## 21. Emergency / Hotfix Process
 
 If a critical bug breaks integration:
 1. Branch from `dev`: `hotfix/<issue-name>`.
@@ -343,7 +362,7 @@ If a critical bug breaks integration:
 
 ---
 
-## 21. Decision-Change Process
+## 22. Decision-Change Process
 
 If you find a mistake in a frozen decision:
 1. **Do not silently change the code.**
@@ -362,7 +381,7 @@ If you find a mistake in a frozen decision:
 
 ---
 
-## 22. Demo Safety Rules
+## 23. Demo Safety Rules
 
 We follow a 3-tier demo safety plan:
 - **Tier 1 (Live Web App):** The normal online web application on standard browsers.
@@ -373,13 +392,25 @@ Never let a demo fail because of venue Wi-Fi. Mode B and golden fixtures keep us
 
 ---
 
-## 23. Instructions for AI Coding Agents
+## 24. Instructions for AI Coding Agents
 
-If you are an AI coding assistant working on this repository:
+If you are an AI coding assistant (including Antigravity) working on this repository:
 1. **Read before writing:** Check `AGENTS.md`, your member's `README.md`, and relevant contracts before editing code.
-2. **Stay in your lane:** Work only in your assigned member folder. Do not edit other members' files.
-3. **Respect contracts:** Never change a file in `contracts/` without explicit authorization.
-4. **Never invent data:** Do not invent facts, numbers, or legal rules.
-5. **No AGPL-3.0 code:** Never recommend or import Ultralytics or copyleft packages.
-6. **Always write tests:** Every new function must have unit tests.
-7. **Keep logs up to date:** Always update `progress.md` and `memory.md` when completing work.
+2. **Team Lead assigns all work:** The Team Lead manually assigns all work. Antigravity must **not** automatically assign, redistribute, or take ownership of member tasks.
+3. **Mandatory sync before starting work:** Always ensure the pre-work sync protocol has been run before starting work on any branch:
+   ```bash
+   git fetch origin
+   git checkout <their-branch>
+   git merge origin/main
+   ```
+4. **Rebase only with explicit approval:** Rebase may be used only when the Team Lead explicitly approves it.
+5. **Protect uncommitted work:** Never run destructive commands that overwrite or discard uncommitted changes.
+6. **Zero force-push:** Never force-push (`git push --force` or `--force-with-lease`) unless the Team Lead explicitly approves it.
+7. **Escalate cross-boundary conflicts:** If conflicts involve contracts, architecture, legal rules, or another member's work, stop and inform the Team Lead immediately.
+8. **Stay in your lane:** Work only in your assigned member folder. Do not edit other members' files.
+9. **Respect contracts:** Never change a file in `contracts/` without explicit authorization.
+10. **Never invent data:** Do not invent facts, numbers, or legal rules.
+11. **No AGPL-3.0 code:** Never recommend or import Ultralytics or copyleft packages.
+12. **Always write tests:** Every new function must have unit tests.
+13. **Keep logs up to date:** Always update `progress.md` and `memory.md` when completing work.
+

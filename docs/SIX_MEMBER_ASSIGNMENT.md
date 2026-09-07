@@ -11,6 +11,24 @@
 
 This document specifies the exact boundaries, inputs, outputs, acceptance criteria, and rules for each of the six developers on the NyayaDrishti-LM engineering team.
 
+### Work Assignment Governance
+1. **Team Lead Authority:** The **Team Lead manually assigns all work** across the team.
+2. **AI Task Boundaries:** Antigravity and automated assistants must **not** automatically assign, redistribute, or take ownership of member tasks. All development proceeds strictly against explicit Team Lead direction.
+
+### Mandatory Pre-Work Branch Sync Protocol
+Before starting any new work on an assigned feature branch, every member must run:
+```bash
+git fetch origin
+git checkout <their-branch>
+git merge origin/main
+```
+
+### Git Operational Guardrails
+- **Rebase:** Permitted **only** with explicit prior approval from the Team Lead. Merging `origin/main` is standard.
+- **Uncommitted Changes:** Never overwrite or discard uncommitted work. Maintain clean working trees.
+- **Force-Push:** Strictly prohibited unless explicitly approved by the Team Lead.
+- **Conflict Escalation:** If conflicts affect contracts (`contracts/`), architecture, legal rules, or peer code, **stop immediately and escalate to the Team Lead**.
+
 ### The Universal Non-Dependency Rule
 Every member must be able to clone the repository, check out their branch, navigate to their assigned folder, run their fixtures, execute their test suite, and implement their module **without waiting for another member's unfinished implementation**. Cross-member coordination is achieved strictly through frozen contracts in `contracts/`.
 

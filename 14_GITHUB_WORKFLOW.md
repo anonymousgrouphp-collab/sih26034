@@ -54,26 +54,49 @@ sih26034-nyayadrishti/
 
 ---
 
-### 2. Branching & Merging Strategy (Strict Trunk-Based)
+### 2. Work Assignment & Team Lead Authority
 
-- `main`: Production-ready, demo-safe code. Direct pushes are strictly **prohibited**.
-- `dev`: Active integration branch. Automated CI must pass before merging into `dev`.
-- Feature Branches: Named strictly as: `feat/m<member_id>-<subsystem>` (e.g., `feat/m1-homography`, `feat/m4-ast-rules`, `feat/m5-fastapi-auth`, `feat/m6-react-dashboard`).
-- Hotfix Branches: `hotfix/<issue-name>`.
+1. **Manual Assignment Only:** The **Team Lead manually assigns all work** to members.
+2. **No Automated AI Task Assignment:** Antigravity and any automated systems must **not** automatically assign, redistribute, or take ownership of member tasks.
+3. **Role of AI Orchestrator:** Antigravity operates strictly under instructions and explicit task boundaries assigned by the Team Lead.
 
 ---
 
-### 3. Pull Request (PR) Policy & Code Review Rules
+### 3. Branching & Merging Strategy (Strict Trunk-Based)
+
+- `main`: Production-ready, demo-safe code. Direct pushes are strictly **prohibited**.
+- `dev`: Active integration branch. Automated CI must pass before merging into `dev`.
+- Feature Branches: Named strictly as: `feat/m<member_id>-<subsystem>` (e.g., `feat/m1-cv-metrology`, `feat/m2-ocr`, `feat/m3-extraction`, `feat/m4-rule-engine`, `feat/m5-evidence`, `feat/m6-ui`).
+- Hotfix Branches: `hotfix/<issue-name>`.
+
+#### Mandatory Pre-Work Branch Sync Protocol
+Before starting **any** new work on any branch, every member must execute:
+
+```bash
+git fetch origin
+git checkout <their-branch>
+git merge origin/main
+```
+
+#### Critical Git Guardrails
+1. **Rebase Approval Required:** Rebase may be used **only when the Team Lead explicitly approves it**. Standard practice is merging `origin/main`.
+2. **Never Overwrite Uncommitted Work:** Always verify working tree status before branch operations. Destructive commands (`git reset --hard`, `git checkout -f`, `git clean -fd`) that risk losing uncommitted changes are strictly forbidden.
+3. **Never Force-Push:** Never force-push (`git push --force` or `--force-with-lease`) unless the **Team Lead explicitly approves it**. If a push is rejected by the remote, stop and report the issue immediately.
+4. **Cross-Boundary Conflict Escalation:** If merge conflicts involve contracts (`contracts/`), system architecture (`03_FINAL_ARCHITECTURE.md`), legal rules (`02_FINAL_REQUIREMENTS_SPECIFICATION.md`, `16_DECISION_LOG.md`), or another member's code, **STOP immediately and inform the Team Lead**. Do NOT resolve cross-boundary conflicts unilaterally.
+
+---
+
+### 4. Pull Request (PR) Policy & Code Review Rules
 
 1. Every PR must reference a specific requirements ID (e.g., `FR-03: Implement ArUco Planar Homography` or `FR-21: Web Portal & RBAC`).
 2. Every PR must pass all automated CI unit tests and lint checks before submission.
 3. Every PR must be reviewed and approved by at least **one other team member** whose interface is affected.
 4. **No AGPL-3.0 Dependencies:** Any PR introducing an AGPL-licensed package (e.g., `ultralytics`) will be rejected automatically by CI license scanning.
-5. PR merges must be squashed and rebased to maintain a clean, linear Git history.
+5. PR merges into `dev` require passing CI and must be approved by the Team Lead. Rebase during merge is permitted only with Team Lead approval.
 
 ---
 
-### 4. Definition of Done (DoD)
+### 5. Definition of Done (DoD)
 
 A feature is considered **DONE** if and only if:
 
