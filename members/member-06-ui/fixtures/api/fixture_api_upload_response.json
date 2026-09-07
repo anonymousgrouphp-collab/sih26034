@@ -1,0 +1,13 @@
+{
+  "status": "SUCCESS",
+  "inspection_id": "insp_8f7b2c14-9d1a-4d2b-a312-c7f3e82d1094",
+  "image_id": "img_3a1e9b20-1123-4567-89ab-cdef01234567",
+  "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "quality_gate": {
+    "passed": true,
+    "blur_variance": 342.18,
+    "glare_percentage": 0.84,
+    "skew_angle_deg": 1.45
+  },
+  "message": "Image successfully ingested, hashed, and queued for pipeline execution."
+}

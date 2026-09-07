@@ -1,0 +1,35 @@
+{
+  "sku_id": "SKU-DEMO-06",
+  "product_name": "Wireless Bluetooth Earbuds (Imported Listing)",
+  "category": "ELECTRONICS_COMMODITY",
+  "packaging_type": "ECOMMERCE_LISTING",
+  "demonstration_point": "Online marketplace single listing missing mandatory Country of Origin declaration under Rule 6(10) / Rule 6(10A)",
+  "expected_overall_verdict": "FAIL",
+  "ecom_source": {
+    "url": "https://marketplace.example.in/dp/B09ABCDEF1",
+    "ingested_via": "TARGETED_LISTING_URL",
+    "mfg_date_present": false,
+    "mfg_date_exempt": true
+  },
+  "extracted_entities": {
+    "importer_name": "AudioTech Imports India Pvt Ltd",
+    "net_quantity": {
+      "magnitude": 1.0,
+      "unit": "unit",
+      "has_banned_unit": false
+    },
+    "mrp": {
+      "amount": 1999.0,
+      "currency": "INR",
+      "tax_inclusive": true
+    },
+    "country_of_origin": null
+  },
+  "expected_violations": [
+    {
+      "rule_code": "RULE_06_10_ECOMM_MANDATORY_DECLARATIONS",
+      "citation": "Rule 6(10) read with Rule 6(1)(p) and G.S.R. 128(E)",
+      "deficit": "Missing mandatory Country of Origin declaration on e-commerce product listing"
+    }
+  ]
+}

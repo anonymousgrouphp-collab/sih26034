@@ -1,0 +1,18 @@
+{
+  "description": "SYNTHETIC: Low confidence OCR crop triggering Tesseract secondary consensus fallback",
+  "image_id": "img_low_conf_01",
+  "total_tokens": 1,
+  "mean_confidence": 0.582,
+  "full_text": "Net Wt: 20O gms",
+  "execution_time_ms": 390,
+  "tokens": [
+    {
+      "token_id": "tok_low_01",
+      "text": "Net Wt: 20O gms",
+      "confidence": 0.582,
+      "language": "en",
+      "polygon": [[100, 300], [350, 300], [350, 350], [100, 350]],
+      "bounding_box": [300, 100, 350, 350]
+    }
+  ]
+}

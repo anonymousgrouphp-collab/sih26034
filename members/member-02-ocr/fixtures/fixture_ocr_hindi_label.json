@@ -1,0 +1,26 @@
+{
+  "description": "DEMO FIXTURE: Dual-language Hindi Devanagari packaging text with Indic numerals",
+  "image_id": "img_demo_02_hindi",
+  "total_tokens": 2,
+  "mean_confidence": 0.945,
+  "full_text": "शुद्ध मात्रा: २०० ग्राम\nअधिकतम खुदरा मूल्य: रु ५०.००",
+  "execution_time_ms": 480,
+  "tokens": [
+    {
+      "token_id": "tok_hi_01",
+      "text": "शुद्ध मात्रा: २०० ग्राम",
+      "confidence": 0.942,
+      "language": "hi",
+      "polygon": [[150, 400], [450, 400], [450, 460], [150, 460]],
+      "bounding_box": [400, 150, 460, 450]
+    },
+    {
+      "token_id": "tok_hi_02",
+      "text": "अधिकतम खुदरा मूल्य: रु ५०.००",
+      "confidence": 0.948,
+      "language": "hi",
+      "polygon": [[150, 480], [520, 480], [520, 540], [150, 540]],
+      "bounding_box": [480, 150, 540, 520]
+    }
+  ]
+}

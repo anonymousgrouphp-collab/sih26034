@@ -1,0 +1,42 @@
+{
+  "description": "DEMO FIXTURE: Standard English packaging label with Net Qty, MRP, USP, and Manufacturer",
+  "image_id": "img_demo_01_biscuit",
+  "total_tokens": 4,
+  "mean_confidence": 0.978,
+  "full_text": "Net Weight: 150 g\nMRP Rs. 35.00 (incl. of all taxes)\nUSP: Rs. 0.23 / g\nMfd By: Sunfeast Foods India Pvt Ltd, Sector 58, Gurugram 122011",
+  "execution_time_ms": 420,
+  "tokens": [
+    {
+      "token_id": "tok_01",
+      "text": "Net Weight: 150 g",
+      "confidence": 0.985,
+      "language": "en",
+      "polygon": [[210, 820], [540, 820], [540, 880], [210, 880]],
+      "bounding_box": [820, 210, 880, 540]
+    },
+    {
+      "token_id": "tok_02",
+      "text": "MRP Rs. 35.00 (incl. of all taxes)",
+      "confidence": 0.991,
+      "language": "en",
+      "polygon": [[210, 910], [680, 910], [680, 960], [210, 960]],
+      "bounding_box": [910, 210, 960, 680]
+    },
+    {
+      "token_id": "tok_03",
+      "text": "USP: Rs. 0.23 / g",
+      "confidence": 0.965,
+      "language": "en",
+      "polygon": [[210, 975], [430, 975], [430, 1015], [210, 1015]],
+      "bounding_box": [975, 210, 1015, 430]
+    },
+    {
+      "token_id": "tok_04",
+      "text": "Mfd By: Sunfeast Foods India Pvt Ltd, Sector 58, Gurugram 122011",
+      "confidence": 0.972,
+      "language": "en",
+      "polygon": [[210, 1030], [890, 1030], [890, 1080], [210, 1080]],
+      "bounding_box": [1030, 210, 1080, 890]
+    }
+  ]
+}

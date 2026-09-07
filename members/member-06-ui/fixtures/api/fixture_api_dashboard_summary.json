@@ -1,0 +1,26 @@
+{
+  "total_inspections": 1420,
+  "compliance_rate_pct": 74.2,
+  "active_circle": "CIRCLE_DL_SOUTH_01",
+  "violations_by_rule": {
+    "RULE_06_1_H_NET_QTY_FONT": 184,
+    "RULE_06_1_K_USP": 112,
+    "RULE_06_1_N_CONSUMER_CARE": 71
+  },
+  "recent_inspections": [
+    {
+      "id": "insp_8f7b2c14-9d1a-4d2b-a312-c7f3e82d1094",
+      "inspection_number": "INSP-20260907-0842",
+      "product_name": "Crunchy Almond Cookies 200g",
+      "status": "FAIL",
+      "timestamp": "2026-09-07T11:32:00Z"
+    },
+    {
+      "id": "insp_7a2c1b90-1123-4567-89ab-cdef01234567",
+      "inspection_number": "INSP-20260907-0841",
+      "product_name": "Pure Mustard Oil 1L",
+      "status": "PASS",
+      "timestamp": "2026-09-07T10:15:00Z"
+    }
+  ]
+}

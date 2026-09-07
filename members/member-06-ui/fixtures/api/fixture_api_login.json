@@ -1,0 +1,9 @@
+{
+  "access_token": "mock_jwt_eyJhGciOiJSUzI1NiIsI...",
+  "token_type": "Bearer",
+  "user_id": "usr_01_rajesh",
+  "role": "INSPECTOR",
+  "full_name": "Rajesh Sharma",
+  "badge_number": "INSP-DL-0842",
+  "jurisdiction_id": "CIRCLE_DL_SOUTH_01"
+}
