@@ -13,7 +13,7 @@ This document specifies the exact boundaries, inputs, outputs, acceptance criter
 
 ### Work Assignment Governance
 1. **Team Lead Authority:** The **Team Lead manually assigns all work** across the team.
-2. **AI Task Boundaries:** Antigravity and automated assistants must **not** create additional member branches, automatically assign work, or redistribute member tasks. All development proceeds strictly against explicit Team Lead direction.
+2. **AI Task Boundaries:** AI coding assistants and autonomous agents must **not** create additional member branches, automatically assign work, or redistribute member tasks. All development proceeds strictly against explicit Team Lead direction.
 
 ### 3-Tier Branch Hierarchy
 ```text

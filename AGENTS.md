@@ -1,102 +1,98 @@
-# AGENTS.md — Master Rules for Developers & AI Agents
+# AGENTS.md — Universal Master Rules for Developers & AI Agents
 
 Welcome to **NyayaDrishti-LM (SIH26034)**.
-This file explains how our team works.
-It is written in simple words so anyone can follow it easily.
-Every developer and AI assistant must follow these rules without exception.
+This document is the authoritative engineering handbook, architectural boundary guide, and operational rulebook for all contributors to this codebase.
+
+Whether you are a **human software engineer** or an **AI coding assistant / autonomous agent** (e.g., Claude Code, Cursor, Windsurf, GitHub Copilot, Devin, Antigravity, Cline, Roo Code, Aider, Codex, or any LLM-powered pair-programmer), you **must adhere strictly and unconditionally** to every rule, boundary, and protocol defined in this specification.
 
 ---
 
-## 1. Project Purpose
+## 1. Project Purpose & System Context
 
-NyayaDrishti-LM is an online web application built for the **Department of Consumer Affairs (DoCA)**, Government of India.
-Its job is to help government inspectors check packaged goods (like biscuits, soaps, and oil bottles) to see if they follow the law.
-The law is called the **Legal Metrology (Packaged Commodities) Rules, 2011**.
-The app also checks single e-commerce product listings.
-It has a local mode (Mode B) so field officers can inspect packages on a laptop even when there is no internet.
-The system does not replace the human officer. It is a smart helper. The human officer always makes the final decision.
+NyayaDrishti-LM is an AI-powered legal metrology compliance verification web platform built for the **Department of Consumer Affairs (DoCA)**, Government of India.
+Its primary objective is to assist government enforcement officers in verifying packaged commodities against statutory labeling requirements under the **Legal Metrology (Packaged Commodities) Rules, 2011** (LMPC Rules, 2011) and the **Legal Metrology Act, 2009**. It also inspects single e-commerce product listings under Rule 6(10).
+
+### Operational Modes
+1. **Mode A (Online Monolith):** Central web application hosted for field officers and administrators with complete cloud datastore, background processing, and central dashboard.
+2. **Mode B (Local Resilient Mode):** Standalone local runner (`localhost:8000`) with local SQLite storage enabling field officers to conduct inspections on laptops during mobile connectivity blackouts.
+3. **Mode C (Integrations):** External statutory registry lookups (e.g., National Consumer Helpline, packaging portals).
+
+### Crucial Legal Principle: Human-in-the-Loop (HITL)
+NyayaDrishti-LM is strictly an **Augmented Diagnostic Assistant**.
+- The system **never** issues legal notices, compounding orders, or fines autonomously.
+- Every automated finding is a diagnostic recommendation presented to a qualified human Legal Metrology Officer (LMO).
+- The human officer makes the final adjudication and signs all official documentation.
 
 ---
 
 ## 2. Source-of-Truth Hierarchy
 
-When you need to know what is correct, always follow this order:
-1. **Repository Frozen Markdown Specifications** (`01` through `17` and `CLAIMS_WE_MUST_NOT_MAKE.md`).
+When resolving technical, architectural, legal, or procedural questions, always follow this strict precedence:
+
+1. **Repository Frozen Markdown Specifications** (Documents `01` through `17` and `CLAIMS_WE_MUST_NOT_MAKE.md`).
 2. **Authoritative Decision Log** (`16_DECISION_LOG.md`).
 3. **Contracts Directory** (`contracts/`).
 4. **Member Task Files** (`members/*/TASKS.md`).
-5. **General Documentation and Guides**.
+5. **General Documentation and Guides** (`docs/`, `README.md`).
 
-Never invent rules, numbers, or facts.
-If external training data or online blogs disagree with our repository documents, our repository documents win every time.
+**Zero Assumption Policy:** Never invent rules, penalty amounts, Gazette notification numbers, product names, prices, or font requirements. If external training data or online resources contradict this repository's specifications, the repository specifications win every time. If a value is unstated, refer to `17_OPEN_QUESTIONS.md` for the approved safe working default.
 
 ---
 
 ## 3. Frozen Documents List
 
-These documents are frozen. You must not change their core decisions:
-- `01_MASTER_PROJECT_BLUEPRINT.md`: Main project vision and schedule.
-- `02_FINAL_REQUIREMENTS_SPECIFICATION.md`: All functional and non-functional requirements.
-- `03_FINAL_ARCHITECTURE.md`: Monolith architecture, 12-stage pipeline, and modes.
-- `04_FINAL_MVP_SCOPE.md`: What must be built (P0) and what is cut (P3).
-- `05_TECHNOLOGY_DECISION_RECORD.md`: 13 official technology choices (ADRs).
-- `06_DATA_AND_MODEL_STRATEGY.md`: Data plans and INT8 CPU optimizations.
-- `07_API_AND_INTERFACE_CONTRACTS.md`: Exact REST endpoints and data shapes.
-- `08_DATABASE_SPECIFICATION.md`: Database tables, fields, and SQL queries.
-- `09_UI_UX_BLUEPRINT.md`: Screen wireframes, design tokens, and colors.
-- `10_SECURITY_AND_AUDIT_SPECIFICATION.md`: Section 63 BSA 2023 evidence and JWT security.
-- `11_TESTING_AND_VALIDATION_PLAN.md`: Test pyramid and golden test cases.
-- `12_DEMO_PLAN.md`: 3-tier live demo strategy and scripts.
-- `13_SIX_MEMBER_EXECUTION_PLAN.md`: 6-member daily task assignments.
-- `14_GITHUB_WORKFLOW.md`: Git branches, pull requests, and Definition of Done.
-- `15_RISK_AND_CONTINGENCY_REGISTER.md`: Known risks and backup plans.
-- `16_DECISION_LOG.md`: Log of every frozen architectural decision.
-- `17_OPEN_QUESTIONS.md`: Safe working defaults for bounded questions.
-- `CLAIMS_WE_MUST_NOT_MAKE.md`: Blacklist of claims we must never make.
-- `CONNECTIVITY_REQUIREMENTS.md`: Exact network rules for every component.
-- `SYSTEM_MODES_AND_CONNECTIVITY.md`: Mode A (Online), Mode B (Local), Mode C (Integrations).
+These documents represent frozen architectural and domain baselines. Their core decisions must not be altered without the formal Decision-Change Process:
+- `01_MASTER_PROJECT_BLUEPRINT.md`: Vision, timeline, and deliverables.
+- `02_FINAL_REQUIREMENTS_SPECIFICATION.md`: Functional and non-functional requirements.
+- `03_FINAL_ARCHITECTURE.md`: Monolith architecture, 12-stage pipeline, and system modes.
+- `04_FINAL_MVP_SCOPE.md`: Core MVP scope boundaries (P0 vs P3).
+- `05_TECHNOLOGY_DECISION_RECORD.md`: 13 official architectural decision records (ADRs).
+- `06_DATA_AND_MODEL_STRATEGY.md`: Quantization, INT8 CPU optimization, and dataset strategy.
+- `07_API_AND_INTERFACE_CONTRACTS.md`: Canonical REST endpoints and Pydantic schemas.
+- `08_DATABASE_SPECIFICATION.md`: PostgreSQL schema, tables, indices, and SQL queries.
+- `09_UI_UX_BLUEPRINT.md`: Design tokens, color palette, wireframes, and screen flows.
+- `10_SECURITY_AND_AUDIT_SPECIFICATION.md`: Section 63 BSA 2023 evidence, Merkle DAG, and JWT RBAC.
+- `11_TESTING_AND_VALIDATION_PLAN.md`: Test pyramid, tolerances, and golden test cases.
+- `12_DEMO_PLAN.md`: 3-tier demo strategy and presentation pitch script.
+- `13_SIX_MEMBER_EXECUTION_PLAN.md`: 6-member daily task assignments and milestones.
+- `14_GITHUB_WORKFLOW.md`: Git branching, pull requests, and Definition of Done.
+- `15_RISK_AND_CONTINGENCY_REGISTER.md`: Known risks, failovers, and contingencies.
+- `16_DECISION_LOG.md`: Log of every frozen architectural decision (ADL-01 to ADL-20).
+- `17_OPEN_QUESTIONS.md`: Safe working defaults for bounded technical questions.
+- `CLAIMS_WE_MUST_NOT_MAKE.md`: Mandatory blacklist of prohibited claims.
+- `CONNECTIVITY_REQUIREMENTS.md`: Network rules and offline tolerances for every module.
+- `SYSTEM_MODES_AND_CONNECTIVITY.md`: Detailed specification of Modes A, B, and C.
 
 ---
 
-## 4. Six-Member Parallel Structure
+## 4. Work Assignment & Team Lead Authority
 
-Six developers work on this project at the same time:
-1. **Member 1 (CV & Metrology):** Optical quality gate, ArUco calibration, homography, and font millimeter measurement.
-2. **Member 2 (OCR):** Text detection (DBNet++) and multilingual recognition (PP-OCRv4).
-3. **Member 3 (Extraction & NLP):** Reads text tokens and extracts MRP, net weight, dates, and addresses without hallucinating.
-4. **Member 4 (Rule Engine):** Deterministic legal checks (Table-I font height, USP math, Rule 6 checks).
-5. **Member 5 (Evidence & Backend):** FastAPI server, PostgreSQL database, SHA-256 Merkle chain, and Section 63 BSA PDF notice generator.
-6. **Member 6 (UI & HUD):** React web frontend, camera HUD, adjudication canvas, and dashboard.
-
----
-
-## 5. Work Assignment & Team Lead Authority
-
-- **Manual Assignment Only:** The **Team Lead manually assigns all work** to members.
-- **No Automatic AI Task Assignment:** Antigravity must **not** automatically assign, redistribute, or take ownership of member tasks.
-- **No Additional Branches:** Antigravity must **not** create additional member branches, assign work, or redistribute work.
-- **Role of Antigravity:** Antigravity operates strictly as an engineering orchestrator and pair-programming assistant under explicit directions and approvals from the Team Lead.
-- **Task Acceptance:** Developers (human or AI) work only on tasks explicitly designated and assigned by the Team Lead.
+To maintain strict coordination across the project:
+1. **Manual Assignment Only:** The **Team Lead manually assigns all work** to members and AI agents.
+2. **No Autonomous AI Task Assignment:** AI coding agents must **not** autonomously assign, reassign, redistribute, or claim ownership of member tasks.
+3. **No Additional Branches:** AI coding agents must **not** create additional branches beyond the approved branch hierarchy.
+4. **Role of AI Agents:** All AI coding assistants function strictly as pair-programming and engineering execution aids under the explicit direction, prompt instructions, and approvals of the Team Lead.
+5. **Task Acceptance:** Developers and agents work only on the specific sub-tasks designated by the Team Lead.
 
 ---
 
-## 6. Task Decomposition, Chunk-by-Chunk Execution & Signing Notes
+## 5. Task Decomposition, Chunk-by-Chunk Execution & Signing Notes
 
 Every developer and AI assistant must adhere to this execution protocol for any assigned task:
 
 ### Rule 1: Break Tasks into Chunks Before Proceeding
-- **Never perform monolithic, unchecked changes in a single step.**
+- **Never perform monolithic, unchecked modifications in a single step.**
 - Before writing code or modifying files, decompose the assigned task into small, distinct, verifiable chunks (sub-tasks).
 - Clearly define the boundary, target files, and expected test assertion for each chunk.
 
 ### Rule 2: Work Chunk by Chunk
 - Execute work sequentially, exactly one chunk at a time.
-- Implement the code for Chunk 1, run the corresponding tests, and verify correctness.
+- Implement the changes for Chunk 1, run the corresponding tests, and verify correctness.
 - Only proceed to Chunk 2 after Chunk 1 is validated and all tests pass.
 - Never jump ahead or batch unverified changes across multiple chunks.
 
 ### Rule 3: Update Records with an Official Signing Note
-- Immediately upon completing and verifying each chunk or milestone, update the official record in `progress.md` (and `memory.md` if key discoveries were made).
+- Immediately upon completing and verifying each chunk or milestone, update the official record in `progress.md` (and `memory.md` if architectural discoveries were made).
 - Every completed record entry must include an explicit **Signing Note / Sign-Off Block** documenting:
   - Exact timestamp in IST (`YYYY-MM-DD HH:MM IST`)
   - Chunk / Task ID and specific work accomplished
@@ -109,27 +105,75 @@ Every developer and AI assistant must adhere to this execution protocol for any 
 
 ---
 
-## 7. Folder Ownership
+## 6. Six-Member Parallel Architecture & Folder Ownership
 
-Every developer owns their specific folder:
-- Member 1 owns `members/member-01-cv-metrology/`
-- Member 2 owns `members/member-02-ocr/`
-- Member 3 owns `members/member-03-extraction/`
-- Member 4 owns `members/member-04-rule-engine/`
-- Member 5 owns `members/member-05-evidence/`
-- Member 6 owns `members/member-06-ui/`
+Six independent workstreams operate in parallel, each mapped to a dedicated folder and branch:
 
-Rules for folder ownership:
-- You work primarily inside your assigned folder.
-- You must not edit another member's folder without direct permission.
-- Shared files live in `contracts/`, `integration/`, or `docs/`.
-- Do not scatter random loose files in the root directory.
+| Member / Workstream | Assigned Folder | Assigned Feature Branch | Primary Subsystem Scope |
+| :--- | :--- | :--- | :--- |
+| **Member 1: CV & Metrology** | `members/member-01-cv-metrology/` | `feat/m1-cv-metrology` | Optical quality gate (blur/glare), ArUco scale calibration, homography rectification, PDP surface area calculation. |
+| **Member 2: Multilingual OCR** | `members/member-02-ocr/` | `feat/m2-ocr` | Text detection (DBNet++), multilingual recognition (PP-OCRv4 English + Devanagari Hindi), ONNX INT8 CPU inference, coordinate normalization. |
+| **Member 3: Semantic Extraction** | `members/member-03-extraction/` | `feat/m3-extraction` | Statutory field parsing (MRP, Net Qty, Dates, Address, PIN), banned unit flagger (`gms`, `ML`, `gm`, `ltrs`), Indic numeral conversion. |
+| **Member 4: Rule Engine** | `members/member-04-rule-engine/` | `feat/m4-rule-engine` | AST statutory compliance engine, Table-I font schedule (Row 5 = 6.0 mm), USP math validation, Rule 6 checks, 4-state verdict triage. |
+| **Member 5: Evidence & Backend** | `members/member-05-evidence/` | `feat/m5-evidence` | FastAPI REST services, PostgreSQL schema, SHA-256 Merkle chain-of-custody, Section 63 BSA 2023 digital certificate, ReportLab Form 1 PDF/A generation. |
+| **Member 6: Frontend & HUD** | `members/member-06-ui/` | `feat/m6-ui` | React 18 + Vite SPA, inspector camera HUD, split-view Adjudication Canvas, Central Dashboard, offline status indicators, mock API client. |
+
+### Folder Ownership Rules
+- You work **strictly inside your assigned folder**.
+- Never modify files in another member's folder without explicit Team Lead approval.
+- Shared contracts live strictly in `contracts/`.
+- Integration glue and multi-module pipelines live strictly in `integration/`.
+- Documentation lives in `docs/` or root markdown files. Never leave miscellaneous loose files in the root folder.
 
 ---
 
-## 8. Branch Rules & Mandatory Pre-Work Sync
+## 7. The Universal Non-Dependency Rule
 
-We use a strict 3-tier branching system:
+This is our fundamental architectural rule:
+**No member or AI agent may depend on another member's unmerged or unfinished code.**
+
+- **Member 1** does not need Member 2; Member 1 tests optics and calibration on standalone image files.
+- **Member 2** does not wait for Member 1; Member 2 runs text detection on pre-cropped image fixtures.
+- **Member 3** does not import Member 2's OCR engine; Member 3 loads static OCR token JSON fixtures.
+- **Member 4** does not wait for Members 1 and 3; Member 4 evaluates legal rules using pre-extracted entity fixtures.
+- **Member 5** does not wait for Member 6; Member 5 tests REST endpoints using `pytest-asyncio` and `httpx`.
+- **Member 6** does not wait for Member 5's live server; Member 6 builds and tests the UI against static mock API fixtures.
+
+Every module must compile, run, and pass 100% of its tests completely standalone!
+
+---
+
+## 8. Contract-First Development
+
+We coordinate parallel work entirely through contracts:
+1. Canonical interfaces and DTOs are frozen in `contracts/`:
+   - `quality_gate/`: `QualityCheckDTO`, `QualityGateResult`
+   - `calibration/`: `CalibrationDTO`, `PlanarHomographyResult`, `PDPGeometryDTO`
+   - `ocr/`: `OCROutput`, `OCRToken`, `BoundingPolygon`
+   - `extraction/`: `ExtractedFieldDTO`, `NormalizedCommodityFacts`
+   - `compliance/`: `RuleEvaluationDTO`, `ComplianceVerdictResult`
+   - `evidence/`: `BSAEvidenceBundleDTO`, `MerkleNodeDTO`, `Section63CertificateDTO`
+   - `ui/`: `ui_contract_schema.json`
+2. Every member creates local test fixtures matching these contract schemas.
+3. Every member writes implementation code to satisfy their contract.
+4. Contracts cannot be modified unilaterally. Any contract change requires the formal Decision-Change Process.
+
+---
+
+## 9. Test Fixture Policy
+
+Every member creates and maintains standalone fixtures inside their `fixtures/` directory:
+- **File Naming Format:** `fixture_<feature>_<scenario>.<ext>` (e.g., `fixture_blur_fail.json`, `fixture_mrp_valid.json`).
+- **Documentation:** Every fixture must include a 1-line source comment explaining where its ground truth values came from.
+- **Clear Labeling:** Clearly tag synthetic data as `SYNTHETIC` and demo data as `DEMO FIXTURE`.
+- **Integrity:** Never misrepresent synthetic data as actual seized or real-world enforcement data.
+
+---
+
+## 10. Git Branching Hierarchy & Sync Protocol
+
+We enforce a strict 3-tier Git branch hierarchy:
+
 ```text
 main (stable/approved baseline)
   ↓
@@ -140,10 +184,10 @@ feat/m2-ocr
 feat/m3-extraction
 feat/m4-rule-engine
 feat/m5-evidence
-feat/m6-ui (individual member branches)
+feat/m6-ui (individual member feature branches)
 ```
 
-- `main`: **Stable and approved baseline**. Contains the complete baseline specification, contracts, workspaces, and demo-safe releases. Direct pushes are restricted to approved baseline syncs by the Team Lead.
+- `main`: **Stable and approved baseline**. Contains the complete baseline specification, contracts, workspaces, and demo-safe releases. Direct pushes to `main` are restricted to approved baseline syncs by the Team Lead.
 - `dev`: **Central integration branch**. All feature branches integrate here. Automated CI must pass before merging.
 - Feature branches (`feat/*`): **Individual member branches** developed from `dev`:
   - `feat/m1-cv-metrology`
@@ -155,7 +199,7 @@ feat/m6-ui (individual member branches)
 - Hotfix branches: `hotfix/<issue-name>`
 
 ### Mandatory Pre-Work Branch Sync Protocol
-Before starting **any** new work, every member must execute the following sequence:
+Before starting **any** new work on an assigned branch, every developer and AI agent must run:
 
 ```bash
 git fetch origin
@@ -167,105 +211,64 @@ git merge origin/main
 Because feature branches are developed from `dev`, the Team Lead may also require a feature branch to sync from the latest `dev` before integration work (e.g., `git merge origin/dev`). Always consult the Team Lead for integration sync timing.
 
 ### Critical Git Guardrails
-1. **Rebase Restriction:** Rebase may be used **only when the Team Lead explicitly approves it**. Merging is the standard sync mechanism.
-2. **Never Overwrite Uncommitted Work:** Never run destructive commands (`git reset --hard`, `git checkout -f`, `git clean -fd`) that risk losing uncommitted changes. Stash or commit before syncing.
-3. **Never Force-Push:** Never force-push (`git push --force` or `git push --force-with-lease`) unless the **Team Lead explicitly approves it**. If a push is rejected by the remote, stop and report the issue immediately.
+1. **Rebase Restriction:** Rebase may be used **only when the Team Lead explicitly approves it**. Standard practice is merging.
+2. **Never Overwrite Uncommitted Work:** Never run destructive reset/clean commands (`git reset --hard`, `git checkout -f`, `git clean -fd`) that risk losing uncommitted changes. Stash or commit before syncing.
+3. **Never Force-Push:** Never force-push (`git push --force` or `--force-with-lease`) unless the **Team Lead explicitly approves it**. If a push is rejected by the remote, stop and report the issue immediately.
 4. **Escalate Cross-Boundary Conflicts:** If merge conflicts involve contracts (`contracts/`), system architecture (`03_FINAL_ARCHITECTURE.md`), legal rules (`02_FINAL_REQUIREMENTS_SPECIFICATION.md`, `16_DECISION_LOG.md`), or another member's code, **STOP immediately and inform the Team Lead**. Do NOT resolve cross-boundary conflicts unilaterally.
 5. **No Extra Feature Branches:** Do not create any additional feature branches beyond the approved six.
 6. **Small & Focused Commits:** Keep commits small, clear, and strictly scoped to your assigned tasks.
 
 ---
 
-## 9. The No-Cross-Dependency Rule
+## 11. Legal & Regulatory Safety Guardrails
 
-This is our golden rule:
-**No member may depend on another member's unfinished code.**
-
-Examples:
-- Bad: Member 3 imports code from Member 2 to get OCR results.
-- Good: Member 3 loads a frozen test fixture (`fixtures/ocr_sample.json`) that matches the contract.
-- Bad: Member 6 waits for Member 5 to finish the live server.
-- Good: Member 6 runs the UI against mock API fixtures (`fixtures/api/`).
-- Bad: Member 4 waits for Member 1 and Member 3.
-- Good: Member 4 uses static extracted entity fixtures to test legal rules.
-
-Every module must run and pass tests completely on its own!
-
----
-
-## 10. Contract-First Development
-
-We build our software using contracts:
-1. The contract defines the data shape in `contracts/`.
-2. Each member builds fixtures that match this contract.
-3. Each member writes code to satisfy the contract.
-4. If a contract must change, you cannot change it alone. You must follow the decision-change process.
-
-Contracts are shared rules. They protect everyone from surprises.
+Our software directly supports government statutory enforcement. The following legal rules are strictly non-negotiable:
+1. **Augmented Assistant Only:** The software never issues notices or fines on its own. It provides recommendations for human officer review.
+2. **Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023):** Electronic evidence certificates must cite **Section 63 of the BSA 2023**. Never cite repealed Section 65B of the Indian Evidence Act, 1872.
+3. **Table-I Font Schedule:** The minimum numeral font height schedule under the LMPC Rules, 2011 is strictly:
+   - Area $\le 50\text{ cm}^2$: **$1.0\text{ mm}$**
+   - $50 < \text{Area} \le 100\text{ cm}^2$: **$1.5\text{ mm}$**
+   - $100 < \text{Area} \le 500\text{ cm}^2$: **$2.5\text{ mm}$**
+   - $500 < \text{Area} \le 2500\text{ cm}^2$: **$4.0\text{ mm}$**
+   - $\text{Area} > 2500\text{ cm}^2$ (Row 5): **$6.0\text{ mm}$** (Never use 8.0 mm; see ADL-01).
+4. **Unit Sale Price (USP) Math:** Enforce $|(\text{USP} \times \text{NetQty}) - \text{MRP}| \le 0.02$ INR.
+5. **Temporal Epoch Router:** Check manufacturing dates against statutory amendment dates (e.g., USP mandatory only after 01 January 2022).
+6. **E-Commerce Rule 6(10):** E-commerce listings must declare manufacturer, net quantity, MRP, consumer care, and country of origin. Manufacturing date is statutory exempt from digital listings.
+7. **4-State Epistemic Verdict:** Output must classify findings into:
+   - `PASS`: Full statutory compliance verified.
+   - `FAIL`: Clear statutory violation established.
+   - `REVIEW`: Borderline measurement within sensor uncertainty band ($k=2, 95\%$ confidence).
+   - `UNABLE_TO_VERIFY`: Image quality degraded (severe blur, glare bloom, or obscured label).
+8. **Prohibited Claims:** Consult `CLAIMS_WE_MUST_NOT_MAKE.md` before writing code comments, documentation, or docstrings.
 
 ---
 
-## 11. Test Fixture Policy
+## 12. Licensing & Intellectual Property Rules
 
-Every member creates local fixtures inside their `fixtures/` directory:
-- File naming format: `fixture_<feature>_<scenario>.<ext>` (e.g., `fixture_blur_fail.json`, `fixture_mrp_valid.json`).
-- Always write a 1-line comment or note explaining where the fixture values came from.
-- Label synthetic data clearly as `SYNTHETIC`.
-- Label demo data clearly as `DEMO FIXTURE`.
-- Never pretend fake data is real government data.
-
----
-
-## 12. Data Non-Assumption Policy
-
-Never invent data. This is strictly prohibited.
-- Do not invent legal rules or fines.
-- Do not invent Gazette notification numbers.
-- Do not invent product names, prices, or manufacturer addresses.
-- Do not invent font sizes or accuracy percentages.
-- Always use the exact values written in the repository documents.
-- If a value is missing in a document, check `17_OPEN_QUESTIONS.md` for the safe working default.
+To protect government intellectual property and ensure complete open-source auditability:
+- **Zero AGPL-3.0 Dependencies:** Never install, import, or vendor Ultralytics YOLOv8, YOLOv11, or any copyleft AGPL library. Any AGPL dependency will trigger automatic CI rejection.
+- **Approved Permissive Licenses Only:** Use packages licensed under **Apache-2.0, MIT, BSD-3-Clause, or PostgreSQL License**.
+- **Approved Core Models:** DBNet++ (Apache-2.0), PP-OCRv4 (Apache-2.0), RT-DETR (Apache-2.0), Tesseract 5 (Apache-2.0).
+- Check `requirements.txt` / `package.json` before adding any new third-party dependency.
 
 ---
 
-## 13. Legal & Regulatory Safety Rules
+## 13. Testing Standards
 
-Our project deals with government law enforcement.
-We must follow strict legal guardrails:
-- Our system is an **Augmented Diagnostic Assistant**.
-- The software **never** issues fines or legal notices by itself.
-- A human Legal Metrology Officer (LMO) must always review and approve the evidence.
-- We cite **Section 63 of the Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)** for electronic evidence. We never cite repealed Section 65B of the old 1872 Act.
-- We implement Table-I font sizes correctly: Row 5 ($> 2500\text{ cm}^2$) requires **6.0 mm** (not 8.0 mm).
-- Check `CLAIMS_WE_MUST_NOT_MAKE.md` before writing any presentation or doc string.
-
----
-
-## 14. Dependency & Licensing Rules
-
-We must protect government intellectual property:
-- **Zero AGPL-3.0 libraries:** Never install or import Ultralytics YOLOv8, YOLOv11, or other AGPL copyleft code.
-- Use only permissive licenses: **Apache-2.0, MIT, BSD-3-Clause, or PostgreSQL license**.
-- Approved models: DBNet++ (Apache-2.0), PP-OCRv4 (Apache-2.0), RT-DETR (Apache-2.0), Tesseract 5 (Apache-2.0).
-- Check `requirements.txt` before adding any new package.
+Every developer and AI agent is directly responsible for their module's tests:
+- Tests reside strictly in your member's `tests/` directory.
+- Test suites must cover normal success paths, explicit failure paths, boundary conditions, and degraded inputs.
+- **Determinism:** Tests must be 100% deterministic and yield the identical result across runs without network calls.
+- **Performance:** Mathematical, image processing, and rule tests must execute rapidly on standard CPU architectures.
+- **Coverage Target:** Maintain $> 85\%$ branch and statement coverage for mathematical, metric calibration, and legal rule logic.
+- Never report a task as complete without providing passing `pytest -v` command output.
 
 ---
 
-## 15. Testing Rules
+## 14. Progress Log Format (`progress.md`)
 
-Every member is responsible for their own tests:
-- Tests go into your `tests/` folder.
-- Write tests for normal cases, failure cases, and edge cases.
-- Every test must be deterministic. It must give the same result every time.
-- Never say "it works on my computer" without showing passing test output.
-- Target: $> 85\%$ test coverage for math and legal rule checks.
-
----
-
-## 16. Progress Log Format (`progress.md`) & Signing Notes
-
-Every member must keep an updated `progress.md` file in their folder.
-Use this exact format for every entry:
+Every member directory contains a permanent `progress.md` tracking file.
+Every completed chunk or task entry must use this exact structure:
 
 ```markdown
 # Progress Log
@@ -273,195 +276,195 @@ Use this exact format for every entry:
 ## [DATE] [TIME] IST
 
 ### Task / Chunk
-What chunk or task I worked on.
+What chunk or task was worked on.
 
 ### Status
 NOT STARTED / IN PROGRESS / BLOCKED / COMPLETE
 
 ### Completed
-Exactly what is finished in this chunk.
+Detailed bullet points of exactly what was implemented or resolved in this chunk.
 
 ### Tests
-Which tests were run and the exact results (e.g., pytest output, 5 passed).
+Exact test command executed and verification evidence (e.g., `pytest members/member-0X/tests/ -v`, 5 passed in 0.20s).
 
 ### Problems
-Any issues or bugs discovered.
+Any blockers, bugs, or anomalies discovered.
 
 ### Decisions
-Any choices made during work.
+Technical choices, parameters, or edge-case handling rationale.
 
 ### Next Step
-What chunk I will do next.
+The specific chunk or task to be executed next.
 
 ### Signing Note
 SIGNED OFF BY: <author_handle> (<author_email>) — YYYY-MM-DD HH:MM IST [VERIFIED]
 ```
 
-Always use real dates and times. Never fake timestamps.
+Always use accurate, current timestamps. Never falsify progress entries or test results.
 
 ---
 
-## 17. Memory Log Format (`memory.md`)
+## 15. Working Memory Format (`memory.md`)
 
-Every member has a permanent memory file called `memory.md`.
-Use this format to record important discoveries and facts:
+Every member directory maintains a `memory.md` file to preserve critical discoveries, architectural constraints, and rationale:
 
 ```markdown
 # Permanent Working Memory
 
-## [07 September 2026 | 18:30 IST]
+## [DATE | TIME IST]
 
 ### Discovery
-Found that Table-I Row 5 requires 6.0 mm for containers over 2500 cm².
+Specific technical, mathematical, or regulatory finding.
 
 ### Evidence
-`05_TECHNOLOGY_DECISION_RECORD.md` and Gazette G.S.R. 629(E).
+Document citation, Gazette notification number, test output, or benchmark data.
 
 ### Decision
-Set the minimum threshold in rule engine to 6.0 mm.
+The precise rule, threshold, parameter, or architectural choice established.
 
 ### Why
-Phase 1 notes had an 8.0 mm typo corrected in official decision ADL-01.
+The root cause or technical rationale explaining why this choice is necessary.
 
 ### Impact
-Prevents false violations on large jars and bags.
+How this prevents bugs, regressions, legal false positives, or latency spikes.
 
 ### Status
-ACTIVE
+ACTIVE / SUPERSEDED
 ```
 
 ---
 
-## 18. Commit Rules
+## 16. Git Commit & Pull Request Standards
 
-Use clear and standard commit messages:
-- Features: `feat(m<N>): short description` (e.g., `feat(m1): implement Laplacian blur check`)
-- Bug fixes: `fix(m<N>): short description` (e.g., `fix(m4): fix USP rounding error`)
-- Tests: `test(m<N>): short description` (e.g., `test(m3): add tests for banned unit gms`)
-- Docs: `docs(m<N>): short description` (e.g., `docs(m5): update PDF generation notes`)
+### Commit Format
+Use clear, conventional commit messages:
+- `feat(m<N>): <description>` (e.g., `feat(m1): implement Laplacian blur variance check`)
+- `fix(m<N>): <description>` (e.g., `fix(m4): resolve USP rounding tolerance for multi-pack`)
+- `test(m<N>): <description>` (e.g., `test(m3): add unit tests for prohibited gms unit`)
+- `docs(m<N>): <description>` (e.g., `docs(m5): document Section 63 BSA certificate fields`)
 
-Keep each commit small and related to one thing.
+Keep each commit small, atomic, and focused on a single verifiable change.
 
----
-
-## 19. Pull Request (PR) Rules
-
-When opening a Pull Request:
-1. Target the `dev` branch (never target `main` directly).
-2. Use this template:
+### Pull Request (PR) Policy
+When submitting a feature branch for integration:
+1. Target the `dev` branch only (never target `main` directly).
+2. Use this required PR template:
    ```markdown
    ## What Changed
-   Brief summary of changes.
+   Summary of changes introduced in this pull request.
 
    ## Why
-   Reason for this change.
+   Technical or statutory reason for this change.
 
    ## Requirements Covered
-   Requirement ID (e.g., FR-02, FR-08).
+   Specification IDs (e.g., FR-03, FR-08, ADR-06).
 
    ## Tests Performed
-   List passing test commands and results.
+   Exact test commands and passing verification output.
 
    ## Known Limitations
-   Anything not yet covered.
+   Any edge cases or incomplete scope deferred to future chunks.
 
    ## Documentation Updated
-   List updated files.
+   List of updated README, progress, or memory files.
    ```
-3. At least one teammate must review and approve.
-4. All CI checks must pass before merging.
+3. At least one peer review approval is required prior to merge.
+4. All automated CI checks (lint, unit tests, license scan) must pass 100%.
 
 ---
 
-## 20. Definition of Done (DoD)
+## 17. Definition of Done (DoD)
 
-A task is **DONE** only when:
-1. The code is written and follows clean coding standards.
-2. It matches the frozen contract in `contracts/`.
-3. Unit tests pass with zero errors.
-4. Error cases are handled smoothly without crashes.
-5. `README.md` in your member folder is updated.
-6. The task was decomposed into chunks before starting, and executed chunk-by-chunk with verification at each step.
+A task or chunk is considered **DONE** if and only if:
+1. The code is written, well-documented, clean, and typed.
+2. It strictly conforms to the canonical contract in `contracts/`.
+3. Unit and regression tests pass with zero errors and zero warnings.
+4. Degradations, edge cases, and invalid inputs are handled gracefully without unhandled exceptions.
+5. The member folder's `README.md` is kept up to date.
+6. The task was decomposed into testable chunks before starting, and executed chunk-by-chunk with verification at each step.
 7. `progress.md` is updated with a verified signing note (`SIGNED OFF BY: <handle> (<email>) — YYYY-MM-DD HH:MM IST [VERIFIED]`).
-8. `memory.md` records all key technical choices.
-9. No unapproved outside data was introduced.
+8. `memory.md` records all architectural discoveries and rationales.
+9. Zero AGPL-3.0 code, zero invented legal rules, and zero unverified assumptions were introduced.
 
 ---
 
-## 21. Integration Rules
+## 18. Integration Rules
 
-We only connect modules together after they work standalone:
-- Integration happens in the `integration/` directory.
-- Use adapters in `integration/adapters/` to bridge components.
-- Do not modify a member's clean source folder to force integration.
-- Test both success and failure flows (e.g., blurry picture, glare, missing unit).
-
----
-
-## 22. Emergency / Hotfix Process
-
-If a critical bug breaks integration:
-1. Branch from `dev`: `hotfix/<issue-name>`.
-2. Fix only the critical bug. Do not add new features.
-3. Write a test reproducing and proving the fix.
-4. Open a hotfix PR.
-5. Merge back to `dev` once tests pass.
+Modules are combined only after each component works completely standalone:
+- Cross-module integration happens strictly in the `integration/` directory.
+- Use adapters in `integration/adapters/` to bridge between subsystems.
+- Never modify a member's clean source folder to force integration.
+- Test both nominal success flows and pipeline rejection flows (e.g., blur retake, glare retake, missing statutory unit).
 
 ---
 
-## 23. Decision-Change Process
+## 19. Emergency & Hotfix Protocol
 
-If you find a mistake in a frozen decision:
-1. **Do not silently change the code.**
-2. Record the conflict clearly:
+If a critical bug breaks integration on `dev`:
+1. Create a hotfix branch from `dev`: `hotfix/<issue-name>`.
+2. Implement only the minimal fix. Do not introduce new features.
+3. Write an automated test reproducing and proving the fix.
+4. Open a hotfix PR targeting `dev`.
+5. Merge once automated CI tests pass and the Team Lead approves.
+
+---
+
+## 20. Decision-Change Process
+
+If an inconsistency or error is discovered in a frozen decision:
+1. **Do not silently modify code or contracts.**
+2. Log the conflict using this template:
    ```text
-   CONFLICT FOUND
+   CONFLICT IDENTIFIED
    Document A: ...
    Document B: ...
    Impact: ...
    Current Frozen Default: ...
-   Proposed Fix: ...
+   Proposed Resolution: ...
    ```
-3. Discuss with the team lead.
-4. If approved, add an entry to `16_DECISION_LOG.md`.
-5. Update the contract and notify all affected members.
+3. Escalate the conflict directly to the Team Lead.
+4. If approved by the Team Lead, record the amendment in `16_DECISION_LOG.md`.
+5. Update canonical contracts and notify all affected workstreams.
 
 ---
 
-## 24. Demo Safety Rules
+## 21. Demo Safety Architecture
 
-We follow a 3-tier demo safety plan:
-- **Tier 1 (Live Web App):** The normal online web application on standard browsers.
-- **Tier 2 (Local Mode B):** Standalone local runner on `localhost:8000` with local SQLite if internet fails.
-- **Tier 3 (Golden Static Fixtures):** 5 pre-computed verified dossiers ready for instant display if hardware fails.
+To guarantee 100% demo reliability under unpredictable hackathon or exhibition venue network conditions, the system adheres to a 3-tier safety plan:
+- **Tier 1 (Live Web Application):** Full online web platform running in modern desktop/mobile browsers connected to the FastAPI backend and PostgreSQL datastore.
+- **Tier 2 (Local Mode B Standalone):** Local Python runner on `localhost:8000` with local SQLite storage, executing inspections locally without internet connectivity.
+- **Tier 3 (Golden Static Fixtures):** 5 pre-computed, verified inspection dossiers (`SKU-DEMO-01` to `SKU-DEMO-05`) ready for instant presentation if all local hardware fails.
 
-Never let a demo fail because of venue Wi-Fi. Mode B and golden fixtures keep us 100% safe.
+Never allow a live demonstration to fail due to network, API timeout, or hardware disruption.
 
 ---
 
-## 25. Instructions for AI Coding Agents
+## 22. Universal Instructions for All AI Coding Agents
 
-If you are an AI coding assistant (including Antigravity) working on this repository:
-1. **Read before writing:** Check `AGENTS.md`, your member's `README.md`, and relevant contracts before editing code.
-2. **Team Lead assigns all work:** The Team Lead manually assigns all work. Antigravity must **not** create additional member branches, automatically assign work, or redistribute work.
-3. **Mandatory sync before starting work:** Always ensure the pre-work sync protocol has been run before starting work on any branch:
+If you are an **AI coding assistant, autonomous agent, or LLM-driven pair-programmer** (including Claude Code, Cursor, Windsurf, GitHub Copilot, Devin, Antigravity, Cline, Roo Code, Aider, or any other agent tool) working on this repository:
+
+1. **Read Before Writing:** Read `AGENTS.md`, your member's `README.md`, and relevant contracts in `contracts/` before touching code.
+2. **Team Lead Authority:** The human Team Lead manually assigns all work. Never autonomously invent tasks, redistribute tasks, or self-assign work across member workspaces.
+3. **No Extra Branches:** Never create extra feature branches beyond the approved 6 member branches (`feat/m1-cv-metrology` through `feat/m6-ui`).
+4. **Mandatory Pre-Work Sync:** Always verify that the branch sync protocol has been run before writing code:
    ```bash
    git fetch origin
    git checkout <member-branch>
    git merge origin/main
    ```
-   Because feature branches are developed from `dev`, the Team Lead may also require a feature branch to sync from the latest `dev` before integration work (e.g., `git merge origin/dev`).
-4. **Rebase only with explicit approval:** Rebase may be used only when the Team Lead explicitly approves it.
-5. **Protect uncommitted work:** Never run destructive commands that overwrite or discard uncommitted changes.
-6. **Zero force-push:** Never force-push (`git push --force` or `--force-with-lease`) unless the Team Lead explicitly approves it.
-7. **Escalate cross-boundary conflicts:** If conflicts involve contracts, architecture, legal rules, or another member's work, stop and inform the Team Lead immediately.
-8. **Stay in your lane:** Work only in your assigned member folder. Do not edit other members' files.
-9. **Respect contracts:** Never change a file in `contracts/` without explicit authorization.
-10. **Never invent data:** Do not invent facts, numbers, or legal rules.
-11. **No AGPL-3.0 code:** Never recommend or import Ultralytics or copyleft packages.
-12. **Always write tests:** Every new function must have unit tests.
-13. **Keep logs up to date:** Always update `progress.md` and `memory.md` when completing work.
-14. **Break tasks into chunks before proceeding:** Never attempt large, monolithic modifications in one shot. Always decompose assigned work into small, testable chunks first.
-15. **Work chunk by chunk:** Implement and verify each chunk sequentially before starting the next chunk.
-16. **Update records with signing notes:** Conclude every completed chunk or task entry in `progress.md` with an official signing note (`SIGNED OFF BY: <handle> (<email>) — YYYY-MM-DD HH:MM IST [VERIFIED]`).
-
+   *(Or `git merge origin/dev` when explicitly directed by the Team Lead for integration work).*
+5. **Rebase Restriction:** Rebase may be used **only** when the Team Lead explicitly approves it. Merging is the standard sync mechanism.
+6. **Protect Uncommitted Changes:** Never run destructive commands (`git reset --hard`, `git checkout -f`, `git clean -fd`) that risk losing uncommitted changes. Stash or commit cleanly.
+7. **Zero Force-Push:** Never force-push (`git push --force` or `--force-with-lease`) unless the Team Lead explicitly approves it. If a push is rejected, stop and investigate.
+8. **Escalate Cross-Boundary Conflicts:** If conflicts involve contracts (`contracts/`), system architecture (`03_FINAL_ARCHITECTURE.md`), legal rules (`02_FINAL_REQUIREMENTS_SPECIFICATION.md`, `16_DECISION_LOG.md`), or another member's code, **STOP immediately and inform the Team Lead**. Do not resolve cross-boundary conflicts unilaterally.
+9. **Stay in Your Assigned Workspace:** Work strictly within your assigned member directory (`members/member-0X/`). Do not edit another member's files.
+10. **Respect Contracts:** Never change a file in `contracts/` without explicit authorization through the Decision-Change Process.
+11. **Zero Data Hallucination:** Do not invent statutory rules, penalty fines, Gazette numbers, font heights, or manufacturer data.
+12. **Zero AGPL-3.0 Code:** Never recommend, import, or vendor Ultralytics YOLO or any copyleft AGPL packages. Use permissive licenses only.
+13. **Write Unit Tests First/Alongside:** Every new function, parser, or rule evaluation must have deterministic unit tests in `tests/`.
+14. **Break Tasks into Chunks Before Proceeding:** Never attempt large, monolithic modifications in one shot. Always decompose assigned work into small, testable chunks first.
+15. **Work Chunk by Chunk:** Implement and verify each chunk sequentially before starting the next chunk.
+16. **Update Records with Signing Notes:** Conclude every completed chunk or task entry in `progress.md` with an official signing note:
+    ```text
+    SIGNED OFF BY: <author_handle> (<author_email>) — YYYY-MM-DD HH:MM IST [VERIFIED]
+    ```

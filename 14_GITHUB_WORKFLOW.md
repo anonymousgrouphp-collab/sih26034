@@ -56,10 +56,10 @@ sih26034-nyayadrishti/
 
 ### 2. Work Assignment & Team Lead Authority
 
-1. **Manual Assignment Only:** The **Team Lead manually assigns all work** to members.
-2. **No Automated AI Task Assignment:** Antigravity and any automated systems must **not** automatically assign, redistribute, or take ownership of member tasks.
-3. **No Additional Branches:** Antigravity must **not** create additional member branches beyond the approved six.
-4. **Role of AI Orchestrator:** Antigravity operates strictly under instructions and explicit task boundaries assigned by the Team Lead.
+1. **Manual Assignment Only:** The **Team Lead manually assigns all work** to members and AI assistants.
+2. **No Autonomous AI Task Assignment:** AI coding assistants and autonomous agents must **not** autonomously assign, reassign, redistribute, or claim ownership of member tasks.
+3. **No Additional Branches:** AI coding assistants and autonomous agents must **not** create additional branches beyond the approved branch hierarchy.
+4. **Role of AI Assistants:** All AI coding assistants function strictly as pair-programming and engineering execution aids under the explicit direction, prompt instructions, and approvals of the Team Lead.
 
 ---
 
