@@ -1,0 +1,92 @@
+name: NyayaDrishti-LM CI
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main, dev ]
+
+jobs:
+  validate-specs:
+    name: Validate Specifications & Integrity
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: License Compliance Check (AGPL-3.0 Rejection)
+        run: |
+          echo "Auditing dependencies and code for prohibited copyleft licenses..."
+          FOUND=0
+          find . -type f \( -name "requirements*.txt" -o -name "pyproject.toml" -o -name "Pipfile" -o -name "*.py" \) ! -path "*/.*" > /tmp/manifest_files.txt 2>/dev/null || true
+          if [ -s /tmp/manifest_files.txt ]; then
+            while IFS= read -r f; do
+              if grep -Ei "^[^#]*(import +ultralytics|from +ultralytics|ultralytics)" "$f" > /dev/null 2>&1; then
+                echo "::error::Found prohibited AGPL-3.0 dependency in $f!"
+                FOUND=1
+              fi
+            done < /tmp/manifest_files.txt
+          fi
+          rm -f /tmp/manifest_files.txt
+
+          if [ $FOUND -eq 1 ]; then
+            exit 1
+          fi
+          echo "License compliance verified: Zero AGPL-3.0 code dependencies detected."
+
+      - name: Verify Core Specifications & Governance Docs
+        run: |
+          echo "Verifying master specification files..."
+          for file in README.md \
+                      LICENSE \
+                      CONTRIBUTING.md \
+                      CODE_OF_CONDUCT.md \
+                      SECURITY.md \
+                      01_MASTER_PROJECT_BLUEPRINT.md \
+                      02_FINAL_REQUIREMENTS_SPECIFICATION.md \
+                      03_FINAL_ARCHITECTURE.md \
+                      04_FINAL_MVP_SCOPE.md \
+                      05_TECHNOLOGY_DECISION_RECORD.md \
+                      06_DATA_AND_MODEL_STRATEGY.md \
+                      07_API_AND_INTERFACE_CONTRACTS.md \
+                      08_DATABASE_SPECIFICATION.md \
+                      09_UI_UX_BLUEPRINT.md \
+                      10_SECURITY_AND_AUDIT_SPECIFICATION.md \
+                      11_TESTING_AND_VALIDATION_PLAN.md \
+                      12_DEMO_PLAN.md \
+                      13_SIX_MEMBER_EXECUTION_PLAN.md \
+                      14_GITHUB_WORKFLOW.md \
+                      15_RISK_AND_CONTINGENCY_REGISTER.md \
+                      16_DECISION_LOG.md \
+                      17_OPEN_QUESTIONS.md \
+                      CLAIMS_WE_MUST_NOT_MAKE.md \
+                      COMPLETE_PROJECT_END_TO_END_GUIDE.md \
+                      CONNECTIVITY_REQUIREMENTS.md \
+                      SYSTEM_MODES_AND_CONNECTIVITY.md \
+                      FINAL_AUTHENTICITY_AND_ACCURACY_AUDIT.md; do
+            if [ ! -f "$file" ]; then
+              echo "::error::Missing critical specification file: $file"
+              exit 1
+            fi
+          done
+          echo "All 27 core specifications and governance documents verified."
+
+      - name: Verify Research Reports & Bilingual Dossiers
+        run: |
+          for dossier in PHASE_1_SIH26034_Domain_Research_Dossier.md \
+                         PHASE_1_SIH26034_Domain_Research_Dossier_HINGLISH.md \
+                         PHASE_2_RESEARCH_REPORT.md \
+                         PHASE_2_RESEARCH_REPORT_HINGLISH.md \
+                         PHASE_3_SOLUTION_BLUEPRINT.md; do
+            if [ ! -f "$dossier" ]; then
+              echo "::error::Missing research dossier: $dossier"
+              exit 1
+            fi
+          done
+          echo "All 5 bilingual research dossiers verified."

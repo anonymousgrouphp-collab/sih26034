@@ -1,0 +1,36 @@
+name: Feature Request / Statutory Amendment
+description: Propose a new feature, model integration, or legal metrology rule update
+title: "[FEAT]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Suggest an idea, model optimization, or gazette amendment integration for NyayaDrishti-LM.
+  - type: dropdown
+    id: category
+    attributes:
+      label: Feature Category
+      options:
+        - Legal Metrology Rule / Gazette Amendment (DoCA)
+        - Optical / Computer Vision Enhancement
+        - Edge ML & Quantization Optimization
+        - User Interface / Inspector Experience
+        - Evidentiary Dossier / Section 63 BSA Compliance
+        - e-Maap / E-Commerce Integration
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement or Statutory Basis
+      description: Is this feature related to a specific legal gazette notification (e.g. GSR 128(E)) or technical bottleneck?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution & Architectural Impact
+      description: Detailed description of what you want to happen and how it impacts existing API contracts.
+    validations:
+      required: true

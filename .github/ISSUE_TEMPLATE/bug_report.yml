@@ -1,0 +1,50 @@
+name: Bug Report
+description: Create a report to help us improve NyayaDrishti-LM
+title: "[BUG]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report an issue in NyayaDrishti-LM!
+  - type: dropdown
+    id: subsystem
+    attributes:
+      label: Subsystem Affected
+      options:
+        - Optical Ingestion & Quality Gate (Stage 1)
+        - Planar Homography & Metric Scale (Stage 2)
+        - Multilingual OCR Engine (Stage 3)
+        - Font Size Connected Component Engine (Stage 4)
+        - Semantic Information Extraction (Stage 5)
+        - Deterministic AST Rule Engine (Stage 6)
+        - HITL Inspector Adjudication Canvas (Stage 7)
+        - Section 63 BSA PDF Dossier & Merkle Ledger (Stage 8)
+        - Database & API Contracts
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the Bug
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Steps or commands to reproduce the behavior.
+      placeholder: |
+        1. Ingest image 'test_sku_01.jpg'
+        2. Run homography warp
+        3. See error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What you expected to happen.
+    validations:
+      required: true
