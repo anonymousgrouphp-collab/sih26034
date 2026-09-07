@@ -74,6 +74,7 @@ Six developers work on this project at the same time:
 
 - **Manual Assignment Only:** The **Team Lead manually assigns all work** to members.
 - **No Automatic AI Task Assignment:** Antigravity must **not** automatically assign, redistribute, or take ownership of member tasks.
+- **No Additional Branches:** Antigravity must **not** create additional member branches, assign work, or redistribute work.
 - **Role of Antigravity:** Antigravity operates strictly as an engineering orchestrator and pair-programming assistant under explicit directions and approvals from the Team Lead.
 - **Task Acceptance:** Developers (human or AI) work only on tasks explicitly designated and assigned by the Team Lead.
 
@@ -99,10 +100,23 @@ Rules for folder ownership:
 
 ## 7. Branch Rules & Mandatory Pre-Work Sync
 
-We use a strict branching system:
-- `main`: Safe for demos and production. Never push directly to `main`.
-- `dev`: The central integration branch.
-- Feature branches:
+We use a strict 3-tier branching system:
+```text
+main (stable/approved baseline)
+  ↓
+dev (central integration branch)
+  ↓
+feat/m1-cv-metrology
+feat/m2-ocr
+feat/m3-extraction
+feat/m4-rule-engine
+feat/m5-evidence
+feat/m6-ui (individual member branches)
+```
+
+- `main`: **Stable and approved baseline**. Contains the complete baseline specification, contracts, workspaces, and demo-safe releases. Direct pushes are restricted to approved baseline syncs by the Team Lead.
+- `dev`: **Central integration branch**. All feature branches integrate here. Automated CI must pass before merging.
+- Feature branches (`feat/*`): **Individual member branches** developed from `dev`:
   - `feat/m1-cv-metrology`
   - `feat/m2-ocr`
   - `feat/m3-extraction`
@@ -116,16 +130,20 @@ Before starting **any** new work, every member must execute the following sequen
 
 ```bash
 git fetch origin
-git checkout <their-branch>
+git checkout <member-branch>
 git merge origin/main
 ```
 
+**Development from `dev` Note:**
+Because feature branches are developed from `dev`, the Team Lead may also require a feature branch to sync from the latest `dev` before integration work (e.g., `git merge origin/dev`). Always consult the Team Lead for integration sync timing.
+
 ### Critical Git Guardrails
-1. **Rebase Restriction:** Rebase may be used **only when the Team Lead explicitly approves it**. Merging `origin/main` is the standard sync mechanism.
+1. **Rebase Restriction:** Rebase may be used **only when the Team Lead explicitly approves it**. Merging is the standard sync mechanism.
 2. **Never Overwrite Uncommitted Work:** Never run destructive commands (`git reset --hard`, `git checkout -f`, `git clean -fd`) that risk losing uncommitted changes. Stash or commit before syncing.
 3. **Never Force-Push:** Never force-push (`git push --force` or `git push --force-with-lease`) unless the **Team Lead explicitly approves it**. If a push is rejected by the remote, stop and report the issue immediately.
 4. **Escalate Cross-Boundary Conflicts:** If merge conflicts involve contracts (`contracts/`), system architecture (`03_FINAL_ARCHITECTURE.md`), legal rules (`02_FINAL_REQUIREMENTS_SPECIFICATION.md`, `16_DECISION_LOG.md`), or another member's code, **STOP immediately and inform the Team Lead**. Do NOT resolve cross-boundary conflicts unilaterally.
-5. **Small & Focused Commits:** Keep commits small, clear, and strictly scoped to your assigned tasks.
+5. **No Extra Feature Branches:** Do not create any additional feature branches beyond the approved six.
+6. **Small & Focused Commits:** Keep commits small, clear, and strictly scoped to your assigned tasks.
 
 ---
 
@@ -396,13 +414,14 @@ Never let a demo fail because of venue Wi-Fi. Mode B and golden fixtures keep us
 
 If you are an AI coding assistant (including Antigravity) working on this repository:
 1. **Read before writing:** Check `AGENTS.md`, your member's `README.md`, and relevant contracts before editing code.
-2. **Team Lead assigns all work:** The Team Lead manually assigns all work. Antigravity must **not** automatically assign, redistribute, or take ownership of member tasks.
+2. **Team Lead assigns all work:** The Team Lead manually assigns all work. Antigravity must **not** create additional member branches, automatically assign work, or redistribute work.
 3. **Mandatory sync before starting work:** Always ensure the pre-work sync protocol has been run before starting work on any branch:
    ```bash
    git fetch origin
-   git checkout <their-branch>
+   git checkout <member-branch>
    git merge origin/main
    ```
+   Because feature branches are developed from `dev`, the Team Lead may also require a feature branch to sync from the latest `dev` before integration work (e.g., `git merge origin/dev`).
 4. **Rebase only with explicit approval:** Rebase may be used only when the Team Lead explicitly approves it.
 5. **Protect uncommitted work:** Never run destructive commands that overwrite or discard uncommitted changes.
 6. **Zero force-push:** Never force-push (`git push --force` or `--force-with-lease`) unless the Team Lead explicitly approves it.

@@ -13,21 +13,39 @@ This document specifies the exact boundaries, inputs, outputs, acceptance criter
 
 ### Work Assignment Governance
 1. **Team Lead Authority:** The **Team Lead manually assigns all work** across the team.
-2. **AI Task Boundaries:** Antigravity and automated assistants must **not** automatically assign, redistribute, or take ownership of member tasks. All development proceeds strictly against explicit Team Lead direction.
+2. **AI Task Boundaries:** Antigravity and automated assistants must **not** create additional member branches, automatically assign work, or redistribute member tasks. All development proceeds strictly against explicit Team Lead direction.
+
+### 3-Tier Branch Hierarchy
+```text
+main (stable/approved baseline)
+  ↓
+dev (central integration branch)
+  ↓
+feat/m1-cv-metrology
+feat/m2-ocr
+feat/m3-extraction
+feat/m4-rule-engine
+feat/m5-evidence
+feat/m6-ui (individual member branches)
+```
 
 ### Mandatory Pre-Work Branch Sync Protocol
 Before starting any new work on an assigned feature branch, every member must run:
 ```bash
 git fetch origin
-git checkout <their-branch>
+git checkout <member-branch>
 git merge origin/main
 ```
 
+**Development from `dev` Note:**
+Because feature branches are developed from `dev`, the Team Lead may also require a feature branch to sync from the latest `dev` before integration work (e.g., `git merge origin/dev`). Always consult the Team Lead for integration sync timing.
+
 ### Git Operational Guardrails
-- **Rebase:** Permitted **only** with explicit prior approval from the Team Lead. Merging `origin/main` is standard.
+- **Rebase:** Permitted **only** with explicit prior approval from the Team Lead. Merging is standard.
 - **Uncommitted Changes:** Never overwrite or discard uncommitted work. Maintain clean working trees.
 - **Force-Push:** Strictly prohibited unless explicitly approved by the Team Lead.
 - **Conflict Escalation:** If conflicts affect contracts (`contracts/`), architecture, legal rules, or peer code, **stop immediately and escalate to the Team Lead**.
+- **No Extra Feature Branches:** No member branches beyond the approved six may be created.
 
 ### The Universal Non-Dependency Rule
 Every member must be able to clone the repository, check out their branch, navigate to their assigned folder, run their fixtures, execute their test suite, and implement their module **without waiting for another member's unfinished implementation**. Cross-member coordination is achieved strictly through frozen contracts in `contracts/`.

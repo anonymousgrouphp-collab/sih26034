@@ -58,15 +58,35 @@ sih26034-nyayadrishti/
 
 1. **Manual Assignment Only:** The **Team Lead manually assigns all work** to members.
 2. **No Automated AI Task Assignment:** Antigravity and any automated systems must **not** automatically assign, redistribute, or take ownership of member tasks.
-3. **Role of AI Orchestrator:** Antigravity operates strictly under instructions and explicit task boundaries assigned by the Team Lead.
+3. **No Additional Branches:** Antigravity must **not** create additional member branches beyond the approved six.
+4. **Role of AI Orchestrator:** Antigravity operates strictly under instructions and explicit task boundaries assigned by the Team Lead.
 
 ---
 
-### 3. Branching & Merging Strategy (Strict Trunk-Based)
+### 3. Branching & Merging Strategy (Strict 3-Tier Trunk Hierarchy)
 
-- `main`: Production-ready, demo-safe code. Direct pushes are strictly **prohibited**.
-- `dev`: Active integration branch. Automated CI must pass before merging into `dev`.
-- Feature Branches: Named strictly as: `feat/m<member_id>-<subsystem>` (e.g., `feat/m1-cv-metrology`, `feat/m2-ocr`, `feat/m3-extraction`, `feat/m4-rule-engine`, `feat/m5-evidence`, `feat/m6-ui`).
+```text
+main (stable/approved baseline)
+  ↓
+dev (central integration branch)
+  ↓
+feat/m1-cv-metrology
+feat/m2-ocr
+feat/m3-extraction
+feat/m4-rule-engine
+feat/m5-evidence
+feat/m6-ui (individual member branches)
+```
+
+- `main`: **Stable and approved baseline**. Contains the verified codebase, contracts, workspaces, and demo-safe releases. Direct pushes are restricted to approved baseline syncs by the Team Lead.
+- `dev`: **Central integration branch**. All feature branches integrate here. Automated CI must pass before merging.
+- Feature Branches (`feat/*`): **Individual member branches** developed from `dev`:
+  - `feat/m1-cv-metrology`
+  - `feat/m2-ocr`
+  - `feat/m3-extraction`
+  - `feat/m4-rule-engine`
+  - `feat/m5-evidence`
+  - `feat/m6-ui`
 - Hotfix Branches: `hotfix/<issue-name>`.
 
 #### Mandatory Pre-Work Branch Sync Protocol
@@ -74,15 +94,19 @@ Before starting **any** new work on any branch, every member must execute:
 
 ```bash
 git fetch origin
-git checkout <their-branch>
+git checkout <member-branch>
 git merge origin/main
 ```
+
+**Development from `dev` Note:**
+Because feature branches are developed from `dev`, the Team Lead may also require a feature branch to sync from the latest `dev` before integration work (e.g., `git merge origin/dev`). Always consult the Team Lead for integration sync timing.
 
 #### Critical Git Guardrails
 1. **Rebase Approval Required:** Rebase may be used **only when the Team Lead explicitly approves it**. Standard practice is merging `origin/main`.
 2. **Never Overwrite Uncommitted Work:** Always verify working tree status before branch operations. Destructive commands (`git reset --hard`, `git checkout -f`, `git clean -fd`) that risk losing uncommitted changes are strictly forbidden.
 3. **Never Force-Push:** Never force-push (`git push --force` or `--force-with-lease`) unless the **Team Lead explicitly approves it**. If a push is rejected by the remote, stop and report the issue immediately.
 4. **Cross-Boundary Conflict Escalation:** If merge conflicts involve contracts (`contracts/`), system architecture (`03_FINAL_ARCHITECTURE.md`), legal rules (`02_FINAL_REQUIREMENTS_SPECIFICATION.md`, `16_DECISION_LOG.md`), or another member's code, **STOP immediately and inform the Team Lead**. Do NOT resolve cross-boundary conflicts unilaterally.
+5. **No Extra Branches:** Do not create any additional feature branches. Work proceeds strictly on the designated member branches.
 
 ---
 
