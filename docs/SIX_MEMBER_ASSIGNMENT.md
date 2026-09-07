@@ -47,6 +47,11 @@ Because feature branches are developed from `dev`, the Team Lead may also requir
 - **Conflict Escalation:** If conflicts affect contracts (`contracts/`), architecture, legal rules, or peer code, **stop immediately and escalate to the Team Lead**.
 - **No Extra Feature Branches:** No member branches beyond the approved six may be created.
 
+### Chunk-by-Chunk Execution & Signing Protocol
+1. **Task Decomposition:** Decompose any assigned task into small, verifiable chunks before modifying code.
+2. **Sequential Verification:** Implement and test one chunk at a time. Do not jump ahead.
+3. **Signed Record:** Update `progress.md` with an official signing note (`SIGNED OFF BY: <handle> (<email>) — YYYY-MM-DD HH:MM IST [VERIFIED]`) upon completing each chunk.
+
 ### The Universal Non-Dependency Rule
 Every member must be able to clone the repository, check out their branch, navigate to their assigned folder, run their fixtures, execute their test suite, and implement their module **without waiting for another member's unfinished implementation**. Cross-member coordination is achieved strictly through frozen contracts in `contracts/`.
 

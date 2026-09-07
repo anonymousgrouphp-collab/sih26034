@@ -80,7 +80,36 @@ Six developers work on this project at the same time:
 
 ---
 
-## 6. Folder Ownership
+## 6. Task Decomposition, Chunk-by-Chunk Execution & Signing Notes
+
+Every developer and AI assistant must adhere to this execution protocol for any assigned task:
+
+### Rule 1: Break Tasks into Chunks Before Proceeding
+- **Never perform monolithic, unchecked changes in a single step.**
+- Before writing code or modifying files, decompose the assigned task into small, distinct, verifiable chunks (sub-tasks).
+- Clearly define the boundary, target files, and expected test assertion for each chunk.
+
+### Rule 2: Work Chunk by Chunk
+- Execute work sequentially, exactly one chunk at a time.
+- Implement the code for Chunk 1, run the corresponding tests, and verify correctness.
+- Only proceed to Chunk 2 after Chunk 1 is validated and all tests pass.
+- Never jump ahead or batch unverified changes across multiple chunks.
+
+### Rule 3: Update Records with an Official Signing Note
+- Immediately upon completing and verifying each chunk or milestone, update the official record in `progress.md` (and `memory.md` if key discoveries were made).
+- Every completed record entry must include an explicit **Signing Note / Sign-Off Block** documenting:
+  - Exact timestamp in IST (`YYYY-MM-DD HH:MM IST`)
+  - Chunk / Task ID and specific work accomplished
+  - Test evidence (exact test command and passing test count)
+  - Formal signature line:
+    ```text
+    SIGNED OFF BY: <author_handle> (<author_email>) — YYYY-MM-DD HH:MM IST [VERIFIED]
+    ```
+- No task or chunk is considered complete without this verified signing note.
+
+---
+
+## 7. Folder Ownership
 
 Every developer owns their specific folder:
 - Member 1 owns `members/member-01-cv-metrology/`
@@ -98,7 +127,7 @@ Rules for folder ownership:
 
 ---
 
-## 7. Branch Rules & Mandatory Pre-Work Sync
+## 8. Branch Rules & Mandatory Pre-Work Sync
 
 We use a strict 3-tier branching system:
 ```text
@@ -147,7 +176,7 @@ Because feature branches are developed from `dev`, the Team Lead may also requir
 
 ---
 
-## 8. The No-Cross-Dependency Rule
+## 9. The No-Cross-Dependency Rule
 
 This is our golden rule:
 **No member may depend on another member's unfinished code.**
@@ -164,7 +193,7 @@ Every module must run and pass tests completely on its own!
 
 ---
 
-## 9. Contract-First Development
+## 10. Contract-First Development
 
 We build our software using contracts:
 1. The contract defines the data shape in `contracts/`.
@@ -176,7 +205,7 @@ Contracts are shared rules. They protect everyone from surprises.
 
 ---
 
-## 10. Test Fixture Policy
+## 11. Test Fixture Policy
 
 Every member creates local fixtures inside their `fixtures/` directory:
 - File naming format: `fixture_<feature>_<scenario>.<ext>` (e.g., `fixture_blur_fail.json`, `fixture_mrp_valid.json`).
@@ -187,7 +216,7 @@ Every member creates local fixtures inside their `fixtures/` directory:
 
 ---
 
-## 11. Data Non-Assumption Policy
+## 12. Data Non-Assumption Policy
 
 Never invent data. This is strictly prohibited.
 - Do not invent legal rules or fines.
@@ -199,7 +228,7 @@ Never invent data. This is strictly prohibited.
 
 ---
 
-## 12. Legal & Regulatory Safety Rules
+## 13. Legal & Regulatory Safety Rules
 
 Our project deals with government law enforcement.
 We must follow strict legal guardrails:
@@ -212,7 +241,7 @@ We must follow strict legal guardrails:
 
 ---
 
-## 13. Dependency & Licensing Rules
+## 14. Dependency & Licensing Rules
 
 We must protect government intellectual property:
 - **Zero AGPL-3.0 libraries:** Never install or import Ultralytics YOLOv8, YOLOv11, or other AGPL copyleft code.
@@ -222,7 +251,7 @@ We must protect government intellectual property:
 
 ---
 
-## 14. Testing Rules
+## 15. Testing Rules
 
 Every member is responsible for their own tests:
 - Tests go into your `tests/` folder.
@@ -233,7 +262,7 @@ Every member is responsible for their own tests:
 
 ---
 
-## 15. Progress Log Format (`progress.md`)
+## 16. Progress Log Format (`progress.md`) & Signing Notes
 
 Every member must keep an updated `progress.md` file in their folder.
 Use this exact format for every entry:
@@ -243,17 +272,17 @@ Use this exact format for every entry:
 
 ## [DATE] [TIME] IST
 
-### Task
-What I worked on.
+### Task / Chunk
+What chunk or task I worked on.
 
 ### Status
 NOT STARTED / IN PROGRESS / BLOCKED / COMPLETE
 
 ### Completed
-Exactly what is finished.
+Exactly what is finished in this chunk.
 
 ### Tests
-Which tests were run and the exact results.
+Which tests were run and the exact results (e.g., pytest output, 5 passed).
 
 ### Problems
 Any issues or bugs discovered.
@@ -262,18 +291,17 @@ Any issues or bugs discovered.
 Any choices made during work.
 
 ### Next Step
-What I will do next.
+What chunk I will do next.
 
-### Completion Note
-If finished, write:
-COMPLETE — YYYY-MM-DD HH:MM IST
+### Signing Note
+SIGNED OFF BY: <author_handle> (<author_email>) — YYYY-MM-DD HH:MM IST [VERIFIED]
 ```
 
 Always use real dates and times. Never fake timestamps.
 
 ---
 
-## 16. Memory Log Format (`memory.md`)
+## 17. Memory Log Format (`memory.md`)
 
 Every member has a permanent memory file called `memory.md`.
 Use this format to record important discoveries and facts:
@@ -304,7 +332,7 @@ ACTIVE
 
 ---
 
-## 17. Commit Rules
+## 18. Commit Rules
 
 Use clear and standard commit messages:
 - Features: `feat(m<N>): short description` (e.g., `feat(m1): implement Laplacian blur check`)
@@ -316,7 +344,7 @@ Keep each commit small and related to one thing.
 
 ---
 
-## 18. Pull Request (PR) Rules
+## 19. Pull Request (PR) Rules
 
 When opening a Pull Request:
 1. Target the `dev` branch (never target `main` directly).
@@ -345,7 +373,7 @@ When opening a Pull Request:
 
 ---
 
-## 19. Definition of Done (DoD)
+## 20. Definition of Done (DoD)
 
 A task is **DONE** only when:
 1. The code is written and follows clean coding standards.
@@ -353,13 +381,14 @@ A task is **DONE** only when:
 3. Unit tests pass with zero errors.
 4. Error cases are handled smoothly without crashes.
 5. `README.md` in your member folder is updated.
-6. `progress.md` is updated with `COMPLETE — [Date] [Time] IST`.
-7. `memory.md` records all key technical choices.
-8. No unapproved outside data was introduced.
+6. The task was decomposed into chunks before starting, and executed chunk-by-chunk with verification at each step.
+7. `progress.md` is updated with a verified signing note (`SIGNED OFF BY: <handle> (<email>) — YYYY-MM-DD HH:MM IST [VERIFIED]`).
+8. `memory.md` records all key technical choices.
+9. No unapproved outside data was introduced.
 
 ---
 
-## 20. Integration Rules
+## 21. Integration Rules
 
 We only connect modules together after they work standalone:
 - Integration happens in the `integration/` directory.
@@ -369,7 +398,7 @@ We only connect modules together after they work standalone:
 
 ---
 
-## 21. Emergency / Hotfix Process
+## 22. Emergency / Hotfix Process
 
 If a critical bug breaks integration:
 1. Branch from `dev`: `hotfix/<issue-name>`.
@@ -380,7 +409,7 @@ If a critical bug breaks integration:
 
 ---
 
-## 22. Decision-Change Process
+## 23. Decision-Change Process
 
 If you find a mistake in a frozen decision:
 1. **Do not silently change the code.**
@@ -399,7 +428,7 @@ If you find a mistake in a frozen decision:
 
 ---
 
-## 23. Demo Safety Rules
+## 24. Demo Safety Rules
 
 We follow a 3-tier demo safety plan:
 - **Tier 1 (Live Web App):** The normal online web application on standard browsers.
@@ -410,7 +439,7 @@ Never let a demo fail because of venue Wi-Fi. Mode B and golden fixtures keep us
 
 ---
 
-## 24. Instructions for AI Coding Agents
+## 25. Instructions for AI Coding Agents
 
 If you are an AI coding assistant (including Antigravity) working on this repository:
 1. **Read before writing:** Check `AGENTS.md`, your member's `README.md`, and relevant contracts before editing code.
@@ -432,4 +461,7 @@ If you are an AI coding assistant (including Antigravity) working on this reposi
 11. **No AGPL-3.0 code:** Never recommend or import Ultralytics or copyleft packages.
 12. **Always write tests:** Every new function must have unit tests.
 13. **Keep logs up to date:** Always update `progress.md` and `memory.md` when completing work.
+14. **Break tasks into chunks before proceeding:** Never attempt large, monolithic modifications in one shot. Always decompose assigned work into small, testable chunks first.
+15. **Work chunk by chunk:** Implement and verify each chunk sequentially before starting the next chunk.
+16. **Update records with signing notes:** Conclude every completed chunk or task entry in `progress.md` with an official signing note (`SIGNED OFF BY: <handle> (<email>) — YYYY-MM-DD HH:MM IST [VERIFIED]`).
 

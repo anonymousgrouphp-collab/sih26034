@@ -129,3 +129,5 @@ A feature is considered **DONE** if and only if:
 3. It executes within the performance budgets specified in `03_FINAL_ARCHITECTURE.md` (server web round-trip $\le 1800\text{ ms}$, local CPU engine $\le 1200\text{ ms}$).
 4. It handles network latency, validation errors, and pipeline rejections gracefully without unhandled crashes.
 5. It is documented with clear OpenAPI schemas and integration test assertions.
+6. It was decomposed into testable chunks before implementation and executed chunk-by-chunk with verification at each step.
+7. Its execution is documented in `progress.md` with an official verified signing note (`SIGNED OFF BY: <handle> (<email>) — YYYY-MM-DD HH:MM IST [VERIFIED]`).
