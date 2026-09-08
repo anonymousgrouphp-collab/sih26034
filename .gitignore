@@ -99,3 +99,4 @@ temp/
 
 # Exclude scripts directory
 scripts/
+!members/*/scripts/
