@@ -56,7 +56,7 @@ You must NOT edit other member directories or root specification files.
 
 ## 7. How do I run my module?
 ```bash
-python -m members.member_03_extraction.src.extractor
+python members/member-03-extraction/src/extractor.py
 ```
 
 ---
