@@ -1,0 +1,348 @@
+{
+  "isolated": {
+    "det_FP32": {
+      "mean": 250.1804399997733,
+      "median": 250.30150000020512,
+      "p95": 304.8441099996125,
+      "min": 178.94560000058846,
+      "max": 325.784399999975
+    },
+    "det_INT8": {
+      "mean": 419.8577066665166,
+      "median": 403.65590000146767,
+      "p95": 573.7786300000151,
+      "min": 281.53759999986505,
+      "max": 617.5083999987692
+    },
+    "rec_en_single_FP32": {
+      "mean": 59.6603266664412,
+      "median": 55.82940000022063,
+      "p95": 78.38080999972587,
+      "min": 48.36090000026161,
+      "max": 92.6130000007106
+    },
+    "rec_en_single_INT8": {
+      "mean": 33.381119999588314,
+      "median": 32.86350000053062,
+      "p95": 37.35919000064313,
+      "min": 29.994799999258248,
+      "max": 40.21469999861438
+    },
+    "rec_hi_single_FP32": {
+      "mean": 35.52341333343065,
+      "median": 31.552899999951478,
+      "p95": 48.91712999997253,
+      "min": 25.4192000029434,
+      "max": 49.75999999805936
+    },
+    "rec_hi_single_INT8": {
+      "mean": 36.07795333397613,
+      "median": 34.75840000101016,
+      "p95": 41.581439999936265,
+      "min": 32.76449999975739,
+      "max": 42.67540000000736
+    }
+  },
+  "pipeline": {
+    "FP32": {
+      "total": {
+        "mean": 920.682946666299,
+        "median": 937.2179000019969,
+        "p95": 1058.048340001187,
+        "min": 675.9958000002371,
+        "max": 1231.3464999970165,
+        "runs": [
+          1231.3464999970165,
+          937.2179000019969,
+          866.8584000006376,
+          787.923599997157,
+          675.9958000002371,
+          882.449099997757,
+          962.6524000013887,
+          983.7777000029746,
+          951.4705000001413,
+          967.8635999989638,
+          966.4532999995572,
+          835.755699998117,
+          895.4107999998087,
+          899.3541999989247,
+          965.7146999998076
+        ]
+      },
+      "detection": {
+        "mean": 257.9311200000423,
+        "median": 255.00560000000405,
+        "p95": 317.8199300000415
+      },
+      "rectification": {
+        "mean": 4.40243333359831,
+        "median": 4.209399998217123,
+        "p95": 5.581769999844254
+      },
+      "recognition": {
+        "mean": 658.3076333336066,
+        "median": 655.0182000028144,
+        "p95": 789.2571200023665
+      },
+      "consensus": {
+        "mean": 0.011186667688889429,
+        "median": 0.006800000846851617,
+        "p95": 0.029359995824052004
+      }
+    },
+    "INT8": {
+      "total": {
+        "mean": 1112.5472866665707,
+        "median": 1068.9975999994203,
+        "p95": 1302.8079600007911,
+        "min": 954.6442000028037,
+        "max": 1401.9238999972004,
+        "runs": [
+          1260.3297000023304,
+          1401.9238999972004,
+          1201.3590999995358,
+          1057.3593999979494,
+          1257.122499999241,
+          954.6442000028037,
+          971.0515000006126,
+          988.4544999986247,
+          956.3220999989426,
+          1070.6734000013967,
+          1220.7669000017631,
+          1068.9975999994203,
+          1212.3873999989883,
+          1062.4726999994891,
+          1004.3444000002637
+        ]
+      },
+      "detection": {
+        "mean": 319.32841999999556,
+        "median": 282.46629999921424,
+        "p95": 434.89099999896996
+      },
+      "rectification": {
+        "mean": 5.009699999936856,
+        "median": 4.492100000788923,
+        "p95": 7.533429999239159
+      },
+      "recognition": {
+        "mean": 788.1829400001152,
+        "median": 766.6301999997813,
+        "p95": 984.6573699978762
+      },
+      "consensus": {
+        "mean": 0.006099999882280827,
+        "median": 0.005899997631786391,
+        "p95": 0.007520001599914394
+      }
+    }
+  },
+  "aggregate": {
+    "FP32": {
+      "mean": 949.5288555552381,
+      "median": 937.2179000019969,
+      "p95": 1266.262419997656,
+      "min": 580.3705999969679,
+      "max": 1577.5647000009485,
+      "count": 45
+    },
+    "INT8": {
+      "mean": 1261.834373333032,
+      "median": 1220.7669000017631,
+      "p95": 1833.3212599987742,
+      "min": 954.6442000028037,
+      "max": 2432.027200000448,
+      "count": 45
+    }
+  },
+  "scenarios": {
+    "Scenario 1 (Standard 2-field PDP)": {
+      "FP32": {
+        "mean_latency_ms": 337.9729200001748,
+        "median_latency_ms": 307.8803999997035,
+        "p95_latency_ms": 418.96059999999125,
+        "tokens_detected": 2,
+        "cer": 0.0,
+        "wer": 0.0,
+        "transcriptions": [
+          "Net Qty: 500 g",
+          "MRP Rs. 150.00"
+        ],
+        "mean_confidence": 0.9967
+      },
+      "INT8": {
+        "mean_latency_ms": 414.7860799996124,
+        "median_latency_ms": 399.8442999982217,
+        "p95_latency_ms": 455.1850000003469,
+        "tokens_detected": 2,
+        "cer": 0.0,
+        "wer": 0.0,
+        "transcriptions": [
+          "Net Qty: 500 g",
+          "MRP Rs. 150.00"
+        ],
+        "mean_confidence": 0.9475
+      }
+    },
+    "Scenario 2 (Standard 3-field PDP)": {
+      "FP32": {
+        "mean_latency_ms": 686.0378199999104,
+        "median_latency_ms": 684.1862999972363,
+        "p95_latency_ms": 698.2499000012467,
+        "tokens_detected": 3,
+        "cer": 1.2345679012345678,
+        "wer": 6.666666666666667,
+        "transcriptions": [
+          "PARLE-G ORIGINAL GLOCOSE BISCUITS",
+          "Net Qty: 500 g",
+          "MRP Rs. 50.00 (Incl. of all taxes)"
+        ],
+        "mean_confidence": 0.9764
+      },
+      "INT8": {
+        "mean_latency_ms": 1548.4190399998624,
+        "median_latency_ms": 1513.7308000012126,
+        "p95_latency_ms": 1837.6250600005733,
+        "tokens_detected": 3,
+        "cer": 1.2345679012345678,
+        "wer": 13.333333333333334,
+        "transcriptions": [
+          "PARLE-G ORIGINAL GLUCOSE BISCUITS",
+          "Net Qty:500 g",
+          "MRP Rs. 50.00 (Incl. of all taxes)"
+        ],
+        "mean_confidence": 0.949
+      }
+    },
+    "Scenario 3 (5-field Dense PDP)": {
+      "FP32": {
+        "mean_latency_ms": 1503.0593599993153,
+        "median_latency_ms": 1508.5724999989907,
+        "p95_latency_ms": 1609.59462000028,
+        "tokens_detected": 5,
+        "cer": 1.0309278350515463,
+        "wer": 11.76470588235294,
+        "transcriptions": [
+          "HERITAGEPURE COW GHEE",
+          "Net Qty: 1 L",
+          "MRP Rs. 650.00",
+          "Mfg Date: 12/2024",
+          "Consumer Care: care@heritage.com"
+        ],
+        "mean_confidence": 0.9891
+      },
+      "INT8": {
+        "mean_latency_ms": 1627.1394800001872,
+        "median_latency_ms": 1604.58540000036,
+        "p95_latency_ms": 1740.9387200008496,
+        "tokens_detected": 5,
+        "cer": 5.154639175257731,
+        "wer": 29.411764705882355,
+        "transcriptions": [
+          "HERITAGE PURE COW GHEE",
+          "Net ty:1",
+          "MRP Rs. 650.00",
+          "Mfg Date: 12/2024",
+          "Consumer Care: care@heritage com"
+        ],
+        "mean_confidence": 0.9559
+      }
+    },
+    "Scenario 4 (Hindi-Only 2-field PDP)": {
+      "FP32": {
+        "mean_latency_ms": 760.9873200002767,
+        "median_latency_ms": 748.6114000021189,
+        "p95_latency_ms": 846.0812399993301,
+        "tokens_detected": 2,
+        "cer": 100.0,
+        "wer": 100.0,
+        "transcriptions": [
+          "00000000000500000000",
+          "00000000000500000000"
+        ],
+        "mean_confidence": 0.8282
+      },
+      "INT8": {
+        "mean_latency_ms": 1445.3143400001863,
+        "median_latency_ms": 1438.0108000004839,
+        "p95_latency_ms": 1511.8981000014173,
+        "tokens_detected": 2,
+        "cer": 100.0,
+        "wer": 100.0,
+        "transcriptions": [
+          "00000",
+          "00000"
+        ],
+        "mean_confidence": 0.6702
+      }
+    },
+    "Scenario 5 (Bilingual 4-field PDP)": {
+      "FP32": {
+        "mean_latency_ms": 514.2285600013565,
+        "median_latency_ms": 523.4823000027973,
+        "p95_latency_ms": 546.2494200000947,
+        "tokens_detected": 4,
+        "cer": 66.19718309859155,
+        "wer": 93.33333333333333,
+        "transcriptions": [
+          "MRPRs 100.00",
+          "NetQty.500g",
+          "MRPRs 100.00",
+          "MRPRs 100.00"
+        ],
+        "mean_confidence": 0.9207
+      },
+      "INT8": {
+        "mean_latency_ms": 990.4672400007257,
+        "median_latency_ms": 977.7256000015768,
+        "p95_latency_ms": 1066.0824800004775,
+        "tokens_detected": 4,
+        "cer": 57.74647887323944,
+        "wer": 73.33333333333333,
+        "transcriptions": [
+          "NetOty: 500 g",
+          "NetOty: 500 g",
+          "NetOty: 500 g",
+          "MRP Rs 100.00"
+        ],
+        "mean_confidence": 0.831
+      }
+    },
+    "Scenario 6 (Small-Text 6-field Dense PDP)": {
+      "FP32": {
+        "mean_latency_ms": 972.5209399999585,
+        "median_latency_ms": 951.927699999942,
+        "p95_latency_ms": 1020.9564199998567,
+        "tokens_detected": 6,
+        "cer": 0.6896551724137931,
+        "wer": 3.4482758620689653,
+        "transcriptions": [
+          "BRAND: TATA TEA PREMIOM",
+          "Net Weight: 250 g",
+          "MRP Rs. 140.00 (Incl. of all taxes)",
+          "Unit Sale Price: Rs. 0.56 / g",
+          "Mfg Date: 01/2024",
+          "Country of Origin: India"
+        ],
+        "mean_confidence": 0.9897
+      },
+      "INT8": {
+        "mean_latency_ms": 1529.777260000992,
+        "median_latency_ms": 1513.895300002332,
+        "p95_latency_ms": 1581.6877599994768,
+        "tokens_detected": 6,
+        "cer": 4.137931034482759,
+        "wer": 27.586206896551722,
+        "transcriptions": [
+          "BRAND: TATA TEA PREMIUM",
+          "Net teight: 250g",
+          "MRP Rs. 140.00 (Incl. of all taxes)",
+          "Unit Sale Price: Rs. 0.56 / g",
+          "MfgDate:01/2024",
+          "Country of origin: ndia"
+        ],
+        "mean_confidence": 0.9315
+      }
+    }
+  }
+}

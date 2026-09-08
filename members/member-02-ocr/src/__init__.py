@@ -1,1 +1,18 @@
-"""Member 2: Multilingual OCR Module (SIH26034)"""
+"""Member 2: Multilingual OCR Module (SIH26034 - NyayaDrishti-LM)"""
+
+from .polygon_normalizer import PolygonNormalizer
+from .detector import DBNetTextDetector, TextDetectionResult
+from .recognizer import PPOCRv4Recognizer, CTCLabelDecode
+from .fallback import TesseractFallback, OCRConsensusEngine
+from .engine import MultilingualOCREngine
+
+__all__ = [
+    "PolygonNormalizer",
+    "DBNetTextDetector",
+    "TextDetectionResult",
+    "PPOCRv4Recognizer",
+    "CTCLabelDecode",
+    "TesseractFallback",
+    "OCRConsensusEngine",
+    "MultilingualOCREngine",
+]
