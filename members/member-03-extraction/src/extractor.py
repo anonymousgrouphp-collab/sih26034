@@ -285,8 +285,9 @@ class CommodityFactExtractor:
             "usp", "unit sale price", "country of origin", "made in",
             "generic name", "commodity",
             # Hindi statutory label keywords
-            "शुद्ध मात्रा", "मात्रा", "शुद्ध भार", "अ.वि.मू.",
-            "उत्पादन तिथि", "पैकिंग तिथि", "अवसान तिथि", "मूल देश"
+            "शुद्ध मात्रा", "मात्रा", "शुद्ध भार", "निवल मात्रा", "निवल भार", "अ.वि.मू.", "अधिकतम खुदरा मूल्य",
+            "उत्पादन तिथि", "पैकिंग तिथि", "अवसान तिथि", "मूल देश", "उत्पत्ति का देश",
+            "इकाई विक्रय मूल्य", "वस्तु का नाम"
         ]
         for i in range(n_tok):
             t_label = tokens[i]
@@ -484,7 +485,7 @@ class CommodityFactExtractor:
         mrp_cand_explicit: Optional[Tuple[Dict[str, Any], Dict[str, Any]]] = None
         mrp_cand_standalone: Optional[Tuple[Dict[str, Any], Dict[str, Any]]] = None
 
-        mrp_kw_re = re.compile(r"(?:MRP|M\.R\.P\.?|Maximum\s*Retail\s*Price|Max\.?\s*Retail\s*Price|अ\.वि\.मू\.)", re.IGNORECASE)
+        mrp_kw_re = re.compile(r"(?:MRP|M\.R\.P\.?|Maximum\s*Retail\s*Price|Max\.?\s*Retail\s*Price|अ\.वि\.मू\.?|अधिकतम\s*खुदरा\s*मूल्य|एमआरपी)", re.IGNORECASE)
 
         for unit in text_units:
             text = unit["text"]

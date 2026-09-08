@@ -772,5 +772,57 @@ def test_extract_end_to_end_gazette_hindi_pack(extractor):
     assert facts.manufacturer.is_complete is True
 
 
+def test_extract_regd_off_address_block(extractor):
+    """Verify extraction of corporate address starting with 'Regd. Off:'."""
+    ocr_payload = {
+        "image_id": "img_regd_off_01",
+        "tokens": [
+            {
+                "token_id": "t1",
+                "text": "Regd. Off: ABC Consumer Products Pvt. Ltd.",
+                "confidence": 0.98,
+                "bounding_box": [100, 40, 120, 350],
+            },
+            {
+                "token_id": "t2",
+                "text": "Plot 42, Electronics City, Bengaluru 560100",
+                "confidence": 0.97,
+                "bounding_box": [125, 40, 145, 380],
+            }
+        ]
+    }
+    facts = extractor.extract(ocr_payload)
+    assert facts.manufacturer is not None
+    assert "ABC Consumer Products" in facts.manufacturer.name
+    assert facts.manufacturer.state == "Karnataka"
+    assert facts.manufacturer.pin_code == "560100"
+    assert facts.manufacturer.is_complete is True
+
+
+def test_extract_spatial_vertical_hindi_label_value(extractor):
+    """Verify 2D vertical spatial linking of Gazette Hindi label and value."""
+    ocr_payload = {
+        "image_id": "img_spatial_hindi_01",
+        "tokens": [
+            {
+                "token_id": "t1",
+                "text": "निवल मात्रा",
+                "confidence": 0.98,
+                "bounding_box": [100, 50, 120, 150],
+            },
+            {
+                "token_id": "t2",
+                "text": "५०० ग्राम",
+                "confidence": 0.99,
+                "bounding_box": [125, 50, 145, 150],
+            }
+        ]
+    }
+    facts = extractor.extract(ocr_payload)
+    assert facts.net_quantity is not None
+    assert facts.net_quantity.magnitude == 500.0
+    assert facts.net_quantity.unit == "g"
+
+
 
 

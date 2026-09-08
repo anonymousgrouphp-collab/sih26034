@@ -791,6 +791,153 @@ def test_address_with_origin_prefix():
     assert addr3["pin_code"] == "631501"
 
 
+def test_banned_units_latin_abbreviations_and_ai_ml_defense():
+    """Verify Section 63 BSA 2023 evidentiary defense against Latin abbreviations and tech terms."""
+    # 1. 'e.g.' in serving suggestions must NOT flag 'g.' as banned unit
+    is_banned, sym = StatutoryDeclarationParser.detect_banned_units("Serving suggestion (e.g. with milk)")
+    assert not is_banned
+    assert sym is None
+
+    # 2. 'e.g. 50g' must NOT flag
+    is_banned2, sym2 = StatutoryDeclarationParser.detect_banned_units("Recipe example (e.g. 50g butter, 100ml water)")
+    assert not is_banned2
+    assert sym2 is None
+
+    # 3. 'i.e.' must NOT flag
+    is_banned3, sym3 = StatutoryDeclarationParser.detect_banned_units("Net Quantity: 1 pack (i.e. 500 g)")
+    assert not is_banned3
+    assert sym3 is None
+
+    # 4. 'AI/ML' tech acronym on smart packaging must NOT flag 'ML'
+    is_banned4, sym4 = StatutoryDeclarationParser.detect_banned_units("Powered by AI/ML Edge Technology")
+    assert not is_banned4
+    assert sym4 is None
+
+    # 5. 'Machine Learning (ML)' must NOT flag
+    is_banned5, sym5 = StatutoryDeclarationParser.detect_banned_units("Advanced Machine Learning (ML) Sensor")
+    assert not is_banned5
+    assert sym5 is None
+
+    # 6. Actual banned units accompanying Latin abbreviations must still be caught
+    is_banned6, sym6 = StatutoryDeclarationParser.detect_banned_units("Serving size: 50 gms (e.g. with milk)")
+    assert is_banned6
+    assert sym6 == "gms"
+
+
+def test_pin_code_regd_off_and_license_disambiguation():
+    """Verify parse_pin_code parses Regd Off without false disallowed_prefix collision."""
+    # 1. 'Regd Off: City 560001' must parse 560001
+    pin1 = StatutoryDeclarationParser.parse_pin_code("Regd Off: Bengaluru 560001")
+    assert pin1 == "560001"
+
+    # 2. 'Regd. Office: Pune 411001' must parse 411001
+    pin2 = StatutoryDeclarationParser.parse_pin_code("Regd. Office: Pune 411001")
+    assert pin2 == "411001"
+
+    # 3. 'Lic. under FSSAI... Regd Office: Mumbai 400001' must parse 400001
+    pin3 = StatutoryDeclarationParser.parse_pin_code("Lic. under FSSAI Act. Regd Office: Mumbai 400001")
+    assert pin3 == "400001"
+
+    # 4. 'Reg. No: 560001' must be rejected as registration number
+    pin4 = StatutoryDeclarationParser.parse_pin_code("Reg. No: 560001")
+    assert pin4 is None
+
+    # 5. 'Lic. No: 560001' must be rejected as license number
+    pin5 = StatutoryDeclarationParser.parse_pin_code("Lic. No: 560001")
+    assert pin5 is None
+
+
+def test_country_of_origin_hindi_state_guard():
+    """Verify parse_country_of_origin does not treat Hindi state 'प्रदेश' as origin prefix 'देश'."""
+    # 1. 'उत्तर प्रदेश: लखनऊ 226001' must NOT match as country of origin
+    origin1 = StatutoryDeclarationParser.parse_country_of_origin("उत्तर प्रदेश: लखनऊ 226001")
+    assert origin1 is None
+
+    # 2. 'मध्य प्रदेश: भोपाल 462001' must NOT match
+    origin2 = StatutoryDeclarationParser.parse_country_of_origin("मध्य प्रदेश: भोपाल 462001")
+    assert origin2 is None
+
+    # 3. Statutory Gazette term 'उत्पत्ति का देश: भारत'
+    origin3 = StatutoryDeclarationParser.parse_country_of_origin("उत्पत्ति का देश: भारत")
+    assert origin3 == "भारत"
+
+    # 4. Statutory Gazette term 'मूल देश: भारत'
+    origin4 = StatutoryDeclarationParser.parse_country_of_origin("मूल देश: भारत")
+    assert origin4 == "भारत"
+
+    # 5. Non-country phrase with 'Made in' must be rejected by fallback validator
+    origin5 = StatutoryDeclarationParser.parse_country_of_origin("Made in accordance with ISO 9001 standards")
+    assert origin5 is None
+
+
+def test_lmpc_second_schedule_count_units():
+    """Verify LMPC Second Schedule count units (pair, pairs, sheet, sheets, wipe, wipes, roll, rolls)."""
+    # 1. 1 pair
+    q1 = StatutoryDeclarationParser.parse_net_quantity("Net Qty: 1 pair")
+    assert q1 is not None
+    assert q1["magnitude"] == 1.0
+    assert q1["unit"] == "N"
+
+    # 2. 2 pairs
+    q2 = StatutoryDeclarationParser.parse_net_quantity("Net Quantity: 2 pairs")
+    assert q2 is not None
+    assert q2["magnitude"] == 2.0
+    assert q2["unit"] == "N"
+
+    # 3. 100 sheets
+    q3 = StatutoryDeclarationParser.parse_net_quantity("Quantity: 100 sheets")
+    assert q3 is not None
+    assert q3["magnitude"] == 100.0
+    assert q3["unit"] == "N"
+
+    # 4. 80 wipes
+    q4 = StatutoryDeclarationParser.parse_net_quantity("Net Qty: 80 wipes")
+    assert q4 is not None
+    assert q4["magnitude"] == 80.0
+    assert q4["unit"] == "N"
+
+    # 5. 1 roll
+    q5 = StatutoryDeclarationParser.parse_net_quantity("Net Qty: 1 roll")
+    assert q5 is not None
+    assert q5["magnitude"] == 1.0
+    assert q5["unit"] == "N"
+
+
+def test_standalone_dot_and_iso_dates():
+    """Verify dot-matrix printed dates '04.2024' and ISO '2024-05' in standalone parser."""
+    # 1. Dot separator date 04.2024
+    d1 = StatutoryDeclarationParser.parse_mfg_and_expiry_dates("04.2024")
+    assert d1["mfg_month"] == 4
+    assert d1["mfg_year"] == 2024
+
+    # 2. Standalone ISO date 2024-05
+    d2 = StatutoryDeclarationParser.parse_mfg_and_expiry_dates("2024-05")
+    assert d2["mfg_month"] == 5
+    assert d2["mfg_year"] == 2024
+
+    # 3. Standalone ISO date with slash 2024/06
+    d3 = StatutoryDeclarationParser.parse_mfg_and_expiry_dates("2024/06")
+    assert d3["mfg_month"] == 6
+    assert d3["mfg_year"] == 2024
+
+
+def test_consumer_care_support_desks():
+    """Verify consumer care parser recognizes Customer Support Desk and Consumer Complaints Cell."""
+    # 1. Customer Support Desk
+    t1 = "For queries write to Customer Support Desk, care@brand.com, 1800-123-4567, address on pack"
+    res1 = StatutoryDeclarationParser.check_consumer_care_completeness(t1)
+    assert res1["is_complete"] is True
+    assert res1["has_contact_name"] is True
+    assert "Customer Support" in res1["contact_name"]
+
+    # 2. Consumer Complaints Cell
+    t2 = "Consumer Complaints Cell, care@brand.com, 1800-123-4567, at above address"
+    res2 = StatutoryDeclarationParser.check_consumer_care_completeness(t2)
+    assert res2["is_complete"] is True
+    assert res2["has_contact_name"] is True
+    assert "Consumer Complaints" in res2["contact_name"]
+
+
 
 
 

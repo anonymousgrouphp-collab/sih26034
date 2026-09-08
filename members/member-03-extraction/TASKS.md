@@ -57,6 +57,13 @@
 - [x] Hindi Gazette Statutory Terminology: support निवल मात्रा, निवल सामग्री, इकाई विक्रय मूल्य, and वस्तु का नाम.
 - [x] Origin Address Prefix Anchors: support "Manufactured in India/Bharat by" and "Packed in India/Bharat by".
 - [x] FMCG Industrial Hubs: add Kanchipuram, Hosur, Thiruvallur, Sri City, Sanand, Bhiwadi, Sonipat, Panipat.
-- [x] Indic Matra Unicode Boundary Resolution: replace standard \b with (?!\w|[\u0900-\u097F]) to prevent vowel sign truncation.
 - [x] Expand test suite to 90 comprehensive deterministic tests passing 100% (and 153 full repo tests passing with zero regressions).
+- [x] Phase 4: Evidentiary defense against Latin abbreviations (e.g. with milk) and tech acronyms (AI/ML) in detect_banned_units (NFR-06 0.0% false accusation rate).
+- [x] Phase 4: Fix Regd. Off and Registered Office PIN code extraction by scoping disallowed prefix to explicit registration numbers (reg no, lic no).
+- [x] Phase 4: Guard Country of Origin against Hindi State names ending in 'प्रदेश' (उत्तर प्रदेश, मध्य प्रदेश) by requiring official Gazette terms (मूल देश, उत्पत्ति का देश) and fallback sanity validation.
+- [x] Phase 4: Add LMPC Second Schedule count units (pair, pairs, sheet, sheets, wipe, wipes, set, sets, roll, rolls) normalized to standard unit "N".
+- [x] Phase 4: Add dot-matrix inkjet printed date formats (04.2024) and standalone ISO formats (2024-05) to date fallback parser.
+- [x] Phase 4: Support Customer Support Desk and Consumer Complaints Cell in Consumer Care contact department extraction.
+- [x] Phase 4: Add 2D vertical spatial proximity linking and MRP priority regex for Gazette Hindi statutory declarations.
+- [x] Phase 4: Expand Member 3 test suite to 98 tests passing 100% (and 161 full repo tests passing with zero regressions).
 

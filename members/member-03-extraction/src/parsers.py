@@ -25,7 +25,7 @@ BANNED_UNITS_CASE_SENSITIVE = re.compile(
 # Under Section 11 & Rule 12: gms, gm, g.m., g.m.s., Kgs, kgms, ltrs, ltr, LTR, cc, c.c., etc. are strictly prohibited.
 # Punctuation on units: Under Rule 12(b), symbols of units shall not be followed by a period or pluralized (e.g. 'g.', 'kg.', 'ml.', 'l.').
 BANNED_UNITS_CASE_INSENSITIVE = re.compile(
-    r"(?<![a-zA-Z])(?:g\.?\s*m\.?\s*s+\.?|gms\.?|g\.m\.s?\.?|g\.m\.?|g\.|kgms\.?|kgs\.?|k\.\s*g\.?|kg\.|ltrs\.?|ltr\.?|l\.\s*t\.\s*r\.?\s*s?\.?|l\.|ml\.|liters|litres|kilos?|mtrs?|cms|mms|ग्राम्स|जी\.?\s*एम\.?)(?![a-zA-Z])",
+    r"(?<![a-zA-Z\.])(?:g\.?\s*m\.?\s*s+\.?|gms\.?|g\.m\.s?\.?|g\.m\.?|g\.|kgms\.?|kgs\.?|k\.\s*g\.?|kg\.|ltrs\.?|ltr\.?|l\.\s*t\.\s*r\.?\s*s?\.?|l\.|ml\.|liters|litres|kilos?|mtrs?|cms|mms|ग्राम्स|जी\.?\s*एम\.?)(?![a-zA-Z])",
     re.IGNORECASE
 )
 
@@ -190,8 +190,10 @@ RECOGNIZED_VALID_UNITS: Set[str] = {
     # Area
     "sq m", "sq cm", "sq mm", "sq.m", "sq.cm", "sq.mm", "m2", "cm2", "mm2", "m²", "cm²", "mm²",
     "square metre", "square metres", "square meter", "square meters", "square centimetre", "square centimetres", "square centimeter", "square centimeters",
-    # Count / Units
-    "n", "u", "units", "unit", "pcs", "piece", "pieces", "nos", "nos.", "no", "no.", "items", "item", "sachets", "sachet", "tablets", "tablet", "capsules", "capsule", "packs", "pack",
+    # Count / Units (LMPC Second Schedule)
+    "n", "u", "units", "unit", "pcs", "piece", "pieces", "nos", "nos.", "no", "no.", "items", "item",
+    "sachets", "sachet", "tablets", "tablet", "capsules", "capsule", "packs", "pack",
+    "pair", "pairs", "sheet", "sheets", "wipe", "wipes", "set", "sets", "roll", "rolls",
     # Hindi Devanagari units
     "ग्राम", "ग्रा", "ग्रा.", "किग्रा", "कि.ग्रा.", "कि.ग्रा", "किलोग्राम", "मिली", "मि.ली.", "मि.ली", "मिलीलीटर", "लीटर", "ली", "ली.", "मीटर", "मी", "मी.", "सेंटीमीटर", "सेमी", "से.मी.", "से.मी", "नग", "इकाई"
 }
@@ -217,9 +219,13 @@ class StatutoryDeclarationParser:
         Distinguishes banned capitalized 'ML' from statutory valid 'ml' or 'mL'.
         Detects prohibited 'gms', 'gm', 'g.m.', 'g.m', 'g.m.s.', 'g.m.s', 'Kgs', 'kgms',
         'k.g.', 'k.g', 'ltrs', 'ltr', 'LTR', 'cc', 'c.c.', 'c.c', 'g.', 'kg.', 'ml.', 'l.', etc.
-        Guards strictly against false positives inside email domains (e.g. 'care@ml.com'),
-        website URLs (e.g. 'www.ml.com'), corporate titles/entities ('GM Foods', 'GM Operations'),
-        and email recipient headers ('CC: care@...').
+        Guards strictly against false positives inside:
+        - Email domains (e.g. 'care@ml.com')
+        - Website URLs (e.g. 'www.ml.com')
+        - Latin abbreviations (e.g. 'e.g.', 'i.e.', 'etc.')
+        - Technology terms (e.g. 'AI/ML', 'Machine Learning')
+        - Corporate titles/entities ('GM Foods', 'GM Operations', 'Non-GM')
+        - Email recipient headers ('CC: care@...')
         """
         if not text:
             return False, None
@@ -227,6 +233,17 @@ class StatutoryDeclarationParser:
         # Mask email addresses and web URLs to avoid false positives on domains (e.g. care@ml.com, www.ml.com)
         masked_text = re.sub(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b", " ", text)
         masked_text = re.sub(r"https?://\S+|www\.[A-Za-z0-9.-]+\.[A-Za-z]{2,}\S*", " ", masked_text)
+
+        # Mask Latin abbreviations containing periods or 'g' to prevent false positive 'g.' (e.g. 'e.g. with milk', 'i.e.')
+        masked_text = re.sub(r"\b(?:e\.?\s*g\.?|i\.?\s*e\.?|etc\.?)\b", " ", masked_text, flags=re.IGNORECASE)
+
+        # Mask AI/ML technology acronyms to prevent false positive 'ML' on smart IoT / devices
+        masked_text = re.sub(
+            r"(?:\bAI\s*/\s*ML\b|\bML\s*/\s*AI\b|\bMachine\s*Learning\s*(?:\(\s*ML\s*\)|\b)|\bML\s*model\b|\bML\s*algorithm\b)",
+            " ",
+            masked_text,
+            flags=re.IGNORECASE
+        )
 
         # Mask corporate names and designations starting with uppercase GM (e.g. GM Foods, GM - Operations, Non-GM)
         masked_text = re.sub(
@@ -282,10 +299,10 @@ class StatutoryDeclarationParser:
         norm_text = cls.convert_indic_digits(text)
 
         # 0. Check Multi-Pack / Multi-Piece Wholesale Syntax (Rule 24 & Rule 6(1)(c))
-        # e.g. "Net Qty: 4 x 50 g", "4 N x 50 g = 200 g", "Pack of 3 x 100 g", "10 sachets x 2 g"
+        # e.g. "Net Qty: 4 x 50 g", "4 N x 50 g = 200 g", "Pack of 3 x 100 g", "10 sachets x 2 g", "2 pairs x 1 set"
         multipack_pattern = re.compile(
             r"(?:Net\s*(?:Quantity|Qty\.?|Weight|Wt\.?|Content|Contents|Volume|Vol\.?|Mass)|Quantity|Qty\.?|Pack\s*of|शुद्ध\s*(?:मात्रा|भार|वजन|सामग्री)|निवल\s*(?:मात्रा|भार|वजन|सामग्री))?\s*[:\-]?\s*"
-            r"(?:([0-9]+)\s*(?:N|U|units?|pcs|nos?|pieces?|sachets?|packs?|bars?|bottles?|cans?|नग|इकाई)?\s*(?:of)?\s*[xX*×]\s*([0-9]+(?:\.[0-9]+)?)\s*([a-zA-Z²³\.\u0900-\u097F]+))"
+            r"(?:([0-9]+)\s*(?:N|U|units?|pcs|nos?|pieces?|sachets?|packs?|bars?|bottles?|cans?|pairs?|sheets?|wipes?|sets?|rolls?|tablets?|capsules?|नग|इकाई)?\s*(?:of)?\s*[xX*×]\s*([0-9]+(?:\.[0-9]+)?)\s*([a-zA-Z²³\.\u0900-\u097F]+))"
             r"(?:\s*(?:=|Total\s*[:\-]?|\(Total\s*[:\-]?)\s*([0-9]+(?:\.[0-9]+)?)\s*([a-zA-Z²³\.\u0900-\u097F]+)\)?)?",
             re.IGNORECASE
         )
@@ -459,7 +476,12 @@ class StatutoryDeclarationParser:
                 clean_unit = "sq cm"
             elif u_lower in ("sq mm", "mm2", "mm²", "sq.mm"):
                 clean_unit = "sq mm"
-            elif u_lower in ("n", "u", "units", "unit", "pcs", "piece", "pieces", "nos", "nos.", "no", "no.", "items", "item", "sachets", "sachet", "tablets", "tablet", "capsules", "capsule", "packs", "pack", "नग", "इकाई"):
+            elif u_lower in (
+                "n", "u", "units", "unit", "pcs", "piece", "pieces", "nos", "nos.", "no", "no.",
+                "items", "item", "sachets", "sachet", "tablets", "tablet", "capsules", "capsule",
+                "packs", "pack", "pair", "pairs", "sheet", "sheets", "wipe", "wipes", "set", "sets", "roll", "rolls",
+                "नग", "इकाई"
+            ):
                 clean_unit = "N"
 
         return {
@@ -736,8 +758,8 @@ class StatutoryDeclarationParser:
             result["mfg_month"] = m_mfg
             result["mfg_year"] = y_mfg
         else:
-            # Standalone fallback date check (e.g. '03/2024' or '03 / 2024' or '2024-04')
-            sa_re = re.compile(r"(?<![0-9])(0[1-9]|1[0-2])\s*[\/\-]\s*(20[2-3][0-9]|[2-3][0-9])(?![0-9])")
+            # Standalone fallback date check (e.g. '03/2024', '03 / 2024', '04.2024', '2024-04')
+            sa_re = re.compile(r"(?<![0-9])(0[1-9]|1[0-2])\s*[\/\-\.]\s*(20[2-3][0-9]|[2-3][0-9])(?![0-9])")
             m_sa = sa_re.search(norm_text)
             if m_sa:
                 month = int(m_sa.group(1))
@@ -746,6 +768,16 @@ class StatutoryDeclarationParser:
                 if 1 <= month <= 12 and 2000 <= year <= 2030:
                     result["mfg_month"] = month
                     result["mfg_year"] = year
+            else:
+                # Standalone ISO format: YYYY-MM or YYYY/MM or YYYY.MM (e.g. '2024-04')
+                iso_sa_re = re.compile(r"(?<![0-9])(20[2-3][0-9])\s*[\/\-\.]\s*(0[1-9]|1[0-2])(?![0-9])")
+                m_iso_sa = iso_sa_re.search(norm_text)
+                if m_iso_sa:
+                    year = int(m_iso_sa.group(1))
+                    month = int(m_iso_sa.group(2))
+                    if 1 <= month <= 12 and 2000 <= year <= 2030:
+                        result["mfg_month"] = month
+                        result["mfg_year"] = year
 
         # 3. Extract Expiry Date
         m_exp, y_exp = extract_date_from_text(exp_prefix, norm_text)
@@ -785,7 +817,7 @@ class StatutoryDeclarationParser:
         norm_text = cls.convert_indic_digits(text)
 
         disallowed_prefix_re = re.compile(
-            r"\b(?:tel|phone|mob|call|fssai|lic|licence|license|batch|b\.?no|lot|invoice|barcode|ean|upc|cin|regd?|mrp|rs|inr|price|exp|mfg|pkg)\b|[₹]",
+            r"\b(?:tel|phone|mob|call|fssai|lic(?:ence|ense)?\.?\s*(?:no\.?|number)|lic\.?\s*no\.?|batch|b\.?no|lot|invoice|barcode|ean|upc|cin(?:\s*no\.?)?|reg(?:n|d)?\.?\s*no\.?|registration\s*(?:no\.?|number)|mrp|rs|inr|price|exp|mfg|pkg)\b|[₹]",
             re.IGNORECASE
         )
         disallowed_suffix_tokens = [
@@ -1021,6 +1053,8 @@ class StatutoryDeclarationParser:
             r"\b(Nodal\s*Officer|Grievance\s*Officer|Customer\s*Care\s*Executive|Consumer\s*Care\s*Executive|"
             r"Customer\s*Care\s*Manager|Consumer\s*Care\s*Manager|Manager\s*-\s*Customer\s*Care|"
             r"Manager\s*-\s*Consumer\s*Relations|Customer\s*Care|Consumer\s*Care|Executive|Manager|Officer|"
+            r"Consumer\s*Complaints(?:\s*Cell|\s*Desk)?|Customer\s*Support|Consumer\s*Grievance|Customer\s*Service|"
+            r"Consumer\s*Relations|Helpdesk|Grievance\s*Redressal|"
             r"नोडल\s*अधिकारी|ग्राहक\s*सेवा\s*अधिकारी|प्रबंधक)\b",
             norm_text,
             re.IGNORECASE
@@ -1058,7 +1092,7 @@ class StatutoryDeclarationParser:
 
         norm_text = cls.convert_indic_digits(text)
         origin_pattern = re.compile(
-            r"(?:Country\s*of\s*Origin|Made\s*in|Product\s*of|Manufactured\s*in|Packed\s*in|Produce\s*of|Imported\s*from|Origin|COO|मूल\s*देश|देश)\s*[:\-]?\s*([^\n\r,;]+)",
+            r"(?<![a-zA-Z\u0900-\u097F])(?:Country\s*of\s*Origin|Made\s*in|Product\s*of|Manufactured\s*in|Packed\s*in|Produce\s*of|Imported\s*from|Origin|COO|मूल\s*देश|उत्पत्ति\s*का\s*देश)\s*[:\-]?\s*([^\n\r,;]+)",
             re.IGNORECASE
         )
         match = origin_pattern.search(norm_text)
@@ -1089,7 +1123,12 @@ class StatutoryDeclarationParser:
         # Fallback: Strip stop words like 'by ...', 'for ...'
         cleaned = re.split(r"\b(?:by|for|under|at)\b", raw, flags=re.IGNORECASE)[0].strip()
         cleaned = cleaned.strip(".- :")
-        return cleaned if cleaned else None
+        # Validate that fallback candidate is a reasonable country name (not a sentence, no digits)
+        if cleaned and len(cleaned.split()) <= 3 and not re.search(r"\d", cleaned):
+            disallowed_words = {"accordance", "compliance", "standard", "facility", "premises", "licence", "license"}
+            if not any(w in cleaned.lower() for w in disallowed_words):
+                return cleaned
+        return None
 
     @classmethod
     def parse_generic_name(cls, text: str) -> Optional[str]:
