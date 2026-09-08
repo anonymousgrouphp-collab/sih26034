@@ -33,6 +33,7 @@
 #### MEMBER 1: Lead Computer Vision & Metrology Engineer
 
 - **Assigned Engineer:** **Kunal Raj** ([@kunal-raj-dev](https://github.com/kunal-raj-dev))
+- **Status:** **COMPLETE & INTEGRATED INTO DEV (PR #3 Merged)**
 - **Role:** Optical Quality, Calibration & Geometric Measurement
 - **Primary Objective:** Deliver sub-millimeter physical scale calibration and optical gating on commodity cameras.
 - **Core Tasks:**
