@@ -109,14 +109,14 @@ Every developer and AI assistant must adhere to this execution protocol for any 
 
 Six independent workstreams operate in parallel, each mapped to a dedicated folder and branch:
 
-| Member / Workstream | Assigned Engineer | Assigned Folder | Assigned Feature Branch | Primary Subsystem Scope |
-| :--- | :--- | :--- | :--- | :--- |
-| **Member 1: CV & Metrology** | **Kunal Raj** ([@kunal-raj-dev](https://github.com/kunal-raj-dev)) | `members/member-01-cv-metrology/` | `feat/m1-cv-metrology` | Optical quality gate (blur/glare), ArUco scale calibration, homography rectification, PDP surface area calculation. |
-| **Member 2: Multilingual OCR** | **Parmarth Kumar** ([@parmarth-kumar](https://github.com/parmarth-kumar)) | `members/member-02-ocr/` | `feat/m2-ocr` | Text detection (DBNet++), multilingual recognition (PP-OCRv4 English + Devanagari Hindi), ONNX INT8 CPU inference, coordinate normalization. |
-| **Member 3: Semantic Extraction** | **Harsh Patel** ([@anonymousgrouphp-collab](https://github.com/anonymousgrouphp-collab)) | `members/member-03-extraction/` | `feat/m3-extraction` | Statutory field parsing (MRP, Net Qty, Dates, Address, PIN), banned unit flagger (`gms`, `ML`, `gm`, `ltrs`), Indic numeral conversion. |
-| **Member 4: Rule Engine** | **Ambika Bansal** ([@bansalambika12-ship-it](https://github.com/bansalambika12-ship-it)) | `members/member-04-rule-engine/` | `feat/m4-rule-engine` | AST statutory compliance engine, Table-I font schedule (Row 5 = 6.0 mm), USP math validation, Rule 6 checks, 4-state verdict triage. |
-| **Member 5: Evidence & Backend** | **Shailendra Pratap Singh** ([@shailendrapratap1](https://github.com/shailendrapratap1)) | `members/member-05-evidence/` | `feat/m5-evidence` | FastAPI REST services, PostgreSQL schema, SHA-256 Merkle chain-of-custody, Section 63 BSA 2023 digital certificate, ReportLab Form 1 PDF/A generation. |
-| **Member 6: Frontend & HUD** | **Urvashi Rajput** ([@rajputurvashi2006-bit](https://github.com/rajputurvashi2006-bit)) | `members/member-06-ui/` | `feat/m6-ui` | React 18 + Vite SPA, inspector camera HUD, split-view Adjudication Canvas, Central Dashboard, offline status indicators, mock API client. |
+| Member / Workstream | Assigned Engineer | Assigned Folder | Assigned Feature Branch | Primary Subsystem Scope | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Member 1: CV & Metrology** | **Kunal Raj** ([@kunal-raj-dev](https://github.com/kunal-raj-dev)) | `members/member-01-cv-metrology/` | `feat/m1-cv-metrology` | Optical quality gate (blur/glare), ArUco scale calibration, homography rectification, PDP surface area calculation. | **MERGED IN DEV (PR #3)** |
+| **Member 2: Multilingual OCR** | **Parmarth Kumar** ([@parmarth-kumar](https://github.com/parmarth-kumar)) | `members/member-02-ocr/` | `feat/m2-ocr` | Text detection (DBNet++), multilingual recognition (PP-OCRv4 English + Devanagari Hindi), ONNX INT8 CPU inference, coordinate normalization. | In Development |
+| **Member 3: Semantic Extraction** | **Harsh Patel** ([@anonymousgrouphp-collab](https://github.com/anonymousgrouphp-collab)) | `members/member-03-extraction/` | `feat/m3-extraction` | Statutory field parsing (MRP, Net Qty, Dates, Address, PIN), banned unit flagger (`gms`, `ML`, `gm`, `ltrs`), Indic numeral conversion. | In Development |
+| **Member 4: Rule Engine** | **Ambika Bansal** ([@bansalambika12-ship-it](https://github.com/bansalambika12-ship-it)) | `members/member-04-rule-engine/` | `feat/m4-rule-engine` | AST statutory compliance engine, Table-I font schedule (Row 5 = 6.0 mm), USP math validation, Rule 6 checks, 4-state verdict triage. | In Development |
+| **Member 5: Evidence & Backend** | **Shailendra Pratap Singh** ([@shailendrapratap1](https://github.com/shailendrapratap1)) | `members/member-05-evidence/` | `feat/m5-evidence` | FastAPI REST services, PostgreSQL schema, SHA-256 Merkle chain-of-custody, Section 63 BSA 2023 digital certificate, ReportLab Form 1 PDF/A generation. | In Review / PR Open |
+| **Member 6: Frontend & HUD** | **Urvashi Rajput** ([@rajputurvashi2006-bit](https://github.com/rajputurvashi2006-bit)) | `members/member-06-ui/` | `feat/m6-ui` | React 18 + Vite SPA, inspector camera HUD, split-view Adjudication Canvas, Central Dashboard, offline status indicators, mock API client. | In Development |
 
 ### Folder Ownership Rules
 - You work **strictly inside your assigned folder**.
