@@ -138,4 +138,3 @@ def test_detector_neural_inference_reports_dbnet_backend():
         results = det.detect(img)
         if results:
             assert results[0].backend == "DBNet++_ONNX"
-
