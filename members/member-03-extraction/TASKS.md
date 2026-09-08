@@ -46,4 +46,12 @@
 - [x] Support Devanagari Hindi metric units (`ग्राम`, `मिली`, `लीटर`) and vulgar fractions (`½`, `¼`, `1/2`).
 - [x] Implement Rule 6(1)(b) Generic Name parsing.
 - [x] Propagate optical calibration `px_to_mm` to `ExtractedFieldDTO.measured_font_height_mm`.
-- [x] Expand test suite to 68 comprehensive deterministic tests passing 100% (and 131 full repo tests passing).
+- [x] Multi-pack parsing under Rule 24: calculate total quantity, capture count and piece magnitude, disallow multiplication operator as unit.
+- [x] Corporate Email & URL Domain Defense: mask emails and URLs preventing false banned unit accusations under NFR-06.
+- [x] Corporate Entity & Title GM Defense: prevent uppercase GM (e.g. GM Foods Ltd, GM Operations) from triggering prohibited unit violations.
+- [x] Tax Inclusivity Robustness: support OCR-truncated 'inc.' and GST declarations in addition to all-taxes clauses.
+- [x] USP Unit Standardization: normalize Devanagari Hindi units (ग्राम, किग्रा, मिली) and count units (N, unit) with rate denominators.
+- [x] Consumer Care Extraction: extract actual redressal address lines and contact titles rather than static placeholders.
+- [x] Pydantic Contract Year Guard: clamp manufacturing year to <= 2030 per NormalizedCommodityFacts schema.
+- [x] Expand test suite to 84 comprehensive deterministic tests passing 100% (and 147 full repo tests passing).
+

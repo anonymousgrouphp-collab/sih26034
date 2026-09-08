@@ -25,9 +25,26 @@ BANNED_UNITS_CASE_SENSITIVE = re.compile(
 # Under Section 11 & Rule 12: gms, gm, g.m., g.m.s., Kgs, kgms, ltrs, ltr, LTR, cc, c.c., etc. are strictly prohibited.
 # Punctuation on units: Under Rule 12(b), symbols of units shall not be followed by a period or pluralized (e.g. 'g.', 'kg.', 'ml.', 'l.').
 BANNED_UNITS_CASE_INSENSITIVE = re.compile(
-    r"(?<![a-zA-Z])(?:g\.?\s*m\.?\s*s?\.?|gms\.?|gm\.?|g\.|kgms\.?|kgs\.?|k\.\s*g\.?|kg\.|ltrs\.?|ltr\.?|l\.\s*t\.\s*r\.?\s*s?\.?|l\.|ml\.|c\.?\s*c\.?|liters|litres|kilos?|mtrs?|cms|mms|ग्राम्स|जी\.?\s*एम\.?)(?![a-zA-Z])",
+    r"(?<![a-zA-Z])(?:g\.?\s*m\.?\s*s+\.?|gms\.?|g\.m\.s?\.?|g\.m\.?|g\.|kgms\.?|kgs\.?|k\.\s*g\.?|kg\.|ltrs\.?|ltr\.?|l\.\s*t\.\s*r\.?\s*s?\.?|l\.|ml\.|liters|litres|kilos?|mtrs?|cms|mms|ग्राम्स|जी\.?\s*एम\.?)(?![a-zA-Z])",
     re.IGNORECASE
 )
+
+# Prohibited lowercase or mixed 'gm' / 'g.m.' symbols (strictly guarding against uppercase 'GM' which denotes General Manager or GM Foods)
+BANNED_GM_GENERAL = re.compile(
+    r"(?<![a-zA-Z])(?:gm\.?|g\.m\.?)(?![a-zA-Z])"
+)
+
+# Prohibited uppercase 'GM' or 'G.M.' strictly when accompanied by numeric quantity, slash, or rate
+BANNED_GM_UPPERCASE_WITH_QTY = re.compile(
+    r"(?:(?<=[0-9])\s*|(?<=/)\s*|(?<=per\s))\s*G\.?M\.?(?![a-zA-Z])"
+)
+
+# Prohibited 'cc' or 'c.c.' strictly when accompanied by numeric quantity, slash, or rate (guards against 'CC: email')
+BANNED_CC_WITH_QTY = re.compile(
+    r"(?:(?<=[0-9])\s*|(?<=/)\s*|(?<=per\s))\s*c\.?\s*c\.?(?![a-zA-Z])",
+    re.IGNORECASE
+)
+
 
 # Standardized Indian States and Union Territories (28 States + 8 UTs + historical variants)
 INDIAN_STATES_AND_UTS = [
@@ -57,7 +74,7 @@ STATE_ABBREVIATIONS: Dict[str, str] = {
     "J&K": "Jammu and Kashmir", "CH": "Chandigarh", "PY": "Puducherry"
 }
 
-# Major commercial cities unambiguously mapped to Indian States
+# Major commercial cities and FMCG manufacturing hubs unambiguously mapped to Indian States
 MAJOR_CITIES_TO_STATE: Dict[str, str] = {
     "mumbai": "Maharashtra", "bombay": "Maharashtra", "pune": "Maharashtra", "nagpur": "Maharashtra",
     "thane": "Maharashtra", "nashik": "Maharashtra", "aurangabad": "Maharashtra", "navi mumbai": "Maharashtra",
@@ -67,13 +84,19 @@ MAJOR_CITIES_TO_STATE: Dict[str, str] = {
     "kolkata": "West Bengal", "calcutta": "West Bengal", "howrah": "West Bengal", "siliguri": "West Bengal",
     "hyderabad": "Telangana", "secunderabad": "Telangana", "warangal": "Telangana",
     "ahmedabad": "Gujarat", "surat": "Gujarat", "vadodara": "Gujarat", "baroda": "Gujarat", "rajkot": "Gujarat", "anand": "Gujarat",
+    "vapi": "Gujarat", "ankleshwar": "Gujarat",
     "jaipur": "Rajasthan", "jodhpur": "Rajasthan", "kota": "Rajasthan", "udaipur": "Rajasthan",
     "lucknow": "Uttar Pradesh", "kanpur": "Uttar Pradesh", "noida": "Uttar Pradesh", "greater noida": "Uttar Pradesh",
     "ghaziabad": "Uttar Pradesh", "varanasi": "Uttar Pradesh", "agra": "Uttar Pradesh", "prayagraj": "Uttar Pradesh",
     "patna": "Bihar", "ranchi": "Jharkhand", "jamshedpur": "Jharkhand", "bhopal": "Madhya Pradesh",
-    "indore": "Madhya Pradesh", "raipur": "Chhattisgarh", "bhubaneswar": "Odisha", "cuttack": "Odisha",
-    "chandigarh": "Chandigarh", "gurgaon": "Haryana", "gurugram": "Haryana", "faridabad": "Haryana",
-    "ludhiana": "Punjab", "amritsar": "Punjab", "dehradun": "Uttarakhand", "haridwar": "Uttarakhand", "guwahati": "Assam",
+    "indore": "Madhya Pradesh", "gwalior": "Madhya Pradesh", "jabalpur": "Madhya Pradesh", "raipur": "Chhattisgarh",
+    "bhubaneswar": "Odisha", "cuttack": "Odisha",
+    "chandigarh": "Chandigarh", "gurgaon": "Haryana", "gurugram": "Haryana", "faridabad": "Haryana", "manesar": "Haryana",
+    "ludhiana": "Punjab", "amritsar": "Punjab",
+    "dehradun": "Uttarakhand", "haridwar": "Uttarakhand", "roorkee": "Uttarakhand", "pantnagar": "Uttarakhand", "rudrapur": "Uttarakhand",
+    "baddi": "Himachal Pradesh", "solan": "Himachal Pradesh", "nalagarh": "Himachal Pradesh", "parwanoo": "Himachal Pradesh",
+    "guwahati": "Assam", "silvassa": "Dadra and Nagar Haveli", "daman": "Daman and Diu",
+    "visakhapatnam": "Andhra Pradesh", "vizag": "Andhra Pradesh", "vijayawada": "Andhra Pradesh",
     "kochi": "Kerala", "cochin": "Kerala", "thiruvananthapuram": "Kerala", "trivandrum": "Kerala", "panaji": "Goa", "bicholim": "Goa"
 }
 
@@ -190,19 +213,49 @@ class StatutoryDeclarationParser:
         Distinguishes banned capitalized 'ML' from statutory valid 'ml' or 'mL'.
         Detects prohibited 'gms', 'gm', 'g.m.', 'g.m', 'g.m.s.', 'g.m.s', 'Kgs', 'kgms',
         'k.g.', 'k.g', 'ltrs', 'ltr', 'LTR', 'cc', 'c.c.', 'c.c', 'g.', 'kg.', 'ml.', 'l.', etc.
+        Guards strictly against false positives inside email domains (e.g. 'care@ml.com'),
+        website URLs (e.g. 'www.ml.com'), corporate titles/entities ('GM Foods', 'GM Operations'),
+        and email recipient headers ('CC: care@...').
         """
         if not text:
             return False, None
 
+        # Mask email addresses and web URLs to avoid false positives on domains (e.g. care@ml.com, www.ml.com)
+        masked_text = re.sub(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b", " ", text)
+        masked_text = re.sub(r"https?://\S+|www\.[A-Za-z0-9.-]+\.[A-Za-z]{2,}\S*", " ", masked_text)
+
+        # Mask corporate names and designations starting with uppercase GM (e.g. GM Foods, GM - Operations, Non-GM)
+        masked_text = re.sub(
+            r"\b(?:Non-GM|GM\s*(?:-|:)?\s*(?:Foods|Enterprises|Motors|Breweries|Laboratories|Pharma|Products|Industries|Operations|Sales|Quality|Plant|Director|Manager|Executive|Officer|Unit|Works|Ltd|Limited|Pvt|LLP|Corp|Inc|Tech)\b)",
+            " ",
+            masked_text,
+            flags=re.IGNORECASE
+        )
+
         # 1. Check case-sensitive banned symbols first (capitalized 'ML', 'Ml', 'M.L.', 'M.L')
-        cs_match = BANNED_UNITS_CASE_SENSITIVE.search(text)
+        cs_match = BANNED_UNITS_CASE_SENSITIVE.search(masked_text)
         if cs_match:
             return True, cs_match.group(0).strip()
 
         # 2. Check general prohibited symbols (case-insensitive)
-        ci_match = BANNED_UNITS_CASE_INSENSITIVE.search(text)
+        ci_match = BANNED_UNITS_CASE_INSENSITIVE.search(masked_text)
         if ci_match:
             return True, ci_match.group(0).strip()
+
+        # 3. Check prohibited lowercase or mixed 'gm' / 'g.m.'
+        gm_match = BANNED_GM_GENERAL.search(masked_text)
+        if gm_match:
+            return True, gm_match.group(0).strip()
+
+        # 4. Check prohibited uppercase 'GM' when accompanied by quantity or unit position
+        gm_num_match = BANNED_GM_UPPERCASE_WITH_QTY.search(masked_text)
+        if gm_num_match:
+            return True, gm_num_match.group(0).strip()
+
+        # 5. Check prohibited 'cc' / 'c.c.' accompanied by quantity
+        cc_match = BANNED_CC_WITH_QTY.search(masked_text)
+        if cc_match:
+            return True, cc_match.group(0).strip()
 
         return False, None
 
@@ -212,13 +265,87 @@ class StatutoryDeclarationParser:
 
         Handles mass (g, kg, mg), volume (ml, l, cl), length (m, cm, mm),
         area (sq m, sq cm, m²), count (N, U, units, pcs, nos), and Devanagari Hindi units.
-        Supports comma-separated numbers (1,000 or 1, 000), fractions (1/2, ½),
-        leading-dot decimals (.5), and Devanagari numerals.
+        Supports:
+        - Multi-pack and wholesale declarations under Rule 24: '4 x 50 g', '4 N x 50 g = 200 g',
+          'Pack of 3 x 100 g', '10 sachets x 2 g each', computing total mass/volume and disallowing 'x' as unit.
+        - Dual bracketed quantities: '500 ml (450 g)'.
+        - Comma-separated numbers (1,000 or 1, 000), fractions (1/2, ½),
+          leading-dot decimals (.5), and Devanagari numerals.
         """
         if not text:
             return None
 
         norm_text = cls.convert_indic_digits(text)
+
+        # 0. Check Multi-Pack / Multi-Piece Wholesale Syntax (Rule 24 & Rule 6(1)(c))
+        # e.g. "Net Qty: 4 x 50 g", "4 N x 50 g = 200 g", "Pack of 3 x 100 g", "10 sachets x 2 g"
+        multipack_pattern = re.compile(
+            r"(?:Net\s*(?:Quantity|Qty\.?|Weight|Wt\.?|Content|Contents|Volume|Vol\.?|Mass)|Quantity|Qty\.?|Pack\s*of|शुद्ध\s*(?:मात्रा|भार|वजन))?\s*[:\-]?\s*"
+            r"(?:([0-9]+)\s*(?:N|U|units?|pcs|nos?|pieces?|sachets?|packs?|bars?|bottles?|cans?|नग|इकाई)?\s*(?:of)?\s*[xX*×]\s*([0-9]+(?:\.[0-9]+)?)\s*([a-zA-Z²³\.\u0900-\u097F]+))"
+            r"(?:\s*(?:=|Total\s*[:\-]?|\(Total\s*[:\-]?)\s*([0-9]+(?:\.[0-9]+)?)\s*([a-zA-Z²³\.\u0900-\u097F]+)\)?)?",
+            re.IGNORECASE
+        )
+        multi_match = multipack_pattern.search(norm_text)
+        if multi_match:
+            count_str, piece_mag_str, piece_unit_raw, total_mag_str, total_unit_raw = multi_match.groups()
+            try:
+                count_val = float(count_str)
+                piece_mag_val = float(piece_mag_str)
+                if count_val > 0 and piece_mag_val > 0:
+                    cand_unit_word = piece_unit_raw.strip().split()[0].lower() if piece_unit_raw.strip() else ""
+                    has_banned_multi, banned_sym_multi = cls.detect_banned_units(piece_unit_raw)
+
+                    # Only proceed if piece unit is recognized or banned
+                    if has_banned_multi or cand_unit_word in RECOGNIZED_VALID_UNITS:
+                        if total_mag_str:
+                            total_mag = float(total_mag_str.replace(",", ""))
+                            clean_unit_str = total_unit_raw or piece_unit_raw
+                        else:
+                            total_mag = round(count_val * piece_mag_val, 4)
+                            clean_unit_str = piece_unit_raw
+
+                        clean_unit_word = clean_unit_str.strip().split()[0]
+                        has_banned, banned_sym = cls.detect_banned_units(clean_unit_word)
+                        if not has_banned and clean_unit_word.lower() in ("gm", "gms", "kgms", "kgs", "ltrs", "ltr", "cc"):
+                            has_banned = True
+                            banned_sym = clean_unit_word
+                        if not has_banned:
+                            has_banned, banned_sym = cls.detect_banned_units(clean_unit_str)
+                        if not has_banned and multi_match:
+                            has_banned, banned_sym = cls.detect_banned_units(multi_match.group(0))
+
+                        # Standardize valid units
+                        if not has_banned:
+                            u_lower = clean_unit_word.lower()
+                            if u_lower in ("g", "gram", "grams", "gramme", "grammes", "ग्राम", "ग्रा", "ग्रा."):
+                                clean_unit_word = "g"
+                            elif u_lower in ("kg", "kilogram", "kilograms", "किग्रा", "कि.ग्रा.", "कि.ग्रा", "किलोग्राम"):
+                                clean_unit_word = "kg"
+                            elif u_lower in ("mg", "milligram", "milligrams"):
+                                clean_unit_word = "mg"
+                            elif u_lower in ("ml", "millilitre", "millilitres", "मिली", "मि.ली.", "मि.ली", "मिलीलीटर"):
+                                clean_unit_word = "ml"
+                            elif u_lower in ("l", "litre", "litres", "liter", "liters", "लीटर", "ली", "ली."):
+                                clean_unit_word = "l"
+                            elif u_lower in ("cl", "centilitre", "centilitres"):
+                                clean_unit_word = "cl"
+                            elif u_lower in ("m", "meter", "meters", "metre", "metres", "मीटर", "मी", "मी."):
+                                clean_unit_word = "m"
+                            elif u_lower in ("cm", "centimeter", "centimeters", "centimetre", "centimetres", "सेंटीमीटर", "सेमी", "से.मी.", "से.मी"):
+                                clean_unit_word = "cm"
+                            elif u_lower in ("mm", "millimeter", "millimeters"):
+                                clean_unit_word = "mm"
+
+                        return {
+                            "magnitude": total_mag,
+                            "unit": clean_unit_word,
+                            "has_banned_unit": has_banned,
+                            "banned_unit_found": banned_sym,
+                            "piece_count": int(count_val),
+                            "piece_magnitude": piece_mag_val,
+                        }
+            except (ValueError, IndexError):
+                pass
 
         # Regex for magnitude supporting standard floats, comma numbers (with spaces), leading dots, and simple fractions
         mag_pattern = r"(?:([0-9]+)\s*/\s*([0-9]+)|([0-9]+(?:,\s*[0-9]+)*(?:\.[0-9]+)?|\.[0-9]+))"
@@ -226,7 +353,7 @@ class StatutoryDeclarationParser:
 
         # 1. Match with explicit quantity prefix (highest priority)
         prefix_pattern = (
-            r"(?:Net\s*(?:Quantity|Qty\.?|Weight|Wt\.?|Content|Contents|Volume|Vol\.?|Mass|Area)|Quantity|Qty\.?|शुद्ध\s*(?:मात्रा|भार)|मात्रा)"
+            r"(?:Net\s*(?:Quantity|Qty\.?|Weight|Wt\.?|Content|Contents|Volume|Vol\.?|Mass|Area)|Quantity|Qty\.?|शुद्ध\s*(?:मात्रा|भार|वजन)|मात्रा|वजन)"
             r"\s*[:\-]?\s*"
             rf"{mag_pattern}"
             r"\s*"
@@ -281,17 +408,25 @@ class StatutoryDeclarationParser:
             return None
 
         clean_unit = unit_words[0]
+
+        # Strictly disallow multiplication operators 'x', 'X', '×' as units
+        if clean_unit.lower() in ("x", "×", "*"):
+            return None
+
         if len(unit_words) >= 2:
             candidate_two_word = f"{unit_words[0]} {unit_words[1]}".lower()
             if candidate_two_word in RECOGNIZED_VALID_UNITS:
                 clean_unit = f"{unit_words[0]} {unit_words[1]}"
 
-        # Check for banned units in clean_unit, the full unit_raw, and the surrounding token
+        # Check for banned units in clean_unit, the full unit_raw, and the matched quantity declaration
         has_banned, banned_sym = cls.detect_banned_units(clean_unit)
+        if not has_banned and clean_unit.lower() in ("gm", "gms", "kgms", "kgs", "ltrs", "ltr", "cc"):
+            has_banned = True
+            banned_sym = clean_unit
         if not has_banned:
             has_banned, banned_sym = cls.detect_banned_units(unit_raw)
-        if not has_banned:
-            has_banned, banned_sym = cls.detect_banned_units(norm_text)
+        if not has_banned and match:
+            has_banned, banned_sym = cls.detect_banned_units(match.group(0))
 
         # Standardize metric units when valid
         if not has_banned:
@@ -347,28 +482,32 @@ class StatutoryDeclarationParser:
 
         # Tax inclusivity clause patterns per Rule 6(1)(e)
         tax_inclusive_patterns = [
-            r"incl(?:usive|\.)?\s*(?:of)?\s*all\s*taxes?",
-            r"incl(?:usive|\.)?\s*(?:of)?\s*taxes?",
-            r"all\s*taxes?\s*incl(?:uded|usive)?",
-            r"including\s*(?:of)?\s*all\s*taxes?",
-            r"including\s*taxes?",
-            r"inclusive\s*of\s*taxes?",
-            r"incl\.?\s*taxes?",
+            r"inc[l]?(?:usive|\.)?\s*(?:of)?\s*all\s*(?:taxes?|gst)",
+            r"inc[l]?(?:usive|\.)?\s*(?:of)?\s*(?:taxes?|gst)",
+            r"all\s*(?:taxes?|gst)\s*inc[l]?(?:uded|usive|\.)?",
+            r"(?:taxes?|gst)\s*inc[l]?(?:uded|usive|\.)?",
+            r"including\s*(?:of)?\s*all\s*(?:taxes?|gst)",
+            r"including\s*(?:taxes?|gst)",
+            r"inclusive\s*(?:of)?\s*(?:all\s*)?(?:taxes?|gst)",
+            r"inc[l]?\.?\s*(?:taxes?|gst)",
             r"कर\s*सहित",
             r"सभी\s*कर(?:ों)?\s*सहित",
+            r"कुल\s*कर\s*सहित",
+            r"कर\s*शामिल",
+            r"अतिरिक्त\s*कर\s*नहीं",
         ]
         tax_inclusive = any(re.search(p, norm_text, re.IGNORECASE) for p in tax_inclusive_patterns)
 
-        mrp_prefix = r"(?:MRP|M\.R\.P\.?|Maximum\s*Retail\s*Price|Max\.?\s*Retail\s*Price|अ\.वि\.मू\.)"
+        mrp_prefix = r"(?:M\.?\s*R\.?\s*P\.?|Maximum\s*Retail\s*Price|Max\.?\s*Retail\s*Price|अ\.वि\.मू\.?|अधिकतम\s*खुदरा\s*मूल्य)"
         tax_clause_group = (
-            r"(?:\([^)]*(?:tax|taxes|कर)[^)]*\)|"
-            r"incl(?:usive|\.)?\s*(?:of)?\s*all\s*taxes?|"
-            r"incl(?:usive|\.)?\s*(?:of)?\s*taxes?|"
-            r"all\s*taxes?\s*included|"
-            r"including\s*(?:of)?\s*all\s*taxes?|"
+            r"(?:\([^)]*(?:tax|taxes|gst|कर)[^)]*\)|"
+            r"inc[l]?(?:usive|\.)?\s*(?:of)?\s*all\s*(?:taxes?|gst)|"
+            r"inc[l]?(?:usive|\.)?\s*(?:of)?\s*(?:taxes?|gst)|"
+            r"all\s*(?:taxes?|gst)\s*included|"
+            r"including\s*(?:of)?\s*all\s*(?:taxes?|gst)|"
             r"कर\s*सहित|सभी\s*कर(?:ों)?\s*सहित)"
         )
-        curr = r"(?:Rs\.?|INR|₹)"
+        curr = r"(?:Rs?\.?|R\s*s\.?|Re\.?|INR|₹|रु\.?|रू\.?|रुपये|रुपए)"
         amount_re = r"([0-9]+(?:,\s*[0-9]+)*(?:\s*\.\s*[0-9]{1,2})?)"
 
         # Pattern 1: Explicit MRP prefix, with optional intervening tax clause or currency
@@ -455,11 +594,22 @@ class StatutoryDeclarationParser:
 
         clean_unit = unit_raw.strip().lower()
         clean_unit = re.sub(r"\s+", "", clean_unit)
-        # Normalize piece/pieces -> piece, units -> unit
+        # Normalize piece/pieces -> piece, units -> unit, nos -> unit
         if clean_unit in ("pieces", "piece", "pcs"):
             clean_unit = "piece"
-        elif clean_unit in ("units", "unit"):
+        elif clean_unit in ("units", "unit", "nos", "no"):
             clean_unit = "unit"
+        elif clean_unit in ("n", "u"):
+            clean_unit = "N"
+
+        # Normalize Hindi Devanagari units
+        hindi_usp_map = {
+            "ग्राम": "g", "किग्रा": "kg", "मिली": "ml", "लीटर": "l", "मीटर": "m", "नग": "N", "इकाई": "N"
+        }
+        if clean_unit in hindi_usp_map:
+            clean_unit = hindi_usp_map[clean_unit]
+        elif clean_unit.startswith("100") and clean_unit[3:] in hindi_usp_map:
+            clean_unit = f"100{hindi_usp_map[clean_unit[3:]]}"
 
         return {
             "price_per_unit": price,
@@ -514,7 +664,7 @@ class StatutoryDeclarationParser:
             r"(?:Manufactured(?:\s*Date)?|Mfg(?:\s*Date)?|Mfg\.?|Mfd(?:\s*Date)?|Mfd\.?|"
             r"Packed(?:\s*Date)?|Pkd(?:\s*Date)?|Packaging(?:\s*Date)?|Packing(?:\s*Date)?|"
             r"Date\s*of\s*(?:Mfg|Mfd|Manufacture|Packaging|Packing|Pkg\.?|Pkd\.?)|"
-            r"उत्पादन\s*तिथि|पैकिंग\s*तिथि|निर्माण\s*तिथि)"
+            r"उत्पादन\s*(?:तिथि|माह(?:\s*एवं\s*वर्ष)?|का\s*महीना)?|पैकिंग\s*(?:तिथि|माह)?|निर्माण\s*तिथि)"
         )
         exp_prefix = (
             r"(?:Exp(?:\s*Date)?|Expiry(?:\s*Date)?|Use\s*by|Use\s*before|Best\s*before|"
@@ -578,7 +728,7 @@ class StatutoryDeclarationParser:
 
         # 2. Extract Manufacturing Date
         m_mfg, y_mfg = extract_date_from_text(mfg_prefix, norm_text)
-        if m_mfg and y_mfg:
+        if m_mfg and y_mfg and 2000 <= y_mfg <= 2030:
             result["mfg_month"] = m_mfg
             result["mfg_year"] = y_mfg
         else:
@@ -589,7 +739,7 @@ class StatutoryDeclarationParser:
                 month = int(m_sa.group(1))
                 yr = int(m_sa.group(2))
                 year = yr + (2000 if yr < 100 else 0)
-                if 1 <= month <= 12 and 2000 <= year <= 2035:
+                if 1 <= month <= 12 and 2000 <= year <= 2030:
                     result["mfg_month"] = month
                     result["mfg_year"] = year
 
@@ -598,6 +748,15 @@ class StatutoryDeclarationParser:
         if m_exp and y_exp:
             result["exp_month"] = m_exp
             result["exp_year"] = y_exp
+        elif (not result["exp_month"] or not result["exp_year"]) and result["mfg_month"] and result["mfg_year"] and result["best_before_months"]:
+            # Derive expiration date from manufacturing date + best before months
+            total_months = result["mfg_month"] + result["best_before_months"]
+            derived_year = result["mfg_year"] + (total_months - 1) // 12
+            derived_month = ((total_months - 1) % 12) + 1
+            if 2000 <= derived_year <= 2035:
+                result["exp_month"] = derived_month
+                result["exp_year"] = derived_year
+                result["is_derived_expiry"] = True
 
         return result
 
@@ -833,13 +992,34 @@ class StatutoryDeclarationParser:
             re.IGNORECASE
         ))
 
+        address_text: Optional[str] = None
+        if has_address:
+            if re.search(r"\b(?:at\s*(?:the\s*)?above\s*address|at\s*the\s*address\s*given\s*above|address\s*given\s*above|manufacturer'?s\s*address|packer'?s\s*address|same\s*as\s*manufacturer|उपरोक्त\s*पते|पते\s*पर)\b", norm_text, re.IGNORECASE):
+                address_text = "At manufacturer's address given on pack"
+            else:
+                addr_clause_match = re.search(
+                    r"(?:write\s*to\s*(?:us\s*at)?|postal\s*address|address|post\s*box|p\.?o\.?\s*box)\s*[:\-]?\s*([^;\n\r]+?)(?=\s*(?:phone|tel|call|helpline|toll|email|contact|ph|t:)|$)",
+                    norm_text,
+                    re.IGNORECASE
+                )
+                if addr_clause_match and len(addr_clause_match.group(1).strip()) >= 3:
+                    address_text = addr_clause_match.group(0).strip()
+                elif re.search(r"\b(?:consumer\s*care\s*cell|registered\s*office)\b", norm_text, re.IGNORECASE):
+                    address_text = "Consumer Care Cell, Registered Office"
+                else:
+                    address_text = "Consumer Care Address on pack"
+
         # 4. Contact Person or Department Name (English and Hindi)
-        has_contact_name = bool(re.search(
-            r"\b(manager|executive|officer|customer\s*care|consumer\s*care|nodal\s*officer|grievance\s*officer|"
-            r"consumer\s*relations|support|in-?charge|cell|team|प्रबंधक|अधिकारी|ग्राहक\s*सेवा|उपभोक्ता\s*सेवा)\b",
+        name_match = re.search(
+            r"\b(Nodal\s*Officer|Grievance\s*Officer|Customer\s*Care\s*Executive|Consumer\s*Care\s*Executive|"
+            r"Customer\s*Care\s*Manager|Consumer\s*Care\s*Manager|Manager\s*-\s*Customer\s*Care|"
+            r"Manager\s*-\s*Consumer\s*Relations|Customer\s*Care|Consumer\s*Care|Executive|Manager|Officer|"
+            r"नोडल\s*अधिकारी|ग्राहक\s*सेवा\s*अधिकारी|प्रबंधक)\b",
             norm_text,
             re.IGNORECASE
-        ))
+        )
+        has_contact_name = bool(name_match)
+        contact_name_str = name_match.group(0).strip() if name_match else None
 
         is_complete = bool(has_email and has_phone and has_address and has_contact_name)
 
@@ -851,6 +1031,8 @@ class StatutoryDeclarationParser:
             "is_complete": is_complete,
             "email": email_str,
             "phone": phone_match_str,
+            "address": address_text,
+            "contact_name": contact_name_str,
         }
 
     @classmethod
@@ -917,7 +1099,7 @@ class StatutoryDeclarationParser:
 
         norm_text = cls.convert_indic_digits(text)
         generic_pattern = re.compile(
-            r"(?:Generic\s*Name|Common\s*Name|Name\s*of\s*Commodity|Commodity|Product\s*Name)\s*[:\-]?\s*([^\n\r,;]+)",
+            r"(?:Generic\s*Name|Common\s*Name|Name\s*of\s*Commodity|Commodity|Product\s*Name|सामान्य\s*नाम|उत्पाद\s*का\s*नाम|सामग्री\s*का\s*नाम)\s*[:\-]?\s*([^\n\r,;]+)",
             re.IGNORECASE
         )
         match = generic_pattern.search(norm_text)

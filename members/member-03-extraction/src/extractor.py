@@ -271,14 +271,38 @@ class CommodityFactExtractor:
             line_text = composite_lines[i]["text"].strip()
             line_lower = line_text.lower()
 
-            if any(starter in line_lower for starter in address_starters):
+            # Skip lines that are customer care or complaints declarations
+            if any(k in line_lower for k in ["complaint", "customer care", "consumer care", "helpline", "feedback", "care@"]):
+                continue
+
+            has_starter = any(starter in line_lower for starter in address_starters)
+
+            # Also detect blocks starting directly with corporate entity names (e.g. "Parle Products Pvt. Ltd.")
+            # followed by address / state / city / PIN in subsequent lines
+            is_corp_starter = False
+            if not has_starter and i + 1 < n:
+                if re.search(r"\b(?:Pvt\.?\s*Ltd\.?|Private\s*Limited|Ltd\.?|Limited|LLP|Inc\.?|Corp\.?|उद्योग|लिमिटेड)\b", line_text, re.IGNORECASE):
+                    for next_idx in range(i + 1, min(i + 4, n)):
+                        nl_text = composite_lines[next_idx]["text"]
+                        if (self.parser.parse_pin_code(nl_text) or
+                            any(s.lower() in nl_text.lower() for s in [
+                                "maharashtra", "delhi", "karnataka", "tamil nadu", "gujarat", "uttarakhand", "haryana",
+                                "mumbai", "pune", "bengaluru", "chennai", "kolkata", "delhi", "road", "street", "plot",
+                                "area", "crossing", "east", "west", "midc", "estate", "nagar"
+                            ])):
+                            is_corp_starter = True
+                            break
+
+            if has_starter or is_corp_starter:
                 # Determine statutory entity role
                 if any(k in line_lower for k in ["manufactured & packed", "mfg & pkd", "mfd & pkd", "manufactured and packed", "निर्माता एवं पैकर"]):
                     role = "MANUFACTURER_AND_PACKER"
-                elif any(k in line_lower for k in ["pack", "pkd", "पैकर"]):
+                elif any(k in line_lower for k in ["pack", "pkd", "पैकर"]) and not any(m in line_lower for m in ["mfd", "mfg", "manufactur"]):
                     role = "PACKER"
                 elif any(k in line_lower for k in ["import", "आयातकर्ता"]):
                     role = "IMPORTER"
+                elif any(k in line_lower for k in ["marketed", "मार्केटेड"]):
+                    role = "MARKETER"
                 else:
                     role = "MANUFACTURER"
 
@@ -441,6 +465,7 @@ class CommodityFactExtractor:
         for unit in text_units:
             text = unit["text"]
             parsed_dates = self.parser.parse_mfg_and_expiry_dates(text)
+            font_mm, font_conf = compute_font_height(unit["bounding_box"])
             if (parsed_dates.get("mfg_month") or parsed_dates.get("mfg_year")) and extracted_mfg_month is None:
                 extracted_mfg_month = parsed_dates.get("mfg_month")
                 extracted_mfg_year = parsed_dates.get("mfg_year")
@@ -452,6 +477,8 @@ class CommodityFactExtractor:
                         detection_confidence=0.95,
                         ocr_confidence=unit["confidence"],
                         bounding_box=unit["bounding_box"],
+                        measured_font_height_mm=font_mm,
+                        measurement_confidence=font_conf,
                     )
                 )
             if (parsed_dates.get("exp_month") or parsed_dates.get("exp_year")) and not any(f.field_type == "DATE_OF_EXPIRY" for f in raw_fields):
@@ -463,6 +490,8 @@ class CommodityFactExtractor:
                         detection_confidence=0.95,
                         ocr_confidence=unit["confidence"],
                         bounding_box=unit["bounding_box"],
+                        measured_font_height_mm=font_mm,
+                        measurement_confidence=font_conf,
                     )
                 )
 
@@ -472,6 +501,7 @@ class CommodityFactExtractor:
             origin = self.parser.parse_country_of_origin(text)
             if origin and extracted_origin is None:
                 extracted_origin = origin
+                font_mm, font_conf = compute_font_height(unit["bounding_box"])
                 raw_fields.append(
                     ExtractedFieldDTO(
                         field_type="COUNTRY_OF_ORIGIN",
@@ -480,11 +510,15 @@ class CommodityFactExtractor:
                         detection_confidence=0.96,
                         ocr_confidence=unit["confidence"],
                         bounding_box=unit["bounding_box"],
+                        measured_font_height_mm=font_mm,
+                        measurement_confidence=font_conf,
                     )
                 )
                 break
 
-        # 6. MANUFACTURER / PACKER / IMPORTER ADDRESS
+        # 6. MANUFACTURER / PACKER / IMPORTER / MARKETER ADDRESS
+        extracted_marketer: Optional[AddressValue] = None
+
         # Priority A: Check aggregated multi-line address blocks first
         address_blocks = self._aggregate_address_blocks(composite_lines)
         for block in address_blocks:
@@ -492,20 +526,23 @@ class CommodityFactExtractor:
             if parsed_addr:
                 addr_val = AddressValue(**parsed_addr)
                 role = block["role"]
+                font_mm, font_conf = compute_font_height(block["bounding_box"])
 
                 if role == "MANUFACTURER_AND_PACKER":
-                    if extracted_mfg is None:
+                    if extracted_mfg is None or extracted_mfg == extracted_marketer:
                         extracted_mfg = addr_val
-                        raw_fields.append(
-                            ExtractedFieldDTO(
-                                field_type="MANUFACTURER_ADDRESS",
-                                raw_ocr_text=block["text"],
-                                normalized_value=parsed_addr,
-                                detection_confidence=0.96,
-                                ocr_confidence=block["confidence"],
-                                bounding_box=block["bounding_box"],
-                            )
+                    raw_fields.append(
+                        ExtractedFieldDTO(
+                            field_type="MANUFACTURER_ADDRESS",
+                            raw_ocr_text=block["text"],
+                            normalized_value=parsed_addr,
+                            detection_confidence=0.96,
+                            ocr_confidence=block["confidence"],
+                            bounding_box=block["bounding_box"],
+                            measured_font_height_mm=font_mm,
+                            measurement_confidence=font_conf,
                         )
+                    )
                     if extracted_packer is None:
                         extracted_packer = addr_val
                         raw_fields.append(
@@ -516,10 +553,14 @@ class CommodityFactExtractor:
                                 detection_confidence=0.96,
                                 ocr_confidence=block["confidence"],
                                 bounding_box=block["bounding_box"],
+                                measured_font_height_mm=font_mm,
+                                measurement_confidence=font_conf,
                             )
                         )
-                elif role == "MANUFACTURER" and extracted_mfg is None:
-                    extracted_mfg = addr_val
+                elif role == "MANUFACTURER":
+                    # Actual manufacturer takes statutory priority over any previous marketer
+                    if extracted_mfg is None or extracted_mfg == extracted_marketer:
+                        extracted_mfg = addr_val
                     raw_fields.append(
                         ExtractedFieldDTO(
                             field_type="MANUFACTURER_ADDRESS",
@@ -528,6 +569,8 @@ class CommodityFactExtractor:
                             detection_confidence=0.95,
                             ocr_confidence=block["confidence"],
                             bounding_box=block["bounding_box"],
+                            measured_font_height_mm=font_mm,
+                            measurement_confidence=font_conf,
                         )
                     )
                 elif role == "PACKER" and extracted_packer is None:
@@ -540,6 +583,8 @@ class CommodityFactExtractor:
                             detection_confidence=0.95,
                             ocr_confidence=block["confidence"],
                             bounding_box=block["bounding_box"],
+                            measured_font_height_mm=font_mm,
+                            measurement_confidence=font_conf,
                         )
                     )
                 elif role == "IMPORTER" and extracted_importer is None:
@@ -552,6 +597,22 @@ class CommodityFactExtractor:
                             detection_confidence=0.95,
                             ocr_confidence=block["confidence"],
                             bounding_box=block["bounding_box"],
+                            measured_font_height_mm=font_mm,
+                            measurement_confidence=font_conf,
+                        )
+                    )
+                elif role == "MARKETER":
+                    extracted_marketer = addr_val
+                    raw_fields.append(
+                        ExtractedFieldDTO(
+                            field_type="MARKETER_ADDRESS",
+                            raw_ocr_text=block["text"],
+                            normalized_value=parsed_addr,
+                            detection_confidence=0.94,
+                            ocr_confidence=block["confidence"],
+                            bounding_box=block["bounding_box"],
+                            measured_font_height_mm=font_mm,
+                            measurement_confidence=font_conf,
                         )
                     )
 
@@ -564,13 +625,16 @@ class CommodityFactExtractor:
                     "mfd by", "manufactured by", "mfg by", "marketed by", "pkd by",
                     "packed by", "imported by", "factory", "address", "निर्माता", "पैकर"
                 ]):
-                    role = "PACKER" if any(p in text_lower for p in ["pack", "pkd", "पैकर"]) else (
-                        "IMPORTER" if "import" in text_lower else "MANUFACTURER"
+                    role = "PACKER" if any(p in text_lower for p in ["pack", "pkd", "पैकर"]) and not any(m in text_lower for m in ["mfd", "mfg", "manufactur"]) else (
+                        "IMPORTER" if "import" in text_lower else (
+                            "MARKETER" if any(m in text_lower for m in ["marketed", "मार्केटेड"]) else "MANUFACTURER"
+                        )
                     )
                     parsed_addr = self.parser.parse_address(text)
                     if parsed_addr:
                         addr_val = AddressValue(**parsed_addr)
-                        if role == "MANUFACTURER" and extracted_mfg is None:
+                        font_mm, font_conf = compute_font_height(unit["bounding_box"])
+                        if role == "MANUFACTURER" and (extracted_mfg is None or extracted_mfg == extracted_marketer):
                             extracted_mfg = addr_val
                             raw_fields.append(
                                 ExtractedFieldDTO(
@@ -580,6 +644,8 @@ class CommodityFactExtractor:
                                     detection_confidence=0.92,
                                     ocr_confidence=unit["confidence"],
                                     bounding_box=unit["bounding_box"],
+                                    measured_font_height_mm=font_mm,
+                                    measurement_confidence=font_conf,
                                 )
                             )
                         elif role == "PACKER" and extracted_packer is None:
@@ -592,6 +658,8 @@ class CommodityFactExtractor:
                                     detection_confidence=0.92,
                                     ocr_confidence=unit["confidence"],
                                     bounding_box=unit["bounding_box"],
+                                    measured_font_height_mm=font_mm,
+                                    measurement_confidence=font_conf,
                                 )
                             )
                         elif role == "IMPORTER" and extracted_importer is None:
@@ -604,6 +672,22 @@ class CommodityFactExtractor:
                                     detection_confidence=0.92,
                                     ocr_confidence=unit["confidence"],
                                     bounding_box=unit["bounding_box"],
+                                    measured_font_height_mm=font_mm,
+                                    measurement_confidence=font_conf,
+                                )
+                            )
+                        elif role == "MARKETER" and extracted_marketer is None:
+                            extracted_marketer = addr_val
+                            raw_fields.append(
+                                ExtractedFieldDTO(
+                                    field_type="MARKETER_ADDRESS",
+                                    raw_ocr_text=text,
+                                    normalized_value=parsed_addr,
+                                    detection_confidence=0.91,
+                                    ocr_confidence=unit["confidence"],
+                                    bounding_box=unit["bounding_box"],
+                                    measured_font_height_mm=font_mm,
+                                    measurement_confidence=font_conf,
                                 )
                             )
 
@@ -614,6 +698,7 @@ class CommodityFactExtractor:
                 parsed_addr = self.parser.parse_address(text)
                 if parsed_addr and (parsed_addr.get("pin_code") or parsed_addr.get("state")):
                     extracted_mfg = AddressValue(**parsed_addr)
+                    font_mm, font_conf = compute_font_height(unit["bounding_box"])
                     raw_fields.append(
                         ExtractedFieldDTO(
                             field_type="MANUFACTURER_ADDRESS",
@@ -622,33 +707,41 @@ class CommodityFactExtractor:
                             detection_confidence=0.90,
                             ocr_confidence=unit["confidence"],
                             bounding_box=unit["bounding_box"],
+                            measured_font_height_mm=font_mm,
+                            measurement_confidence=font_conf,
                         )
                     )
                     break
 
+        # Priority D: Fallback to marketer if manufacturer was not declared separately
+        if extracted_mfg is None and extracted_marketer is not None:
+            extracted_mfg = extracted_marketer
+
         # 7. CONSUMER CARE
         care_status = self.parser.check_consumer_care_completeness(full_text)
         if any(care_status[k] for k in ["has_email", "has_phone", "has_address", "has_contact_name"]):
-            contact_name = "Customer Care Executive" if care_status["has_contact_name"] else None
+            contact_name = care_status.get("contact_name")
             phone = care_status.get("phone")
             email = care_status.get("email")
+            address = care_status.get("address")
 
             # Collect consumer care bounding boxes
             care_bboxes = []
             for unit in composite_lines:
                 if any(w in unit["text"].lower() for w in [
                     "consumer", "customer care", "complaints", "feedback", "helpline", "toll free",
-                    "ग्राहक सेवा", "उपभोक्ता"
+                    "care@", "nodal", "grievance", "ग्राहक सेवा", "उपभोक्ता"
                 ]):
                     care_bboxes.append(unit["bounding_box"])
 
             care_bbox = _compute_union_bbox(care_bboxes) if care_bboxes else [0, 0, 0, 0]
+            font_mm, font_conf = compute_font_height(care_bbox)
 
             extracted_consumer_care = ConsumerCareValue(
                 contact_name=contact_name,
                 phone=phone,
                 email=email,
-                address="Consumer Care Cell" if care_status["has_address"] else None,
+                address=address,
                 is_complete=care_status["is_complete"],
             )
             raw_fields.append(
@@ -659,6 +752,8 @@ class CommodityFactExtractor:
                     detection_confidence=0.94,
                     ocr_confidence=0.95,
                     bounding_box=care_bbox,
+                    measured_font_height_mm=font_mm,
+                    measurement_confidence=font_conf,
                 )
             )
 
@@ -667,6 +762,7 @@ class CommodityFactExtractor:
             text = unit["text"]
             generic_name = self.parser.parse_generic_name(text)
             if generic_name and not any(f.field_type == "GENERIC_NAME" for f in raw_fields):
+                font_mm, font_conf = compute_font_height(unit["bounding_box"])
                 raw_fields.append(
                     ExtractedFieldDTO(
                         field_type="GENERIC_NAME",
@@ -675,6 +771,8 @@ class CommodityFactExtractor:
                         detection_confidence=0.93,
                         ocr_confidence=unit["confidence"],
                         bounding_box=unit["bounding_box"],
+                        measured_font_height_mm=font_mm,
+                        measurement_confidence=font_conf,
                     )
                 )
                 break

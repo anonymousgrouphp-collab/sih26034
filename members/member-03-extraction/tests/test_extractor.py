@@ -495,3 +495,116 @@ def test_extract_with_calibration_font_height(extractor):
     assert net_field.measurement_confidence == 0.95
 
 
+def test_extract_marketer_vs_manufacturer_priority(extractor):
+    """Verify actual manufacturer takes statutory precedence over marketer."""
+    ocr_payload = {
+        "image_id": "img_mkt_mfg_01",
+        "tokens": [
+            {
+                "token_id": "t1",
+                "text": "Marketed by: Dabur India Ltd., New Delhi 110002",
+                "confidence": 0.96,
+                "bounding_box": [20, 20, 35, 300],
+            },
+            {
+                "token_id": "t2",
+                "text": "Manufactured by: Althea Pharma Pvt Ltd, Haridwar, Uttarakhand 249403",
+                "confidence": 0.97,
+                "bounding_box": [50, 20, 65, 450],
+            }
+        ]
+    }
+    facts = extractor.extract(ocr_payload)
+    assert facts.manufacturer is not None
+    assert facts.manufacturer.name == "Althea Pharma Pvt Ltd"
+    assert facts.manufacturer.state == "Uttarakhand"
+    assert facts.manufacturer.pin_code == "249403"
+    assert facts.manufacturer.is_complete is True
+
+    field_types = [f.field_type for f in facts.raw_fields]
+    assert "MARKETER_ADDRESS" in field_types
+    assert "MANUFACTURER_ADDRESS" in field_types
+
+
+def test_extract_marketer_fallback_when_sole_declaration(extractor):
+    """Verify marketer acts as statutory fallback when manufacturer is omitted."""
+    ocr_payload = {
+        "image_id": "img_mkt_only_01",
+        "tokens": [
+            {
+                "token_id": "t1",
+                "text": "Marketed by: Dabur India Ltd., New Delhi 110002",
+                "confidence": 0.96,
+                "bounding_box": [20, 20, 35, 300],
+            }
+        ]
+    }
+    facts = extractor.extract(ocr_payload)
+    assert facts.manufacturer is not None
+    assert facts.manufacturer.name == "Dabur India Ltd."
+    assert facts.manufacturer.state == "Delhi"
+    assert facts.manufacturer.pin_code == "110002"
+
+
+def test_extract_corporate_entity_without_prefix_starter(extractor):
+    """Verify multi-line address block aggregation starting directly with corporate entity name."""
+    ocr_payload = {
+        "image_id": "img_corp_addr_01",
+        "tokens": [
+            {
+                "token_id": "t1",
+                "text": "Parle Products Pvt. Ltd.",
+                "confidence": 0.98,
+                "bounding_box": [100, 50, 120, 300],
+            },
+            {
+                "token_id": "t2",
+                "text": "North Level Crossing, Vile Parle East",
+                "confidence": 0.97,
+                "bounding_box": [130, 50, 150, 350],
+            },
+            {
+                "token_id": "t3",
+                "text": "Mumbai, Maharashtra 400057",
+                "confidence": 0.98,
+                "bounding_box": [160, 50, 180, 280],
+            }
+        ]
+    }
+    facts = extractor.extract(ocr_payload)
+    assert facts.manufacturer is not None
+    assert facts.manufacturer.name == "Parle Products Pvt. Ltd."
+    assert facts.manufacturer.state == "Maharashtra"
+    assert facts.manufacturer.pin_code == "400057"
+    assert facts.manufacturer.is_complete is True
+
+
+def test_extract_multipack_factual_normalization(extractor):
+    """Verify multi-pack wholesale packaging normalization in facts extractor."""
+    ocr_payload = {
+        "image_id": "img_multipack_01",
+        "tokens": [
+            {
+                "token_id": "t1",
+                "text": "Net Qty: 4 x 50 g",
+                "confidence": 0.99,
+                "bounding_box": [50, 50, 75, 200],
+            },
+            {
+                "token_id": "t2",
+                "text": "MRP Rs. 120.00 (incl. of all taxes)",
+                "confidence": 0.98,
+                "bounding_box": [90, 50, 110, 300],
+            }
+        ]
+    }
+    facts = extractor.extract(ocr_payload)
+    assert facts.net_quantity is not None
+    assert facts.net_quantity.magnitude == 200.0
+    assert facts.net_quantity.unit == "g"
+    assert facts.net_quantity.has_banned_unit is False
+    assert facts.mrp.amount == 120.0
+    assert facts.mrp.tax_inclusive is True
+
+
+

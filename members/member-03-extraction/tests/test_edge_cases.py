@@ -393,3 +393,56 @@ def test_adversarial_pin_code_guards():
     assert StatutoryDeclarationParser.parse_pin_code("FSSAI: 10014022001234") is None
     assert StatutoryDeclarationParser.parse_pin_code("400057") == "400057"
 
+
+def test_adversarial_multipack_and_dual_units():
+    """Verify adversarial multi-pack and dual unit scenarios under Rule 24."""
+    # 12 count x 15 ml
+    res1 = StatutoryDeclarationParser.parse_net_quantity("Net Qty: 12 N x 15 ml = 180 ml")
+    assert res1 is not None
+    assert res1["magnitude"] == 180.0
+    assert res1["unit"] == "ml"
+    assert res1["unit"] != "x"
+
+    # Pack of 6 x 250 ml
+    res2 = StatutoryDeclarationParser.parse_net_quantity("Pack of 6 x 250 ml")
+    assert res2 is not None
+    assert res2["magnitude"] == 1500.0
+    assert res2["unit"] == "ml"
+
+    # Multi-pack with prohibited unit
+    res3 = StatutoryDeclarationParser.parse_net_quantity("Net Qty: 2 x 500 gms")
+    assert res3 is not None
+    assert res3["magnitude"] == 1000.0
+    assert res3["has_banned_unit"] is True
+    assert res3["banned_unit_found"] == "gms"
+
+
+def test_adversarial_email_and_url_banned_units_guard():
+    """Verify email domains and web links never trigger banned unit violations."""
+    samples = [
+        "Customer Care Email: customercare@ml.co.in",
+        "Web Portal: https://www.parlegms.com/help",
+        "Visit www.ml.com for complaints",
+        "Contact: feedback@nestle.ml.com, Phone: 1800 102 1234",
+    ]
+    for sample in samples:
+        has_banned, sym = StatutoryDeclarationParser.detect_banned_units(sample)
+        assert has_banned is False, f"Falsely flagged legal domain in: {sample}"
+        assert sym is None
+
+
+def test_adversarial_hindi_mrp_and_derived_dates():
+    """Verify bilingual Hindi pricing and calculated expiration epochs."""
+    mrp = StatutoryDeclarationParser.parse_mrp("अधिकतम खुदरा मूल्य: रु. ५०.०० (सभी कर सहित)")
+    assert mrp is not None
+    assert mrp["amount"] == 50.0
+    assert mrp["tax_inclusive"] is True
+
+    dates = StatutoryDeclarationParser.parse_mfg_and_expiry_dates("Mfg: 01/2024, Best before 36 months")
+    assert dates["mfg_month"] == 1
+    assert dates["mfg_year"] == 2024
+    assert dates["exp_month"] == 1
+    assert dates["exp_year"] == 2027
+    assert dates["is_derived_expiry"] is True
+
+

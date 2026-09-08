@@ -508,5 +508,227 @@ def test_generic_name_parsing():
     text2 = "Commodity: Whole Wheat Atta"
     assert StatutoryDeclarationParser.parse_generic_name(text2) == "Whole Wheat Atta"
 
+    text3 = "सामान्य नाम: बिस्कुट"
+    assert StatutoryDeclarationParser.parse_generic_name(text3) == "बिस्कुट"
+
+    text4 = "उत्पाद का नाम: आलू चिप्स"
+    assert StatutoryDeclarationParser.parse_generic_name(text4) == "आलू चिप्स"
+
+
+def test_multipack_net_quantity_parsing():
+    """Verify multi-pack and composite wholesale quantity parsing under Rule 24."""
+    # 1. Standard count x piece size (e.g. 4 x 50 g -> 200 g, never unit 'x')
+    res1 = StatutoryDeclarationParser.parse_net_quantity("Net Qty: 4 x 50 g")
+    assert res1 is not None
+    assert res1["magnitude"] == 200.0
+    assert res1["unit"] == "g"
+    assert res1["unit"] != "x"
+    assert res1["piece_count"] == 4
+    assert res1["piece_magnitude"] == 50.0
+
+    # 2. Explicit count N x piece size with declared total
+    res2 = StatutoryDeclarationParser.parse_net_quantity("Net Qty: 4 N x 50 g = 200 g")
+    assert res2 is not None
+    assert res2["magnitude"] == 200.0
+    assert res2["unit"] == "g"
+
+    # 3. Pack of 3 x 100 ml
+    res3 = StatutoryDeclarationParser.parse_net_quantity("Pack of 3 x 100 ml")
+    assert res3 is not None
+    assert res3["magnitude"] == 300.0
+    assert res3["unit"] == "ml"
+
+    # 4. Multi-pack with banned unit in piece declaration
+    res4 = StatutoryDeclarationParser.parse_net_quantity("Net Qty: 4 x 50 gms")
+    assert res4 is not None
+    assert res4["magnitude"] == 200.0
+    assert res4["has_banned_unit"] is True
+    assert res4["banned_unit_found"] == "gms"
+
+
+def test_banned_units_email_and_url_domain_guard():
+    """Verify email domains and URLs containing 'ml' or 'gms' do not falsely trigger banned unit violations."""
+    # Email with .ml domain or ml user
+    has_banned1, sym1 = StatutoryDeclarationParser.detect_banned_units("Customer Care: care@ml.com")
+    assert has_banned1 is False
+    assert sym1 is None
+
+    # URL with ml
+    has_banned2, sym2 = StatutoryDeclarationParser.detect_banned_units("Visit: https://www.ml.com/care")
+    assert has_banned2 is False
+
+    # Real banned unit in same text alongside email
+    has_banned3, sym3 = StatutoryDeclarationParser.detect_banned_units("Net Qty: 500 ML. Email: care@ml.com")
+    assert has_banned3 is True
+    assert sym3 == "ML"
+
+
+def test_hindi_mrp_currency_symbols():
+    """Verify Hindi currency symbols (रु., रू., रुपये) in MRP extraction."""
+    # 1. Standalone Hindi currency with explicit prefix
+    mrp1 = StatutoryDeclarationParser.parse_mrp("अ.वि.मू. रु. ५०/-")
+    assert mrp1 is not None
+    assert mrp1["amount"] == 50.0
+    assert mrp1["currency"] == "INR"
+    assert mrp1["tax_inclusive"] is False
+
+    # 2. Hindi MRP with full prefix and tax inclusion clause
+    mrp2 = StatutoryDeclarationParser.parse_mrp("अधिकतम खुदरा मूल्य: रु. ५०.०० (सभी कर सहित)")
+    assert mrp2 is not None
+    assert mrp2["amount"] == 50.0
+    assert mrp2["tax_inclusive"] is True
+
+    # 3. Currency symbol रू.
+    mrp3 = StatutoryDeclarationParser.parse_mrp("अ.वि.मू. रू. १००/- (कर सहित)")
+    assert mrp3 is not None
+    assert mrp3["amount"] == 100.0
+    assert mrp3["tax_inclusive"] is True
+
+
+def test_derived_expiry_date_computation():
+    """Verify derived expiry date calculation from manufacturing date + best before duration."""
+    # 1. 12 months from 03/2024 -> 03/2025
+    d1 = StatutoryDeclarationParser.parse_mfg_and_expiry_dates("Mfg Date: 03/2024, Best before 12 months")
+    assert d1["mfg_month"] == 3
+    assert d1["mfg_year"] == 2024
+    assert d1["exp_month"] == 3
+    assert d1["exp_year"] == 2025
+    assert d1.get("is_derived_expiry") is True
+
+    # 2. 24 months from 11/2023 -> 11/2025
+    d2 = StatutoryDeclarationParser.parse_mfg_and_expiry_dates("Pkd: 11/2023, Best before 24 months")
+    assert d2["mfg_month"] == 11
+    assert d2["mfg_year"] == 2023
+    assert d2["exp_month"] == 11
+    assert d2["exp_year"] == 2025
+
+    # 3. Explicit expiry date takes priority over best before duration
+    d3 = StatutoryDeclarationParser.parse_mfg_and_expiry_dates("Mfg: 04/2024, Exp: 10/2025, Best before 12 months")
+    assert d3["exp_month"] == 10
+    assert d3["exp_year"] == 2025
+    assert d3.get("is_derived_expiry") is None
+
+
+def test_fmcg_industrial_hubs_mapping():
+    """Verify major Indian FMCG manufacturing hubs map correctly to States."""
+    # Baddi -> Himachal Pradesh
+    a1 = StatutoryDeclarationParser.parse_address("Plot 14, Industrial Area, Baddi 173205")
+    assert a1["state"] == "Himachal Pradesh"
+    assert a1["pin_code"] == "173205"
+
+    # Vapi -> Gujarat
+    a2 = StatutoryDeclarationParser.parse_address("Plot 55, Phase II, GIDC, Vapi 396195")
+    assert a2["state"] == "Gujarat"
+    assert a2["pin_code"] == "396195"
+
+    # Haridwar -> Uttarakhand
+    a3 = StatutoryDeclarationParser.parse_address("Plot 1, SIDCUL, Haridwar 249403")
+    assert a3["state"] == "Uttarakhand"
+    assert a3["pin_code"] == "249403"
+
+
+def test_banned_units_corporate_gm_defense():
+    """Verify uppercase GM in corporate entities or job titles never triggers false accusations (NFR-06)."""
+    # 1. Company names with GM must NOT be flagged
+    has_banned1, sym1 = StatutoryDeclarationParser.detect_banned_units("Manufactured by: GM Foods Pvt Ltd")
+    assert has_banned1 is False
+    assert sym1 is None
+
+    # 2. Job title GM must NOT be flagged
+    has_banned2, sym2 = StatutoryDeclarationParser.detect_banned_units("Contact: GM - Operations")
+    assert has_banned2 is False
+
+    # 3. Non-GM crops must NOT be flagged
+    has_banned3, sym3 = StatutoryDeclarationParser.detect_banned_units("Ingredients: Non-GM soybean")
+    assert has_banned3 is False
+
+    # 4. Email CC header must NOT be flagged as cubic centimeter
+    has_banned4, sym4 = StatutoryDeclarationParser.detect_banned_units("CC: legal@nestle.com")
+    assert has_banned4 is False
+
+    # 5. Full text with GM company but legal 500 g net quantity must have has_banned_unit: False
+    qty1 = StatutoryDeclarationParser.parse_net_quantity("Manufactured by: GM Foods Pvt Ltd, Net Qty: 500 g")
+    assert qty1 is not None
+    assert qty1["magnitude"] == 500.0
+    assert qty1["unit"] == "g"
+    assert qty1["has_banned_unit"] is False
+
+    # 6. Actual illegal 500 GM must be flagged
+    qty2 = StatutoryDeclarationParser.parse_net_quantity("Net Qty: 500 GM")
+    assert qty2 is not None
+    assert qty2["has_banned_unit"] is True
+    assert qty2["banned_unit_found"] == "GM"
+
+
+def test_mrp_inc_gst_and_ocr_inclusivity():
+    """Verify GST, OCR missing 'l' (inc. of taxes), and Devanagari tax clauses."""
+    # OCR dropping 'l' -> 'inc. of all taxes'
+    mrp1 = StatutoryDeclarationParser.parse_mrp("MRP Rs. 150 (inc. of all taxes)")
+    assert mrp1 is not None
+    assert mrp1["amount"] == 150.0
+    assert mrp1["tax_inclusive"] is True
+
+    # GST clause
+    mrp2 = StatutoryDeclarationParser.parse_mrp("MRP Rs. 200 (incl. of GST)")
+    assert mrp2 is not None
+    assert mrp2["amount"] == 200.0
+    assert mrp2["tax_inclusive"] is True
+
+    # Spaced acronym M. R. P.
+    mrp3 = StatutoryDeclarationParser.parse_mrp("M. R. P. Rs. 250 (incl. of all taxes)")
+    assert mrp3 is not None
+    assert mrp3["amount"] == 250.0
+    assert mrp3["tax_inclusive"] is True
+
+    # Devanagari कुल कर सहित
+    mrp4 = StatutoryDeclarationParser.parse_mrp("अधिकतम खुदरा मूल्य रु. 99 (कुल कर सहित)")
+    assert mrp4 is not None
+    assert mrp4["amount"] == 99.0
+    assert mrp4["tax_inclusive"] is True
+
+
+def test_usp_hindi_and_count_standardization():
+    """Verify USP normalization for Hindi Devanagari and count units."""
+    # Hindi gram -> g
+    usp1 = StatutoryDeclarationParser.parse_usp("USP: Rs. 0.50 / ग्राम")
+    assert usp1 is not None
+    assert usp1["price_per_unit"] == 0.50
+    assert usp1["unit"] == "g"
+
+    # Hindi 100 gram -> 100g
+    usp2 = StatutoryDeclarationParser.parse_usp("USP: Rs. 50 / 100 ग्राम")
+    assert usp2 is not None
+    assert usp2["price_per_unit"] == 50.0
+    assert usp2["unit"] == "100g"
+
+    # Hindi nag -> N
+    usp3 = StatutoryDeclarationParser.parse_usp("USP: Rs. 10 / नग")
+    assert usp3 is not None
+    assert usp3["price_per_unit"] == 10.0
+    assert usp3["unit"] == "N"
+
+    # Count unit -> unit
+    usp4 = StatutoryDeclarationParser.parse_usp("USP: Rs. 15.00 / unit")
+    assert usp4 is not None
+    assert usp4["price_per_unit"] == 15.0
+    assert usp4["unit"] == "unit"
+
+
+def test_consumer_care_actual_address_and_title_extraction():
+    """Verify consumer care extracts actual postal address reference and contact designation."""
+    text1 = "For complaints contact: Nodal Officer, Write to us at: P.O. Box 1234, Mumbai, Phone: 1800-11-2233, Email: care@domain.com"
+    res1 = StatutoryDeclarationParser.check_consumer_care_completeness(text1)
+    assert res1["is_complete"] is True
+    assert res1["contact_name"] == "Nodal Officer"
+    assert "P.O. Box 1234" in res1["address"]
+
+    text2 = "For complaints contact: Customer Care Executive at the address given above, Helpline: 18001801234, Email: care@nestle.in"
+    res2 = StatutoryDeclarationParser.check_consumer_care_completeness(text2)
+    assert res2["is_complete"] is True
+    assert res2["contact_name"] == "Customer Care Executive"
+    assert res2["address"] == "At manufacturer's address given on pack"
+
+
+
 
 

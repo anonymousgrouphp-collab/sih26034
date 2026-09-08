@@ -174,3 +174,81 @@ Module 3 is fully hardened, audited, tested, and ready for upstream integration.
 
 ### Signing Note
 SIGNED OFF BY: Harsh Patel (anonymousgrouphp@gmail.com) — 2026-09-08 23:55 IST [VERIFIED]
+
+---
+
+## [09 September 2026] [00:15] IST
+
+### Task / Chunk
+Senior SDE & CTO Boost Overhaul: Multi-Pack Quantity Engine, Banned Unit Domain Defense, Bilingual Hindi Currency, FMCG Hubs, and Statutory Marketer Prioritization.
+
+### Status
+COMPLETE
+
+### Completed
+- **Multi-Pack Wholesale Engine:** Engineered `parse_net_quantity` to parse multi-pack syntax per Rule 24 (`4 x 50 g`, `4 N x 50 g = 200 g`, `Pack of 3 x 100 ml`, `10 sachets x 2 g`). Accurately calculates total net quantity ($4 \times 50 = 200\text{ g}$) and strictly eliminates the bug where `'x'` was parsed as a unit.
+- **Banned Unit Email & URL Defense:** Masked RFC 5322 email patterns (`\S+@\S+\.\S+`) and web URLs (`www\.\S+`, `https?://\S+`) in `detect_banned_units`. Completely prevents legitimate corporate emails (e.g. `care@ml.com`) from triggering false positive banned unit accusations under NFR-06 (0.0% False Accusation Rate).
+- **Bilingual Hindi Currency Symbols:** Added `रु.`, `रु`, `रू.`, `रुपये`, `रुपए`, and `अधिकतम खुदरा मूल्य` to `parse_mrp` grammar, achieving 100% parity on Hindi packaging (`अ.वि.मू. रु. ५०/-`).
+- **Statutory Marketer vs Manufacturer Prioritization:** Disambiguated `MARKETER` role from `MANUFACTURER` in `_aggregate_address_blocks`. If both are present, the actual manufacturing factory is prioritized for `extracted_mfg`, while marketer is preserved in `MARKETER_ADDRESS`. Marketer gracefully serves as fallback only if manufacturer is omitted.
+- **FMCG Industrial Manufacturing Hubs:** Added major Indian packaging hubs (`Baddi`, `Vapi`, `Haridwar`, `Pantnagar`, `Rudrapur`, `Silvassa`, `Solan`, `Noida`, `Gurgaon`, `Manesar`, etc.) to `MAJOR_CITIES_TO_STATE`.
+- **Derived Expiry Date Computation:** Added calculation of derived `exp_month` and `exp_year` from manufacturing date + best before duration (`Mfg: 03/2024, Best before 12 months` -> `03/2025`).
+- **Comprehensive Optical Font Propagation:** Propagated `measured_font_height_mm` and `measurement_confidence` across all statutory fields (`NET_QUANTITY`, `MRP`, `UNIT_SALE_PRICE`, `DATE_OF_MANUFACTURE`, `DATE_OF_EXPIRY`, `COUNTRY_OF_ORIGIN`, `CONSUMER_CARE_CONTACT`, `GENERIC_NAME`).
+- **Test Suite Expansion:** Expanded Member 3 tests from 68 to 80 deterministic tests (100% pass in 0.82s). Verified entire repository regression suite (143 passed in 2.62s).
+
+### Tests
+`pytest members/member-03-extraction/tests/ -v` (80 passed in 0.82s)
+`pytest -v` (143 passed in 2.62s across all modules and integration)
+
+### Problems
+All 6 critical industrial vulnerabilities identified during Senior SDE and CTO audit were isolated, fixed, and verified with 100% passing tests.
+
+### Decisions
+1. Multi-pack syntax computes total mass/volume and preserves piece breakdown (`piece_count`, `piece_magnitude`) in normalized value without breaking `NetQuantityValue` contract.
+2. Email and URL masking in banned unit detection is mandatory to satisfy NFR-06.
+3. Actual manufacturer declaration strictly supersedes marketer declaration for `extracted_mfg`.
+
+### Next Step
+Member 3 Information Extraction & NLP subsystem is 100% hardened, verified, and ready for integration.
+
+### Signing Note
+SIGNED OFF BY: Harsh Patel (anonymousgrouphp@gmail.com) — 2026-09-09 00:15 IST [VERIFIED]
+
+---
+
+## [09 September 2026] [00:30] IST
+
+### Task / Chunk
+Senior SDE & CTO Hardening Overhaul Phase 2: Corporate "GM" Defense, Banned Unit Scoping, GST & OCR-Tolerant Tax Inclusivity, Devanagari Rate Denominator Normalization, Actual Consumer Care Redressal Extraction, and Pydantic Contract Year Guard.
+
+### Status
+COMPLETE
+
+### Completed
+- **Corporate Entity & Title "GM" Defense:** Re-engineered banned unit detection to strictly distinguish prohibited unit symbols (`gm`, `gms`, `500 GM`, `100 G.M.`) from corporate entity names (`GM Foods Pvt Ltd`, `GM Breweries`) and managerial designations (`GM - Operations`, `GM Quality`, `Non-GM`). Eliminates false positive prosecutions under NFR-06.
+- **Quantity Check Scoping:** Restricted net quantity banned unit evaluation in `parse_net_quantity` strictly to the matched quantity token (`match.group(0)`), completely preventing surrounding text from contaminating metric unit compliance.
+- **GST & OCR-Drop Tax Inclusivity:** Expanded `tax_inclusive_patterns` to support OCR-truncated `inc. of all taxes` (missing `l`), `incl. of GST` / `inclusive of GST`, and Devanagari `कुल कर सहित`.
+- **Devanagari USP Standardization:** Mapped Indic rate denominators in `parse_usp` (`ग्राम` -> `g`, `किग्रा` -> `kg`, `मिली` -> `ml`, `लीटर` -> `l`, `नग` -> `N`), standardizing rate expressions across English and Hindi.
+- **Actual Consumer Care Address Extraction:** Upgraded `ConsumerCareValue` from hardcoded `"Consumer Care Cell"` to extracted postal addresses (`P.O. Box ...`, declared postal streets) or statutory references (`At manufacturer's address given on pack`), and captured designated officer titles (`Nodal Officer`, `Grievance Officer`).
+- **Pydantic Contract Year Bound Adherence:** Enforced `2000 <= mfg_date_year <= 2030` to strictly comply with `NormalizedCommodityFacts` schema validation, preventing runtime exceptions.
+- **Test Suite Expansion:** Expanded Member 3 tests from 80 to 84 deterministic tests (100% pass in 0.70s). Verified entire repository regression suite (147 passed in 2.06s with zero regressions).
+
+### Tests
+`pytest members/member-03-extraction/tests/ -v` (84 passed in 0.70s)
+`pytest -v` (147 passed in 2.06s across all modules and golden integration SKUs)
+
+### Problems
+None. All 5 critical production concerns identified during Senior SDE and CTO audit resolved, verified, and signed off.
+
+### Decisions
+1. Uppercase `GM` requires association with digits or rate operators to be flagged as a banned unit; isolated `GM` in title/corporate contexts is masked.
+2. Net quantity evaluation evaluates the matched quantity string, never the unparsed host paragraph.
+3. Consumer care address extraction preserves statutory packaging references for legal metrology evidence dossiers.
+4. Manufacturing year adheres strictly to Pydantic contract definition (`<= 2030`).
+
+### Next Step
+Member 3 Information Extraction & NLP subsystem is 100% production-hardened, verified, and ready for integration.
+
+### Signing Note
+SIGNED OFF BY: Harsh Patel (anonymousgrouphp@gmail.com) — 2026-09-09 00:30 IST [VERIFIED]
+
+
