@@ -46,8 +46,8 @@ MODEL_REGISTRY = {
         "local_filename": "en_dict.txt",
         "url": "https://raw.githubusercontent.com/PaddlePaddle/PaddleOCR/release/2.7/ppocr/utils/en_dict.txt",
         "upstream": "PaddleOCR upstream en_dict.txt",
-        "sha256": "f27a6aa993c9cb67a588e7ea9aea90bb96b8e51dec6ce98bd7e76c104c1829fe",
-        "size": 285,
+        "sha256": "5662df9d2d03f0e8ca0d3b0649d6acbab904b6a14b3d3521463c71c37c668ce3",
+        "size": 190,
         "license": "Apache-2.0",
         "desc": "PP-OCR English Character Vocabulary (95 chars, Apache-2.0)"
     },
