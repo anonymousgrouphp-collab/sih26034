@@ -29,6 +29,12 @@ from contracts.extraction.extraction_dto import (
 )
 
 try:
+    from contracts.calibration.calibration_dto import CalibrationDTO, CalibrationResult
+except ImportError:
+    CalibrationDTO = None  # type: ignore
+    CalibrationResult = None  # type: ignore
+
+try:
     from .parsers import StatutoryDeclarationParser
 except ImportError:
     from parsers import StatutoryDeclarationParser
@@ -56,8 +62,76 @@ class CommodityFactExtractor:
         self.horizontal_gap_threshold = horizontal_gap_threshold
         self.parser = StatutoryDeclarationParser
 
-    def _normalize_tokens(self, ocr_data: Union[Dict[str, Any], Any]) -> Tuple[str, List[Dict[str, Any]], str, Optional[float]]:
-        """Extracts image_id, tokens list, full_text, and optional calibration scale from dict or DTO."""
+    def _resolve_calibration(
+        self,
+        ocr_data: Any,
+        explicit_calibration: Optional[Any] = None
+    ) -> Tuple[Optional[float], Optional[float]]:
+        """Resolves (px_to_mm, calibration_confidence) from calibration object or embedded OCR payload.
+
+        Seamlessly accepts Member 1's CalibrationResult, CalibrationDTO, dictionary, or raw float.
+        """
+        calib_obj = explicit_calibration
+        if calib_obj is None:
+            if isinstance(ocr_data, dict):
+                calib_obj = ocr_data.get("calibration") or ocr_data.get("calibration_data")
+            elif hasattr(ocr_data, "calibration"):
+                calib_obj = getattr(ocr_data, "calibration", None)
+
+        if calib_obj is None:
+            if isinstance(ocr_data, dict) and "px_to_mm" in ocr_data:
+                scale = ocr_data.get("px_to_mm")
+                if isinstance(scale, (int, float)) and scale > 0:
+                    return float(scale), 0.95
+            return None, None
+
+        # Numeric float or int
+        if isinstance(calib_obj, (int, float)) and calib_obj > 0:
+            return float(calib_obj), 0.95
+
+        # CalibrationResult (from Member 1 contracts/calibration/calibration_dto.py)
+        if hasattr(calib_obj, "is_calibrated") and hasattr(calib_obj, "calibration"):
+            if not calib_obj.is_calibrated:
+                return None, None
+            inner = calib_obj.calibration
+            px_to_mm = getattr(inner, "px_to_mm", None)
+            conf = getattr(inner, "confidence", 0.95)
+            if px_to_mm and px_to_mm > 0:
+                return float(px_to_mm), float(conf) if conf is not None else 0.95
+            return None, None
+
+        # CalibrationDTO
+        if hasattr(calib_obj, "px_to_mm"):
+            method = getattr(calib_obj, "method", None)
+            if method == "UNRESOLVED":
+                return None, None
+            px_to_mm = getattr(calib_obj, "px_to_mm", None)
+            conf = getattr(calib_obj, "confidence", 0.95)
+            if px_to_mm and px_to_mm > 0:
+                return float(px_to_mm), float(conf) if conf is not None else 0.95
+            return None, None
+
+        # Dict representation
+        if isinstance(calib_obj, dict):
+            if calib_obj.get("is_calibrated") is False or calib_obj.get("method") == "UNRESOLVED":
+                return None, None
+            if "calibration" in calib_obj and isinstance(calib_obj["calibration"], dict):
+                inner = calib_obj["calibration"]
+                if inner.get("method") == "UNRESOLVED":
+                    return None, None
+                scale = inner.get("px_to_mm")
+                conf = inner.get("confidence", 0.95)
+                if scale and scale > 0:
+                    return float(scale), float(conf) if conf is not None else 0.95
+            scale = calib_obj.get("px_to_mm")
+            conf = calib_obj.get("confidence", 0.95)
+            if scale and scale > 0:
+                return float(scale), float(conf) if conf is not None else 0.95
+
+        return None, None
+
+    def _normalize_tokens(self, ocr_data: Union[Dict[str, Any], Any]) -> Tuple[str, List[Dict[str, Any]], str]:
+        """Extracts image_id, tokens list, and full_text from dict or DTO."""
         if hasattr(ocr_data, "model_dump"):
             data = ocr_data.model_dump()
         elif hasattr(ocr_data, "dict"):
@@ -75,12 +149,7 @@ class CommodityFactExtractor:
         if not full_text and tokens:
             full_text = "\n".join(t.get("text", "") for t in tokens if t.get("text"))
 
-        # Extract optical calibration px_to_mm scale if attached (from Member 1 calibration)
-        px_to_mm = data.get("px_to_mm")
-        if not px_to_mm and isinstance(data.get("calibration"), dict):
-            px_to_mm = data["calibration"].get("px_to_mm")
-
-        return image_id, tokens, full_text, px_to_mm
+        return image_id, tokens, full_text
 
     def _sort_tokens_reading_order(self, tokens: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Sorts tokens into top-to-bottom, left-to-right 2D reading order."""
@@ -254,6 +323,8 @@ class CommodityFactExtractor:
         address_starters = [
             "manufactured & packed by", "mfg & pkd by", "mfd & pkd by", "mfd. & pkd. by",
             "manufactured and packed by", "निर्माता एवं पैकर", "निर्माता व पैकर",
+            "manufactured in india by", "manufactured in bharat by", "mfd in india by", "mfd. in india by",
+            "packed in india by", "pkd in india by", "pkd. in india by",
             "manufactured by", "mfd by", "mfd. by", "mfg by", "mfg. by", "produced by",
             "packed by", "pkd by", "pkd. by", "packaging by", "pre-packed by",
             "imported by", "importer", "marketed by", "address", "registered office",
@@ -350,9 +421,18 @@ class CommodityFactExtractor:
 
         return blocks
 
-    def extract(self, ocr_data: Union[Dict[str, Any], Any]) -> NormalizedCommodityFacts:
-        """Processes OCR tokens to extract and normalize all statutory commodity declarations."""
-        image_id, tokens, full_text, px_to_mm = self._normalize_tokens(ocr_data)
+    def extract(
+        self,
+        ocr_data: Union[Dict[str, Any], Any],
+        calibration: Optional[Any] = None
+    ) -> NormalizedCommodityFacts:
+        """Processes OCR tokens to extract and normalize all statutory commodity declarations.
+
+        Accepts optional Member 1 calibration results (CalibrationResult, CalibrationDTO, dict, or float)
+        to accurately resolve physical mm font height and measurement confidence for downstream Rule Engine checks.
+        """
+        image_id, tokens, full_text = self._normalize_tokens(ocr_data)
+        px_to_mm, calib_confidence = self._resolve_calibration(ocr_data, calibration)
         sorted_tokens = self._sort_tokens_reading_order(tokens)
         composite_lines = self._cluster_horizontal_lines(tokens)
         text_units = self._build_spatial_linked_candidates(composite_lines, sorted_tokens)
@@ -374,7 +454,8 @@ class CommodityFactExtractor:
         def compute_font_height(bbox: List[int]) -> Tuple[Optional[float], Optional[float]]:
             if px_to_mm and px_to_mm > 0:
                 h_px = max(1, bbox[2] - bbox[0])
-                return round(h_px / px_to_mm, 2), 0.95
+                conf = calib_confidence if calib_confidence is not None else 0.95
+                return round(h_px / px_to_mm, 2), round(conf, 2)
             return None, None
 
         # 1. NET QUANTITY & BANNED UNITS
@@ -623,7 +704,8 @@ class CommodityFactExtractor:
                 text_lower = text.lower()
                 if any(k in text_lower for k in [
                     "mfd by", "manufactured by", "mfg by", "marketed by", "pkd by",
-                    "packed by", "imported by", "factory", "address", "निर्माता", "पैकर"
+                    "packed by", "imported by", "factory", "address", "निर्माता", "पैकर",
+                    "manufactured in", "packed in", "mfd in", "mfd. in"
                 ]):
                     role = "PACKER" if any(p in text_lower for p in ["pack", "pkd", "पैकर"]) and not any(m in text_lower for m in ["mfd", "mfg", "manufactur"]) else (
                         "IMPORTER" if "import" in text_lower else (

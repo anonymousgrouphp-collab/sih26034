@@ -251,4 +251,40 @@ Member 3 Information Extraction & NLP subsystem is 100% production-hardened, ver
 ### Signing Note
 SIGNED OFF BY: Harsh Patel (anonymousgrouphp@gmail.com) — 2026-09-09 00:30 IST [VERIFIED]
 
+---
+
+## [09 September 2026] [00:50] IST
+
+### Task / Chunk
+Senior SDE & CTO Hardening Overhaul Phase 3: Member 1 Calibration Synergy & Direct Scale Injection, Indic Matra Unicode Boundary Defense, Hindi Gazette Statutory Terminology, Origin Prefix Address Anchors, and Industrial Clusters Expansion.
+
+### Status
+COMPLETE
+
+### Completed
+- **Member 1 Metrology Synergy:** Implemented `_resolve_calibration` in `CommodityFactExtractor`, accepting Member 1's `CalibrationResult`, `CalibrationDTO`, dictionaries, or numeric scale factors. Seamlessly propagates `measured_font_height_mm` and `measurement_confidence` across `ExtractedFieldDTO` elements for downstream Member 4 Table-I compliance. Uncalibrated/unresolved frames cleanly suppress font metrics rather than hallucinating measurements.
+- **Indic Matra Unicode Boundary Defense:** Identified and resolved Python regex word boundary failure on Indic matras (combining vowel signs `ी`, `ा`, `ु` under Unicode category `Mc` treated as `\W`), replacing vulnerable `\b` assertions with Unicode-safe negative lookahead `(?!\w|[\u0900-\u097F])`.
+- **Hindi Gazette Statutory Terminology:** Expanded regex parsers to recognize official Hindi Gazette phrases under LMPC Rules 2011: `निवल मात्रा` (Net Quantity), `निवल सामग्री` (Multipack contents), `इकाई विक्रय मूल्य` / `इकाई बिक्री मूल्य` (Unit Sale Price), and `वस्तु का नाम` (Generic Name).
+- **Origin Address Prefix Anchors:** Enhanced address entity extraction to support packaging declarations with origin specifications (`Manufactured in India by: ...`, `Packed in Bharat by: ...`, `Mfd in India by: ...`).
+- **Industrial Packaging Clusters:** Mapped key manufacturing and packaging industrial hubs (`Kanchipuram`, `Hosur`, `Thiruvallur`, `Sri City`, `Sanand`, `Bhiwadi`, `Sonipat`, `Panipat`) directly to statutory States.
+- **Test Suite Expansion:** Added 6 new comprehensive unit and integration tests. Expanded Member 3 test suite to 90 deterministic tests (100% pass in 0.39s). Verified entire repository regression suite (153 passed in 1.25s with zero regressions).
+
+### Tests
+`pytest members/member-03-extraction/tests/ -v` (90 passed in 0.39s)
+`pytest -v` (153 passed in 1.25s across all modules and golden integration SKUs)
+
+### Problems
+None. Indic matra boundary edge-case isolated and solved. Full synergy with Member 1 PR #3 verified.
+
+### Decisions
+1. Direct injection of Member 1 `CalibrationResult` into `CommodityFactExtractor.extract` automatically extracts physical millimeter dimensions without intermediate conversion layers.
+2. Uncalibrated or unresolved inspection frames return `None` for font height, maintaining epistemic truthfulness and preventing wrongful accusations.
+3. Indic vowel sign word boundaries must use `(?!\w|[\u0900-\u097F])` to prevent non-word category `Mc` boundary collapse.
+
+### Next Step
+Subsystem 100% complete, fully aligned with Member 1 and Member 4, tested, documented, and ready for commit and pull request.
+
+### Signing Note
+SIGNED OFF BY: Harsh Patel (anonymousgrouphp@gmail.com) — 2026-09-09 00:50 IST [VERIFIED]
+
 

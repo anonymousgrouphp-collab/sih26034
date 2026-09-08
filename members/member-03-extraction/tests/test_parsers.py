@@ -729,6 +729,68 @@ def test_consumer_care_actual_address_and_title_extraction():
     assert res2["address"] == "At manufacturer's address given on pack"
 
 
+def test_gazette_statutory_hindi_terms():
+    """Verify official Hindi Gazette terms under LMPC Rules 2011."""
+    # 1. Gazette Net Quantity: निवल मात्रा
+    qty1 = StatutoryDeclarationParser.parse_net_quantity("निवल मात्रा: 500 g")
+    assert qty1 is not None
+    assert qty1["magnitude"] == 500.0
+    assert qty1["unit"] == "g"
+
+    # 2. Gazette Multipack: निवल सामग्री
+    qty2 = StatutoryDeclarationParser.parse_net_quantity("निवल सामग्री: 4 x 50 g")
+    assert qty2 is not None
+    assert qty2["magnitude"] == 200.0
+    assert qty2["unit"] == "g"
+
+    # 3. Gazette Unit Sale Price: इकाई विक्रय मूल्य
+    usp1 = StatutoryDeclarationParser.parse_usp("इकाई विक्रय मूल्य: ₹ 1.25 / ग्राम")
+    assert usp1 is not None
+    assert usp1["price_per_unit"] == 1.25
+    assert usp1["unit"] == "g"
+
+    # 4. Gazette Unit Sale Price with प्रति: इकाई बिक्री मूल्य: रु. 0.50 प्रति मिली
+    usp2 = StatutoryDeclarationParser.parse_usp("इकाई बिक्री मूल्य: रु. 0.50 प्रति मिली")
+    assert usp2 is not None
+    assert usp2["price_per_unit"] == 0.50
+    assert usp2["unit"] == "ml"
+
+    # 5. Gazette Commodity Name: वस्तु का नाम
+    gen1 = StatutoryDeclarationParser.parse_generic_name("वस्तु का नाम: पारले-जी बिस्कुट")
+    assert gen1 == "पारले-जी बिस्कुट"
+
+
+def test_address_with_origin_prefix():
+    """Verify address parser extracts entity and location when prefixed with manufacturing origin."""
+    # 1. Manufactured in India by
+    addr1 = StatutoryDeclarationParser.parse_address(
+        "Manufactured in India by: ABC Consumer Goods Pvt Ltd, Plot 12, Sanand, Gujarat 382110"
+    )
+    assert addr1 is not None
+    assert "ABC Consumer Goods" in addr1["name"]
+    assert addr1["state"] == "Gujarat"
+    assert addr1["pin_code"] == "382110"
+    assert addr1["is_complete"] is True
+
+    # 2. Packed in Bharat by
+    addr2 = StatutoryDeclarationParser.parse_address(
+        "Packed in Bharat by: South Agro Foods Ltd, SIPCOT Phase 1, Hosur, Tamil Nadu 635126"
+    )
+    assert addr2 is not None
+    assert "South Agro Foods" in addr2["name"]
+    assert addr2["state"] == "Tamil Nadu"
+    assert addr2["pin_code"] == "635126"
+    assert addr2["is_complete"] is True
+
+    # 3. Industrial cluster Kanchipuram
+    addr3 = StatutoryDeclarationParser.parse_address(
+        "Mfd by: Chennai Packagers Ltd, Industrial Hub, Kanchipuram 631501"
+    )
+    assert addr3 is not None
+    assert addr3["state"] == "Tamil Nadu"
+    assert addr3["pin_code"] == "631501"
+
+
 
 
 

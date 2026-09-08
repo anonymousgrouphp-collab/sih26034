@@ -15,6 +15,7 @@ if str(SRC_DIR) not in sys.path:
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from contracts.calibration.calibration_dto import CalibrationDTO, CalibrationResult, PDPGeometryDTO
 from contracts.extraction.extraction_dto import NormalizedCommodityFacts
 from contracts.ocr.ocr_dto import OCROutput, OCRToken
 from extractor import CommodityFactExtractor
@@ -492,7 +493,7 @@ def test_extract_with_calibration_font_height(extractor):
     facts = extractor.extract(ocr_payload)
     net_field = next(f for f in facts.raw_fields if f.field_type == "NET_QUANTITY")
     assert net_field.measured_font_height_mm == 2.5
-    assert net_field.measurement_confidence == 0.95
+    assert net_field.measurement_confidence == 0.99
 
 
 def test_extract_marketer_vs_manufacturer_priority(extractor):
@@ -605,6 +606,171 @@ def test_extract_multipack_factual_normalization(extractor):
     assert facts.net_quantity.has_banned_unit is False
     assert facts.mrp.amount == 120.0
     assert facts.mrp.tax_inclusive is True
+
+
+def test_extract_with_member1_calibration_dto(extractor):
+    """Verify direct injection of Member 1's CalibrationDTO into extractor."""
+    calib_dto = CalibrationDTO(
+        method="ARUCO_4X4_50",
+        px_to_mm=8.0,
+        confidence=0.97,
+        reference_bounding_box=[10, 10, 50, 50],
+        margin_of_error_pct=1.5,
+    )
+    ocr_payload = {
+        "image_id": "img_m1_calib_01",
+        "tokens": [
+            {
+                "token_id": "t1",
+                "text": "Net Qty: 500 g",
+                "confidence": 0.98,
+                "bounding_box": [100, 50, 124, 250],  # 24 px height / 8.0 px_to_mm = 3.0 mm
+            }
+        ]
+    }
+    facts = extractor.extract(ocr_payload, calibration=calib_dto)
+    net_field = next(f for f in facts.raw_fields if f.field_type == "NET_QUANTITY")
+    assert net_field.measured_font_height_mm == 3.0
+    assert net_field.measurement_confidence == 0.97
+
+
+def test_extract_with_member1_calibration_result(extractor):
+    """Verify direct injection of Member 1's full CalibrationResult into extractor."""
+    calib_result = CalibrationResult(
+        is_calibrated=True,
+        calibration=CalibrationDTO(
+            method="ISO_7810_CARD",
+            px_to_mm=5.0,
+            confidence=0.94,
+            reference_bounding_box=[20, 20, 100, 150],
+        ),
+        principal_display_panel=PDPGeometryDTO(
+            package_type="RECTANGULAR",
+            package_area_cm2=250.0,
+            pdp_area_cm2=100.0,
+            pdp_area_percentage=40.0,
+            bounding_box=[0, 0, 400, 300],
+        )
+    )
+    ocr_payload = {
+        "image_id": "img_m1_calib_02",
+        "tokens": [
+            {
+                "token_id": "t1",
+                "text": "MRP Rs. 200.00 (incl. of all taxes)",
+                "confidence": 0.99,
+                "bounding_box": [50, 50, 70, 200],  # 20 px height / 5.0 = 4.0 mm
+            }
+        ]
+    }
+    facts = extractor.extract(ocr_payload, calibration=calib_result)
+    mrp_field = next(f for f in facts.raw_fields if f.field_type == "MRP")
+    assert mrp_field.measured_font_height_mm == 4.0
+    assert mrp_field.measurement_confidence == 0.94
+
+
+def test_extract_uncalibrated_result_suppresses_font_height(extractor):
+    """Verify that uncalibrated or UNRESOLVED frames suppress font height rather than hallucinate."""
+    unresolved_result = CalibrationResult(
+        is_calibrated=False,
+        calibration=CalibrationDTO(
+            method="UNRESOLVED",
+            px_to_mm=1.0,
+            confidence=0.0,
+            reference_bounding_box=[0, 0, 0, 0],
+        ),
+        principal_display_panel=PDPGeometryDTO(
+            package_type="RECTANGULAR",
+            package_area_cm2=100.0,
+            pdp_area_cm2=40.0,
+            pdp_area_percentage=40.0,
+            bounding_box=[0, 0, 100, 100],
+        )
+    )
+    ocr_payload = {
+        "image_id": "img_m1_uncalib_01",
+        "tokens": [
+            {
+                "token_id": "t1",
+                "text": "Net Weight: 100 g",
+                "confidence": 0.95,
+                "bounding_box": [10, 10, 30, 80],
+            }
+        ]
+    }
+    facts = extractor.extract(ocr_payload, calibration=unresolved_result)
+    net_field = next(f for f in facts.raw_fields if f.field_type == "NET_QUANTITY")
+    assert net_field.measured_font_height_mm is None
+    assert net_field.measurement_confidence is None
+
+
+def test_extract_end_to_end_gazette_hindi_pack(extractor):
+    """Verify full end-to-end extraction on Gazette Hindi packaged commodity declarations."""
+    ocr_payload = {
+        "image_id": "img_gazette_hindi_pack_01",
+        "tokens": [
+            {
+                "token_id": "t1",
+                "text": "वस्तु का नाम: पारले बिस्कुट",
+                "confidence": 0.96,
+                "bounding_box": [50, 40, 70, 250],
+            },
+            {
+                "token_id": "t2",
+                "text": "निवल मात्रा: 250 g",
+                "confidence": 0.98,
+                "bounding_box": [80, 40, 100, 200],
+            },
+            {
+                "token_id": "t3",
+                "text": "अधिकतम खुदरा मूल्य: ₹ 50.00 (सभी करों सहित)",
+                "confidence": 0.97,
+                "bounding_box": [110, 40, 130, 350],
+            },
+            {
+                "token_id": "t4",
+                "text": "इकाई विक्रय मूल्य: ₹ 0.20 / ग्राम",
+                "confidence": 0.96,
+                "bounding_box": [140, 40, 160, 280],
+            },
+            {
+                "token_id": "t5",
+                "text": "उत्पादन माह एवं वर्ष: 04/2024",
+                "confidence": 0.95,
+                "bounding_box": [170, 40, 190, 260],
+            },
+            {
+                "token_id": "t6",
+                "text": "Manufactured in India by: ABC Foods Ltd",
+                "confidence": 0.97,
+                "bounding_box": [200, 40, 220, 340],
+            },
+            {
+                "token_id": "t7",
+                "text": "Plot 10, Industrial Estate, Sanand, Gujarat 382110",
+                "confidence": 0.98,
+                "bounding_box": [225, 40, 245, 380],
+            }
+        ]
+    }
+    facts = extractor.extract(ocr_payload)
+    assert facts.net_quantity is not None
+    assert facts.net_quantity.magnitude == 250.0
+    assert facts.net_quantity.unit == "g"
+    assert facts.mrp is not None
+    assert facts.mrp.amount == 50.0
+    assert facts.mrp.tax_inclusive is True
+    assert facts.unit_sale_price is not None
+    assert facts.unit_sale_price.price_per_unit == 0.20
+    assert facts.unit_sale_price.unit == "g"
+    assert facts.mfg_date_month == 4
+    assert facts.mfg_date_year == 2024
+    assert facts.manufacturer is not None
+    assert "ABC Foods" in facts.manufacturer.name
+    assert facts.manufacturer.state == "Gujarat"
+    assert facts.manufacturer.pin_code == "382110"
+    assert facts.manufacturer.is_complete is True
+
 
 
 

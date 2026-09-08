@@ -96,8 +96,12 @@ MAJOR_CITIES_TO_STATE: Dict[str, str] = {
     "dehradun": "Uttarakhand", "haridwar": "Uttarakhand", "roorkee": "Uttarakhand", "pantnagar": "Uttarakhand", "rudrapur": "Uttarakhand",
     "baddi": "Himachal Pradesh", "solan": "Himachal Pradesh", "nalagarh": "Himachal Pradesh", "parwanoo": "Himachal Pradesh",
     "guwahati": "Assam", "silvassa": "Dadra and Nagar Haveli", "daman": "Daman and Diu",
-    "visakhapatnam": "Andhra Pradesh", "vizag": "Andhra Pradesh", "vijayawada": "Andhra Pradesh",
-    "kochi": "Kerala", "cochin": "Kerala", "thiruvananthapuram": "Kerala", "trivandrum": "Kerala", "panaji": "Goa", "bicholim": "Goa"
+    "visakhapatnam": "Andhra Pradesh", "vizag": "Andhra Pradesh", "vijayawada": "Andhra Pradesh", "sri city": "Andhra Pradesh", "chittoor": "Andhra Pradesh",
+    "kochi": "Kerala", "cochin": "Kerala", "thiruvananthapuram": "Kerala", "trivandrum": "Kerala", "panaji": "Goa", "bicholim": "Goa",
+    "kanchipuram": "Tamil Nadu", "hosur": "Tamil Nadu", "thiruvallur": "Tamil Nadu", "sriperumbudur": "Tamil Nadu",
+    "sanand": "Gujarat", "morbi": "Gujarat", "mehsana": "Gujarat",
+    "bhiwadi": "Rajasthan", "alwar": "Rajasthan", "neemrana": "Rajasthan",
+    "sonipat": "Haryana", "panipat": "Haryana", "kundli": "Haryana"
 }
 
 # High-precision 3-digit PIN prefix overrides for sub-state regions and Union Territories
@@ -280,7 +284,7 @@ class StatutoryDeclarationParser:
         # 0. Check Multi-Pack / Multi-Piece Wholesale Syntax (Rule 24 & Rule 6(1)(c))
         # e.g. "Net Qty: 4 x 50 g", "4 N x 50 g = 200 g", "Pack of 3 x 100 g", "10 sachets x 2 g"
         multipack_pattern = re.compile(
-            r"(?:Net\s*(?:Quantity|Qty\.?|Weight|Wt\.?|Content|Contents|Volume|Vol\.?|Mass)|Quantity|Qty\.?|Pack\s*of|शुद्ध\s*(?:मात्रा|भार|वजन))?\s*[:\-]?\s*"
+            r"(?:Net\s*(?:Quantity|Qty\.?|Weight|Wt\.?|Content|Contents|Volume|Vol\.?|Mass)|Quantity|Qty\.?|Pack\s*of|शुद्ध\s*(?:मात्रा|भार|वजन|सामग्री)|निवल\s*(?:मात्रा|भार|वजन|सामग्री))?\s*[:\-]?\s*"
             r"(?:([0-9]+)\s*(?:N|U|units?|pcs|nos?|pieces?|sachets?|packs?|bars?|bottles?|cans?|नग|इकाई)?\s*(?:of)?\s*[xX*×]\s*([0-9]+(?:\.[0-9]+)?)\s*([a-zA-Z²³\.\u0900-\u097F]+))"
             r"(?:\s*(?:=|Total\s*[:\-]?|\(Total\s*[:\-]?)\s*([0-9]+(?:\.[0-9]+)?)\s*([a-zA-Z²³\.\u0900-\u097F]+)\)?)?",
             re.IGNORECASE
@@ -353,7 +357,7 @@ class StatutoryDeclarationParser:
 
         # 1. Match with explicit quantity prefix (highest priority)
         prefix_pattern = (
-            r"(?:Net\s*(?:Quantity|Qty\.?|Weight|Wt\.?|Content|Contents|Volume|Vol\.?|Mass|Area)|Quantity|Qty\.?|शुद्ध\s*(?:मात्रा|भार|वजन)|मात्रा|वजन)"
+            r"(?:Net\s*(?:Quantity|Qty\.?|Weight|Wt\.?|Content|Contents|Volume|Vol\.?|Mass|Area)|Quantity|Qty\.?|शुद्ध\s*(?:मात्रा|भार|वजन|सामग्री)|निवल\s*(?:मात्रा|भार|वजन|सामग्री)|मात्रा|वजन)"
             r"\s*[:\-]?\s*"
             rf"{mag_pattern}"
             r"\s*"
@@ -560,23 +564,23 @@ class StatutoryDeclarationParser:
 
         norm_text = cls.convert_indic_digits(text)
 
-        usp_prefix = r"(?:Unit\s*Sale\s*Price|USP)"
-        curr = r"(?:Rs\.?|INR|₹)?"
+        usp_prefix = r"(?:Unit\s*Sale\s*Price|USP|इकाई\s*विक्रय\s*मूल्य|इकाई\s*बिक्री\s*मूल्य)"
+        curr = r"(?:Rs\.?|INR|₹|रु\.?|रू\.?|रुपये)?"
         amount_re = r"([0-9]+(?:,\s*[0-9]+)*(?:\.[0-9]{1,4})?)"
-        # Restrict denominator strictly to recognized statutory metric and count units
-        denom_re = r"((?:100\s*)?(?:g|kg|mg|ml|l|cl|m|cm|mm|sq\s*m|sq\s*cm|sq\s*mm|n|u|pieces?|pcs|units?|items?|nos?|tablets?|capsules?|sachets?|packs?|ग्राम|किग्रा|मिली|लीटर|मीटर|नग|इकाई))\b"
+        # Restrict denominator strictly to recognized statutory metric and count units (with Unicode-safe word boundary for Indic matras)
+        denom_re = r"((?:100\s*)?(?:g|kg|mg|ml|l|cl|m|cm|mm|sq\s*m|sq\s*cm|sq\s*mm|n|u|pieces?|pcs|units?|items?|nos?|tablets?|capsules?|sachets?|packs?|ग्राम|किग्रा|मिली|लीटर|मीटर|नग|इकाई))(?!\w|[\u0900-\u097F])"
 
         # Pattern 1: Explicit USP prefix
         p1 = re.compile(
-            rf"{usp_prefix}\s*[:\-]?\s*{curr}\s*{amount_re}\s*(?:/|per)\s*{denom_re}",
+            rf"{usp_prefix}\s*[:\-]?\s*{curr}\s*{amount_re}\s*(?:/|per|प्रति)\s*{denom_re}",
             re.IGNORECASE
         )
         match = p1.search(norm_text)
 
-        # Pattern 2: Standalone 'Rs. X / g' or '₹ X per ml'
+        # Pattern 2: Standalone 'Rs. X / g' or '₹ X per ml' or '₹ X / ग्राम'
         if not match:
             p2 = re.compile(
-                rf"(?:Rs\.?|INR|₹)\s*{amount_re}\s*(?:/|per)\s*{denom_re}",
+                rf"(?:Rs\.?|INR|₹|रु\.?|रू\.?|रुपये)\s*{amount_re}\s*(?:/|per|प्रति)\s*{denom_re}",
                 re.IGNORECASE
             )
             match = p2.search(norm_text)
@@ -885,10 +889,11 @@ class StatutoryDeclarationParser:
         # 3. Detect Registered Corporate Entity Name
         entity_name: Optional[str] = None
 
-        # Approach A: Extract entity anchored to address prefix (e.g. "Manufactured by: Krishna Dairy, ...")
+        # Approach A: Extract entity anchored to address prefix (e.g. "Manufactured by: Krishna Dairy, ...", "Manufactured in India by: ABC Ltd")
         pref_anchor_re = re.compile(
-            r"(?:Manufactured\s*(?:&|and)?\s*Packed\s*by|Manufactured\s*by|Mfd\.?\s*by|Mfg\.?\s*by|"
-            r"Packed\s*by|Pkd\.?\s*by|Marketed\s*by|Imported\s*by|निर्माता(?:\s*एवं\s*पैकर)?|पैकर|निर्मित|आयातकर्ता)\s*[:\-]?\s*"
+            r"(?:Manufactured\s*(?:&|and)?\s*Packed\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
+            r"Manufactured\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Mfd\.?\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Mfg\.?\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
+            r"Packed\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Pkd\.?\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Marketed\s*by|Imported\s*by|निर्माता(?:\s*एवं\s*पैकर)?|पैकर|निर्मित|आयातकर्ता)\s*[:\-]?\s*"
             r"([^,\n\r]+?)(?:,|\n|\r|Plot|Sector|Road|Phase|Industrial|Village|Dist|Taluka|City|Area|Ward|No\.|\b(?=[A-Z][a-z]+\s*-\s*[1-9]))",
             re.IGNORECASE
         )
@@ -910,7 +915,9 @@ class StatutoryDeclarationParser:
             if corp_name_match:
                 raw_entity = corp_name_match.group(1).strip()
                 cleaned_entity = re.sub(
-                    r"^(?:Manufactured\s*(?:&|and)?\s*Packed\s*by|Manufactured\s*by|Mfd\.?\s*by|Mfg\.?\s*by|Packed\s*by|Pkd\.?\s*by|Marketed\s*by|Imported\s*by|Address|निर्माता|पैकर)\s*[:\-]?\s*",
+                    r"^(?:Manufactured\s*(?:&|and)?\s*Packed\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
+                    r"Manufactured\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Mfd\.?\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Mfg\.?\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
+                    r"Packed\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Pkd\.?\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Marketed\s*by|Imported\s*by|Address|निर्माता|पैकर)\s*[:\-]?\s*",
                     "",
                     raw_entity,
                     flags=re.IGNORECASE
@@ -1099,7 +1106,7 @@ class StatutoryDeclarationParser:
 
         norm_text = cls.convert_indic_digits(text)
         generic_pattern = re.compile(
-            r"(?:Generic\s*Name|Common\s*Name|Name\s*of\s*Commodity|Commodity|Product\s*Name|सामान्य\s*नाम|उत्पाद\s*का\s*नाम|सामग्री\s*का\s*नाम)\s*[:\-]?\s*([^\n\r,;]+)",
+            r"(?:Generic\s*Name|Common\s*Name|Name\s*of\s*Commodity|Commodity|Product\s*Name|वस्तु\s*का\s*नाम|सामान्य\s*नाम|उत्पाद\s*का\s*नाम|सामग्री\s*का\s*नाम|वस्तु|उत्पाद)\s*[:\-]?\s*([^\n\r,;]+)",
             re.IGNORECASE
         )
         match = generic_pattern.search(norm_text)

@@ -53,5 +53,10 @@
 - [x] USP Unit Standardization: normalize Devanagari Hindi units (ग्राम, किग्रा, मिली) and count units (N, unit) with rate denominators.
 - [x] Consumer Care Extraction: extract actual redressal address lines and contact titles rather than static placeholders.
 - [x] Pydantic Contract Year Guard: clamp manufacturing year to <= 2030 per NormalizedCommodityFacts schema.
-- [x] Expand test suite to 84 comprehensive deterministic tests passing 100% (and 147 full repo tests passing).
+- [x] Member 1 Calibration Synergy: direct injection of CalibrationDTO and CalibrationResult, propagating physical millimeter heights and measurement confidence for Member 4 Table-I compliance.
+- [x] Hindi Gazette Statutory Terminology: support निवल मात्रा, निवल सामग्री, इकाई विक्रय मूल्य, and वस्तु का नाम.
+- [x] Origin Address Prefix Anchors: support "Manufactured in India/Bharat by" and "Packed in India/Bharat by".
+- [x] FMCG Industrial Hubs: add Kanchipuram, Hosur, Thiruvallur, Sri City, Sanand, Bhiwadi, Sonipat, Panipat.
+- [x] Indic Matra Unicode Boundary Resolution: replace standard \b with (?!\w|[\u0900-\u097F]) to prevent vowel sign truncation.
+- [x] Expand test suite to 90 comprehensive deterministic tests passing 100% (and 153 full repo tests passing with zero regressions).
 
