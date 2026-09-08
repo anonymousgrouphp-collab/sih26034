@@ -29,3 +29,21 @@
 - [x] Complete Definition of Done checklist.
 - [x] Update `progress.md` and `memory.md`.
 
+### Senior SDE & CTO Hardening & Verification
+- [x] Fix word boundary bugs for dotted banned units (`g.m.`, `g.m.s.`, `c.c.`, `ltr.`).
+- [x] Fix MRP comma truncation bug (`Rs. 1,499.00` parsed as `1499.0`).
+- [x] Fix intermediate tax clause extraction in MRP (`MRP (incl. of all taxes) Rs. 250`).
+- [x] Implement multi-line address block aggregation preventing false Rule 6(1)(a) incomplete address flags.
+- [x] Guard Consumer Care against 14-digit FSSAI numbers and barcodes.
+- [x] Add commercial city-to-state and PIN-prefix-to-state mapping (OQ-02).
+- [x] Add complete units suite: mass, volume, length, area, and count (`N`, `U`, `units`).
+- [x] Support OCR spaced slash dates (`04 / 2024`) and named month formats (`15-Mar-2024`).
+- [x] Support Unicode accented brand names (e.g. `Nestlé`).
+- [x] Fix PIN code word-boundary check against false matches on words ending in `rs` (e.g. `Traders`).
+- [x] Fix country of origin period truncation (`U.S.A.` -> `USA`, `P.R.C.` -> `China`).
+- [x] Restrict horizontal line clustering gap to `-20px` to preserve multi-column isolation.
+- [x] Implement `MANUFACTURER_AND_PACKER` joint statutory roles per Rule 6(1)(a).
+- [x] Support Devanagari Hindi metric units (`ग्राम`, `मिली`, `लीटर`) and vulgar fractions (`½`, `¼`, `1/2`).
+- [x] Implement Rule 6(1)(b) Generic Name parsing.
+- [x] Propagate optical calibration `px_to_mm` to `ExtractedFieldDTO.measured_font_height_mm`.
+- [x] Expand test suite to 68 comprehensive deterministic tests passing 100% (and 131 full repo tests passing).

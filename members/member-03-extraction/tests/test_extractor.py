@@ -252,3 +252,246 @@ def test_extract_valid_quantities_fixture(extractor):
     assert facts.mrp.tax_inclusive is True
     assert facts.unit_sale_price.price_per_unit == 0.40
     assert facts.unit_sale_price.unit == "g"
+
+
+def test_extract_multiline_address_block(extractor):
+    """Verify that multi-line address declarations across 3 lines are aggregated into a complete address."""
+    ocr_payload = {
+        "image_id": "img_multiline_addr_01",
+        "tokens": [
+            {
+                "token_id": "t1",
+                "text": "Manufactured by: Parle Products Pvt Ltd",
+                "confidence": 0.98,
+                "bounding_box": [100, 10, 120, 350],
+            },
+            {
+                "token_id": "t2",
+                "text": "North Level Crossing, Vile Parle East",
+                "confidence": 0.97,
+                "bounding_box": [125, 10, 145, 350],
+            },
+            {
+                "token_id": "t3",
+                "text": "Mumbai, Maharashtra 400057",
+                "confidence": 0.98,
+                "bounding_box": [150, 10, 170, 350],
+            }
+        ]
+    }
+
+    facts = extractor.extract(ocr_payload)
+    assert facts.manufacturer is not None
+    assert "Parle Products" in facts.manufacturer.name
+    assert facts.manufacturer.state == "Maharashtra"
+    assert facts.manufacturer.pin_code == "400057"
+    assert facts.manufacturer.is_complete is True
+
+    # Verify union bounding box across the 3 lines
+    mfg_field = next(f for f in facts.raw_fields if f.field_type == "MANUFACTURER_ADDRESS")
+    assert mfg_field.bounding_box == [100, 10, 170, 350]
+
+
+def test_extract_vertically_stacked_tokens(extractor):
+    """Verify linking of vertically stacked label and value tokens."""
+    ocr_payload = {
+        "image_id": "img_vert_stack_01",
+        "tokens": [
+            {
+                "token_id": "t1",
+                "text": "Net Weight:",
+                "confidence": 0.99,
+                "bounding_box": [50, 20, 70, 150],
+            },
+            {
+                "token_id": "t2",
+                "text": "500 g",
+                "confidence": 0.98,
+                "bounding_box": [75, 20, 95, 150],
+            },
+            {
+                "token_id": "t3",
+                "text": "MRP",
+                "confidence": 0.99,
+                "bounding_box": [110, 20, 130, 80],
+            },
+            {
+                "token_id": "t4",
+                "text": "Rs. 250.00 (incl. of all taxes)",
+                "confidence": 0.97,
+                "bounding_box": [135, 20, 155, 320],
+            }
+        ]
+    }
+
+    facts = extractor.extract(ocr_payload)
+    assert facts.net_quantity is not None
+    assert facts.net_quantity.magnitude == 500.0
+    assert facts.net_quantity.unit == "g"
+
+    assert facts.mrp is not None
+    assert facts.mrp.amount == 250.0
+    assert facts.mrp.tax_inclusive is True
+
+
+def test_extract_packer_and_importer_role_disambiguation(extractor):
+    """Verify disambiguation between manufacturer and packer in the same package."""
+    ocr_payload = {
+        "image_id": "img_roles_01",
+        "tokens": [
+            {
+                "token_id": "t1",
+                "text": "Manufactured by: Nestlé India Limited, Industrial Area, Nanjangud, Mysore, Karnataka 571301",
+                "confidence": 0.98,
+                "bounding_box": [100, 10, 130, 600],
+            },
+            {
+                "token_id": "t2",
+                "text": "Packed by: Packaging Solutions Pvt Ltd, Sector 5, Haridwar, Uttarakhand 249403",
+                "confidence": 0.97,
+                "bounding_box": [140, 10, 170, 600],
+            }
+        ]
+    }
+
+    facts = extractor.extract(ocr_payload)
+    assert facts.manufacturer is not None
+    assert "Nestlé India" in facts.manufacturer.name
+    assert facts.manufacturer.state == "Karnataka"
+    assert facts.manufacturer.pin_code == "571301"
+
+    assert facts.packer is not None
+    assert "Packaging Solutions" in facts.packer.name
+    assert facts.packer.state == "Uttarakhand"
+    assert facts.packer.pin_code == "249403"
+
+
+def test_extract_manufactured_and_packed_by_joint_roles(extractor):
+    """Verify that 'Manufactured & Packed by' populates BOTH manufacturer and packer facts."""
+    ocr_payload = {
+        "image_id": "img_joint_roles_01",
+        "tokens": [
+            {
+                "token_id": "t1",
+                "text": "Manufactured & Packed by: Parle Products Pvt Ltd, Mumbai, Maharashtra 400057",
+                "confidence": 0.98,
+                "bounding_box": [100, 10, 130, 600],
+            }
+        ]
+    }
+    facts = extractor.extract(ocr_payload)
+    assert facts.manufacturer is not None
+    assert "Parle Products" in facts.manufacturer.name
+    assert facts.manufacturer.pin_code == "400057"
+    assert facts.manufacturer.state == "Maharashtra"
+
+    assert facts.packer is not None
+    assert "Parle Products" in facts.packer.name
+    assert facts.packer.pin_code == "400057"
+
+
+def test_extract_multi_column_isolation(extractor):
+    """Verify that tokens in distant columns at the same vertical level are NOT merged into the same line."""
+    ocr_payload = {
+        "image_id": "img_multicol_01",
+        "tokens": [
+            {
+                "token_id": "t_right",
+                "text": "Batch No: 9876",
+                "confidence": 0.95,
+                "bounding_box": [100, 500, 120, 650],
+            },
+            {
+                "token_id": "t_left",
+                "text": "Net Qty: 500 g",
+                "confidence": 0.98,
+                "bounding_box": [101, 50, 121, 180],
+            }
+        ]
+    }
+    composite = extractor._cluster_horizontal_lines(ocr_payload["tokens"])
+    assert len(composite) == 2, f"Expected 2 lines for 2 distinct columns, got {len(composite)}"
+
+    facts = extractor.extract(ocr_payload)
+    assert facts.net_quantity is not None
+    assert facts.net_quantity.magnitude == 500.0
+    assert facts.net_quantity.unit == "g"
+
+
+def test_mrp_priority_over_usp_when_usp_precedes_mrp(extractor):
+    """Verify that when USP appears before MRP in token stream, true MRP is not overwritten by USP."""
+    ocr_payload = {
+        "image_id": "img_mrp_usp_order_01",
+        "tokens": [
+            {
+                "token_id": "t1",
+                "text": "USP: Rs. 0.40 / g",
+                "confidence": 0.97,
+                "bounding_box": [100, 50, 120, 250],
+            },
+            {
+                "token_id": "t2",
+                "text": "MRP: Rs. 80.00 (incl. of all taxes)",
+                "confidence": 0.98,
+                "bounding_box": [150, 50, 170, 380],
+            }
+        ]
+    }
+    facts = extractor.extract(ocr_payload)
+    assert facts.mrp is not None
+    assert facts.mrp.amount == 80.0, f"Expected true MRP 80.0, but got {facts.mrp.amount}"
+    assert facts.mrp.tax_inclusive is True
+
+    assert facts.unit_sale_price is not None
+    assert facts.unit_sale_price.price_per_unit == 0.40
+    assert facts.unit_sale_price.unit == "g"
+
+
+def test_extract_generic_name_field(extractor):
+    """Verify generic name extraction per Rule 6(1)(b) into ExtractedFieldDTO."""
+    ocr_payload = {
+        "image_id": "img_generic_name_01",
+        "tokens": [
+            {
+                "token_id": "t1",
+                "text": "Generic Name: Butter Cookies",
+                "confidence": 0.99,
+                "bounding_box": [50, 50, 70, 300],
+            },
+            {
+                "token_id": "t2",
+                "text": "Net Qty: 200 g",
+                "confidence": 0.98,
+                "bounding_box": [80, 50, 100, 200],
+            }
+        ]
+    }
+    facts = extractor.extract(ocr_payload)
+    generic_field = next((f for f in facts.raw_fields if f.field_type == "GENERIC_NAME"), None)
+    assert generic_field is not None
+    assert generic_field.normalized_value.get("generic_name") == "Butter Cookies"
+
+
+def test_extract_with_calibration_font_height(extractor):
+    """Verify that optical scale factor px_to_mm attaches measured_font_height_mm."""
+    ocr_payload = {
+        "image_id": "img_calib_01",
+        "calibration": {
+            "px_to_mm": 10.0,
+            "confidence": 0.99
+        },
+        "tokens": [
+            {
+                "token_id": "t1",
+                "text": "Net Weight: 500 g",
+                "confidence": 0.98,
+                "bounding_box": [100, 50, 125, 250],  # 25 pixels height -> 2.5 mm
+            }
+        ]
+    }
+    facts = extractor.extract(ocr_payload)
+    net_field = next(f for f in facts.raw_fields if f.field_type == "NET_QUANTITY")
+    assert net_field.measured_font_height_mm == 2.5
+    assert net_field.measurement_confidence == 0.95
+
+

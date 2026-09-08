@@ -1,28 +1,35 @@
 """Deterministic Semantic Parsers for Statutory Packaged Commodities Declarations (SIH26034)
-Fulfills Rule 6 LMPC Rules 2011, Section 11 / Rule 12 banned unit detection,
-and Section 63 BSA 2023 deterministic evidence requirements.
+
+Fulfills:
+- Rule 6 of the Legal Metrology (Packaged Commodities) Rules, 2011 (LMPC Rules, 2011)
+- Section 11 & Rule 12: Prohibited non-standard metric symbols and unit standardization
+- Section 63 Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023): Deterministic, auditable evidence
+- Working Default OQ-02: State + 6-digit PIN is statutory minimum for complete address
 """
 
 import re
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 
-# Devanagari numeral conversion mapping
+# Devanagari numeral conversion mapping (०-९ -> 0-9)
 DEVANAGARI_DIGITS_MAP = str.maketrans("०१२३४५६७८९", "0123456789")
 
-# Banned units: Case-insensitive symbols
-# Under Section 11 & Rule 12: gms, gm, g.m., Kgs, kgms, ltrs, ltr, cc, etc. are prohibited.
+# Prohibited units: Strictly capitalized 'ML' or 'Ml' or 'M.L.' (whereas lowercase 'ml' or standard 'mL' is valid)
+# Under Section 11 & Rule 12, capitalized 'ML' represents Mega-Litre (1,000,000 litres), an illegal declaration.
+# Detects ML, Ml, M.L., M.L, M.l., M.l without trailing character bounds.
+BANNED_UNITS_CASE_SENSITIVE = re.compile(
+    r"(?<![a-zA-Z])(?:ML|Ml|M\.?\s*L\.?|M\.?\s*l\.?)(?![a-zA-Z])"
+)
+
+# Prohibited non-standard metric symbols (case-insensitive)
+# Under Section 11 & Rule 12: gms, gm, g.m., g.m.s., Kgs, kgms, ltrs, ltr, LTR, cc, c.c., etc. are strictly prohibited.
+# Punctuation on units: Under Rule 12(b), symbols of units shall not be followed by a period or pluralized (e.g. 'g.', 'kg.', 'ml.', 'l.').
 BANNED_UNITS_CASE_INSENSITIVE = re.compile(
-    r"\b(gms|gm|g\.m\.|g\.m\.s\.|Kgs|kgms|kgs|ltrs|ltr|LTR|LTRS|cc|liters|litres)\b",
+    r"(?<![a-zA-Z])(?:g\.?\s*m\.?\s*s?\.?|gms\.?|gm\.?|g\.|kgms\.?|kgs\.?|k\.\s*g\.?|kg\.|ltrs\.?|ltr\.?|l\.\s*t\.\s*r\.?\s*s?\.?|l\.|ml\.|c\.?\s*c\.?|liters|litres|kilos?|mtrs?|cms|mms|ग्राम्स|जी\.?\s*एम\.?)(?![a-zA-Z])",
     re.IGNORECASE
 )
 
-# Banned units: Strictly capitalized 'ML' or 'Ml' (whereas lowercase 'ml' or standard 'mL' is valid)
-BANNED_UNITS_CASE_SENSITIVE = re.compile(
-    r"\b(ML|Ml)\b"
-)
-
-# Indian States and Union Territories for address validation
+# Standardized Indian States and Union Territories (28 States + 8 UTs + historical variants)
 INDIAN_STATES_AND_UTS = [
     "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
     "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka",
@@ -31,11 +38,88 @@ INDIAN_STATES_AND_UTS = [
     "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal",
     "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli",
     "Daman and Diu", "Delhi", "Jammu and Kashmir", "Ladakh", "Lakshadweep",
-    "Puducherry", "New Delhi"
+    "Puducherry", "New Delhi", "Orissa", "Pondicherry", "Uttaranchal",
+    # Hindi Devanagari state names
+    "आंध्र प्रदेश", "अरुणाचल प्रदेश", "असम", "बिहार", "छत्तीसगढ़", "गोवा", "गुजरात",
+    "हरियाणा", "हिमाचल प्रदेश", "झारखंड", "कर्नाटक", "केरल", "मध्य प्रदेश", "महाराष्ट्र",
+    "मणिपुर", "मेघालय", "मिजोरम", "नागालैंड", "ओडिशा", "पंजाब", "राजस्थान", "सिक्किम",
+    "तमिलनाडु", "तेलंगाना", "त्रिपुरा", "उत्तर प्रदेश", "उत्तराखंड", "पश्चिम बंगाल", "दिल्ली"
 ]
 
-# Month name mapping
-MONTH_NAMES = {
+# State two-letter postal abbreviations
+STATE_ABBREVIATIONS: Dict[str, str] = {
+    "MH": "Maharashtra", "DL": "Delhi", "KA": "Karnataka", "TN": "Tamil Nadu", "WB": "West Bengal",
+    "TS": "Telangana", "TG": "Telangana", "AP": "Andhra Pradesh", "GJ": "Gujarat", "RJ": "Rajasthan",
+    "UP": "Uttar Pradesh", "U.P.": "Uttar Pradesh", "MP": "Madhya Pradesh", "M.P.": "Madhya Pradesh",
+    "BR": "Bihar", "JH": "Jharkhand", "CG": "Chhattisgarh", "OD": "Odisha", "OR": "Odisha",
+    "HR": "Haryana", "PB": "Punjab", "UK": "Uttarakhand", "UA": "Uttarakhand", "AS": "Assam",
+    "KL": "Kerala", "GA": "Goa", "HP": "Himachal Pradesh", "H.P.": "Himachal Pradesh", "JK": "Jammu and Kashmir",
+    "J&K": "Jammu and Kashmir", "CH": "Chandigarh", "PY": "Puducherry"
+}
+
+# Major commercial cities unambiguously mapped to Indian States
+MAJOR_CITIES_TO_STATE: Dict[str, str] = {
+    "mumbai": "Maharashtra", "bombay": "Maharashtra", "pune": "Maharashtra", "nagpur": "Maharashtra",
+    "thane": "Maharashtra", "nashik": "Maharashtra", "aurangabad": "Maharashtra", "navi mumbai": "Maharashtra",
+    "delhi": "Delhi", "new delhi": "Delhi",
+    "bengaluru": "Karnataka", "bangalore": "Karnataka", "mysore": "Karnataka", "mysuru": "Karnataka", "hubli": "Karnataka",
+    "chennai": "Tamil Nadu", "madras": "Tamil Nadu", "coimbatore": "Tamil Nadu", "madurai": "Tamil Nadu",
+    "kolkata": "West Bengal", "calcutta": "West Bengal", "howrah": "West Bengal", "siliguri": "West Bengal",
+    "hyderabad": "Telangana", "secunderabad": "Telangana", "warangal": "Telangana",
+    "ahmedabad": "Gujarat", "surat": "Gujarat", "vadodara": "Gujarat", "baroda": "Gujarat", "rajkot": "Gujarat", "anand": "Gujarat",
+    "jaipur": "Rajasthan", "jodhpur": "Rajasthan", "kota": "Rajasthan", "udaipur": "Rajasthan",
+    "lucknow": "Uttar Pradesh", "kanpur": "Uttar Pradesh", "noida": "Uttar Pradesh", "greater noida": "Uttar Pradesh",
+    "ghaziabad": "Uttar Pradesh", "varanasi": "Uttar Pradesh", "agra": "Uttar Pradesh", "prayagraj": "Uttar Pradesh",
+    "patna": "Bihar", "ranchi": "Jharkhand", "jamshedpur": "Jharkhand", "bhopal": "Madhya Pradesh",
+    "indore": "Madhya Pradesh", "raipur": "Chhattisgarh", "bhubaneswar": "Odisha", "cuttack": "Odisha",
+    "chandigarh": "Chandigarh", "gurgaon": "Haryana", "gurugram": "Haryana", "faridabad": "Haryana",
+    "ludhiana": "Punjab", "amritsar": "Punjab", "dehradun": "Uttarakhand", "haridwar": "Uttarakhand", "guwahati": "Assam",
+    "kochi": "Kerala", "cochin": "Kerala", "thiruvananthapuram": "Kerala", "trivandrum": "Kerala", "panaji": "Goa", "bicholim": "Goa"
+}
+
+# High-precision 3-digit PIN prefix overrides for sub-state regions and Union Territories
+PIN_3DIGIT_TO_STATE: Dict[str, str] = {
+    "403": "Goa",
+    "248": "Uttarakhand", "249": "Uttarakhand", "263": "Uttarakhand",
+    "605": "Puducherry", "609": "Puducherry",
+    "737": "Sikkim",
+    "744": "Andaman and Nicobar Islands",
+    "790": "Arunachal Pradesh", "791": "Arunachal Pradesh", "792": "Arunachal Pradesh",
+    "793": "Meghalaya", "794": "Meghalaya",
+    "795": "Manipur",
+    "796": "Mizoram",
+    "797": "Nagaland",
+    "799": "Tripura"
+}
+
+# PIN prefix (first 2 digits) deterministic mapping to Indian State/UT
+PIN_PREFIX_TO_STATE: Dict[str, str] = {
+    "11": "Delhi",
+    "12": "Haryana", "13": "Haryana",
+    "14": "Punjab", "15": "Punjab",
+    "16": "Chandigarh",
+    "17": "Himachal Pradesh",
+    "18": "Jammu and Kashmir", "19": "Jammu and Kashmir",
+    "20": "Uttar Pradesh", "21": "Uttar Pradesh", "22": "Uttar Pradesh", "23": "Uttar Pradesh",
+    "24": "Uttar Pradesh", "25": "Uttar Pradesh", "26": "Uttar Pradesh", "27": "Uttar Pradesh", "28": "Uttar Pradesh",
+    "30": "Rajasthan", "31": "Rajasthan", "32": "Rajasthan", "33": "Rajasthan", "34": "Rajasthan",
+    "36": "Gujarat", "37": "Gujarat", "38": "Gujarat", "39": "Gujarat",
+    "40": "Maharashtra", "41": "Maharashtra", "42": "Maharashtra", "43": "Maharashtra", "44": "Maharashtra",
+    "45": "Madhya Pradesh", "46": "Madhya Pradesh", "47": "Madhya Pradesh", "48": "Madhya Pradesh",
+    "49": "Chhattisgarh",
+    "50": "Telangana",
+    "51": "Andhra Pradesh", "52": "Andhra Pradesh", "53": "Andhra Pradesh",
+    "56": "Karnataka", "57": "Karnataka", "58": "Karnataka", "59": "Karnataka",
+    "60": "Tamil Nadu", "61": "Tamil Nadu", "62": "Tamil Nadu", "63": "Tamil Nadu", "64": "Tamil Nadu",
+    "67": "Kerala", "68": "Kerala", "69": "Kerala",
+    "70": "West Bengal", "71": "West Bengal", "72": "West Bengal", "73": "West Bengal", "74": "West Bengal",
+    "75": "Odisha", "76": "Odisha", "77": "Odisha",
+    "78": "Assam", "79": "Assam",
+    "80": "Bihar", "81": "Bihar", "82": "Bihar", "83": "Jharkhand", "84": "Bihar", "85": "Bihar"
+}
+
+# Multilingual month names (English and Hindi)
+MONTH_NAMES: Dict[str, int] = {
     "jan": 1, "january": 1,
     "feb": 2, "february": 2,
     "mar": 3, "march": 3,
@@ -47,7 +131,42 @@ MONTH_NAMES = {
     "sep": 9, "september": 9, "sept": 9,
     "oct": 10, "october": 10,
     "nov": 11, "november": 11,
-    "dec": 12, "december": 12
+    "dec": 12, "december": 12,
+    "जनवरी": 1, "फ़रवरी": 2, "फरवरी": 2, "मार्च": 3, "अप्रैल": 4, "मई": 5,
+    "जून": 6, "जुलाई": 7, "अगस्त": 8, "सितंबर": 9, "अक्टूबर": 10, "नवंबर": 11, "दिसंबर": 12
+}
+
+# Word to number mapping for best before duration
+WORD_TO_MONTHS: Dict[str, int] = {
+    "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6,
+    "seven": 7, "eight": 8, "nine": 9, "ten": 10, "eleven": 11, "twelve": 12,
+    "eighteen": 18, "twenty four": 24, "twenty-four": 24, "thirty six": 36
+}
+
+# Recognized countries for origin isolation
+RECOGNIZED_COUNTRIES = [
+    "India", "Bharat", "China", "Thailand", "Vietnam", "Bangladesh", "USA", "United States",
+    "Germany", "Japan", "United Kingdom", "UK", "France", "Italy", "Switzerland", "Sri Lanka",
+    "Nepal", "Bhutan", "Malaysia", "Indonesia", "Taiwan", "South Korea", "Korea", "Brazil",
+    "Mexico", "Canada", "Australia", "New Zealand", "Spain", "Netherlands", "Turkey", "UAE",
+    "PRC", "P.R.C."
+]
+
+# Complete suite of recognized statutory valid units (SI, length, area, volume, count, and Devanagari)
+RECOGNIZED_VALID_UNITS: Set[str] = {
+    # Mass
+    "g", "gram", "grams", "gramme", "grammes", "kg", "kilogram", "kilograms", "mg", "milligram", "milligrams",
+    # Volume
+    "ml", "l", "litre", "litres", "liter", "liters", "cl", "centilitre", "centilitres",
+    # Length
+    "m", "meter", "meters", "metre", "metres", "cm", "centimeter", "centimeters", "centimetre", "centimetres", "mm", "millimeter", "millimeters",
+    # Area
+    "sq m", "sq cm", "sq mm", "sq.m", "sq.cm", "sq.mm", "m2", "cm2", "mm2", "m²", "cm²", "mm²",
+    "square metre", "square metres", "square meter", "square meters", "square centimetre", "square centimetres", "square centimeter", "square centimeters",
+    # Count / Units
+    "n", "u", "units", "unit", "pcs", "piece", "pieces", "nos", "nos.", "no", "no.", "items", "item", "sachets", "sachet", "tablets", "tablet", "capsules", "capsule", "packs", "pack",
+    # Hindi Devanagari units
+    "ग्राम", "ग्रा", "ग्रा.", "किग्रा", "कि.ग्रा.", "कि.ग्रा", "किलोग्राम", "मिली", "मि.ली.", "मि.ली", "मिलीलीटर", "लीटर", "ली", "ली.", "मीटर", "मी", "मी.", "सेंटीमीटर", "सेमी", "से.मी.", "से.मी", "नग", "इकाई"
 }
 
 
@@ -56,83 +175,156 @@ class StatutoryDeclarationParser:
 
     @staticmethod
     def convert_indic_digits(text: str) -> str:
-        """Converts Devanagari numerals (०-९) to standard ASCII decimal digits (0-9)."""
+        """Converts Devanagari numerals (०-९) and fractions to standard ASCII decimal digits (0-9)."""
         if not text:
             return ""
-        return text.translate(DEVANAGARI_DIGITS_MAP)
+        converted = text.translate(DEVANAGARI_DIGITS_MAP)
+        # Normalize Unicode vulgar fractions
+        converted = converted.replace("½", "0.5").replace("¼", "0.25").replace("¾", "0.75")
+        return converted
 
     @classmethod
     def detect_banned_units(cls, text: str) -> Tuple[bool, Optional[str]]:
         """Flags non-standard prohibited unit symbols under Section 11 & Rule 12.
 
-        Distinguishes banned capitalized 'ML' from statutory valid 'ml'.
-        Detects prohibited 'gms', 'gm', 'Kgs', 'ltrs', 'cc', etc.
+        Distinguishes banned capitalized 'ML' from statutory valid 'ml' or 'mL'.
+        Detects prohibited 'gms', 'gm', 'g.m.', 'g.m', 'g.m.s.', 'g.m.s', 'Kgs', 'kgms',
+        'k.g.', 'k.g', 'ltrs', 'ltr', 'LTR', 'cc', 'c.c.', 'c.c', 'g.', 'kg.', 'ml.', 'l.', etc.
         """
-        # 1. Check case-sensitive banned symbols first (e.g. capitalized 'ML')
+        if not text:
+            return False, None
+
+        # 1. Check case-sensitive banned symbols first (capitalized 'ML', 'Ml', 'M.L.', 'M.L')
         cs_match = BANNED_UNITS_CASE_SENSITIVE.search(text)
         if cs_match:
-            return True, cs_match.group(1)
+            return True, cs_match.group(0).strip()
 
-        # 2. Check general banned symbols (case-insensitive)
+        # 2. Check general prohibited symbols (case-insensitive)
         ci_match = BANNED_UNITS_CASE_INSENSITIVE.search(text)
         if ci_match:
-            return True, ci_match.group(1)
+            return True, ci_match.group(0).strip()
 
         return False, None
 
     @classmethod
     def parse_net_quantity(cls, text: str) -> Optional[Dict[str, Any]]:
-        """Extracts net quantity magnitude and metric unit, evaluating banned symbols."""
+        """Extracts net quantity magnitude and metric unit, evaluating prohibited symbols.
+
+        Handles mass (g, kg, mg), volume (ml, l, cl), length (m, cm, mm),
+        area (sq m, sq cm, m²), count (N, U, units, pcs, nos), and Devanagari Hindi units.
+        Supports comma-separated numbers (1,000 or 1, 000), fractions (1/2, ½),
+        leading-dot decimals (.5), and Devanagari numerals.
+        """
+        if not text:
+            return None
+
         norm_text = cls.convert_indic_digits(text)
 
-        recognized_units = {
-            "g", "kg", "mg", "ml", "l", "cl", "m", "cm", "mm", "n", "u", "units", "pcs", "piece", "pieces",
-            "gms", "gm", "g.m.", "g.m.s.", "kgs", "kgms", "ltrs", "ltr", "cc", "liters", "litres"
-        }
+        # Regex for magnitude supporting standard floats, comma numbers (with spaces), leading dots, and simple fractions
+        mag_pattern = r"(?:([0-9]+)\s*/\s*([0-9]+)|([0-9]+(?:,\s*[0-9]+)*(?:\.[0-9]+)?|\.[0-9]+))"
+        unit_pattern = r"([a-zA-Z²³\.\u0900-\u097F]+(?:\s+[a-zA-Z²³\.\u0900-\u097F]+)?|\b[NU]\b)"
 
-        # Look for quantity with explicit prefix, or standalone quantity with recognized metric unit
-        explicit_pattern = re.compile(
-            r"(?:Net\s*(?:Qty|Quantity|Wt|Weight)|Volume|शुद्ध\s*मात्रा)\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*([a-zA-Z]+)",
-            re.IGNORECASE
+        # 1. Match with explicit quantity prefix (highest priority)
+        prefix_pattern = (
+            r"(?:Net\s*(?:Quantity|Qty\.?|Weight|Wt\.?|Content|Contents|Volume|Vol\.?|Mass|Area)|Quantity|Qty\.?|शुद्ध\s*(?:मात्रा|भार)|मात्रा)"
+            r"\s*[:\-]?\s*"
+            rf"{mag_pattern}"
+            r"\s*"
+            rf"{unit_pattern}"
         )
-        match = explicit_pattern.search(norm_text)
+        match = re.search(prefix_pattern, norm_text, re.IGNORECASE)
+
+        # 2. Fallback to standalone magnitude + unit if recognized
         if not match:
-            # Fallback to standalone magnitude + unit only if unit is recognized
             standalone_pattern = re.compile(
-                r"\b(\d+(?:\.\d+)?)\s*([a-zA-Z]+)\b"
+                rf"(?<![a-zA-Z0-9]){mag_pattern}\s*{unit_pattern}"
             )
             for m in standalone_pattern.finditer(norm_text):
-                cand_mag, cand_unit = m.groups()
-                if cand_unit.lower() in recognized_units or cand_unit in ("ML", "Ml"):
+                f_num, f_den, f_dec, cand_unit_raw = m.group(1), m.group(2), m.group(3), m.group(4)
+                words = cand_unit_raw.strip().split()
+                first_w = words[0].lower() if words else ""
+                two_w = f"{words[0]} {words[1]}".lower() if len(words) >= 2 else ""
+
+                has_banned_cand, _ = cls.detect_banned_units(cand_unit_raw)
+                if (has_banned_cand or
+                    first_w in RECOGNIZED_VALID_UNITS or
+                    two_w in RECOGNIZED_VALID_UNITS or
+                    cand_unit_raw in ("N", "U")):
                     match = m
                     break
 
         if not match:
             return None
 
-        magnitude_str, unit_str = match.groups()
-        has_banned, banned_sym = cls.detect_banned_units(unit_str)
+        frac_num, frac_den, decimal_raw, unit_raw = match.group(1), match.group(2), match.group(3), match.group(4)
 
-        # If the unit string was not in unit_str alone (e.g. full token had banned unit)
+        if frac_num and frac_den:
+            try:
+                magnitude = float(frac_num) / float(frac_den)
+            except (ValueError, ZeroDivisionError):
+                return None
+        elif decimal_raw:
+            clean_num_str = decimal_raw.replace(",", "").replace(" ", "")
+            try:
+                magnitude = float(clean_num_str)
+            except ValueError:
+                return None
+        else:
+            return None
+
+        if magnitude <= 0:
+            return None
+
+        # Resolve unit: avoid greedily consuming trailing packaging words (e.g. 'g when packed')
+        unit_words = unit_raw.strip().split()
+        if not unit_words:
+            return None
+
+        clean_unit = unit_words[0]
+        if len(unit_words) >= 2:
+            candidate_two_word = f"{unit_words[0]} {unit_words[1]}".lower()
+            if candidate_two_word in RECOGNIZED_VALID_UNITS:
+                clean_unit = f"{unit_words[0]} {unit_words[1]}"
+
+        # Check for banned units in clean_unit, the full unit_raw, and the surrounding token
+        has_banned, banned_sym = cls.detect_banned_units(clean_unit)
+        if not has_banned:
+            has_banned, banned_sym = cls.detect_banned_units(unit_raw)
         if not has_banned:
             has_banned, banned_sym = cls.detect_banned_units(norm_text)
 
-        # Standardize metric unit symbol if valid
-        clean_unit = unit_str.strip()
+        # Standardize metric units when valid
         if not has_banned:
-            if clean_unit.lower() == "ml":
-                clean_unit = "ml"
-            elif clean_unit.lower() == "g":
+            u_lower = clean_unit.lower()
+            if u_lower in ("g", "gram", "grams", "gramme", "grammes", "ग्राम", "ग्रा", "ग्रा."):
                 clean_unit = "g"
-            elif clean_unit.lower() == "kg":
+            elif u_lower in ("kg", "kilogram", "kilograms", "किग्रा", "कि.ग्रा.", "कि.ग्रा", "किलोग्राम"):
                 clean_unit = "kg"
-            elif clean_unit.lower() == "l":
+            elif u_lower in ("mg", "milligram", "milligrams"):
+                clean_unit = "mg"
+            elif u_lower in ("ml", "millilitre", "millilitres", "मिली", "मि.ली.", "मि.ली", "मिलीलीटर"):
+                clean_unit = "ml"
+            elif u_lower in ("l", "litre", "litres", "liter", "liters", "लीटर", "ली", "ली."):
                 clean_unit = "l"
-            elif clean_unit.upper() in ("N", "U"):
-                clean_unit = clean_unit.upper()
+            elif u_lower in ("cl", "centilitre", "centilitres"):
+                clean_unit = "cl"
+            elif u_lower in ("m", "meter", "meters", "metre", "metres", "मीटर", "मी", "मी."):
+                clean_unit = "m"
+            elif u_lower in ("cm", "centimeter", "centimeters", "centimetre", "centimetres", "सेंटीमीटर", "सेमी", "से.मी.", "से.मी"):
+                clean_unit = "cm"
+            elif u_lower in ("mm", "millimeter", "millimeters"):
+                clean_unit = "mm"
+            elif u_lower in ("sq m", "m2", "m²", "sq.m", "square metre", "square metres", "square meter", "square meters"):
+                clean_unit = "sq m"
+            elif u_lower in ("sq cm", "cm2", "cm²", "sq.cm", "square centimetre", "square centimetres", "square centimeter", "square centimeters"):
+                clean_unit = "sq cm"
+            elif u_lower in ("sq mm", "mm2", "mm²", "sq.mm"):
+                clean_unit = "sq mm"
+            elif u_lower in ("n", "u", "units", "unit", "pcs", "piece", "pieces", "nos", "nos.", "no", "no.", "items", "item", "sachets", "sachet", "tablets", "tablet", "capsules", "capsule", "packs", "pack", "नग", "इकाई"):
+                clean_unit = "N"
 
         return {
-            "magnitude": float(magnitude_str),
+            "magnitude": magnitude,
             "unit": clean_unit,
             "has_banned_unit": has_banned,
             "banned_unit_found": banned_sym,
@@ -143,38 +335,72 @@ class StatutoryDeclarationParser:
         """Parses Maximum Retail Price (MRP) amount and checks mandatory tax inclusivity clause.
 
         Under Rule 6(1)(e), declaration must state '(incl. of all taxes)'.
-        Requires an explicit MRP keyword or currency indicator to prevent false number matches.
+        Guards strictly against Unit Sale Price (USP) declarations (e.g. 'USP: Rs. 0.40/g')
+        falsely evaluated as MRP amounts.
+        Handles intermediate tax clauses, currency indicators (Rs., INR, ₹),
+        Indian comma formatting (1,499.00 or 1, 499.00), and Devanagari numerals.
         """
+        if not text:
+            return None
+
         norm_text = cls.convert_indic_digits(text)
 
-        # Currency and MRP amount regex - requiring either MRP label OR currency symbol
-        mrp_pattern = re.compile(
-            r"(?:(?:MRP|M\.R\.P\.?|Maximum\s*Retail\s*Price|Max\.?\s*Retail\s*Price|अ\.वि\.मू\.)\s*[:\-]?\s*(?:Rs\.?|INR|₹)?\s*(\d+(?:\.\d{1,2})?)|(?:Rs\.?|INR|₹)\s*(\d+(?:\.\d{1,2})?))\s*(?:/-)?",
+        # Tax inclusivity clause patterns per Rule 6(1)(e)
+        tax_inclusive_patterns = [
+            r"incl(?:usive|\.)?\s*(?:of)?\s*all\s*taxes?",
+            r"incl(?:usive|\.)?\s*(?:of)?\s*taxes?",
+            r"all\s*taxes?\s*incl(?:uded|usive)?",
+            r"including\s*(?:of)?\s*all\s*taxes?",
+            r"including\s*taxes?",
+            r"inclusive\s*of\s*taxes?",
+            r"incl\.?\s*taxes?",
+            r"कर\s*सहित",
+            r"सभी\s*कर(?:ों)?\s*सहित",
+        ]
+        tax_inclusive = any(re.search(p, norm_text, re.IGNORECASE) for p in tax_inclusive_patterns)
+
+        mrp_prefix = r"(?:MRP|M\.R\.P\.?|Maximum\s*Retail\s*Price|Max\.?\s*Retail\s*Price|अ\.वि\.मू\.)"
+        tax_clause_group = (
+            r"(?:\([^)]*(?:tax|taxes|कर)[^)]*\)|"
+            r"incl(?:usive|\.)?\s*(?:of)?\s*all\s*taxes?|"
+            r"incl(?:usive|\.)?\s*(?:of)?\s*taxes?|"
+            r"all\s*taxes?\s*included|"
+            r"including\s*(?:of)?\s*all\s*taxes?|"
+            r"कर\s*सहित|सभी\s*कर(?:ों)?\s*सहित)"
+        )
+        curr = r"(?:Rs\.?|INR|₹)"
+        amount_re = r"([0-9]+(?:,\s*[0-9]+)*(?:\s*\.\s*[0-9]{1,2})?)"
+
+        # Pattern 1: Explicit MRP prefix, with optional intervening tax clause or currency
+        p1 = re.compile(
+            rf"{mrp_prefix}\s*(?:{tax_clause_group})?\s*[:\-]?\s*(?:{tax_clause_group})?\s*(?:{curr})?\s*[:\-]?\s*(?:{tax_clause_group})?\s*{amount_re}\s*(?:/-)?",
             re.IGNORECASE
         )
-        match = mrp_pattern.search(norm_text)
+        match = p1.search(norm_text)
+
+        # Pattern 2: Standalone currency symbol followed by amount (ONLY if NOT part of a USP declaration or discount)
+        if not match:
+            # Reject if string is explicitly marked as USP or contains unit denominator (/g, /ml, per unit)
+            is_usp = bool(re.search(r"(?:USP|Unit\s*Sale\s*Price|/(?:\s*[a-zA-Z²³\.]+)|\bper\b)", norm_text, re.IGNORECASE))
+            is_discount = bool(re.search(r"\b(?:save|discount|off|cashback)\b", norm_text, re.IGNORECASE))
+
+            if not is_usp and not is_discount:
+                p2 = re.compile(
+                    rf"{curr}\s*[:\-]?\s*{amount_re}\s*(?:/-)?",
+                    re.IGNORECASE
+                )
+                match = p2.search(norm_text)
+
         if not match:
             return None
 
-        amount_str = match.group(1) or match.group(2)
-        if not amount_str:
-            return None
-
+        amount_str = match.group(1).replace(",", "").replace(" ", "")
         try:
             amount = float(amount_str)
             if amount <= 0:
                 return None
         except ValueError:
             return None
-
-        # Tax inclusivity clause detection per Rule 6(1)(e)
-        tax_inclusive_patterns = [
-            r"incl(?:usive|\.)?\s*(?:of)?\s*all\s*taxes",
-            r"incl(?:usive|\.)?\s*(?:of)?\s*taxes",
-            r"all\s*taxes\s*included",
-            r"कर\s*सहित",
-        ]
-        tax_inclusive = any(re.search(p, norm_text, re.IGNORECASE) for p in tax_inclusive_patterns)
 
         return {
             "amount": amount,
@@ -184,36 +410,57 @@ class StatutoryDeclarationParser:
 
     @classmethod
     def parse_usp(cls, text: str) -> Optional[Dict[str, Any]]:
-        """Extracts Unit Sale Price (USP) under Rule 6(1)(k).
+        """Extracts Unit Sale Price (USP) under Rule 6(1)(k) (G.S.R. 779(E)).
 
-        Examples: 'Unit Sale Price: Rs. 0.40 / g', 'USP: Rs. 1.20/ml', '₹ 0.50 per g'.
+        Validates that denominator is a recognized metric or count unit
+        (g, ml, 100g, 100ml, kg, l, piece, unit, N, U, etc.), guarding against
+        arbitrary words or dates falsely parsed as units.
         """
+        if not text:
+            return None
+
         norm_text = cls.convert_indic_digits(text)
 
-        usp_pattern = re.compile(
-            r"(?:Unit\s*Sale\s*Price|USP)\s*[:\-]?\s*(?:Rs\.?|INR|₹)?\s*(\d+(?:\.\d{1,4})?)\s*(?:/|per)\s*([a-zA-Z0-9]+)",
+        usp_prefix = r"(?:Unit\s*Sale\s*Price|USP)"
+        curr = r"(?:Rs\.?|INR|₹)?"
+        amount_re = r"([0-9]+(?:,\s*[0-9]+)*(?:\.[0-9]{1,4})?)"
+        # Restrict denominator strictly to recognized statutory metric and count units
+        denom_re = r"((?:100\s*)?(?:g|kg|mg|ml|l|cl|m|cm|mm|sq\s*m|sq\s*cm|sq\s*mm|n|u|pieces?|pcs|units?|items?|nos?|tablets?|capsules?|sachets?|packs?|ग्राम|किग्रा|मिली|लीटर|मीटर|नग|इकाई))\b"
+
+        # Pattern 1: Explicit USP prefix
+        p1 = re.compile(
+            rf"{usp_prefix}\s*[:\-]?\s*{curr}\s*{amount_re}\s*(?:/|per)\s*{denom_re}",
             re.IGNORECASE
         )
-        match = usp_pattern.search(norm_text)
+        match = p1.search(norm_text)
+
+        # Pattern 2: Standalone 'Rs. X / g' or '₹ X per ml'
         if not match:
-            # Also try matching standalone 'Rs. X / g' or '₹ X / ml'
-            standalone_pattern = re.compile(
-                r"(?:Rs\.?|INR|₹)\s*(\d+(?:\.\d{1,4})?)\s*(?:/|per)\s*([a-zA-Z0-9]+)",
+            p2 = re.compile(
+                rf"(?:Rs\.?|INR|₹)\s*{amount_re}\s*(?:/|per)\s*{denom_re}",
                 re.IGNORECASE
             )
-            match = standalone_pattern.search(norm_text)
-            if not match:
-                return None
+            match = p2.search(norm_text)
 
-        price_str, unit_str = match.groups()
+        if not match:
+            return None
+
+        price_str, unit_raw = match.groups()
         try:
-            price = float(price_str)
+            price = float(price_str.replace(",", "").replace(" ", ""))
             if price <= 0:
                 return None
         except ValueError:
             return None
 
-        clean_unit = unit_str.strip().lower()
+        clean_unit = unit_raw.strip().lower()
+        clean_unit = re.sub(r"\s+", "", clean_unit)
+        # Normalize piece/pieces -> piece, units -> unit
+        if clean_unit in ("pieces", "piece", "pcs"):
+            clean_unit = "piece"
+        elif clean_unit in ("units", "unit"):
+            clean_unit = "unit"
+
         return {
             "price_per_unit": price,
             "unit": clean_unit,
@@ -223,9 +470,14 @@ class StatutoryDeclarationParser:
     def parse_mfg_and_expiry_dates(cls, text: str) -> Dict[str, Any]:
         """Extracts manufacturing and expiry/best before dates under Rule 6(1)(d).
 
-        Returns month (1-12) and year (2000-2030) if identifiable.
+        Supports multiple date formats:
+        - ISO 8601: YYYY-MM, YYYY/MM, YYYY-MM-DD
+        - Standard: MM/YYYY, MM-YYYY, MM.YYYY, MM / YYYY (with spaces around delimiters)
+        - Day dates: DD/MM/YYYY, DD-MM-YYYY, MM/DD/YYYY, DD/MM/YY
+        - Alpha month dates: '15-Mar-2024', 'Mar 2024', 'March 2024'
+        - Devanagari numerals and Hindi dates: 'उत्पादन तिथि: ०५/२०२४', 'मार्च २०२४'
+        - Best before duration: 'Best before 12 months', 'Best before 180 days'
         """
-        norm_text = cls.convert_indic_digits(text)
         result: Dict[str, Any] = {
             "mfg_month": None,
             "mfg_year": None,
@@ -234,85 +486,118 @@ class StatutoryDeclarationParser:
             "best_before_months": None,
         }
 
-        # 1. Best before X months
+        if not text:
+            return result
+
+        norm_text = cls.convert_indic_digits(text)
+
+        # 1. Best before duration (months or days)
         bb_pattern = re.compile(
-            r"best\s*before\s*(\d+)\s*months?",
+            r"(?:best\s*before|use\s*before|best\s*by|within)\s*([0-9]+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|eighteen|twenty\s*four|twenty-four|thirty\s*six)\s*(months?|days?)",
             re.IGNORECASE
         )
         bb_match = bb_pattern.search(norm_text)
         if bb_match:
-            result["best_before_months"] = int(bb_match.group(1))
+            bb_val = bb_match.group(1).lower().strip()
+            bb_unit = bb_match.group(2).lower().strip()
+            if bb_unit.startswith("month"):
+                if bb_val.isdigit():
+                    result["best_before_months"] = int(bb_val)
+                elif bb_val in WORD_TO_MONTHS:
+                    result["best_before_months"] = WORD_TO_MONTHS[bb_val]
+            elif bb_unit.startswith("day") and bb_val.isdigit():
+                # Convert days to approximate whole months (e.g. 90 days = 3 months, 180 days = 6 months)
+                result["best_before_months"] = max(1, round(int(bb_val) / 30.0))
 
-        # 2. Manufacturing date patterns
-        # e.g., 'Mfg Date: 03/2024', 'Mfg: 03/24', 'Pkd: 05/2023', 'Date of Pkg: March 2024', '03/2024'
-        mfg_date_pattern = re.compile(
-            r"(?:Mfg(?:\s*Date)?|Mfg\.?|Packed|Pkd\.?|Date\s*of\s*(?:Mfg|Packaging|Packing))\s*[:\-]?\s*"
-            r"(?:(\d{1,2})[\/\-\.](?:(\d{1,2})[\/\-\.])?(\d{2,4})|([a-zA-Z]+)[\s,]+(\d{2,4}))",
-            re.IGNORECASE
+        # Prefixes for Manufacturing and Expiry
+        mfg_prefix = (
+            r"(?:Manufactured(?:\s*Date)?|Mfg(?:\s*Date)?|Mfg\.?|Mfd(?:\s*Date)?|Mfd\.?|"
+            r"Packed(?:\s*Date)?|Pkd(?:\s*Date)?|Packaging(?:\s*Date)?|Packing(?:\s*Date)?|"
+            r"Date\s*of\s*(?:Mfg|Mfd|Manufacture|Packaging|Packing|Pkg\.?|Pkd\.?)|"
+            r"उत्पादन\s*तिथि|पैकिंग\s*तिथि|निर्माण\s*तिथि)"
         )
-        mfg_match = mfg_date_pattern.search(norm_text)
-        if mfg_match:
-            d1, d2, y_num, m_name, y_named = mfg_match.groups()
-            if y_num:
-                month = int(d2) if d2 else int(d1)
-                year = int(y_num)
-                if year < 100:
-                    year += 2000
-                if 1 <= month <= 12 and 2000 <= year <= 2030:
-                    result["mfg_month"] = month
-                    result["mfg_year"] = year
-            elif m_name and y_named:
-                m_lower = m_name.lower()[:3]
-                if m_lower in MONTH_NAMES:
-                    month = MONTH_NAMES[m_lower]
-                    year = int(y_named)
-                    if year < 100:
-                        year += 2000
-                    if 2000 <= year <= 2030:
-                        result["mfg_month"] = month
-                        result["mfg_year"] = year
-        else:
-            # Standalone date check e.g. '03/2024' or '03-2024'
-            standalone_date_pattern = re.compile(
-                r"\b(0[1-9]|1[0-2])[\/\-](20[2-3][0-9]|[2-3][0-9])\b"
+        exp_prefix = (
+            r"(?:Exp(?:\s*Date)?|Expiry(?:\s*Date)?|Use\s*by|Use\s*before|Best\s*before|"
+            r"Date\s*of\s*(?:Expiry|Exp\.?)|अवसान\s*तिथि|समाप्ति\s*तिथि|उपयोग\s*तिथि)"
+        )
+
+        def extract_date_from_text(prefix_re: str, target_text: str) -> Tuple[Optional[int], Optional[int]]:
+            # Sub-pattern A: Named/Alpha month (e.g. '15-Mar-2024', 'Mar 2024', 'March 2024')
+            alpha_re = re.compile(
+                rf"{prefix_re}\s*[:\-]?\s*(?:(\d{{1,2}})\s*[\/\-\.\s]\s*)?([a-zA-Z\u0900-\u097F]+)\s*[\/\-\.\s,]?\s*(\d{{2,4}})",
+                re.IGNORECASE
             )
-            sa_match = standalone_date_pattern.search(norm_text)
-            if sa_match:
-                month = int(sa_match.group(1))
-                year = int(sa_match.group(2))
-                if year < 100:
-                    year += 2000
-                if 1 <= month <= 12 and 2000 <= year <= 2030:
+            m_alpha = alpha_re.search(target_text)
+            if m_alpha:
+                _, m_name, yr_str = m_alpha.groups()
+                m_clean = m_name.lower()[:3] if m_name.isascii() else m_name
+                month = MONTH_NAMES.get(m_clean) or MONTH_NAMES.get(m_name.lower())
+                yr = int(yr_str)
+                year = yr + (2000 if yr < 100 else 0)
+                if month and 2000 <= year <= 2035:
+                    return month, year
+
+            # Sub-pattern B: ISO numeric date (e.g. '2024-04', '2024/04', '2024-04-15')
+            iso_re = re.compile(
+                rf"{prefix_re}\s*[:\-]?\s*(20[2-3][0-9])\s*[\/\-\.]\s*(0[1-9]|1[0-2])(?:\s*[\/\-\.]\s*(?:[0-3]?[0-9]))?(?!\d)",
+                re.IGNORECASE
+            )
+            m_iso = iso_re.search(target_text)
+            if m_iso:
+                year = int(m_iso.group(1))
+                month = int(m_iso.group(2))
+                return month, year
+
+            # Sub-pattern C: Standard numeric date (e.g. '15/04/2024', '04/2024', '04 / 2024', '04-24')
+            num_re = re.compile(
+                rf"{prefix_re}\s*[:\-]?\s*(?:(\d{{1,2}})\s*[\/\-\.\s]\s*)?(\d{{1,2}})\s*[\/\-\.\s]\s*(\d{{2,4}})",
+                re.IGNORECASE
+            )
+            m_num = num_re.search(target_text)
+            if m_num:
+                d1, d2, yr_str = m_num.groups()
+                yr = int(yr_str)
+                year = yr + (2000 if yr < 100 else 0)
+                if d1 is not None:
+                    val1, val2 = int(d1), int(d2)
+                    # Disambiguate DD/MM/YYYY vs MM/DD/YYYY
+                    if val2 > 12 and 1 <= val1 <= 12:
+                        month = val1  # MM/DD/YYYY
+                    elif 1 <= val2 <= 12:
+                        month = val2  # DD/MM/YYYY
+                    else:
+                        month = None
+                else:
+                    val2 = int(d2)
+                    month = val2 if 1 <= val2 <= 12 else None
+
+                if month and 2000 <= year <= 2035:
+                    return month, year
+
+            return None, None
+
+        # 2. Extract Manufacturing Date
+        m_mfg, y_mfg = extract_date_from_text(mfg_prefix, norm_text)
+        if m_mfg and y_mfg:
+            result["mfg_month"] = m_mfg
+            result["mfg_year"] = y_mfg
+        else:
+            # Standalone fallback date check (e.g. '03/2024' or '03 / 2024' or '2024-04')
+            sa_re = re.compile(r"(?<![0-9])(0[1-9]|1[0-2])\s*[\/\-]\s*(20[2-3][0-9]|[2-3][0-9])(?![0-9])")
+            m_sa = sa_re.search(norm_text)
+            if m_sa:
+                month = int(m_sa.group(1))
+                yr = int(m_sa.group(2))
+                year = yr + (2000 if yr < 100 else 0)
+                if 1 <= month <= 12 and 2000 <= year <= 2035:
                     result["mfg_month"] = month
                     result["mfg_year"] = year
 
-        # 3. Expiry date pattern
-        exp_date_pattern = re.compile(
-            r"(?:Exp(?:\s*Date)?|Expiry|Use\s*by|Best\s*before)\s*[:\-]?\s*"
-            r"(?:(\d{1,2})[\/\-\.](?:(\d{1,2})[\/\-\.])?(\d{2,4})|([a-zA-Z]+)[\s,]+(\d{2,4}))",
-            re.IGNORECASE
-        )
-        exp_match = exp_date_pattern.search(norm_text)
-        if exp_match:
-            d1, d2, y_num, m_name, y_named = exp_match.groups()
-            if y_num:
-                month = int(d2) if d2 else int(d1)
-                year = int(y_num)
-                if year < 100:
-                    year += 2000
-                if 1 <= month <= 12 and 2000 <= year <= 2030:
-                    result["exp_month"] = month
-                    result["exp_year"] = year
-            elif m_name and y_named:
-                m_lower = m_name.lower()[:3]
-                if m_lower in MONTH_NAMES:
-                    month = MONTH_NAMES[m_lower]
-                    year = int(y_named)
-                    if year < 100:
-                        year += 2000
-                    if 2000 <= year <= 2030:
-                        result["exp_month"] = month
-                        result["exp_year"] = year
+        # 3. Extract Expiry Date
+        m_exp, y_exp = extract_date_from_text(exp_prefix, norm_text)
+        if m_exp and y_exp:
+            result["exp_month"] = m_exp
+            result["exp_year"] = y_exp
 
         return result
 
@@ -320,23 +605,48 @@ class StatutoryDeclarationParser:
     def parse_pin_code(cls, text: str) -> Optional[str]:
         """Extracts a valid 6-digit Indian PIN code (100000 - 999999).
 
-        Guards against false positives from 10-digit phone numbers, GSTINs, and dates.
+        Supports:
+        - Standalone 6 digits: '700017', '400057'
+        - Formatted with space/hyphen: '110 020', '560-001'
+        Guards strictly against:
+        - 10-digit phone numbers ('9876543210' must NOT match '987654')
+        - 14-digit FSSAI numbers ('10014022001234' must NOT match '100140')
+        - 15-character GSTINs ('27AAPFU0939F1ZV')
+        - Batch numbers / Lot numbers ('Batch No: 110020' must NOT match)
+        - Pricing values ('MRP: Rs. 100020' or '100020/-' must NOT match)
+        - Metric or count quantities ('100020 units', '100020 kg' must NOT match)
         """
+        if not text:
+            return None
+
         norm_text = cls.convert_indic_digits(text)
 
-        # Standalone 6-digit number starting with 1-9
-        pin_pattern = re.compile(
-            r"(?:(?<=\b)|(?<=[^\d]))([1-9][0-9]{5})(?=[^\d]|$)"
+        disallowed_prefix_re = re.compile(
+            r"\b(?:tel|phone|mob|call|fssai|lic|licence|license|batch|b\.?no|lot|invoice|barcode|ean|upc|cin|regd?|mrp|rs|inr|price|exp|mfg|pkg)\b|[₹]",
+            re.IGNORECASE
         )
-        for match in pin_pattern.finditer(norm_text):
-            candidate = match.group(1)
-            start, end = match.span(1)
-            prefix = norm_text[max(0, start - 4):start]
-            suffix = norm_text[end:min(len(norm_text), end + 4)]
-            # If adjacent characters are digits, it's part of a phone or longer number
-            if re.search(r"\d", prefix[-1:]) or re.search(r"\d", suffix[:1]):
+        disallowed_suffix_tokens = [
+            "/-", "₹", "rs", "inr", "g", "kg", "ml", "l", "pcs", "pieces",
+            "units", "unit", "tablets", "capsules", "nos"
+        ]
+
+        pin_re = re.compile(r"(?<![a-zA-Z0-9])([1-9][0-9]{2})\s*[\-]?\s*([0-9]{3})(?![a-zA-Z0-9])")
+        for m in pin_re.finditer(norm_text):
+            cand = m.group(1) + m.group(2)
+            start, end = m.span()
+
+            prefix_window = norm_text[max(0, start - 20):start]
+            suffix_window = norm_text[end:min(len(norm_text), end + 15)].lower().strip()
+
+            # Disallow matches immediately preceded by telephone, batch, price, or license keywords
+            if disallowed_prefix_re.search(prefix_window):
                 continue
-            return candidate
+
+            # Disallow matches followed by price or measurement units
+            if any(suffix_window.startswith(k) for k in disallowed_suffix_tokens):
+                continue
+
+            return cand
 
         return None
 
@@ -344,34 +654,115 @@ class StatutoryDeclarationParser:
     def parse_address(cls, text: str) -> Optional[Dict[str, Any]]:
         """Parses address tokens into entity name, address line, State, and 6-digit PIN code.
 
-        Per working default OQ-02, an address is complete if State + 6-digit PIN are present.
+        Statutory completeness per Working Default OQ-02: State + 6-digit PIN code.
+        Resolves State from:
+        1. Explicit full State / UT names (English & Hindi)
+        2. High-precision 3-digit PIN prefix mapping (e.g. 403 -> Goa, 248/249/263 -> Uttarakhand)
+        3. Two-letter State abbreviations (MH, DL, KA, TN, WB, UP, MP, GJ, RJ, etc.)
+        4. Major commercial Indian cities (Mumbai, Bengaluru, Kolkata, Haridwar, etc.)
+        5. 2-digit PIN prefix fallback mapping (e.g. 40... -> Maharashtra)
+        Extracts corporate/entity name from address starters or corporate suffixes.
         """
+        if not text:
+            return None
+
         norm_text = cls.convert_indic_digits(text)
 
-        # Extract PIN code
+        # 1. Extract PIN code
         pin_code = cls.parse_pin_code(norm_text)
 
-        # Detect Indian State / UT
+        # 2. Detect Indian State / UT
         detected_state: Optional[str] = None
+
+        # Check explicit State names
         for state in INDIAN_STATES_AND_UTS:
             pattern = re.compile(r"\b" + re.escape(state) + r"\b", re.IGNORECASE)
             if pattern.search(norm_text):
-                detected_state = state
+                # Standardize variant names
+                if state.lower() == "orissa":
+                    detected_state = "Odisha"
+                elif state.lower() == "pondicherry":
+                    detected_state = "Puducherry"
+                elif state.lower() == "uttaranchal":
+                    detected_state = "Uttarakhand"
+                elif state.lower() in ("new delhi", "दिल्ली"):
+                    detected_state = "Delhi"
+                elif state == "उत्तर प्रदेश":
+                    detected_state = "Uttar Pradesh"
+                elif state == "महाराष्ट्र":
+                    detected_state = "Maharashtra"
+                elif state == "गुजरात":
+                    detected_state = "Gujarat"
+                else:
+                    detected_state = state
                 break
 
-        # Check for registered corporate name keywords
-        corp_name_match = re.search(
-            r"([A-Za-z0-9\s.,&'\-]+(?:Pvt\.?\s*Ltd\.?|Private\s*Limited|Ltd\.?|Limited|LLP|Industries|Enterprises|Foods|Beverages|Consumer\s*Care))",
-            norm_text,
+        # Check high-precision 3-digit PIN prefix overrides first (e.g. 403 -> Goa, 249 -> Uttarakhand)
+        if not detected_state and pin_code:
+            prefix3 = pin_code[:3]
+            if prefix3 in PIN_3DIGIT_TO_STATE:
+                detected_state = PIN_3DIGIT_TO_STATE[prefix3]
+
+        # Check State Abbreviations if not found
+        if not detected_state:
+            for abbr, full_state in STATE_ABBREVIATIONS.items():
+                if re.search(r"\b" + re.escape(abbr) + r"\b", norm_text):
+                    detected_state = full_state
+                    break
+
+        # Check major commercial cities mapped to states
+        if not detected_state:
+            for city, mapped_state in MAJOR_CITIES_TO_STATE.items():
+                if re.search(r"\b" + re.escape(city) + r"\b", norm_text, re.IGNORECASE):
+                    detected_state = mapped_state
+                    break
+
+        # Fallback: Infer State from 2-digit PIN code prefix
+        if not detected_state and pin_code:
+            prefix2 = pin_code[:2]
+            if prefix2 in PIN_PREFIX_TO_STATE:
+                detected_state = PIN_PREFIX_TO_STATE[prefix2]
+
+        # 3. Detect Registered Corporate Entity Name
+        entity_name: Optional[str] = None
+
+        # Approach A: Extract entity anchored to address prefix (e.g. "Manufactured by: Krishna Dairy, ...")
+        pref_anchor_re = re.compile(
+            r"(?:Manufactured\s*(?:&|and)?\s*Packed\s*by|Manufactured\s*by|Mfd\.?\s*by|Mfg\.?\s*by|"
+            r"Packed\s*by|Pkd\.?\s*by|Marketed\s*by|Imported\s*by|निर्माता(?:\s*एवं\s*पैकर)?|पैकर|निर्मित|आयातकर्ता)\s*[:\-]?\s*"
+            r"([^,\n\r]+?)(?:,|\n|\r|Plot|Sector|Road|Phase|Industrial|Village|Dist|Taluka|City|Area|Ward|No\.|\b(?=[A-Z][a-z]+\s*-\s*[1-9]))",
             re.IGNORECASE
         )
-        entity_name = corp_name_match.group(1).strip() if corp_name_match else None
+        anchor_match = pref_anchor_re.search(norm_text)
+        if anchor_match:
+            cand_name = anchor_match.group(1).strip()
+            # Clean trailing periods or dashes
+            cand_name = cand_name.strip("- :")
+            if len(cand_name) >= 3 and not cand_name.isdigit():
+                entity_name = cand_name
+
+        # Approach B: Fallback to corporate suffix pattern (English & Hindi)
+        if not entity_name:
+            corp_name_match = re.search(
+                r"([a-zA-Z\u00C0-\u024F\u0900-\u097F0-9\s.,&'\-]+?(?:(?:Industries|Enterprises|Foods|Beverages|Consumer\s*Care|Laboratories|Pharma|Products|Dairy|Mills|Bakery|Herbals|Cosmetics|Naturals|उद्योग|फूड्स)\s+)?(?:Pvt\.?\s*Ltd\.?|Private\s*Limited|Ltd\.?|Limited|LLP|Inc\.?|Corp\.?|Cooperative|लिमिटेड|प्राइवेट\s*लिमिटेड)(?:\.|\b))",
+                norm_text,
+                re.IGNORECASE
+            )
+            if corp_name_match:
+                raw_entity = corp_name_match.group(1).strip()
+                cleaned_entity = re.sub(
+                    r"^(?:Manufactured\s*(?:&|and)?\s*Packed\s*by|Manufactured\s*by|Mfd\.?\s*by|Mfg\.?\s*by|Packed\s*by|Pkd\.?\s*by|Marketed\s*by|Imported\s*by|Address|निर्माता|पैकर)\s*[:\-]?\s*",
+                    "",
+                    raw_entity,
+                    flags=re.IGNORECASE
+                ).strip()
+                entity_name = cleaned_entity if cleaned_entity else None
 
         # Statutory completeness per OQ-02: State + 6-digit PIN code
         is_complete = bool(detected_state and pin_code)
 
         if not detected_state and not pin_code and not entity_name:
-            address_keywords = ["plot", "sector", "road", "phase", "street", "industrial", "area", "village", "taluka", "dist", "district"]
+            address_keywords = ["plot", "sector", "road", "phase", "street", "industrial", "area", "village", "taluka", "dist", "district", "estate"]
             if not any(k in norm_text.lower() for k in address_keywords):
                 return None
 
@@ -387,60 +778,151 @@ class StatutoryDeclarationParser:
     def check_consumer_care_completeness(cls, full_text: str) -> Dict[str, Any]:
         """Validates presence of all 4 Consumer Care tuples under Rule 6(1)(n).
 
-        Tuples: Contact Person/Department, Postal Address, Phone Number, Email.
+        Tuples:
+        1. Contact Person / Department
+        2. Postal Address / Reference to Manufacturer Address
+        3. Telephone / Toll-free Contact Number
+        4. Valid Email Address
+        Guards strictly against FSSAI license numbers and barcodes falsely detected as phone numbers.
         """
+        if not full_text:
+            return {
+                "has_email": False, "has_phone": False, "has_address": False,
+                "has_contact_name": False, "is_complete": False, "email": None, "phone": None
+            }
+
         norm_text = cls.convert_indic_digits(full_text)
 
-        email_pattern = re.compile(r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+")
-        phone_pattern = re.compile(
-            r"(?:(?:tel|phone|contact|toll[- ]free|helpline|call)?\s*[:\-]?\s*)?"
-            r"(\+?91[-\s]?)?(?:1800[-\s]?[0-9]{2,4}[-\s]?[0-9]{3,4}|[1-9][0-9]{9}|0\d{2,4}[-\s]?[0-9]{6,8})",
-            re.IGNORECASE
-        )
-
+        # 1. Email pattern
+        email_pattern = re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b")
         email_match = email_pattern.search(norm_text)
-        phone_match = phone_pattern.search(norm_text)
-
         has_email = bool(email_match)
-        has_phone = bool(phone_match)
+        email_str = email_match.group(0).strip() if email_match else None
+
+        # 2. Phone pattern: Toll-free 1800/1860 or telephone with explicit keyword prefix
+        phone_match_str: Optional[str] = None
+
+        toll_free_pattern = re.compile(r"\b(1800|1860)[-\s]?[0-9]{2,4}[-\s]?[0-9]{3,4}\b")
+        tf_match = toll_free_pattern.search(norm_text)
+
+        if tf_match:
+            phone_match_str = tf_match.group(0).strip()
+        else:
+            std_phone_pattern = re.compile(
+                r"(?:tel|phone|contact|toll[- ]free|helpline|call|care\s*no|customer\s*care|ph|mob|whatsapp|t:|फोन)\s*[:\-]?\s*"
+                r"(\+?91[-\s]?)?([1-9][0-9\s\-]{8,12}[0-9]|0\d{2,4}[-\s]?[0-9\s\-]{6,10}[0-9])\b",
+                re.IGNORECASE
+            )
+            sp_match = std_phone_pattern.search(norm_text)
+            if sp_match:
+                prefix = sp_match.group(1) or ""
+                raw_num = sp_match.group(2)
+                # Ensure it's not an FSSAI 14-digit number
+                clean_digits = re.sub(r"\D", "", raw_num)
+                if 8 <= len(clean_digits) <= 12 and not any(k in norm_text[max(0, sp_match.start() - 15):sp_match.start()].lower() for k in ["fssai", "lic"]):
+                    phone_match_str = f"{prefix}{raw_num}".strip()
+
+        has_phone = bool(phone_match_str)
+
+        # 3. Postal Address or Reference to Address (English and Hindi)
         has_address = bool(re.search(
-            r"\b(address|plot|sector|road|phase|delhi|mumbai|bangalore|bengaluru|haryana|pune|chennai|kolkata)\b",
-            norm_text,
-            re.IGNORECASE
-        ))
-        has_contact_name = bool(re.search(
-            r"\b(manager|executive|officer|customer\s*care|consumer\s*care|nodal\s*officer)\b",
+            r"\b(address|plot|sector|road|phase|delhi|mumbai|bangalore|bengaluru|haryana|pune|chennai|kolkata|"
+            r"office|cell|consumer\s*care\s*cell|at\s*above\s*address|at\s*the\s*address\s*given\s*above|"
+            r"manufacturer'?s\s*address|packer'?s\s*address|registered\s*office|पते\s*पर|उपरोक्त\s*पते|निर्माता\s*के\s*पते|पता)\b",
             norm_text,
             re.IGNORECASE
         ))
 
-        is_complete = has_email and has_phone and has_address and has_contact_name
+        # 4. Contact Person or Department Name (English and Hindi)
+        has_contact_name = bool(re.search(
+            r"\b(manager|executive|officer|customer\s*care|consumer\s*care|nodal\s*officer|grievance\s*officer|"
+            r"consumer\s*relations|support|in-?charge|cell|team|प्रबंधक|अधिकारी|ग्राहक\s*सेवा|उपभोक्ता\s*सेवा)\b",
+            norm_text,
+            re.IGNORECASE
+        ))
+
+        is_complete = bool(has_email and has_phone and has_address and has_contact_name)
+
         return {
             "has_email": has_email,
             "has_phone": has_phone,
             "has_address": has_address,
             "has_contact_name": has_contact_name,
             "is_complete": is_complete,
-            "email": email_match.group(0) if email_match else None,
-            "phone": phone_match.group(0).strip() if phone_match else None,
+            "email": email_str,
+            "phone": phone_match_str,
         }
 
     @classmethod
     def parse_country_of_origin(cls, text: str) -> Optional[str]:
-        """Extracts Country of Origin under Rule 6(1)(p).
+        """Extracts Country of Origin under Rule 6(1)(p) and GSR 128(E).
 
-        Matches: 'Country of Origin: India', 'Made in India', 'Product of India'.
+        Preserves dotted acronyms (e.g. 'U.S.A.', 'U.K.', 'P.R.C.') and normalizes:
+        - 'Country of Origin: U.S.A.' -> 'USA'
+        - 'Country of Origin: P.R.C.' -> 'China'
+        - 'Made in India by XYZ Ltd' -> 'India'
+        - 'Imported from: Thailand' -> 'Thailand'
+        - 'मूल देश: भारत' -> 'India'
         """
+        if not text:
+            return None
+
         norm_text = cls.convert_indic_digits(text)
         origin_pattern = re.compile(
-            r"(?:Country\s*of\s*Origin|Made\s*in|Product\s*of)\s*[:\-]?\s*([A-Za-z\s]+)",
+            r"(?:Country\s*of\s*Origin|Made\s*in|Product\s*of|Manufactured\s*in|Packed\s*in|Produce\s*of|Imported\s*from|Origin|COO|मूल\s*देश|देश)\s*[:\-]?\s*([^\n\r,;]+)",
             re.IGNORECASE
         )
         match = origin_pattern.search(norm_text)
-        if match:
-            country = match.group(1).strip()
-            country = re.split(r"[,;.\n]", country)[0].strip()
-            if country:
-                return country
-        return None
+        if not match:
+            return None
 
+        raw = match.group(1).strip()
+
+        # Check canonical country mappings
+        if "भारत" in raw:
+            return "भारत"
+        if re.search(r"\b(?:India|Bharat)\b", raw, re.IGNORECASE):
+            return "India"
+        if re.search(r"\b(?:U\.?S\.?A\.?|United\s*States(?:\s*of\s*America)?)\b", raw, re.IGNORECASE):
+            return "USA"
+        if re.search(r"\b(?:U\.?K\.?|United\s*Kingdom|Great\s*Britain)\b", raw, re.IGNORECASE):
+            return "United Kingdom"
+        if re.search(r"\b(?:P\.?R\.?C\.?|China|People'?s\s*Republic\s*of\s*China)\b", raw, re.IGNORECASE):
+            return "China"
+        if re.search(r"\b(?:U\.?A\.?E\.?|United\s*Arab\s*Emirates)\b", raw, re.IGNORECASE):
+            return "UAE"
+
+        # Check recognized country names
+        for country in RECOGNIZED_COUNTRIES:
+            if re.search(r"\b" + re.escape(country) + r"\b", raw, re.IGNORECASE):
+                return country
+
+        # Fallback: Strip stop words like 'by ...', 'for ...'
+        cleaned = re.split(r"\b(?:by|for|under|at)\b", raw, flags=re.IGNORECASE)[0].strip()
+        cleaned = cleaned.strip(".- :")
+        return cleaned if cleaned else None
+
+    @classmethod
+    def parse_generic_name(cls, text: str) -> Optional[str]:
+        """Extracts commodity generic/common name under Rule 6(1)(b).
+
+        Matches declarations like:
+        - 'Generic Name: Biscuits'
+        - 'Common Name: Potato Chips'
+        - 'Name of Commodity: Wheat Flour'
+        - 'Commodity: Bath Soap'
+        """
+        if not text:
+            return None
+
+        norm_text = cls.convert_indic_digits(text)
+        generic_pattern = re.compile(
+            r"(?:Generic\s*Name|Common\s*Name|Name\s*of\s*Commodity|Commodity|Product\s*Name)\s*[:\-]?\s*([^\n\r,;]+)",
+            re.IGNORECASE
+        )
+        match = generic_pattern.search(norm_text)
+        if not match:
+            return None
+
+        cleaned = match.group(1).strip().strip(".- :")
+        return cleaned if cleaned and len(cleaned) >= 2 else None
