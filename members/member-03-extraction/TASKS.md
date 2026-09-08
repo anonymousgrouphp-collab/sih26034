@@ -66,4 +66,13 @@
 - [x] Phase 4: Support Customer Support Desk and Consumer Complaints Cell in Consumer Care contact department extraction.
 - [x] Phase 4: Add 2D vertical spatial proximity linking and MRP priority regex for Gazette Hindi statutory declarations.
 - [x] Phase 4: Expand Member 3 test suite to 98 tests passing 100% (and 161 full repo tests passing with zero regressions).
+- [x] Phase 5: Implement E-Commerce Single Listing & HTML DOM Ingestion under ADL-10 and FR-14/15 in `extractor.py` without requiring OCR DTOs.
+- [x] Phase 5: Implement Rule 6(10) Manufacturing Date Exemption annotator in `extract_ecommerce()` for digital marketplace compliance.
+- [x] Phase 5: Decouple statutory tax inclusivity verification into standalone `StatutoryDeclarationParser.has_tax_inclusive_clause()` helper for split-line declarations.
+- [x] Phase 5: Add high-precision 3-digit PIN code mapping for Union Territory of Ladakh (194xxx) and cities Leh, Kargil, and Kavaratti (Lakshadweep).
+- [x] Phase 5: Expand address prefix anchors to support composite packaging titles: `Processed & Packed by`, `Formulated & Packed by`, `Marketed & Distributed by`, `Works:`, `Factory:`.
+- [x] Phase 5: Support parenthesized STD telephone codes (e.g. `(022) 2831-8888`, `(011) 2345-6789`) in Consumer Care parsing.
+- [x] Phase 5: Normalize mixed vulgar fractions in net quantity (e.g. `1 ½ kg` -> `1.5 kg`, `2 ½ g` -> `2.5 g`).
+- [x] Phase 5: Expand Member 3 test suite to 106 tests passing 100% (and 169 full repo tests passing with zero regressions).
+
 

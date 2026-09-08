@@ -938,6 +938,108 @@ def test_consumer_care_support_desks():
     assert "Consumer Complaints" in res2["contact_name"]
 
 
+def test_ladakh_and_ut_pin_codes():
+    """Verify Ladakh 194xxx and UT city mappings."""
+    # 1. Ladakh 194xxx PIN code override
+    a1 = StatutoryDeclarationParser.parse_address("Main Bazar, Leh 194101")
+    assert a1 is not None
+    assert a1["state"] == "Ladakh"
+    assert a1["pin_code"] == "194101"
+    assert a1["is_complete"] is True
+
+    # 2. Kargil Ladakh
+    a2 = StatutoryDeclarationParser.parse_address("Near District Hospital, Kargil 194103")
+    assert a2 is not None
+    assert a2["state"] == "Ladakh"
+    assert a2["pin_code"] == "194103"
+
+    # 3. Kavaratti Lakshadweep
+    a3 = StatutoryDeclarationParser.parse_address("Beach Road, Kavaratti 682555")
+    assert a3 is not None
+    assert a3["state"] == "Lakshadweep"
+    assert a3["pin_code"] == "682555"
+
+    # 4. Silvassa Dadra and Nagar Haveli
+    a4 = StatutoryDeclarationParser.parse_address("Plot 22, GIDC, Silvassa 396230")
+    assert a4 is not None
+    assert a4["state"] == "Dadra and Nagar Haveli"
+    assert a4["pin_code"] == "396230"
+
+
+def test_parenthesized_std_phones():
+    """Verify consumer care telephone numbers with parenthesized STD codes."""
+    # 1. Mumbai STD (022)
+    t1 = "For queries write to Nodal Officer, Tel: (022) 2831-8888, care@brand.in, at above address"
+    res1 = StatutoryDeclarationParser.check_consumer_care_completeness(t1)
+    assert res1["is_complete"] is True
+    assert res1["has_phone"] is True
+    assert res1["phone"] == "(022) 2831-8888"
+
+    # 2. Delhi STD (011)
+    t2 = "Customer Care: (011) 2345-6789, email: care@tea.com, Customer Care Executive, address on pack"
+    res2 = StatutoryDeclarationParser.check_consumer_care_completeness(t2)
+    assert res2["is_complete"] is True
+    assert res2["has_phone"] is True
+    assert res2["phone"] == "(011) 2345-6789"
+
+
+def test_mixed_fractions_net_quantity():
+    """Verify mixed vulgar fractions like '1 ½ kg' and '2 ½ g' normalize to correct floats."""
+    # 1. 1 ½ kg -> 1.5 kg
+    q1 = StatutoryDeclarationParser.parse_net_quantity("Net Qty: 1 ½ kg")
+    assert q1 is not None
+    assert q1["magnitude"] == 1.5
+    assert q1["unit"] == "kg"
+    assert q1["has_banned_unit"] is False
+
+    # 2. 2 ½ g -> 2.5 g
+    q2 = StatutoryDeclarationParser.parse_net_quantity("Net Weight: 2 ½ g")
+    assert q2 is not None
+    assert q2["magnitude"] == 2.5
+    assert q2["unit"] == "g"
+
+    # 3. 1 1/4 l -> 1.25 l
+    q3 = StatutoryDeclarationParser.parse_net_quantity("Net Content: 1 1/4 l")
+    assert q3 is not None
+    assert q3["magnitude"] == 1.25
+    assert q3["unit"] == "l"
+
+
+def test_has_tax_inclusive_clause_standalone():
+    """Verify StatutoryDeclarationParser.has_tax_inclusive_clause standalone helper."""
+    assert StatutoryDeclarationParser.has_tax_inclusive_clause("MRP: Rs. 100/- (incl. of all taxes)") is True
+    assert StatutoryDeclarationParser.has_tax_inclusive_clause("Inclusive of all taxes") is True
+    assert StatutoryDeclarationParser.has_tax_inclusive_clause("All taxes included") is True
+    assert StatutoryDeclarationParser.has_tax_inclusive_clause("सभी कर सहित") is True
+    assert StatutoryDeclarationParser.has_tax_inclusive_clause("MRP: Rs. 100/- (Extra taxes apply)") is False
+    assert StatutoryDeclarationParser.has_tax_inclusive_clause("Price: Rs. 50") is False
+
+
+def test_processed_and_packed_by_factory_anchors():
+    """Verify entity extraction anchored to Processed & Packed by, Works:, and composite headers."""
+    # 1. Processed & Packed by
+    a1 = StatutoryDeclarationParser.parse_address("Processed & Packed by: Organic India Pvt. Ltd., Plot 5, Industrial Area, Solan 173212")
+    assert a1 is not None
+    assert a1["name"] == "Organic India Pvt. Ltd."
+    assert a1["state"] == "Himachal Pradesh"
+    assert a1["pin_code"] == "173212"
+
+    # 2. Manufactured, Packed & Marketed by
+    a2 = StatutoryDeclarationParser.parse_address("Manufactured, Packed & Marketed by: Amul Dairy, Anand 388001, Gujarat")
+    assert a2 is not None
+    assert a2["name"] == "Amul Dairy"
+    assert a2["state"] == "Gujarat"
+    assert a2["pin_code"] == "388001"
+
+    # 3. Works:
+    a3 = StatutoryDeclarationParser.parse_address("Works: Godrej Agrovet Ltd, GIDC Sanand 382110, Gujarat")
+    assert a3 is not None
+    assert a3["name"] == "Godrej Agrovet Ltd"
+    assert a3["state"] == "Gujarat"
+    assert a3["pin_code"] == "382110"
+
+
+
 
 
 

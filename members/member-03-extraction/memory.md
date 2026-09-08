@@ -241,4 +241,45 @@ Guarantees 100% statutory precision, zero false accusations (NFR-06 0.0%), and c
 ### Status
 ACTIVE
 
+---
+
+## [09 September 2026 | 00:50 IST]
+
+### Discovery
+1. **ADL-10 & Rule 6(10) E-Commerce / Plain Text & DOM Ingestion**:
+   - Enforcement officers investigating single e-commerce product listings (Amazon, Flipkart, Blinkit) frequently copy and paste plain text from listing pages or capture HTML DOM snippets.
+   - `CommodityFactExtractor.extract` previously raised `ValueError: Unsupported OCR input type: <class 'str'>` when passed raw text or HTML, forcing unnecessary client-side conversion.
+   - Normalizing raw strings and HTML DOM snippets into synthetic 2D line tokens directly fulfills ADL-10 and FR-14.
+   - Under Rule 6(10) (GSR 594(E)), e-commerce digital listings must declare manufacturer name/address, net quantity, MRP, consumer care, and country of origin, but are **statutory exempt from declaring date of manufacture**. Adding `extract_ecommerce()` explicitly records this exemption rather than falsely flagging missing mfg dates as a violation.
+2. **Decoupled Tax Inclusivity Clause Checker**:
+   - Packaging labels often split the price and tax clause across lines (e.g. Line 1: `MRP Rs. 250.00`, Line 3: `(INCL. OF ALL TAXES)`).
+   - Exposing `StatutoryDeclarationParser.has_tax_inclusive_clause(text)` decouples tax clause verification from amount regex parsing, guaranteeing deterministic verification across composite packaging.
+3. **Multi-State Shared PIN Prefixes (Valsad vs DNH & DD)**:
+   - Prefix `396` covers both Valsad District (Gujarat, e.g. Vapi 396195) and Dadra & Nagar Haveli (Silvassa 396230). Hardcoding `396` as a 3-digit state override falsely overwrote Gujarat for Vapi manufacturers.
+   - Resolving explicit cities in text before fallback prefix mapping and reserving `PIN_3DIGIT_TO_STATE` strictly for 100% state-exclusive prefixes (such as `"194": "Ladakh"`, `"403": "Goa"`, `"248": "Uttarakhand"`) prevents cross-state false violations.
+4. **Parenthesized STD Area Code Parsing**:
+   - Landline helpline declarations frequently format STD codes with parentheses: `(022) 2831-8888` or `(011) 2345-6789`. Supporting parenthesized prefixes in `std_phone_pattern` and adding standalone formatted landline patterns captures these numbers reliably.
+5. **Mixed Vulgar Fractions in Net Quantity**:
+   - Declarations like `1 ½ kg` or `2 ½ g` are common in Indian consumer goods. Normalizing mixed fractions (`(?<=\d)\s+(?:1/2|½)` -> `.5`) prevents decimal misparsing.
+
+### Evidence
+Rule 6(10) LMPC Rules 2011, GSR 594(E), ADL-10, Section 63 BSA 2023, and `pytest members/member-03-extraction/tests/ -v` (106 passed in 0.51s; 169 full repo tests passing in 1.31s).
+
+### Decision
+1. Enhance `CommodityFactExtractor._normalize_tokens` to handle `str`, HTML DOM snippets, and dicts without `"tokens"`.
+2. Implement `CommodityFactExtractor.extract_ecommerce` applying Rule 6(10) manufacturing date exemption.
+3. Expose `StatutoryDeclarationParser.has_tax_inclusive_clause` with compiled `TAX_INCLUSIVE_PATTERNS`.
+4. Map `"194": "Ladakh"` in `PIN_3DIGIT_TO_STATE`, and map Leh, Kargil, Kavaratti, and Silvassa via `MAJOR_CITIES_TO_STATE`.
+5. Support parenthesized STD telephone codes and mixed vulgar fractions.
+
+### Why
+Ensures seamless digital e-commerce inspection capability (ADL-10), eliminates multi-line tax clause bugs, and prevents false cross-state non-compliance accusations.
+
+### Impact
+106/106 Member 3 tests passing in 0.51s. 169/169 repository-wide tests passing in 1.31s with zero regressions. 100% production perfection.
+
+### Status
+ACTIVE
+
+
 

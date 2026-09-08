@@ -131,7 +131,29 @@ class CommodityFactExtractor:
         return None, None
 
     def _normalize_tokens(self, ocr_data: Union[Dict[str, Any], Any]) -> Tuple[str, List[Dict[str, Any]], str]:
-        """Extracts image_id, tokens list, and full_text from dict or DTO."""
+        """Extracts image_id, tokens list, and full_text from dict, DTO, string, or HTML DOM snapshot."""
+        if isinstance(ocr_data, str):
+            image_id = "text_input"
+            raw_text = ocr_data
+            # Strip HTML tags if HTML is detected
+            if "<" in raw_text and ">" in raw_text:
+                # Replace line-breaking HTML tags with newlines to preserve statutory reading blocks
+                clean_lines = re.sub(r"(?i)<(?:br|/p|/div|/li|/tr|/h[1-6])[^>]*>", "\n", raw_text)
+                clean_lines = re.sub(r"<[^>]+>", " ", clean_lines)
+            else:
+                clean_lines = raw_text
+
+            lines = [line.strip() for line in clean_lines.splitlines() if line.strip()]
+            full_text = "\n".join(lines)
+            tokens = []
+            for idx, line in enumerate(lines):
+                tokens.append({
+                    "text": line,
+                    "confidence": 0.95,
+                    "bounding_box": [idx * 30, 10, idx * 30 + 20, 500],
+                })
+            return image_id, tokens, full_text
+
         if hasattr(ocr_data, "model_dump"):
             data = ocr_data.model_dump()
         elif hasattr(ocr_data, "dict"):
@@ -143,9 +165,28 @@ class CommodityFactExtractor:
         else:
             raise ValueError(f"Unsupported OCR input type: {type(ocr_data)}")
 
-        image_id = data.get("image_id", "unknown_image")
+        image_id = data.get("image_id") or data.get("url") or "unknown_image"
         tokens = data.get("tokens", []) or []
         full_text = data.get("full_text", "")
+
+        # Fallback if dict has text/html content but no pre-tokenized bounding boxes
+        if not tokens:
+            alt_text = data.get("text") or data.get("html") or data.get("page_content") or data.get("listing_text") or ""
+            if alt_text:
+                if "<" in alt_text and ">" in alt_text:
+                    clean_lines = re.sub(r"(?i)<(?:br|/p|/div|/li|/tr|/h[1-6])[^>]*>", "\n", alt_text)
+                    clean_lines = re.sub(r"<[^>]+>", " ", clean_lines)
+                else:
+                    clean_lines = alt_text
+                lines = [line.strip() for line in clean_lines.splitlines() if line.strip()]
+                full_text = "\n".join(lines)
+                for idx, line in enumerate(lines):
+                    tokens.append({
+                        "text": line,
+                        "confidence": 0.95,
+                        "bounding_box": [idx * 30, 10, idx * 30 + 20, 500],
+                    })
+
         if not full_text and tokens:
             full_text = "\n".join(t.get("text", "") for t in tokens if t.get("text"))
 
@@ -322,13 +363,18 @@ class CommodityFactExtractor:
         Differentiates between MANUFACTURER, PACKER, IMPORTER, and joint MANUFACTURER_AND_PACKER.
         """
         address_starters = [
+            "manufactured, packed & marketed by", "manufactured and packed and marketed by",
             "manufactured & packed by", "mfg & pkd by", "mfd & pkd by", "mfd. & pkd. by",
             "manufactured and packed by", "निर्माता एवं पैकर", "निर्माता व पैकर",
+            "processed & packed by", "processed and packed by",
+            "formulated & packed by", "formulated and packed by",
+            "marketed & distributed by", "marketed and distributed by",
             "manufactured in india by", "manufactured in bharat by", "mfd in india by", "mfd. in india by",
             "packed in india by", "pkd in india by", "pkd. in india by",
             "manufactured by", "mfd by", "mfd. by", "mfg by", "mfg. by", "produced by",
             "packed by", "pkd by", "pkd. by", "packaging by", "pre-packed by",
             "imported by", "importer", "marketed by", "address", "registered office",
+            "works:", "factory:", "mfg unit:", "unit:",
             "निर्माता", "पैकर", "निर्मित", "आयातकर्ता", "मार्केटेड"
         ]
 
@@ -503,8 +549,7 @@ class CommodityFactExtractor:
             parsed_mrp, unit = chosen_mrp
             # If tax clause wasn't on this candidate line, verify against global full_text
             if not parsed_mrp["tax_inclusive"]:
-                global_mrp_check = self.parser.parse_mrp(full_text)
-                if global_mrp_check and global_mrp_check.get("tax_inclusive"):
+                if self.parser.has_tax_inclusive_clause(full_text):
                     parsed_mrp["tax_inclusive"] = True
 
             extracted_mrp = MRPValue(**parsed_mrp)
@@ -874,6 +919,49 @@ class CommodityFactExtractor:
             mfg_date_year=extracted_mfg_year,
             raw_fields=raw_fields,
         )
+
+    def extract_ecommerce(
+        self,
+        listing_data: Union[str, Dict[str, Any]],
+        url: Optional[str] = None
+    ) -> NormalizedCommodityFacts:
+        """Extracts statutory declarations from an e-commerce single listing under Rule 6(10) & ADL-10.
+
+        Per Rule 6(10) and GSR 594(E), digital listings on e-commerce marketplaces must declare:
+        - Name and address of manufacturer / packer / importer
+        - Net quantity
+        - MRP (inclusive of all taxes)
+        - Consumer care details
+        - Country of origin
+
+        Statutory Exemption:
+        The manufacturing date is statutory exempt from digital marketplace listings under Rule 6(10).
+        If manufacturing date is not declared, this method records an explicit exemption annotation
+        in raw_fields rather than leaving a gap or triggering non-compliance.
+        """
+        facts = self.extract(listing_data)
+        if url and facts.image_id in ("unknown_image", "text_input", "dict_text_input"):
+            facts.image_id = url
+
+        # If manufacturing date was not declared, record Rule 6(10) statutory exemption
+        if facts.mfg_date_month is None and facts.mfg_date_year is None:
+            facts.raw_fields.append(
+                ExtractedFieldDTO(
+                    field_type="DATE_OF_MANUFACTURE",
+                    raw_ocr_text="STATUTORY_EXEMPTION_RULE_6_10",
+                    normalized_value={
+                        "is_exempt": True,
+                        "statutory_basis": "Rule 6(10) Legal Metrology (Packaged Commodities) Rules, 2011",
+                        "description": "Digital e-commerce listings are statutory exempt from declaring date of manufacture",
+                        "status": "EXEMPT"
+                    },
+                    detection_confidence=1.0,
+                    ocr_confidence=1.0,
+                    bounding_box=[0, 0, 0, 0],
+                )
+            )
+
+        return facts
 
 
 def main():

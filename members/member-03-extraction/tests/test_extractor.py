@@ -824,5 +824,122 @@ def test_extract_spatial_vertical_hindi_label_value(extractor):
     assert facts.net_quantity.unit == "g"
 
 
+def test_extract_plain_text_input(extractor):
+    """Verify CommodityFactExtractor seamlessly handles raw plain text strings."""
+    raw_text = """
+    Britannia Industries Ltd.
+    Plot 12, Industrial Area, Solan 173212, Himachal Pradesh
+    Generic Name: Marie Gold Biscuits
+    Net Quantity: 200 g
+    MRP Rs. 50.00 (incl. of all taxes)
+    Unit Sale Price: Rs. 0.25 / g
+    Country of Origin: India
+    Date of Mfg: 05/2024
+    Customer Care: Nodal Officer, care@britannia.com, 1800-425-4444, address on pack
+    """
+    facts = extractor.extract(raw_text)
+    assert facts.image_id == "text_input"
+    assert facts.mrp is not None
+    assert facts.mrp.amount == 50.0
+    assert facts.mrp.tax_inclusive is True
+
+    assert facts.net_quantity is not None
+    assert facts.net_quantity.magnitude == 200.0
+    assert facts.net_quantity.unit == "g"
+
+    assert facts.unit_sale_price is not None
+    assert facts.unit_sale_price.price_per_unit == 0.25
+
+    assert facts.manufacturer is not None
+    assert facts.manufacturer.name == "Britannia Industries Ltd."
+    assert facts.manufacturer.state == "Himachal Pradesh"
+    assert facts.manufacturer.pin_code == "173212"
+    assert facts.manufacturer.is_complete is True
+
+    assert facts.country_of_origin == "India"
+    assert facts.mfg_date_month == 5
+    assert facts.mfg_date_year == 2024
+
+    assert facts.consumer_care is not None
+    assert facts.consumer_care.is_complete is True
+    assert facts.consumer_care.email == "care@britannia.com"
+    assert facts.consumer_care.phone == "1800-425-4444"
+
+
+def test_extract_ecommerce_html_dom(extractor):
+    """Verify extract_ecommerce parses HTML DOM snapshots and applies Rule 6(10) mfg date exemption."""
+    html_dom = """
+    <div class="pdp-details">
+      <h1 class="product-title">Haldiram's Bhujia Sev</h1>
+      <p class="manufacturer">Manufactured by: Haldiram Snacks Pvt. Ltd., Mohan Industrial Estate, Main Mathura Road, New Delhi 110044</p>
+      <div class="price-row">MRP: ₹ 160.00 (inclusive of all taxes)</div>
+      <div class="usp">USP: ₹ 0.40 per g</div>
+      <div class="net-qty">Net Quantity: 400 g</div>
+      <div class="origin">Country of Origin: India</div>
+      <div class="care">Customer Care Executive: 011-45204100, care@haldirams.com, Consumer Care Cell, New Delhi</div>
+    </div>
+    """
+    facts = extractor.extract_ecommerce(html_dom, url="https://supermart.in/product/haldirams-bhujia-400g")
+    assert facts.image_id == "https://supermart.in/product/haldirams-bhujia-400g"
+
+    assert facts.mrp is not None
+    assert facts.mrp.amount == 160.0
+    assert facts.mrp.tax_inclusive is True
+
+    assert facts.net_quantity is not None
+    assert facts.net_quantity.magnitude == 400.0
+    assert facts.net_quantity.unit == "g"
+
+    assert facts.manufacturer is not None
+    assert facts.manufacturer.state == "Delhi"
+    assert facts.manufacturer.pin_code == "110044"
+
+    assert facts.consumer_care is not None
+    assert facts.consumer_care.phone == "011-45204100"
+    assert facts.consumer_care.email == "care@haldirams.com"
+    assert facts.consumer_care.is_complete is True
+
+    assert facts.country_of_origin == "India"
+
+    # Verify Rule 6(10) statutory exemption annotation
+    mfg_exempt_field = next((f for f in facts.raw_fields if f.field_type == "DATE_OF_MANUFACTURE"), None)
+    assert mfg_exempt_field is not None
+    assert mfg_exempt_field.raw_ocr_text == "STATUTORY_EXEMPTION_RULE_6_10"
+    assert mfg_exempt_field.normalized_value.get("is_exempt") is True
+    assert "Rule 6(10)" in mfg_exempt_field.normalized_value.get("statutory_basis", "")
+
+
+def test_extract_split_line_tax_inclusivity(extractor):
+    """Verify tax inclusivity clause detection when price and tax clause are on separate distant lines."""
+    ocr_payload = {
+        "image_id": "img_split_tax_01",
+        "tokens": [
+            {
+                "token_id": "t1",
+                "text": "MRP Rs. 250.00",
+                "confidence": 0.98,
+                "bounding_box": [50, 50, 70, 200],
+            },
+            {
+                "token_id": "t2",
+                "text": "Net Qty: 500 g",
+                "confidence": 0.99,
+                "bounding_box": [100, 50, 120, 200],
+            },
+            {
+                "token_id": "t3",
+                "text": "(INCL. OF ALL TAXES)",
+                "confidence": 0.96,
+                "bounding_box": [200, 50, 220, 300],
+            }
+        ]
+    }
+    facts = extractor.extract(ocr_payload)
+    assert facts.mrp is not None
+    assert facts.mrp.amount == 250.0
+    assert facts.mrp.tax_inclusive is True
+
+
+
 
 

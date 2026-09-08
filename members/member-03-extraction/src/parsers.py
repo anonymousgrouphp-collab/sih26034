@@ -99,13 +99,18 @@ MAJOR_CITIES_TO_STATE: Dict[str, str] = {
     "visakhapatnam": "Andhra Pradesh", "vizag": "Andhra Pradesh", "vijayawada": "Andhra Pradesh", "sri city": "Andhra Pradesh", "chittoor": "Andhra Pradesh",
     "kochi": "Kerala", "cochin": "Kerala", "thiruvananthapuram": "Kerala", "trivandrum": "Kerala", "panaji": "Goa", "bicholim": "Goa",
     "kanchipuram": "Tamil Nadu", "hosur": "Tamil Nadu", "thiruvallur": "Tamil Nadu", "sriperumbudur": "Tamil Nadu",
-    "sanand": "Gujarat", "morbi": "Gujarat", "mehsana": "Gujarat",
+    "sanand": "Gujarat", "morbi": "Gujarat", "mehsana": "Gujarat", "valsad": "Gujarat", "halol": "Gujarat", "chhatral": "Gujarat", "kadi": "Gujarat",
     "bhiwadi": "Rajasthan", "alwar": "Rajasthan", "neemrana": "Rajasthan",
-    "sonipat": "Haryana", "panipat": "Haryana", "kundli": "Haryana"
+    "sonipat": "Haryana", "panipat": "Haryana", "kundli": "Haryana",
+    "mohali": "Punjab", "zirakpur": "Punjab", "derabassi": "Punjab",
+    "tarapur": "Maharashtra",
+    "leh": "Ladakh", "kargil": "Ladakh",
+    "kavaratti": "Lakshadweep"
 }
 
 # High-precision 3-digit PIN prefix overrides for sub-state regions and Union Territories
 PIN_3DIGIT_TO_STATE: Dict[str, str] = {
+    "194": "Ladakh",
     "403": "Goa",
     "248": "Uttarakhand", "249": "Uttarakhand", "263": "Uttarakhand",
     "605": "Puducherry", "609": "Puducherry",
@@ -202,13 +207,42 @@ RECOGNIZED_VALID_UNITS: Set[str] = {
 class StatutoryDeclarationParser:
     """Deterministic, auditable parsers for statutory packaging declarations."""
 
+    # Statutory tax inclusivity patterns under Rule 6(1)(e)
+    TAX_INCLUSIVE_PATTERNS: List[str] = [
+        r"inc[l]?(?:usive|\.)?\s*(?:of)?\s*all\s*(?:taxes?|gst)",
+        r"inc[l]?(?:usive|\.)?\s*(?:of)?\s*(?:taxes?|gst)",
+        r"all\s*(?:taxes?|gst)\s*inc[l]?(?:uded|usive|\.)?",
+        r"(?:taxes?|gst)\s*inc[l]?(?:uded|usive|\.)?",
+        r"including\s*(?:of)?\s*all\s*(?:taxes?|gst)",
+        r"including\s*(?:taxes?|gst)",
+        r"inclusive\s*(?:of)?\s*(?:all\s*)?(?:taxes?|gst)",
+        r"inc[l]?\.?\s*(?:taxes?|gst)",
+        r"कर\s*सहित",
+        r"सभी\s*कर(?:ों)?\s*सहित",
+        r"कुल\s*कर\s*सहित",
+        r"कर\s*शामिल",
+        r"अतिरिक्त\s*कर\s*नहीं",
+    ]
+
+    @classmethod
+    def has_tax_inclusive_clause(cls, text: str) -> bool:
+        """Determines if the text contains a mandatory tax inclusive clause per Rule 6(1)(e)."""
+        if not text:
+            return False
+        norm_text = cls.convert_indic_digits(text)
+        return any(re.search(p, norm_text, re.IGNORECASE) for p in cls.TAX_INCLUSIVE_PATTERNS)
+
     @staticmethod
     def convert_indic_digits(text: str) -> str:
         """Converts Devanagari numerals (०-९) and fractions to standard ASCII decimal digits (0-9)."""
         if not text:
             return ""
         converted = text.translate(DEVANAGARI_DIGITS_MAP)
-        # Normalize Unicode vulgar fractions
+        # Normalize mixed fractions (e.g. '1 ½', '1 1/2', '2 ¼', '2 1/4', '3 ¾', '3 3/4')
+        converted = re.sub(r"(?<=\d)\s+(?:1/2|½)", ".5", converted)
+        converted = re.sub(r"(?<=\d)\s+(?:1/4|¼)", ".25", converted)
+        converted = re.sub(r"(?<=\d)\s+(?:3/4|¾)", ".75", converted)
+        # Normalize standalone Unicode vulgar fractions
         converted = converted.replace("½", "0.5").replace("¼", "0.25").replace("¾", "0.75")
         return converted
 
@@ -506,23 +540,8 @@ class StatutoryDeclarationParser:
 
         norm_text = cls.convert_indic_digits(text)
 
-        # Tax inclusivity clause patterns per Rule 6(1)(e)
-        tax_inclusive_patterns = [
-            r"inc[l]?(?:usive|\.)?\s*(?:of)?\s*all\s*(?:taxes?|gst)",
-            r"inc[l]?(?:usive|\.)?\s*(?:of)?\s*(?:taxes?|gst)",
-            r"all\s*(?:taxes?|gst)\s*inc[l]?(?:uded|usive|\.)?",
-            r"(?:taxes?|gst)\s*inc[l]?(?:uded|usive|\.)?",
-            r"including\s*(?:of)?\s*all\s*(?:taxes?|gst)",
-            r"including\s*(?:taxes?|gst)",
-            r"inclusive\s*(?:of)?\s*(?:all\s*)?(?:taxes?|gst)",
-            r"inc[l]?\.?\s*(?:taxes?|gst)",
-            r"कर\s*सहित",
-            r"सभी\s*कर(?:ों)?\s*सहित",
-            r"कुल\s*कर\s*सहित",
-            r"कर\s*शामिल",
-            r"अतिरिक्त\s*कर\s*नहीं",
-        ]
-        tax_inclusive = any(re.search(p, norm_text, re.IGNORECASE) for p in tax_inclusive_patterns)
+        # Check mandatory tax inclusivity clause per Rule 6(1)(e)
+        tax_inclusive = cls.has_tax_inclusive_clause(norm_text)
 
         mrp_prefix = r"(?:M\.?\s*R\.?\s*P\.?|Maximum\s*Retail\s*Price|Max\.?\s*Retail\s*Price|अ\.वि\.मू\.?|अधिकतम\s*खुदरा\s*मूल्य)"
         tax_clause_group = (
@@ -923,9 +942,15 @@ class StatutoryDeclarationParser:
 
         # Approach A: Extract entity anchored to address prefix (e.g. "Manufactured by: Krishna Dairy, ...", "Manufactured in India by: ABC Ltd")
         pref_anchor_re = re.compile(
-            r"(?:Manufactured\s*(?:&|and)?\s*Packed\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
+            r"(?:Manufactured\s*(?:,|&|and)?\s*Packed\s*(?:&|and)?\s*Marketed\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
+            r"Manufactured\s*(?:&|and)?\s*Packed\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
             r"Manufactured\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Mfd\.?\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Mfg\.?\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
-            r"Packed\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Pkd\.?\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Marketed\s*by|Imported\s*by|निर्माता(?:\s*एवं\s*पैकर)?|पैकर|निर्मित|आयातकर्ता)\s*[:\-]?\s*"
+            r"Processed\s*(?:&|and)?\s*Packed\s*by|Formulated\s*(?:&|and)?\s*Packed\s*by|"
+            r"Marketed\s*(?:&|and)?\s*Distributed\s*by|"
+            r"Packed\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Pkd\.?\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
+            r"Marketed\s*by|Imported\s*by|"
+            r"Works\s*[:\-]|Factory\s*[:\-]|Mfg\s*Unit\s*[:\-]|"
+            r"निर्माता(?:\s*एवं\s*पैकर)?|पैकर|निर्मित|आयातकर्ता)\s*[:\-]?\s*"
             r"([^,\n\r]+?)(?:,|\n|\r|Plot|Sector|Road|Phase|Industrial|Village|Dist|Taluka|City|Area|Ward|No\.|\b(?=[A-Z][a-z]+\s*-\s*[1-9]))",
             re.IGNORECASE
         )
@@ -947,9 +972,13 @@ class StatutoryDeclarationParser:
             if corp_name_match:
                 raw_entity = corp_name_match.group(1).strip()
                 cleaned_entity = re.sub(
-                    r"^(?:Manufactured\s*(?:&|and)?\s*Packed\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
+                    r"^(?:Manufactured\s*(?:,|&|and)?\s*Packed\s*(?:&|and)?\s*Marketed\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
+                    r"Manufactured\s*(?:&|and)?\s*Packed\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
                     r"Manufactured\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Mfd\.?\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Mfg\.?\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
-                    r"Packed\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Pkd\.?\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Marketed\s*by|Imported\s*by|Address|निर्माता|पैकर)\s*[:\-]?\s*",
+                    r"Processed\s*(?:&|and)?\s*Packed\s*by|Formulated\s*(?:&|and)?\s*Packed\s*by|"
+                    r"Marketed\s*(?:&|and)?\s*Distributed\s*by|"
+                    r"Packed\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Pkd\.?\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
+                    r"Marketed\s*by|Imported\s*by|Works|Factory|Address|निर्माता|पैकर)\s*[:\-]?\s*",
                     "",
                     raw_entity,
                     flags=re.IGNORECASE
@@ -1007,8 +1036,8 @@ class StatutoryDeclarationParser:
             phone_match_str = tf_match.group(0).strip()
         else:
             std_phone_pattern = re.compile(
-                r"(?:tel|phone|contact|toll[- ]free|helpline|call|care\s*no|customer\s*care|ph|mob|whatsapp|t:|फोन)\s*[:\-]?\s*"
-                r"(\+?91[-\s]?)?([1-9][0-9\s\-]{8,12}[0-9]|0\d{2,4}[-\s]?[0-9\s\-]{6,10}[0-9])\b",
+                r"(?:tel|phone|contact|toll[- ]free|helpline|call|care\s*no|customer\s*care(?:\s*(?:executive|manager|officer|desk|cell|helpdesk))?|ph|mob|whatsapp|t:|फोन)\s*[:\-]?\s*"
+                r"((?:\(\s*0?\d{2,4}\s*\)\s*|\+?91[-\s]?|0\d{2,4}[-\s]?))?([1-9][0-9\s\-]{5,12}[0-9])\b",
                 re.IGNORECASE
             )
             sp_match = std_phone_pattern.search(norm_text)
@@ -1016,9 +1045,19 @@ class StatutoryDeclarationParser:
                 prefix = sp_match.group(1) or ""
                 raw_num = sp_match.group(2)
                 # Ensure it's not an FSSAI 14-digit number
-                clean_digits = re.sub(r"\D", "", raw_num)
+                clean_digits = re.sub(r"\D", "", f"{prefix}{raw_num}")
                 if 8 <= len(clean_digits) <= 12 and not any(k in norm_text[max(0, sp_match.start() - 15):sp_match.start()].lower() for k in ["fssai", "lic"]):
                     phone_match_str = f"{prefix}{raw_num}".strip()
+            else:
+                # Standalone formatted STD phone: e.g. 011-45204100 or (022) 2831-8888 or +91-9876543210
+                sa_phone_pattern = re.compile(
+                    r"\b((?:\(\s*0?\d{2,4}\s*\)\s*|\+?91[-\s]|0\d{2,4}-))([1-9][0-9\-]{5,8})\b"
+                )
+                sa_match = sa_phone_pattern.search(norm_text)
+                if sa_match:
+                    clean_digits = re.sub(r"\D", "", sa_match.group(0))
+                    if 8 <= len(clean_digits) <= 12 and not any(k in norm_text[max(0, sa_match.start() - 15):sa_match.start()].lower() for k in ["fssai", "lic"]):
+                        phone_match_str = sa_match.group(0).strip()
 
         has_phone = bool(phone_match_str)
 
