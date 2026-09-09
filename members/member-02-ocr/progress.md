@@ -653,3 +653,45 @@ Prepare final pre-merge acceptance report for Team Lead sign-off.
 
 ### Signing Note
 SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-09 01:15 IST [VERIFIED]
+
+---
+
+## [10 September 2026] [01:45] IST
+
+### Task / Chunk
+Special Assignment: Development and Integration of Standalone Temporary Testing UI & Golden Demonstration HUD (`integration/test_ui/`).
+
+### Status
+COMPLETE
+
+### Completed
+- Created isolated feature branch `feat/m2-parmarth-test-ui` branched from `dev` and pushed to origin.
+- Documented formal assignment specification in `TASK_TEMP_UI.md` and updated `TASKS.md` and `docs/SIX_MEMBER_ASSIGNMENT.md`.
+- Implemented zero-build, single-page inspection testing HUD in `integration/test_ui/index.html`:
+  - 4-role officer context switcher (Inspector, Controller, Admin, Viewer) connecting to `POST /api/v1/auth/login`.
+  - 1-click interactive quick-load presets for all 6 Golden Demonstration SKUs (`SKU-DEMO-01` to `SKU-DEMO-06`).
+  - Interactive calibrated packaging canvas with dynamic color-coded bounding box overlays.
+  - Optical Quality Gate telemetry (Laplacian blur, specular glare bloom, ArUco metric scaling).
+  - Table-I statutory font schedule comparison card (1.0mm, 1.5mm, 2.5mm, 4.0mm, 6.0mm) and USP consistency math.
+  - Prominent 4-state Epistemic Verdict badge (`PASS`, `FAIL`, `REVIEW`, `UNABLE_TO_VERIFY`).
+  - Human-in-the-Loop (HITL) official adjudication recording form (`POST /api/v1/inspections/{id}/adjudicate`).
+  - Court-ready Form-1 Legal Notice PDF/A generation and download trigger (`POST /api/v1/inspections/{id}/notice`).
+  - Section 63 BSA 2023 7-stage Merkle DAG chain-of-custody display and unbroken audit chain verifier (`GET /api/v1/system/audit-chain/verify`).
+- Implemented `integration/test_ui/test_ui_server.py` seamlessly mounting the testing HUD on FastAPI at `/test-ui` (and redirecting `/` -> `/test-ui`).
+- Created automated integration test suite `integration/tests/test_ui_endpoints.py` covering HTML serving, redirects, SKU listing, and golden SKU pipeline runs.
+
+### Tests
+- `pytest integration/tests/test_ui_endpoints.py -v` (6 passed in 1.57s)
+- `pytest members/ integration/ -v` (297 passed, 1 skipped in 21.63s — 100% repository-wide pass rate)
+
+### Problems
+None. Zero conflicts with Member 6 folder (`members/member-06-ui/`).
+
+### Decisions
+Temporary testing UI deployed exclusively in `integration/test_ui/` using zero-build HTML/Tailwind/Vanilla JS. Enables parallel testing and jury demonstrations without blocking on Member 6's full production React 18 frontend.
+
+### Next Step
+Hand over temporary testing HUD URL (`http://localhost:8000/test-ui`) to team and field officers for testing.
+
+### Signing Note
+SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-10 01:45 IST [VERIFIED]

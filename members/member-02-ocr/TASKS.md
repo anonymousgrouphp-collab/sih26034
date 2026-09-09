@@ -47,7 +47,7 @@
 - [x] Record formal verdict and deployment decision.
 
 ### Special Assignment: Temporary Test Frontend & Inspection HUD (feat/m2-parmarth-test-ui)
-- [ ] Implement standalone zero-build test UI in `integration/test_ui/` for end-to-end team testing.
-- [ ] Connect to FastAPI `/api/v1/` endpoints for auth, upload, pipeline execution, adjudication, and PDF notice download.
-- [ ] Provide quick-load interactive presets for the 6 Golden Demonstration SKUs.
-- [ ] Deliver automated integration tests and documentation (`TASK_TEMP_UI.md`).
+- [x] Implement standalone zero-build test UI in `integration/test_ui/` for end-to-end team testing.
+- [x] Connect to FastAPI `/api/v1/` endpoints for auth, upload, pipeline execution, adjudication, and PDF notice download.
+- [x] Provide quick-load interactive presets for the 6 Golden Demonstration SKUs.
+- [x] Deliver automated integration tests and documentation (`TASK_TEMP_UI.md`).
