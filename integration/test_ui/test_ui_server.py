@@ -46,9 +46,20 @@ from database import (
     RoleEnum,
     User,
     get_db_session,
+    init_database,
+    seed_default_platform_data,
+    get_database_engine,
+    get_session_factory,
 )
 from merkle_dag import MerkleAuditLedger, PipelineEvidenceDAG
 from integration.adapters.pipeline_adapter import CentralPipelineAdapter
+
+# Ensure database tables exist and default accounts are seeded for test harness
+_engine = get_database_engine()
+init_database(_engine)
+_Session = get_session_factory(_engine)
+with _Session() as _s:
+    seed_default_platform_data(_s)
 
 
 # -----------------------------------------------------------------------------
