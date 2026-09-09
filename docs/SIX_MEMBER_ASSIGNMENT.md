@@ -18,7 +18,7 @@ This document specifies the exact boundaries, inputs, outputs, acceptance criter
 | **Member 1: CV & Metrology** | **Kunal Raj** | [@kunal-raj-dev](https://github.com/kunal-raj-dev) | `members/member-01-cv-metrology/` | `feat/m1-cv-metrology` | **MERGED IN DEV (PR #3)** |
 | **Member 2: Multilingual OCR** | **Parmarth Kumar** | [@parmarth-kumar](https://github.com/parmarth-kumar) | `members/member-02-ocr/` | `feat/m2-ocr` | **MERGED IN DEV (PR #4)** |
 | **Member 3: Semantic Extraction** | **Harsh Patel** | [@anonymousgrouphp-collab](https://github.com/anonymousgrouphp-collab) | `members/member-03-extraction/` | `feat/m3-extraction` | **MERGED IN DEV (PR #5)** |
-| **Member 4: Rule Engine** | **Ambika Bansal** | [@bansalambika12-ship-it](https://github.com/bansalambika12-ship-it) | `members/member-04-rule-engine/` | `feat/m4-rule-engine` | In Development |
+| **Member 4: Rule Engine** | **Ambika Bansal** | [@bansalambika12-ship-it](https://github.com/bansalambika12-ship-it) | `members/member-04-rule-engine/` | `feat/m4-rule-engine` | **MERGED IN DEV (PR #6)** |
 | **Member 5: Evidence & Backend** | **Shailendra Pratap Singh** | [@shailendrapratap1](https://github.com/shailendrapratap1) | `members/member-05-evidence/` | `feat/m5-evidence` | In Review / PR Open |
 | **Member 6: Frontend & HUD** | **Urvashi Rajput** | [@rajputurvashi2006-bit](https://github.com/rajputurvashi2006-bit) | `members/member-06-ui/` | `feat/m6-ui` | In Development |
 
