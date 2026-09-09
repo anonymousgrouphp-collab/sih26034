@@ -53,6 +53,14 @@ class CentralPipelineAdapter:
         return evaluations
 
     @classmethod
+    def execute_ocr(cls, image: Any, image_id: str = "img_01") -> Dict[str, Any]:
+        """Executes Member 2 Multilingual OCR pipeline on rectified image."""
+        from engine import MultilingualOCREngine
+        engine = MultilingualOCREngine()
+        output = engine.process_image(image, image_id=image_id)
+        return output.model_dump()
+
+    @classmethod
     def build_evidence_merkle_root(cls, stage_payloads: List[Any]) -> str:
         hashes = [MerkleAuditLedger.hash_payload(p) for p in stage_payloads]
         return MerkleAuditLedger.build_merkle_root(hashes)

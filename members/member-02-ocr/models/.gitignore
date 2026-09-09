@@ -1,0 +1,9 @@
+# Ignore large binary weights in git
+*.onnx
+*.traineddata
+
+# Keep manifests and dictionaries
+!*.txt
+!*.json
+!*.md
+!.gitignore
