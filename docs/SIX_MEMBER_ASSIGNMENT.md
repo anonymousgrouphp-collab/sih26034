@@ -25,6 +25,7 @@ This document specifies the exact boundaries, inputs, outputs, acceptance criter
 ### Work Assignment Governance
 1. **Team Lead Authority:** The **Team Lead manually assigns all work** across the team.
 2. **AI Task Boundaries:** AI coding assistants and autonomous agents must **not** create additional member branches, automatically assign work, or redistribute member tasks. All development proceeds strictly against explicit Team Lead direction.
+3. **Special Parallel Tooling Assignment (10 September 2026):** By explicit Team Lead directive, **Parmarth Kumar** ([@parmarth-kumar](https://github.com/parmarth-kumar)) is assigned a temporary testing UI task on branch `feat/m2-parmarth-test-ui` (`integration/test_ui/`) to unblock end-to-end testing across merged subsystems (M1-M5) while Member 6 completes production React 18 frontend (`feat/m6-ui`).
 
 ### 3-Tier Branch Hierarchy
 ```text

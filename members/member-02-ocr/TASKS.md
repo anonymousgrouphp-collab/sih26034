@@ -45,3 +45,9 @@
 - [x] Conduct 15-run isolated, 15-run standard, 45-run sustained, and 6-scenario benchmarks.
 - [x] Perform hardware instruction analysis (AVX2 vs AVX-512 VNNI) and statutory accuracy regression analysis.
 - [x] Record formal verdict and deployment decision.
+
+### Special Assignment: Temporary Test Frontend & Inspection HUD (feat/m2-parmarth-test-ui)
+- [ ] Implement standalone zero-build test UI in `integration/test_ui/` for end-to-end team testing.
+- [ ] Connect to FastAPI `/api/v1/` endpoints for auth, upload, pipeline execution, adjudication, and PDF notice download.
+- [ ] Provide quick-load interactive presets for the 6 Golden Demonstration SKUs.
+- [ ] Deliver automated integration tests and documentation (`TASK_TEMP_UI.md`).
