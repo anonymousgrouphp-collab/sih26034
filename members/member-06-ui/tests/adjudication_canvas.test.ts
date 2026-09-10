@@ -238,7 +238,7 @@ describe("Chunk 5: Flagship Split-View Adjudication Canvas", () => {
       const validReq: AdjudicationRequest = {
         adjudication_verdict: "CONFIRM_VIOLATION",
         override_applied: false,
-        officer_remarks: "Verified net quantity font height deficit of 0.66mm against Table-I schedule. Confirmed non-standard unit gms.",
+        officer_remarks: "Reviewed automated finding against backend-provided schedule. Confirmed non-standard unit violation.",
         action_order: "GENERATE_LEGAL_NOTICE_FORM_1",
       };
 
@@ -247,7 +247,7 @@ describe("Chunk 5: Flagship Split-View Adjudication Canvas", () => {
       assert.equal(decision.verdict, "CONFIRM_VIOLATION");
       assert.equal(decision.officer_id, "INSP-DL-0842");
       assert.equal(decision.override_applied, false);
-      assert.match(decision.remarks, /deficit of 0\.66mm/);
+      assert.match(decision.remarks, /backend-provided schedule/);
 
       // Verify case state updated to COMPLETED without erasing automated findings
       const updatedCase = await ApiService.getInspection(biscuitCase.id);
@@ -266,7 +266,7 @@ describe("Chunk 5: Flagship Split-View Adjudication Canvas", () => {
       const overrideReq: AdjudicationRequest = {
         adjudication_verdict: "DISMISS_AS_COMPLIANT",
         override_applied: true,
-        officer_remarks: "Physical digital caliper verification conducted on-site. Net weight numeral height measured 2.52 mm (>= 2.50 mm statutory threshold). Packaging is compliant.",
+        officer_remarks: "Physical digital caliper verification conducted on-site confirmed the field satisfies the applicable backend-provided threshold. Packaging is compliant.",
         action_order: "CLOSE_INSPECTION_COMPLIANT",
       };
 

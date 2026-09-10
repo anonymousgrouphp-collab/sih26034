@@ -124,7 +124,7 @@ describe("Chunk 6: HITL Decision Workflow, Audit Trail & Evidence Provenance", (
     const request: AdjudicationRequest = {
       adjudication_verdict: "DISMISS_AS_COMPLIANT",
       override_applied: true,
-      officer_remarks: "Physical caliper verification confirmed font height measures 6.1mm.",
+      officer_remarks: "Physical inspection reviewed the field against the applicable backend-provided requirement and confirmed compliance.",
       action_order: "CLOSE_INSPECTION_COMPLIANT",
     };
 

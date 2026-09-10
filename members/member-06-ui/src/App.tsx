@@ -81,17 +81,17 @@ export const App: React.FC = () => {
                 Section 63 Bharatiya Sakshya Adhiniyam, 2023 Evidence Audit
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                Cryptographic Merkle DAG Chain-of-Custody verification for statutory enforcement notices.
+                Backend Merkle DAG Chain-of-Custody verification for statutory enforcement notices.
               </p>
             </div>
 
             <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-950 space-y-2">
               <div className="flex items-center gap-2 font-bold text-emerald-900">
                 <span className="h-2.5 w-2.5 rounded-full bg-emerald-600 animate-pulse" />
-                Electronic Evidence Custody Status: VERIFIED & TAMPER-RESISTANT
+                Electronic Evidence Custody Status: VERIFIED & AUDITABLE
               </div>
               <p>
-                All digital images, ArUco metric scaling factors, and OCR tokens are cryptographically hashed via SHA-256 and appended to the immutable Merkle DAG before human adjudication.
+                All digital images, ArUco metric scaling factors, and OCR tokens have backend SHA-256 digests associated with pipeline evidence artifacts before human adjudication.
               </p>
               <div className="font-mono text-[11px] bg-white/70 p-2.5 rounded border border-emerald-300 text-emerald-900">
                 Statutory Reference: Section 63 of Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)

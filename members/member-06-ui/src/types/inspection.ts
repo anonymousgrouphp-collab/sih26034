@@ -390,6 +390,7 @@ export interface InspectionCase {
   bsa_certificate?: Section63Certificate;
   audit_trail?: AuditEvent[];
   finding_decisions?: Record<string, FindingAdjudication>;
+  readiness_checklist?: CaseReadinessChecklist;
   notice_reference?: string;
   epoch_applied?: string;
   is_mock_fixture?: boolean;

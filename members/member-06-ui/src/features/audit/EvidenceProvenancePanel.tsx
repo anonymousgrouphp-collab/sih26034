@@ -23,7 +23,7 @@ export const EvidenceProvenancePanel: React.FC<EvidenceProvenancePanelProps> = (
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
           <h3 className="text-xs font-bold uppercase tracking-wider text-govNavy">
-            Evidence Provenance & Cryptographic Chain
+            Evidence Provenance & SHA-256 Artifact Chain
           </h3>
         </div>
         <p className="text-[11px] text-slate-500 mt-0.5">

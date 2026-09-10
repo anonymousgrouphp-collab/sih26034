@@ -871,10 +871,16 @@ export function appendAuditEvent(
 }
 
 /**
- * Computes downstream case handoff readiness without client-side legal calculations.
- * Driven strictly by case state and officer adjudication.
+ * Renders downstream case handoff readiness from fixture/backend data.
+ * The frontend NEVER independently decides statutory compliance or notice dispatch.
+ * If the case fixture provides a canonical readiness_checklist, it is returned directly.
+ * In mock mode fallback, state is mapped strictly from the officer's explicit action order.
  */
 export function computeCaseReadiness(caseData: InspectionCase): CaseReadinessChecklist {
+  if (caseData.readiness_checklist) {
+    return caseData.readiness_checklist;
+  }
+
   const evidenceAvailable = caseData.evidence_assets && caseData.evidence_assets.length > 0;
   const automatedAnalysisCompleted = !!(caseData.rule_evaluations && caseData.rule_evaluations.length > 0);
   const officerAdjudicationCompleted = !!caseData.adjudication;
@@ -887,18 +893,19 @@ export function computeCaseReadiness(caseData: InspectionCase): CaseReadinessChe
     readinessState = "PENDING_OFFICER_REVIEW";
     guidance = "Automated findings require authorized Legal Metrology Officer review and adjudication.";
   } else {
-    const verdict = caseData.adjudication!.verdict;
+    // Map strictly from the officer's explicit action order or adjudication instruction (not frontend legal math)
     const actionOrder = caseData.adjudication!.action_order;
+    const verdict = caseData.adjudication!.verdict;
 
-    if (verdict === "REQUEST_RETEST" || actionOrder === "REQUEST_PHYSICAL_CALIPER_CHECK") {
+    if (actionOrder === "REQUEST_PHYSICAL_CALIPER_CHECK" || verdict === "REQUEST_RETEST") {
       readinessState = "ACTION_REQUIRED_RETEST";
       guidance = "Physical caliper re-measurement or packaging re-capture ordered by inspecting officer.";
-    } else if (verdict === "DISMISS_AS_COMPLIANT" || actionOrder === "CLOSE_INSPECTION_COMPLIANT") {
+    } else if (actionOrder === "CLOSE_INSPECTION_COMPLIANT" || verdict === "DISMISS_AS_COMPLIANT") {
       readinessState = "READY_FOR_CASE_CLOSURE";
       guidance = "Inspection record marked compliant by officer. Ready for administrative filing and case closure.";
-    } else if (verdict === "CONFIRM_VIOLATION" || actionOrder === "GENERATE_LEGAL_NOTICE_FORM_1") {
+    } else if (actionOrder === "GENERATE_LEGAL_NOTICE_FORM_1" || verdict === "CONFIRM_VIOLATION") {
       readinessState = "READY_FOR_LEGAL_NOTICE_DISPATCH";
-      guidance = "Statutory violation confirmed by officer. Ready for Form-1 Show Cause Notice preparation.";
+      guidance = "Statutory notice authorized by inspecting officer. Ready for Form-1 Show Cause Notice preparation.";
     }
   }
 

@@ -20,6 +20,7 @@ import {
   FindingAdjudication,
   FindingOfficerDecision,
   AuditEvent,
+  HandoffReadinessState,
   CaseReadinessChecklist,
   LegalNoticeResult,
   GenerateNoticePayload,
@@ -611,10 +612,41 @@ export class ApiService {
         action_order: request.action_order,
       };
 
-      // 1. Update case status and adjudication, preserving all rule evaluations and findings
+      // Determine canonical handoff checklist from officer's explicit action order
+      let readinessState: HandoffReadinessState = "PENDING_OFFICER_REVIEW";
+      let guidance = "Officer adjudication recorded.";
+      if (
+        request.action_order === "REQUEST_PHYSICAL_CALIPER_CHECK" ||
+        request.adjudication_verdict === "REQUEST_RETEST"
+      ) {
+        readinessState = "ACTION_REQUIRED_RETEST";
+        guidance = "Physical caliper re-measurement or packaging re-capture ordered by inspecting officer.";
+      } else if (
+        request.action_order === "CLOSE_INSPECTION_COMPLIANT" ||
+        request.adjudication_verdict === "DISMISS_AS_COMPLIANT"
+      ) {
+        readinessState = "READY_FOR_CASE_CLOSURE";
+        guidance = "Inspection record marked compliant by officer. Ready for administrative filing and case closure.";
+      } else if (
+        request.action_order === "GENERATE_LEGAL_NOTICE_FORM_1" ||
+        request.adjudication_verdict === "CONFIRM_VIOLATION"
+      ) {
+        readinessState = "READY_FOR_LEGAL_NOTICE_DISPATCH";
+        guidance = "Statutory notice authorized by inspecting officer. Ready for Form-1 Show Cause Notice preparation.";
+      }
+
+      // 1. Update case status, adjudication, and readiness checklist, preserving all rule evaluations and findings
       updateMockCase(inspectionId, {
         adjudication: decision,
         workflow_status: "COMPLETED",
+        readiness_checklist: {
+          evidence_available: true,
+          automated_analysis_completed: true,
+          officer_adjudication_completed: true,
+          audit_record_complete: true,
+          readiness_state: readinessState,
+          downstream_action_guidance: guidance,
+        },
       });
 
       // 2. Append chronological audit event (append-only)
