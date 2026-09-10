@@ -695,3 +695,44 @@ Hand over temporary testing HUD URL (`http://localhost:8000/test-ui`) to team an
 
 ### Signing Note
 SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-10 01:45 IST [VERIFIED]
+
+---
+
+## [10 September 2026] [09:12] IST
+
+### Task / Chunk
+Testing HUD Refinement & Evidentiary Alignment: Porting Member 6 Inspection Capabilities to Standalone Testing HUD (`integration/test_ui/`).
+
+### Status
+COMPLETE
+
+### Completed
+- Safely ported and adapted inspection HUD improvements from `feat/m6-ui` reference into the lightweight zero-build testing HUD (`integration/test_ui/`):
+  - Dynamic aspect ratio handling with natural dimension detection and resolution indicator badge.
+  - Dual evidence toggle (`📷 Original Raw Evidence` vs `📐 Rectified PDP Surface`) with immutable SHA-256 provenance badge.
+  - Optical quality gate rejection overlay for `UNABLE_TO_VERIFY` state with specular glare bloom warnings and retake prompts.
+  - Interactive Token & Bounding Box Drawer with coordinates, confidence, model attribution, and measured font height.
+  - Bidirectional canvas-to-rule card highlighting.
+  - Truthful OCR model attribution: DBNet++ detection, PP-OCRv4 Latin (En) recognition, PP-OCRv3 Devanagari (Hi) recognition.
+  - Deterministic Indic numeral transliteration (`०-९ → 0-9`) with explicit metadata tag.
+  - E-Commerce Rule 6(10) statutory exemption handling for manufacturing date under G.S.R. 594(E).
+  - Safe client-side MIME and file size validation for custom package uploads without hallucinated findings.
+  - Full Section 63 BSA 2023 7-stage Merkle DAG chain-of-custody verification.
+- Updated `integration/test_ui/test_ui_server.py` with robust null entity guards and Rule 6(10) e-commerce listing execution.
+- Added comprehensive unit tests in `integration/tests/test_ui_endpoints.py` asserting all 6 Golden Demonstration SKUs.
+
+### Tests
+- `pytest integration/tests/ -v` (16 passed in 1.72s)
+- Live server test against all 6 Golden SKUs (`http://127.0.0.1:8000/test-ui`) with 100% success.
+
+### Problems
+None. Zero modifications to `members/member-06-ui/` or `dev`.
+
+### Decisions
+Preserved zero-build HTML5/Tailwind/Vanilla JS architecture. Retained `feat/m6-ui` as read-only reference without merging or cherry-picking.
+
+### Next Step
+Testing HUD ready for demonstration, juror review, and pipeline verification.
+
+### Signing Note
+SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-10 09:12 IST [VERIFIED]
