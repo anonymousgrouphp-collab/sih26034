@@ -102,4 +102,5 @@ scripts/
 !members/*/scripts/
 
 # Runtime evidence storage
-storage/
+/storage/
+!members/member-06-ui/public/storage/

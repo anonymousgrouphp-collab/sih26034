@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo } from "react";
+import React, { useState, useRef, useMemo, useEffect } from "react";
 import { EvidenceAsset, OCRToken, ExtractedField, RuleFinding } from "../../types/inspection";
 import {
   polygonToSvgPoints,
@@ -46,10 +46,39 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
 
-  const tokens: OCRToken[] = asset.ocr?.tokens || [];
+  const tokens: OCRToken[] = useMemo(() => {
+    if (asset.ocr?.tokens && asset.ocr.tokens.length > 0) {
+      return asset.ocr.tokens;
+    }
+    if (extractedFields && extractedFields.length > 0) {
+      return extractedFields
+        .filter((f) => f.bounding_box && f.bounding_box.length === 4)
+        .map((f, idx) => {
+          const [ymin, xmin, ymax, xmax] = f.bounding_box!;
+          return {
+            token_id: f.token_ids?.[0] || `tok_synth_${idx}`,
+            text: f.raw_ocr_text,
+            confidence: f.ocr_confidence || f.detection_confidence || 0.95,
+            polygon: [
+              [xmin, ymin],
+              [xmax, ymin],
+              [xmax, ymax],
+              [xmin, ymax],
+            ] as [[number, number], [number, number], [number, number], [number, number]],
+            bounding_box: [ymin, xmin, ymax, xmax] as [number, number, number, number],
+            language: "en",
+            model_source: "PP-OCRv4_Latin",
+          };
+        });
+    }
+    return [];
+  }, [asset.ocr?.tokens, extractedFields]);
+
   // Dynamic natural dimensions mapped from loaded image, with fallback to asset metadata
   const imgWidth = naturalDimensions?.width || asset.image_width || 1920;
   const imgHeight = naturalDimensions?.height || asset.image_height || 1080;
+
+  const [imageError, setImageError] = useState<boolean>(false);
 
   const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const img = e.currentTarget;
@@ -123,8 +152,25 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
     return undefined;
   }, [selectedField, currentToken, extractedFields]);
 
-  // Image source URL
-  const imageSrc = asset.preview_url || asset.file_path || "";
+  // Image source URL normalization
+  const rawSrc = asset.preview_url || asset.file_path || "";
+  const imageSrc = useMemo(() => {
+    if (!rawSrc) return "";
+    if (
+      rawSrc.startsWith("http://") ||
+      rawSrc.startsWith("https://") ||
+      rawSrc.startsWith("data:") ||
+      rawSrc.startsWith("blob:") ||
+      rawSrc.startsWith("/")
+    ) {
+      return rawSrc;
+    }
+    return `/${rawSrc}`;
+  }, [rawSrc]);
+
+  useEffect(() => {
+    setImageError(false);
+  }, [imageSrc]);
 
   return (
     <div className="bg-panelBg rounded-lg border border-slate-200 shadow-sm flex flex-col h-full overflow-hidden">
@@ -273,17 +319,45 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
               </div>
             )}
 
-            {/* Base Packaging Image */}
-            <img
-              ref={imgRef}
-              src={imageSrc}
-              alt={`Packaging inspection evidence for ${productName}`}
-              onLoad={handleImageLoad}
-              className={`block max-h-[520px] w-auto h-auto object-contain rounded transition-all ${
-                viewMode === "RECTIFIED" ? "ring-2 ring-purple-500/50 filter brightness-105" : ""
-              }`}
-              draggable={false}
-            />
+            {/* Base Packaging Image or Institutional Fallback Canvas */}
+            {!imageError ? (
+              <img
+                ref={imgRef}
+                src={imageSrc}
+                alt={`Packaging inspection evidence for ${productName}`}
+                onLoad={handleImageLoad}
+                onError={() => setImageError(true)}
+                className={`block max-h-[520px] w-auto h-auto object-contain rounded transition-all ${
+                  viewMode === "RECTIFIED" ? "ring-2 ring-purple-500/50 filter brightness-105" : ""
+                }`}
+                draggable={false}
+              />
+            ) : (
+              <div
+                className="bg-slate-900 border border-slate-700 rounded flex flex-col items-center justify-center p-8 text-center"
+                style={{
+                  width: `${Math.min(imgWidth, 880)}px`,
+                  height: `${Math.min(imgHeight, 495)}px`,
+                  maxWidth: "100%",
+                }}
+              >
+                <div className="w-12 h-12 rounded-full bg-slate-800 border border-amber-500/50 flex items-center justify-center text-amber-400 mb-3">
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <div className="text-white font-bold text-sm tracking-wide">
+                  {productName}
+                </div>
+                <div className="text-slate-400 text-xs mt-1">
+                  Principal Display Panel • Metrology Calibration Frame
+                </div>
+                <div className="mt-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-800 text-[10px] font-mono text-amber-300 border border-amber-500/30">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                  <span>SYNTHETIC AUDIT FALLBACK • {asset.image_id}</span>
+                </div>
+              </div>
+            )}
 
             {/* SVG Polygon Overlay Layer */}
             <svg
