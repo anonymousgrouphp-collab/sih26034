@@ -36,7 +36,7 @@ import { computeCaseReadiness } from "./mockData";
 
 export class LiveApiService implements IInspectionApiService {
   private static instance: LiveApiService;
-  private baseUrl = "/api/v1";
+  private baseUrl = ((import.meta as any)?.env?.VITE_API_BASE_URL as string) || "/api/v1";
 
   // In-memory cache to preserve pipeline execution artifacts (extracted_fields, etc.)
   // across single-inspection requests, bridging backend session persistence gap (P0 blocker).

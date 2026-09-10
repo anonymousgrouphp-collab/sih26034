@@ -1,0 +1,65 @@
+version: "3.8"
+
+services:
+  # ---------------------------------------------------------------------------
+  # 1. PostgreSQL 16 Relational Datastore (Mode A Online Monolith)
+  # ---------------------------------------------------------------------------
+  db:
+    image: postgres:16-alpine
+    container_name: nyayadrishti-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: nyayadrishti
+      POSTGRES_USER: nyaya_admin
+      POSTGRES_PASSWORD: StatutoryEnforcement@2026
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nyaya_admin -d nyayadrishti"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # 2. FastAPI Backend & Live AI Legal Metrology Pipeline
+  # ---------------------------------------------------------------------------
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nyayadrishti-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://nyaya_admin:StatutoryEnforcement@2026@db:5432/nyayadrishti
+      NYAYADRISHTI_SECRET_KEY: nyayadrishti-sec63-bsa2023-statutory-secret-key-prod-delhi-01
+      PORT: 8000
+      HOST: 0.0.0.0
+    ports:
+      - "8000:8000"
+    volumes:
+      - storage_data:/app/storage
+
+  # ---------------------------------------------------------------------------
+  # 3. React 18 + Nginx Production Frontend Workstation
+  # ---------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./members/member-06-ui
+      dockerfile: Dockerfile
+    container_name: nyayadrishti-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+
+volumes:
+  pgdata:
+    name: nyayadrishti_pgdata
+  storage_data:
+    name: nyayadrishti_storage

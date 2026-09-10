@@ -43,10 +43,19 @@ export { MockApiService } from "./mockApi";
 export { DemoFixtureService } from "./demoFixtures";
 
 export class ApiService {
-  private static operatingMode: ApiOperatingMode = "MOCK";
+  private static operatingMode: ApiOperatingMode =
+    (typeof window !== "undefined" && (window.localStorage?.getItem("nyayadrishti_operating_mode") as ApiOperatingMode)) ||
+    (((import.meta as any)?.env?.VITE_OPERATING_MODE as ApiOperatingMode) || "MOCK");
 
   public static setOperatingMode(mode: ApiOperatingMode): void {
     this.operatingMode = mode;
+    try {
+      if (typeof window !== "undefined" && window.localStorage) {
+        window.localStorage.setItem("nyayadrishti_operating_mode", mode);
+      }
+    } catch {
+      // Ignore storage write errors in restricted or test environments
+    }
   }
 
   public static getOperatingMode(): ApiOperatingMode {
@@ -55,7 +64,7 @@ export class ApiService {
 
   // Backward-compatible mock mode toggle
   public static setMockMode(enabled: boolean): void {
-    this.operatingMode = enabled ? "MOCK" : "LIVE";
+    this.setOperatingMode(enabled ? "MOCK" : "LIVE");
   }
 
   public static isMockMode(): boolean {

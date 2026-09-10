@@ -1,0 +1,11 @@
+{
+  "buildCommand": "cd members/member-06-ui && npm install && npm run build",
+  "outputDirectory": "members/member-06-ui/dist",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

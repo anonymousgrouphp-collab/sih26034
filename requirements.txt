@@ -1,0 +1,41 @@
+# =============================================================================
+# NyayaDrishti-LM (SIH26034) - Production Backend Dependencies
+# Strictly Permissive Licenses Only (Apache-2.0, MIT, BSD-3, HPND)
+# Zero AGPL-3.0 Dependencies (Per ADR-03 / AGENTS.md)
+# =============================================================================
+
+# FastAPI Web Services & Application Server (Member 5)
+fastapi>=0.110.0
+uvicorn[standard]>=0.28.0
+pydantic>=2.6.0
+python-multipart>=0.0.9
+httpx>=0.27.0
+PyJWT>=2.8.0
+cryptography>=42.0.5
+
+# Database & Relational Datastore (PostgreSQL 16+ & SQLite 3.45+)
+SQLAlchemy>=2.0.28
+psycopg2-binary>=2.9.9
+
+# Statutory Evidence Generation (ReportLab PDF/A per BSA 2023)
+reportlab>=4.1.0
+
+# Computer Vision & Quality Gate (Member 1)
+opencv-python-headless>=4.9.0
+numpy>=1.26.0
+
+# Multilingual OCR Engine & Preprocessing (Member 2)
+onnxruntime>=1.17.0
+onnx>=1.16.0
+pillow>=10.2.0
+shapely>=2.0.0
+pyclipper>=1.3.0
+pytesseract>=0.3.10
+
+# Semantic Extraction & Computational Parsing (Member 3)
+regex>=2023.12.25
+scipy>=1.12.0
+
+# Test & Validation Suites
+pytest>=8.0.0
+pytest-asyncio>=0.23.0

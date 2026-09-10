@@ -289,6 +289,28 @@ class CaseCloseRequest(BaseModel):
 
 
 # -----------------------------------------------------------------------------
+# 0. Health & Statutory Status Endpoints
+# -----------------------------------------------------------------------------
+
+@app.get("/api/v1/system/status")
+@app.get("/api/v1/health")
+def system_health_status(db: Session = Depends(get_db_session)):
+    """System health check and operational status per Section 63 BSA 2023."""
+    chain_valid, _ = AuditLedgerService.verify_audit_chain(db)
+    is_sqlite = "sqlite" in str(db.get_bind().url)
+    return {
+        "status": "ONLINE",
+        "system_mode": "LOCAL_RESILIENT_MODE" if is_sqlite else "ONLINE_MONOLITH",
+        "statutory_mandate": "Section 63 Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)",
+        "repealed_acts_cited": None,
+        "audit_chain_valid": chain_valid,
+        "database": "CONNECTED",
+        "version": "1.0.0-sih26034",
+        "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+# -----------------------------------------------------------------------------
 # 1. Authentication Endpoints
 # -----------------------------------------------------------------------------
 

@@ -381,6 +381,8 @@ class AuditLedgerService:
 def get_database_engine(url: Optional[str] = None):
     """Creates a SQLAlchemy engine supporting SQLite and PostgreSQL."""
     db_url = url or os.getenv("DATABASE_URL", "sqlite:///legal_metrology.db")
+    if db_url.startswith("postgres://"):
+        db_url = db_url.replace("postgres://", "postgresql://", 1)
     connect_args = {"check_same_thread": False} if "sqlite" in db_url else {}
     return create_engine(db_url, connect_args=connect_args, echo=False)
 
