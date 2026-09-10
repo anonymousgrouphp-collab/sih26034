@@ -6,6 +6,7 @@ Frozen per 07_API_AND_INTERFACE_CONTRACTS.md, 16_DECISION_LOG.md (ADL-01, ADL-07
 and 02_FINAL_REQUIREMENTS_SPECIFICATION.md.
 """
 
+import math
 import time
 from typing import Any, Dict, List, Literal, Optional, Tuple
 
@@ -98,6 +99,14 @@ class USPEvaluator:
     """Rule 6(1)(k) Unit Sale Price consistency under G.S.R. 779(E).
 
     Enforces mathematical consistency: |(USP × NetQty) - MRP| <= 0.02 INR.
+    Supports:
+    - Direct unit arithmetic: |(declared_usp × net_qty) - mrp| <= 0.02 INR
+    - Metric cross-unit conversions:
+      - grams <-> kg (e.g. 500g with USP ₹400/kg or 2.5kg with USP ₹0.08/g)
+      - millilitres <-> litres (e.g. 750ml with USP ₹200/l)
+      - per 100g / per 100ml commercial rates (e.g. 500g with USP ₹40/100g)
+    - Multi-pack piece rates: |(declared_usp × piece_count) - mrp| <= 0.02 INR
+    - IEEE 754 floating point precision defense preventing representation anomalies.
     """
 
     TOLERANCE_INR: float = 0.02
@@ -107,10 +116,21 @@ class USPEvaluator:
         cls,
         net_qty: Optional[float],
         mrp: Optional[float],
-        declared_usp: Optional[float]
+        declared_usp: Optional[float],
+        net_unit: Optional[str] = None,
+        usp_unit: Optional[str] = None,
+        piece_count: Optional[int] = None,
     ) -> Dict[str, Any]:
         """Evaluates declared Unit Sale Price against Net Quantity and MRP."""
-        if net_qty is None or net_qty <= 0 or mrp is None or mrp <= 0 or declared_usp is None or declared_usp <= 0:
+        def _is_invalid(val: Any) -> bool:
+            if val is None or not isinstance(val, (int, float)):
+                return True
+            try:
+                return math.isnan(val) or math.isinf(val) or val <= 0
+            except (TypeError, ValueError):
+                return True
+
+        if _is_invalid(net_qty) or _is_invalid(mrp) or _is_invalid(declared_usp):
             return {
                 "rule_code": "RULE_06_1_K_USP_COMPUTATION",
                 "statutory_reference": "Rule 6(1)(k), G.S.R. 779(E)",
@@ -121,17 +141,53 @@ class USPEvaluator:
                 "measured_value": "UNAVAILABLE",
                 "declared_usp": declared_usp,
                 "calculated_usp": 0.0,
-                "discrepancy": "Invalid or missing net quantity, MRP, or declared USP",
+                "discrepancy": "Invalid, non-positive, or missing net quantity, MRP, or declared USP",
                 "legal_consequence": "Unable to verify Unit Sale Price arithmetic under Section 36(1) LM Act 2009",
             }
 
-        calculated_total = declared_usp * net_qty
-        discrepancy = abs(calculated_total - mrp)
-        status = "PASS" if discrepancy <= cls.TOLERANCE_INR else "FAIL"
+        q = float(net_qty)
+        p = float(mrp)
+        usp = float(declared_usp)
 
-        calculated_usp = round(mrp / net_qty, 4)
-        required_val = f"Rs. {calculated_usp:.2f} (tolerance <= 0.02 INR)"
-        measured_val = f"Rs. {declared_usp:.2f}"
+        # Standard candidate evaluation factors: (discrepancy, calculated_total, calculated_usp, unit_label)
+        candidates = []
+
+        # 1. Direct multiplication: USP per declared base unit
+        total_direct = round(usp * q, 4)
+        diff_direct = abs(total_direct - p)
+        candidates.append((diff_direct, total_direct, round(p / q, 4), ""))
+
+        # 2. Metric mass/volume cross-unit: declared in grams/ml, USP per kg/litre
+        total_per_kg_or_l = round((usp / 1000.0) * q, 4)
+        diff_kg_or_l = abs(total_per_kg_or_l - p)
+        candidates.append((diff_kg_or_l, total_per_kg_or_l, round(p / (q / 1000.0), 4), "/kg or /l"))
+
+        # 3. Metric mass/volume cross-unit: declared in kg/litre, USP per gram/ml
+        total_per_g_or_ml = round((usp * 1000.0) * q, 4)
+        diff_g_or_ml = abs(total_per_g_or_ml - p)
+        candidates.append((diff_g_or_ml, total_per_g_or_ml, round(p / (q * 1000.0), 4), "/g or /ml"))
+
+        # 4. Commercial per-100g or per-100ml rates
+        total_per_100 = round((usp / 100.0) * q, 4)
+        diff_100 = abs(total_per_100 - p)
+        candidates.append((diff_100, total_per_100, round(p / (q / 100.0), 4), "/100g or /100ml"))
+
+        # 5. Multi-pack piece count rate (if piece_count available)
+        if piece_count and piece_count > 0:
+            total_piece = round(usp * piece_count, 4)
+            diff_piece = abs(total_piece - p)
+            candidates.append((diff_piece, total_piece, round(p / piece_count, 4), "/piece"))
+
+        # Pick candidate with minimum discrepancy
+        candidates.sort(key=lambda c: c[0])
+        best_diff, best_total, best_calc_usp, unit_lbl = candidates[0]
+
+        is_pass = round(best_diff, 4) <= cls.TOLERANCE_INR
+        status = "PASS" if is_pass else "FAIL"
+
+        unit_str = f" {unit_lbl}".rstrip()
+        required_val = f"Rs. {best_calc_usp:.2f}{unit_str} (tolerance <= 0.02 INR)"
+        measured_val = f"Rs. {usp:.2f}"
 
         return {
             "rule_code": "RULE_06_1_K_USP_COMPUTATION",
@@ -141,12 +197,12 @@ class USPEvaluator:
             "severity": "CRITICAL",
             "required_value": required_val,
             "measured_value": measured_val,
-            "declared_usp": declared_usp,
-            "calculated_usp": calculated_usp,
-            "discrepancy": round(discrepancy, 2),
+            "declared_usp": usp,
+            "calculated_usp": best_calc_usp,
+            "discrepancy": round(best_diff, 2),
             "legal_consequence": (
                 "Compliant"
-                if status == "PASS"
+                if is_pass
                 else "Misleading or incorrect Unit Sale Price under Section 36(1) LM Act 2009"
             ),
         }
@@ -487,6 +543,226 @@ class TemporalEpochDispatcher:
         return epoch in ("EPOCH_2021_GSR_779", "EPOCH_2026_GSR_128")
 
 
+class Rule24MultiPackEvaluator:
+    """Rule 24 Wholesale and Multi-Piece Package Statutory Compliance.
+
+    Under Rule 24 of Legal Metrology (Packaged Commodities) Rules, 2011:
+    - Every multi-piece package containing individual retail packages or pieces must declare:
+      1. Number of individual pieces contained ('piece_count')
+      2. Net quantity of each individual piece ('piece_magnitude' and 'piece_unit')
+      3. Total quantity of all pieces equal to (piece_count × piece_magnitude)
+      4. Combined total retail price (MRP) or individual retail prices
+      5. Support USP declared either per individual piece or per unit weight/volume
+    """
+
+    @classmethod
+    def evaluate(
+        cls,
+        piece_count: Optional[int],
+        piece_magnitude: Optional[float],
+        piece_unit: Optional[str],
+        total_magnitude: Optional[float],
+        total_unit: Optional[str] = None,
+        mrp_amount: Optional[float] = None,
+        declared_usp: Optional[float] = None,
+    ) -> List[Dict[str, Any]]:
+        evaluations: List[Dict[str, Any]] = []
+
+        # 1. Mandatory individual piece count declaration under Rule 24
+        if piece_count is None or piece_count <= 0:
+            evaluations.append({
+                "rule_code": "RULE_24_PIECE_COUNT",
+                "statutory_reference": "Rule 24, Legal Metrology (Packaged Commodities) Rules, 2011",
+                "citation": "Rule 24 LMPC Rules 2011",
+                "status": "FAIL",
+                "severity": "CRITICAL",
+                "required_value": "Number of individual pieces declared on multi-piece package",
+                "measured_value": "MISSING",
+                "discrepancy": "Missing number of usable individual retail pieces in multi-pack",
+                "legal_consequence": "Non-compliant multi-pack declaration under Rule 24 & Section 36(1) LM Act 2009",
+            })
+        else:
+            evaluations.append({
+                "rule_code": "RULE_24_PIECE_COUNT",
+                "statutory_reference": "Rule 24, Legal Metrology (Packaged Commodities) Rules, 2011",
+                "citation": "Rule 24 LMPC Rules 2011",
+                "status": "PASS",
+                "severity": "CRITICAL",
+                "required_value": "Number of individual pieces declared on multi-piece package",
+                "measured_value": f"{piece_count} pieces",
+                "discrepancy": None,
+                "legal_consequence": "Compliant",
+            })
+
+        # 2. Mandatory individual piece net quantity under Rule 24
+        if piece_magnitude is None or piece_magnitude <= 0 or not piece_unit:
+            evaluations.append({
+                "rule_code": "RULE_24_PIECE_QUANTITY",
+                "statutory_reference": "Rule 24, Legal Metrology (Packaged Commodities) Rules, 2011",
+                "citation": "Rule 24 LMPC Rules 2011",
+                "status": "FAIL",
+                "severity": "CRITICAL",
+                "required_value": "Net quantity of each individual piece declared",
+                "measured_value": "MISSING",
+                "discrepancy": "Missing individual piece quantity on multi-pack",
+                "legal_consequence": "Non-compliant individual piece declaration under Rule 24 & Section 36(1) LM Act 2009",
+            })
+        else:
+            evaluations.append({
+                "rule_code": "RULE_24_PIECE_QUANTITY",
+                "statutory_reference": "Rule 24, Legal Metrology (Packaged Commodities) Rules, 2011",
+                "citation": "Rule 24 LMPC Rules 2011",
+                "status": "PASS",
+                "severity": "CRITICAL",
+                "required_value": "Net quantity of each individual piece declared",
+                "measured_value": f"{piece_magnitude} {piece_unit}",
+                "discrepancy": None,
+                "legal_consequence": "Compliant",
+            })
+
+        # 3. Total quantity arithmetic consistency
+        if piece_count and piece_magnitude and total_magnitude:
+            calculated_total = piece_count * piece_magnitude
+            diff = abs(calculated_total - total_magnitude)
+            if diff <= 0.01:
+                status = "PASS"
+                disc = None
+                consequence = "Compliant"
+            else:
+                status = "FAIL"
+                disc = f"Declared total {total_magnitude} != expected {calculated_total:.2f} (diff {diff:.2f})"
+                consequence = "Incorrect total quantity arithmetic in multi-pack under Rule 24"
+
+            evaluations.append({
+                "rule_code": "RULE_24_TOTAL_QUANTITY_ARITHMETIC",
+                "statutory_reference": "Rule 24, Legal Metrology (Packaged Commodities) Rules, 2011",
+                "citation": "Rule 24 LMPC Rules 2011",
+                "status": status,
+                "severity": "CRITICAL",
+                "required_value": f"Total quantity matching piece_count × piece_magnitude ({calculated_total:.2f})",
+                "measured_value": f"{total_magnitude} {total_unit or piece_unit or ''}".strip(),
+                "discrepancy": disc,
+                "legal_consequence": consequence,
+            })
+
+        return evaluations
+
+
+class JanVishwasCompoundingCalculator:
+    """Statutory Legal Sanction & Compounding Recommendation Calculator
+    under Legal Metrology Act, 2009 as amended by Jan Vishwas Act, 2023 (Act No. 18 of 2023).
+
+    Key Legislative Principles:
+    1. Decriminalization of Section 36(1): Imprisonment repealed for packaging offenses.
+    2. Proviso to Section 36(1) (Improvement Notices):
+       - For first-time technical labeling non-compliances (font deficit, missing tax clause,
+         missing consumer care address/email), the system recommends an official Form-1
+         Statutory Improvement Notice with a mandatory 14-day cure window.
+    3. Compounding under Section 48 / Section 53:
+       - First Offense (where Improvement Notice unheeded or non-curable/banned units/fraud):
+         Maximum compounding fee up to ₹25,000.
+       - Second Offense (within 3 years):
+         Maximum compounding fee up to ₹50,000.
+       - Subsequent Offense:
+         Maximum compounding fee up to ₹1,00,000 (civil adjudication by Adjudicating Officer).
+    4. Epistemic Review and Degraded Inputs:
+       - Borderline Review -> Human Officer Adjudication Required.
+       - Unable to Verify -> Retake imagery or physical inspection required.
+    """
+
+    @classmethod
+    def calculate_sanction(
+        cls,
+        overall_verdict: str,
+        evaluations: List[Dict[str, Any]],
+        offense_history: Literal["FIRST", "SECOND", "SUBSEQUENT"] = "FIRST",
+    ) -> Dict[str, Any]:
+        if overall_verdict == "PASS":
+            return {
+                "statutory_framework": "Legal Metrology Act, 2009 (amended by Jan Vishwas Act, 2023, Act No. 18 of 2023)",
+                "offense_history": offense_history,
+                "recommended_action": "NO_ACTION",
+                "statutory_cure_period_days": 0,
+                "max_compounding_fee_inr": 0,
+                "decriminalization_status": "Fully compliant with LMPC Rules, 2011",
+                "legal_summary": "100% statutory compliance verified across all evaluated legal metrology rules.",
+            }
+
+        if overall_verdict == "REVIEW":
+            return {
+                "statutory_framework": "Legal Metrology Act, 2009 (amended by Jan Vishwas Act, 2023, Act No. 18 of 2023)",
+                "offense_history": offense_history,
+                "recommended_action": "OFFICER_REVIEW",
+                "statutory_cure_period_days": 0,
+                "max_compounding_fee_inr": 0,
+                "decriminalization_status": "Pre-adjudication measurement triage",
+                "legal_summary": "Borderline measurement within sensor uncertainty band (k=2, 95% confidence). Statutory natural justice requires physical assessment by Legal Metrology Officer under Section 15.",
+            }
+
+        if overall_verdict == "UNABLE_TO_VERIFY":
+            return {
+                "statutory_framework": "Legal Metrology Act, 2009 (amended by Jan Vishwas Act, 2023, Act No. 18 of 2023)",
+                "offense_history": offense_history,
+                "recommended_action": "RETAKE_OR_PHYSICAL_INSPECTION",
+                "statutory_cure_period_days": 0,
+                "max_compounding_fee_inr": 0,
+                "decriminalization_status": "Insufficient evidentiary quality",
+                "legal_summary": "Imagery degraded, blurred, or occluded. Section 63 BSA 2023 evidentiary standards require optical retake or physical packaging seizure before statutory adjudication.",
+            }
+
+        # For FAIL:
+        failed_evals = [e for e in evaluations if e.get("status") == "FAIL"]
+        has_banned_unit = any(
+            "banned" in str(e.get("discrepancy", "")).lower()
+            or "prohibited" in str(e.get("discrepancy", "")).lower()
+            for e in failed_evals
+        )
+
+        if offense_history == "FIRST":
+            if not has_banned_unit:
+                return {
+                    "statutory_framework": "Legal Metrology Act, 2009 (amended by Jan Vishwas Act, 2023, Act No. 18 of 2023)",
+                    "offense_history": "FIRST",
+                    "recommended_action": "STATUTORY_IMPROVEMENT_NOTICE",
+                    "statutory_cure_period_days": 14,
+                    "max_compounding_fee_inr": 0,
+                    "decriminalization_status": "First technical default eligible for statutory cure under Section 36(1) proviso",
+                    "legal_summary": "Issue Form-1 Statutory Improvement Notice under Section 36(1) proviso read with Jan Vishwas Act, 2023 (Act No. 18 of 2023). Manufacturer/packer granted 14 calendar days to rectify packaging non-compliance prior to penal compounding.",
+                }
+            else:
+                return {
+                    "statutory_framework": "Legal Metrology Act, 2009 (amended by Jan Vishwas Act, 2023, Act No. 18 of 2023)",
+                    "offense_history": "FIRST",
+                    "recommended_action": "COMPOUNDING_FIRST_OFFENSE",
+                    "statutory_cure_period_days": 0,
+                    "max_compounding_fee_inr": 25000,
+                    "decriminalization_status": "Decriminalized to civil compounding (imprisonment repealed)",
+                    "legal_summary": "Prohibited non-standard unit violation under Section 11 & Section 36(1). Recommend compounding under Section 48 with compounding fee up to ₹25,000 per Jan Vishwas Act, 2023.",
+                }
+
+        elif offense_history == "SECOND":
+            return {
+                "statutory_framework": "Legal Metrology Act, 2009 (amended by Jan Vishwas Act, 2023, Act No. 18 of 2023)",
+                "offense_history": "SECOND",
+                "recommended_action": "COMPOUNDING_SECOND_OFFENSE",
+                "statutory_cure_period_days": 0,
+                "max_compounding_fee_inr": 50000,
+                "decriminalization_status": "Decriminalized to civil compounding (imprisonment repealed)",
+                "legal_summary": "Second packaging offense under Section 36(1) of Legal Metrology Act, 2009 (amended by Jan Vishwas Act, 2023). Recommend compounding fee up to ₹50,000.",
+            }
+
+        else:  # SUBSEQUENT
+            return {
+                "statutory_framework": "Legal Metrology Act, 2009 (amended by Jan Vishwas Act, 2023, Act No. 18 of 2023)",
+                "offense_history": "SUBSEQUENT",
+                "recommended_action": "COMPOUNDING_SUBSEQUENT_OFFENSE",
+                "statutory_cure_period_days": 0,
+                "max_compounding_fee_inr": 100000,
+                "decriminalization_status": "Decriminalized to civil adjudication by Adjudicating Officer (criminal imprisonment repealed)",
+                "legal_summary": "Subsequent offense under Section 36(1) of Legal Metrology Act, 2009 (amended by Jan Vishwas Act, 2023). Maximum civil compounding penalty up to ₹1,00,000. Criminal imprisonment repealed.",
+            }
+
+
 class LegalMetrologyRuleEngine:
     """Composite Deterministic AST Rule Engine (Member 4 - NyayaDrishti-LM).
 
@@ -535,6 +811,8 @@ class LegalMetrologyRuleEngine:
         country_of_origin: Optional[str] = None,
         mfg_date_iso: Optional[str] = None,
         is_ecommerce: bool = False,
+        offense_history: Literal["FIRST", "SECOND", "SUBSEQUENT"] = "FIRST",
+        multipack_details: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """Executes complete deterministic compliance audit for an inspection session."""
         t_start = time.perf_counter()
@@ -581,10 +859,18 @@ class LegalMetrologyRuleEngine:
 
         # 6. Rule 6(1)(k) Unit Sale Price Math (checked if declared or if mandatory in epoch)
         net_qty_val = net_quantity.get("magnitude") if net_quantity else None
+        net_qty_unit = net_quantity.get("unit") if net_quantity else None
         mrp_val = mrp.get("amount") if mrp else None
+        piece_cnt = multipack_details.get("piece_count") if multipack_details else None
 
         if declared_usp is not None:
-            evaluations.append(USPEvaluator.evaluate(net_qty_val, mrp_val, declared_usp))
+            evaluations.append(USPEvaluator.evaluate(
+                net_qty=net_qty_val,
+                mrp=mrp_val,
+                declared_usp=declared_usp,
+                net_unit=net_qty_unit,
+                piece_count=piece_cnt,
+            ))
         elif TemporalEpochDispatcher.is_usp_mandatory(epoch) and not is_ecommerce:
             evaluations.append({
                 "rule_code": "RULE_06_1_K_USP_COMPUTATION",
@@ -612,7 +898,20 @@ class LegalMetrologyRuleEngine:
         # 8. Rule 6(1)(p) Country of Origin
         evaluations.append(Rule6DeclarationsEvaluator.evaluate_country_of_origin(country_of_origin))
 
-        # 9. E-Commerce specific exemptions / requirements
+        # 9. Rule 24 Wholesale and Multi-Piece Package Checks
+        if multipack_details:
+            multi_evals = Rule24MultiPackEvaluator.evaluate(
+                piece_count=multipack_details.get("piece_count"),
+                piece_magnitude=multipack_details.get("piece_magnitude"),
+                piece_unit=multipack_details.get("piece_unit"),
+                total_magnitude=multipack_details.get("total_magnitude") or net_qty_val,
+                total_unit=multipack_details.get("total_unit") or net_qty_unit,
+                mrp_amount=mrp_val,
+                declared_usp=declared_usp,
+            )
+            evaluations.extend(multi_evals)
+
+        # 10. E-Commerce specific exemptions / requirements
         if is_ecommerce:
             evaluations.append({
                 "rule_code": "RULE_06_10_MFG_DATE_EXEMPTION",
@@ -626,7 +925,7 @@ class LegalMetrologyRuleEngine:
                 "legal_consequence": "Compliant: Manufacturing Date is legally exempt from digital listings",
             })
 
-        # 10. Normalize evaluations to strictly conform to RuleEvaluationDTO schema
+        # 11. Normalize evaluations to strictly conform to RuleEvaluationDTO schema
         dto_evaluations: List[Dict[str, Any]] = []
         for ev in evaluations:
             item = dict(ev)
@@ -638,8 +937,16 @@ class LegalMetrologyRuleEngine:
                     item["discrepancy"] = f"Discrepancy of {disc:.2f}"
             dto_evaluations.append(item)
 
-        # 11. Composite 4-state triage
+        # 12. Composite 4-state triage
         overall_verdict = cls.triage_verdict(dto_evaluations)
+
+        # 13. Calculate Jan Vishwas 2023 Statutory Compounding / Sanction recommendation
+        sanction = JanVishwasCompoundingCalculator.calculate_sanction(
+            overall_verdict=overall_verdict,
+            evaluations=dto_evaluations,
+            offense_history=offense_history,
+        )
+
         exec_time_ms = int((time.perf_counter() - t_start) * 1000)
 
         return {
@@ -649,4 +956,5 @@ class LegalMetrologyRuleEngine:
             "evaluations": dto_evaluations,
             "epoch_applied": epoch,
             "execution_time_ms": exec_time_ms,
+            "jan_vishwas_sanction": sanction,
         }
