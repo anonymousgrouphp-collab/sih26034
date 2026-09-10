@@ -160,10 +160,13 @@ class CommodityFactExtractor:
             data = ocr_data.dict()
         elif isinstance(ocr_data, dict):
             data = ocr_data
+        elif isinstance(ocr_data, (list, tuple)):
+            data = {"tokens": list(ocr_data)}
         elif ocr_data is None:
             data = {}
         else:
             raise ValueError(f"Unsupported OCR input type: {type(ocr_data)}")
+
 
         image_id = data.get("image_id") or data.get("url") or "unknown_image"
         raw_tokens = data.get("tokens", []) or []

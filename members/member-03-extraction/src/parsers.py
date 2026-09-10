@@ -8,6 +8,7 @@ Fulfills:
 """
 
 import re
+import unicodedata
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 
@@ -247,10 +248,20 @@ class StatutoryDeclarationParser:
 
     @staticmethod
     def convert_indic_digits(text: str) -> str:
-        """Converts Devanagari numerals (०-९) and fractions to standard ASCII decimal digits (0-9)."""
+        """Converts Devanagari numerals (०-९) and fractions to standard ASCII decimal digits (0-9).
+        Also normalizes Unicode NFC and strips invisible zero-width and non-breaking space characters.
+        """
         if not text:
             return ""
-        converted = text.translate(DEVANAGARI_DIGITS_MAP)
+        # Normalize Unicode NFC and strip invisible formatting noise (BOM, zero-width space, non-breaking space)
+        cleaned = unicodedata.normalize("NFC", text)
+        cleaned = (
+            cleaned.replace("\u200b", "")
+            .replace("\ufeff", "")
+            .replace("\u00a0", " ")
+            .replace("\u202f", " ")
+        )
+        converted = cleaned.translate(DEVANAGARI_DIGITS_MAP)
         # Normalize mixed fractions (e.g. '1 ½', '1 1/2', '2 ¼', '2 1/4', '3 ¾', '3 3/4')
         converted = re.sub(r"(?<=\d)\s+(?:1/2|½)", ".5", converted)
         converted = re.sub(r"(?<=\d)\s+(?:1/4|¼)", ".25", converted)
@@ -258,6 +269,7 @@ class StatutoryDeclarationParser:
         # Normalize standalone Unicode vulgar fractions
         converted = converted.replace("½", "0.5").replace("¼", "0.25").replace("¾", "0.75")
         return converted
+
 
     @classmethod
     def detect_banned_units(cls, text: str) -> Tuple[bool, Optional[str]]:

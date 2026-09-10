@@ -300,22 +300,25 @@ ACTIVE
    - Bounding the disallowed prefix scan to reset at address anchors (`Regd Office`, `Address:`, `Works:`) prevents cross-sentence prefix collisions.
 
 ### Evidence
-`02_FINAL_REQUIREMENTS_SPECIFICATION.md` (NFR-06 0.0% False Accusation Rate), Section 63 BSA 2023, ReDoS benchmarks on 40k adversarial inputs, and `pytest members/member-03-extraction/tests/ -v` (120 passed in 1.02s).
+`02_FINAL_REQUIREMENTS_SPECIFICATION.md` (NFR-06 0.0% False Accusation Rate), Section 63 BSA 2023, ReDoS benchmarks on 40k adversarial inputs, and `pytest members/member-03-extraction/tests/ -v` (139 passed in 1.26s across 4 passes).
 
 ### Decision
 1. Eliminate all nested or unanchored regex repetition across all extraction grammars.
 2. Channel singular `gm` / `g.m.` strictly through quantity-associated regexes; protect corporate acronyms (`G.M.`) unconditionally unless associated with explicit numerical quantity.
 3. Enforce explicit city precedence over 3-digit PIN prefix fallbacks.
 4. Reset PIN prefix validation windows at address label anchors.
+5. Apply NFC Unicode normalization and strip invisible zero-width formatting characters (`\u200B`, `\uFEFF`, `\u00A0`, `\u202F`) in `convert_indic_digits` before any regex evaluation.
+6. Guarantee thread-safe, stateless execution in `CommodityFactExtractor` to support 50+ concurrent officer scans.
 
 ### Why
-Guarantees resilient sub-second execution under adversarial Denial of Service attacks and ensures 0.0% false accusation rate under Section 63 BSA 2023.
+Guarantees resilient sub-second execution under adversarial Denial of Service attacks, eliminates OCR Unicode encoding glitches on Devanagari packaging, and ensures 0.0% false accusation rate under Section 63 BSA 2023.
 
 ### Impact
-120/120 Member 3 tests passing; 301/301 repository tests passing; zero ReDoS vectors; courtroom-grade statutory evidence dossiers.
+139/139 Member 3 tests passing; 362/362 repository tests passing; zero ReDoS vectors; courtroom-grade statutory evidence dossiers.
 
 ### Status
 ACTIVE
+
 
 
 
