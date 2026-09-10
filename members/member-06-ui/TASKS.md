@@ -1,5 +1,5 @@
 # Member 6 Tasks — Frontend, Web UX & Integration
-**Assigned Engineer:** **Urvashi Rajput** ([@rajputurvashi2006-bit](https://github.com/rajputurvashi2006-bit))  
+**Assigned Engineer:** **Parmarth Kumar** ([@parmarth-kumar](https://github.com/parmarth-kumar)) *(Reassigned by Team Lead)*  
 **Branch:** `feat/m6-ui`
 
 ## Sprint Checklist (07–13 September 2026)
@@ -62,3 +62,10 @@
 - [x] Implement monochrome print-ready CSS stylesheet (`index.css`) hiding interactive controls and formatting print dossier for physical filing.
 - [x] Implement comprehensive automated test suite verifying workflow state preservation, absence of fabricated verdicts, report traceability, closure gating, and print structure (`tests/inspection_outcome.test.ts`).
 - [x] Complete Definition of Done checklist, verified 70/70 passing tests, clean production build, and zero prohibited claims.
+
+### Day 7: Standalone Zero-Build Test HUD Integration & Vercel Asset Packaging
+- [x] Merge zero-build HTML5 + Tailwind test HUD into `standalone/index.html` and `standalone/test_ui_server.py`.
+- [x] Package `test-ui.html` into `public/` for instant static routing on live Vercel deployments.
+- [x] Add `"test-ui"` runner script in `package.json`.
+- [x] Verify 100% backward compatibility with `integration/tests/test_ui_endpoints.py` and Vite production build.
+

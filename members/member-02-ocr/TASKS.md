@@ -46,8 +46,9 @@
 - [x] Perform hardware instruction analysis (AVX2 vs AVX-512 VNNI) and statutory accuracy regression analysis.
 - [x] Record formal verdict and deployment decision.
 
-### Special Assignment: Temporary Test Frontend & Inspection HUD (feat/m2-parmarth-test-ui)
+### Special Assignment: Temporary Test Frontend & Merged into Member 6 (feat/m2-parmarth-test-ui)
 - [x] Implement standalone zero-build test UI in `integration/test_ui/` for end-to-end team testing.
 - [x] Connect to FastAPI `/api/v1/` endpoints for auth, upload, pipeline execution, adjudication, and PDF notice download.
 - [x] Provide quick-load interactive presets for the 6 Golden Demonstration SKUs.
 - [x] Deliver automated integration tests and documentation (`TASK_TEMP_UI.md`).
+- [x] Handover and merge standalone test HUD into `members/member-06-ui/standalone/` as Parmarth Kumar assumes official ownership of Member 6.
