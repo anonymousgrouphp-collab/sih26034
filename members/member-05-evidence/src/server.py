@@ -73,7 +73,9 @@ try:
         StorageSecurityError,
         UnsupportedMediaTypeError,
     )
-except ImportError:
+except ImportError as e:
+    if e.name not in ("auth", "bsa_certificate", "database", "merkle_dag", "notice_generator", "storage"):
+        raise
     from .auth import (
         RequestHeaders,
         UserContext,

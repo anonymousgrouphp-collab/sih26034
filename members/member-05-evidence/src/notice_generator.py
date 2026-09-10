@@ -11,7 +11,10 @@ from pathlib import Path
 import time
 from typing import Any, Dict, List, Optional, Tuple
 
-import qrcode
+try:
+    import qrcode
+except ImportError:
+    qrcode = None
 from reportlab.lib.colors import HexColor
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
@@ -63,18 +66,25 @@ class Form1NoticePDFGenerator:
 
     @staticmethod
     def _create_qr_image(data_string: str) -> io.BytesIO:
-        """Generates an in-memory QR code image buffer."""
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_M,
-            box_size=4,
-            border=2,
-        )
-        qr.add_data(data_string)
-        qr.make(fit=True)
-        img = qr.make_image(fill_color="#1B365D", back_color="white")
         buffer = io.BytesIO()
-        img.save(buffer, format="PNG")
+        if qrcode is not None:
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_M,
+                box_size=4,
+                border=2,
+            )
+            qr.add_data(data_string)
+            qr.make(fit=True)
+            img = qr.make_image(fill_color="#1B365D", back_color="white")
+            img.save(buffer, format="PNG")
+        else:
+            from PIL import Image as PILImage, ImageDraw
+            img = PILImage.new("RGB", (120, 120), color="#F1F5F9")
+            draw = ImageDraw.Draw(img)
+            draw.rectangle([2, 2, 117, 117], outline="#1B365D", width=2)
+            draw.text((15, 50), "BSA SEC-63", fill="#1B365D")
+            img.save(buffer, format="PNG")
         buffer.seek(0)
         return buffer
 

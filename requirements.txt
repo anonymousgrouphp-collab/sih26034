@@ -17,8 +17,9 @@ cryptography>=42.0.5
 SQLAlchemy>=2.0.28
 psycopg2-binary>=2.9.9
 
-# Statutory Evidence Generation (ReportLab PDF/A per BSA 2023)
+# Statutory Evidence Generation (ReportLab PDF/A & QR per BSA 2023)
 reportlab>=4.1.0
+qrcode[pil]>=7.4.2
 
 # Computer Vision & Quality Gate (Member 1)
 opencv-python-headless>=4.9.0
