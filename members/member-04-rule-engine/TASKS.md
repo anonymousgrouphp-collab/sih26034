@@ -40,3 +40,10 @@
 - [x] Chunk 2: Rule 24 Wholesale Multi-Pack & Multi-Piece Package Compliance (piece count, individual piece net quantity, quantity arithmetic validation, and multi-pack USP).
 - [x] Chunk 3: Jan Vishwas (Amendment of Provisions) Act, 2023 (Act No. 18 of 2023) Decriminalization & Compounding Schedule Calculator (Form-1 Statutory Improvement Notices with 14-day cure window for first-time technical defaults, compounding tiers up to ₹25,000 / ₹50,000 / ₹1,00,000 with imprisonment repealed).
 - [x] Chunk 4: Courtroom-admissible AST evidence integration, 100% Pydantic contract compliance (`ComplianceVerdictResult` / `RuleEvaluationDTO`), sub-5ms execution latency, and comprehensive 42-test suite.
+
+### Phase 4: 4-Pass Stress-Test, Bug-Bash, Fuzzing & Concurrency Audit
+- [x] Pass 1: Metrological Corner Cases & Table-I Schedule Boundaries (exact row thresholds across 5 tiers, sensor uncertainty envelope triage with IEEE 754 precision guard, epoch boundary days, banned unit symbol exhaustive matrix).
+- [x] Pass 2: 1,000 Randomized Fuzzed Inspections & Singularity Defense (extreme floats, negative numbers, NaN/Inf, zero crash guarantee, Pydantic DTO roundtrip).
+- [x] Pass 3: High-Concurrency & Multi-Thread Stress (50 concurrent worker threads, 500 simultaneous inspections, wholesale multi-pack calculations, p99 latency < 5ms).
+- [x] Pass 4: Memory Stability & 100% Deterministic Repetitive Stress (3,000 sequential inspections in constant time, zero memory leaks, byte-for-byte reproducibility).
+
