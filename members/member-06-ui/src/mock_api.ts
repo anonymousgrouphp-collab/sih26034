@@ -38,6 +38,7 @@ export class MockApiService {
       status: "SUCCESS",
       inspection_id: inspectionId,
       final_verdict: verdict,
+      officer_pin_hash: pinHash,
       adjudicated_at: new Date().toISOString(),
     };
   }
