@@ -322,3 +322,84 @@ def test_emaap_standard_json_export(client, inspector_headers):
     assert "commodity" in data
     assert "statutory_findings" in data
 
+
+def test_analyze_case_endpoint_and_persistence(client, inspector_headers):
+    """Verifies POST /api/v1/inspections/{id}/analyze and database persistence of findings."""
+    valid_jpeg = b"\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00" + b"\xff" * 200
+    files = {"image": ("chips_pack.jpg", BytesIO(valid_jpeg), "image/jpeg")}
+    meta = {
+        "product_name": "Crunchy Potato Chips 90g",
+        "brand_name": "Lays",
+        "category": "FOOD_SNACKS",
+    }
+    up_resp = client.post(
+        "/api/v1/inspections/upload",
+        files=files,
+        data={"metadata": json.dumps(meta)},
+        headers=inspector_headers,
+    )
+    assert up_resp.status_code == 201
+    insp_id = up_resp.json()["inspection_id"]
+
+    # 1. Trigger live analyze endpoint directly on inspection case
+    analyze_resp = client.post(f"/api/v1/inspections/{insp_id}/analyze", headers=inspector_headers)
+    assert analyze_resp.status_code == 200
+    analyze_data = analyze_resp.json()
+    assert analyze_data["inspection_id"] == insp_id
+    assert "extracted_fields" in analyze_data
+    assert "rule_evaluations" in analyze_data
+    assert len(analyze_data["rule_evaluations"]) >= 1
+    assert "merkle_root" in analyze_data
+    assert len(analyze_data["merkle_root"]) == 64
+
+    # 2. Query GET /api/v1/inspections/{id} to verify database persistence (P0-1)
+    detail_resp = client.get(f"/api/v1/inspections/{insp_id}", headers=inspector_headers)
+    assert detail_resp.status_code == 200
+    detail_data = detail_resp.json()
+    assert detail_data["inspection"]["id"] == insp_id
+    # Ensure child records are populated from DB tables without mock fallback
+    assert len(detail_data["extracted_fields"]) >= 1
+    assert len(detail_data["bounding_boxes"]) >= 1
+    assert len(detail_data["rule_evaluations"]) >= 1
+
+
+def test_case_close_endpoint_and_audit_trail(client, inspector_headers):
+    """Verifies POST /api/v1/inspections/{id}/close and GET /api/v1/inspections/{id}/audit-trail."""
+    # 1. Create inspection
+    valid_jpeg = b"\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00" + b"\x11" * 200
+    files = {"image": ("salt.jpg", BytesIO(valid_jpeg), "image/jpeg")}
+    up = client.post("/api/v1/inspections/upload", files=files, headers=inspector_headers)
+    insp_id = up.json()["inspection_id"]
+
+    # 2. Attempt closure without remarks -> Expect 400
+    bad_close = client.post(
+        f"/api/v1/inspections/{insp_id}/close",
+        json={"remarks": "  "},
+        headers=inspector_headers,
+    )
+    assert bad_close.status_code == 400
+
+    # 3. Valid closure
+    good_close = client.post(
+        f"/api/v1/inspections/{insp_id}/close",
+        json={
+            "closure_reason": "ALL_FINDINGS_ADJUDICATED_AND_FILED",
+            "remarks": "Field investigation complete. Administrative case sealed.",
+        },
+        headers=inspector_headers,
+    )
+    assert good_close.status_code == 200
+    close_data = good_close.json()
+    assert close_data["status"] == "SUCCESS"
+    assert close_data["workflow_status"] == "COMPLETED"
+
+    # 4. Verify Audit Trail endpoint
+    audit_resp = client.get(f"/api/v1/inspections/{insp_id}/audit-trail", headers=inspector_headers)
+    assert audit_resp.status_code == 200
+    audit_data = audit_resp.json()
+    assert audit_data["status"] == "SUCCESS"
+    assert audit_data["total_events"] >= 1
+    actions = [e["action"] for e in audit_data["events"]]
+    assert "CASE_CLOSED" in actions
+
+

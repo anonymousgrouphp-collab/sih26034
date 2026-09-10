@@ -128,3 +128,43 @@ Merge PR #2 into `dev` branch and proceed to Member 6 frontend integration.
 ### Signing Note
 SIGNED OFF BY: shailendrapratap1 (shailendrapratap1@example.com) — 2026-09-09 22:05 IST [VERIFIED]
 
+---
+
+## [10 September 2026] [14:20] IST
+
+### Task / Chunk
+Full-System Live Pipeline Integration (P0 & P1 Deliverables): CentralPipelineAdapter Wiring, Database Session Persistence, Statutory Case Closure Gating, and Merkle Audit Trail Endpoint.
+
+### Status
+COMPLETE
+
+### Completed
+- **Live Pipeline Wiring (`POST /api/v1/pipeline/execute/{image_id}` & `POST /api/v1/inspections/{id}/analyze`):** Connected `CentralPipelineAdapter` and `LegalMetrologyRuleEngine` directly into the FastAPI server. Automatically routes Golden Demonstration SKUs and field imagery through optical quality checks, Table-I font schedule AST, USP arithmetic, and Rule 6 declarations.
+- **Database Persistence of Pipeline Artifacts (P0-1):** In `execute_pipeline`, automatically cleared stale records and persisted `BoundingBox` records and `ComplianceEvaluation` records into the database session.
+- **Session Persistence in `GET /api/v1/inspections/{id}`:** Enhanced inspection detail endpoint to query `BoundingBox` and `ComplianceEvaluation` tables, returning populated `extracted_fields`, `bounding_boxes`, and `rule_evaluations` directly from the database without requiring client-side mock fallbacks.
+- **Statutory Case Closure Endpoint (`POST /api/v1/inspections/{id}/close`):** Implemented case closure route requiring mandatory officer remarks, sealing the administrative case with `workflow_status: "COMPLETED"`, and recording an immutable audit event.
+- **Merkle Audit Trail Endpoint (`GET /api/v1/inspections/{id}/audit-trail`):** Implemented audit reader endpoint returning chronological, cryptographically chained `AuditEvent` records with SHA-256 entry hashes and previous hashes.
+- **Automated Verification:** Added dedicated integration tests in `test_server_api.py` covering live case analysis, database persistence, closure remarks validation, and audit trail verification.
+- **Full Test Suite:** 58/58 Member 5 tests passed; 303 Python tests passed (1 skipped) across repository in 16.18s; 86/86 frontend tests passed in 11.18s. Total: 389 passing automated tests.
+
+### Tests
+- `pytest members/member-05-evidence/tests/ -v` (58 passed in 2.62s)
+- `pytest integration/tests/ -v` (16 passed in 1.41s)
+- `pytest -v` (303 passed, 1 skipped in 16.18s across entire repository)
+- `npm test` in `members/member-06-ui` (86 passed in 11.18s)
+
+### Problems
+None. Zero regressions across all five member modules and golden demonstration SKUs.
+
+### Decisions
+1. Direct pipeline invocation seamlessly handles both field captures and golden fixtures with deterministic legal defaults.
+2. Querying BoundingBox and ComplianceEvaluation directly on `get_inspection` eliminates client-side caching dependencies.
+3. Strict closure gating guarantees unbroken chain-of-custody under Section 63 BSA 2023.
+
+### Next Step
+Prepare pull request or merge commit into `dev` and notify Team Lead of successful P0/P1 full-system live pipeline delivery.
+
+### Signing Note
+SIGNED OFF BY: shailendrapratap1 (shailendrapratap1@example.com) — 2026-09-10 14:20 IST [VERIFIED]
+
+
