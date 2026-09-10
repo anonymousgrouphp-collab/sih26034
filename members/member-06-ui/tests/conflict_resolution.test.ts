@@ -149,4 +149,73 @@ describe("ConflictResolutionCard & Contradictory Evidence Widget", () => {
     assert.ok(html.includes("₹100.00 vs ₹110.00"));
     assert.ok(html.includes("950 g vs 1000 g"));
   });
+
+  it("6. renders specific recorded adjudication finding (resolutionNote / selectedDecision)", () => {
+    const specificResolvedConflict: EvidenceConflict[] = [
+      {
+        id: "conflict_mrp_resolved",
+        field: "MRP",
+        expected: "₹48.00",
+        observed: "₹48.00 vs ₹45.00",
+        description: "Multiple contradictory MRP declarations detected on package panels.",
+        requiresHumanDecision: true,
+        resolved: true,
+        resolutionNote: "Accepted Observed MRP",
+        selectedDecision: "DISMISS_AS_COMPLIANT",
+      },
+    ];
+
+    const html = renderToStaticMarkup(
+      React.createElement(ConflictResolutionCard, {
+        conflicts: specificResolvedConflict,
+      })
+    );
+
+    assert.ok(html.includes("LMO Adjudicated: Accepted Observed MRP"), "Must render specific officer decision note");
+  });
+
+  it("7. falls back to selectedDecision when resolutionNote is not provided", () => {
+    const decisionOnlyConflict: EvidenceConflict[] = [
+      {
+        id: "conflict_usp_resolved",
+        field: "UNIT_SALE_PRICE",
+        expected: "Rs. 0.40 / g",
+        observed: "Declared Rs. 0.55 / g",
+        description: "Arithmetic mismatch in USP calculation.",
+        requiresHumanDecision: true,
+        resolved: true,
+        selectedDecision: "Confirmed Violation",
+      },
+    ];
+
+    const html = renderToStaticMarkup(
+      React.createElement(ConflictResolutionCard, {
+        conflicts: decisionOnlyConflict,
+      })
+    );
+
+    assert.ok(html.includes("LMO Adjudicated: Confirmed Violation"), "Must render decision as finding when note is omitted");
+  });
+
+  it("8. falls back to 'Resolved by LMO' when neither note nor decision is provided", () => {
+    const genericResolvedConflict: EvidenceConflict[] = [
+      {
+        id: "conflict_generic",
+        field: "NET_QUANTITY",
+        expected: "200 g",
+        observed: "190 g",
+        description: "Net quantity deficit.",
+        requiresHumanDecision: true,
+        resolved: true,
+      },
+    ];
+
+    const html = renderToStaticMarkup(
+      React.createElement(ConflictResolutionCard, {
+        conflicts: genericResolvedConflict,
+      })
+    );
+
+    assert.ok(html.includes("Resolved by LMO"), "Must safely fall back to Resolved by LMO");
+  });
 });

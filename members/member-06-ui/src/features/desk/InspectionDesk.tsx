@@ -298,10 +298,10 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
         </div>
 
         {/* Filters */}
-        <div className="flex items-center gap-2.5 w-full md:w-auto overflow-x-auto">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 w-full md:w-auto">
           {/* Workflow Status Filter */}
-          <div className="flex items-center gap-1.5 shrink-0">
-            <span className="text-xs font-medium text-slate-500">Workflow:</span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-medium text-slate-500 whitespace-nowrap">Workflow:</span>
             <select
               value={selectedWorkflow}
               onChange={(e) => setSelectedWorkflow(e.target.value)}
@@ -317,8 +317,8 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
           </div>
 
           {/* Verdict Filter */}
-          <div className="flex items-center gap-1.5 shrink-0">
-            <span className="text-xs font-medium text-slate-500">Verdict:</span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-medium text-slate-500 whitespace-nowrap">Verdict:</span>
             <select
               value={selectedVerdict}
               onChange={(e) => setSelectedVerdict(e.target.value)}
@@ -342,7 +342,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                 setSelectedVerdict("ALL");
                 setTriageFilter("ALL");
               }}
-              className="text-xs text-rose-600 hover:text-rose-800 font-medium px-2 py-1 underline"
+              className="text-xs text-rose-600 hover:text-rose-800 font-medium px-2 py-1 underline whitespace-nowrap"
             >
               Clear
             </button>

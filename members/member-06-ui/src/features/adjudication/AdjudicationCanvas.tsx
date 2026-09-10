@@ -162,8 +162,25 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
 
   // Automated Contradictory Evidence & Conflict Detection (ADL-01, Rule 6, HITL Gate)
   const detectedConflicts: EvidenceConflict[] = useMemo(() => {
+    const adj = caseData.adjudication;
+    const isResolved = Boolean(adj);
+    const adjNote = adj
+      ? adj.remarks ||
+        (adj.verdict === "CONFIRM_VIOLATION"
+          ? "Confirmed Violation"
+          : adj.verdict === "DISMISS_AS_COMPLIANT"
+          ? "Dismissed as Compliant"
+          : "Retest Ordered")
+      : undefined;
+    const adjDecision = adj?.verdict;
+
     if (propsConflicts && propsConflicts.length > 0) {
-      return propsConflicts;
+      return propsConflicts.map((c) => ({
+        ...c,
+        resolved: c.resolved ?? isResolved,
+        resolutionNote: c.resolutionNote || (c.resolved || isResolved ? adjNote : undefined),
+        selectedDecision: c.selectedDecision || (c.resolved || isResolved ? adjDecision : undefined),
+      }));
     }
 
     const list: EvidenceConflict[] = [];
@@ -186,7 +203,9 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
             f.discrepancy ||
             "Unit Sale Price declared on package does not reconcile with Net Quantity and declared MRP.",
           requiresHumanDecision: true,
-          resolved: Boolean(caseData.adjudication),
+          resolved: isResolved,
+          resolutionNote: isResolved ? adjNote : undefined,
+          selectedDecision: isResolved ? adjDecision : undefined,
         });
       }
     }
@@ -213,7 +232,9 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
             observed: `${items[0].raw_ocr_text} vs ${diffItem.raw_ocr_text}`,
             description: `Multiple contradictory ${fieldType} declarations detected on package panels. Dual pricing violates LMPC Rule 6 and requires officer adjudication.`,
             requiresHumanDecision: true,
-            resolved: Boolean(caseData.adjudication),
+            resolved: isResolved,
+            resolutionNote: isResolved ? adjNote : undefined,
+            selectedDecision: isResolved ? adjDecision : undefined,
           });
         }
       }
@@ -233,7 +254,9 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
               f.discrepancy ||
               "Measurement falls within sensor uncertainty band (95% CI). Physical caliper verification recommended before notice issuance.",
             requiresHumanDecision: true,
-            resolved: Boolean(caseData.adjudication),
+            resolved: isResolved,
+            resolutionNote: isResolved ? adjNote : undefined,
+            selectedDecision: isResolved ? adjDecision : undefined,
           });
         }
       }
@@ -248,7 +271,9 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
         observed: "Declared Rs. 0.55 / g",
         description: "Arithmetic mismatch: 300g * Rs 0.55/g = Rs 165.00 != declared MRP Rs 120.00 (Discrepancy Rs 45.00).",
         requiresHumanDecision: true,
-        resolved: Boolean(caseData.adjudication),
+        resolved: isResolved,
+        resolutionNote: isResolved ? adjNote : undefined,
+        selectedDecision: isResolved ? adjDecision : undefined,
       });
     } else if (list.length === 0 && caseData.sku_demo_id === "SKU-DEMO-04") {
       list.push({
@@ -258,7 +283,9 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
         observed: "2.48 mm (±0.04 mm k=2 CI)",
         description: "Measurement falls within sensor uncertainty band (95% CI). Physical caliper verification recommended before notice issuance.",
         requiresHumanDecision: true,
-        resolved: Boolean(caseData.adjudication),
+        resolved: isResolved,
+        resolutionNote: isResolved ? adjNote : undefined,
+        selectedDecision: isResolved ? adjDecision : undefined,
       });
     }
 
@@ -282,7 +309,7 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
           </span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {onSwitchToDiagnosticHUD && (
             <button
               type="button"

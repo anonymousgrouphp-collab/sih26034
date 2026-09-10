@@ -751,6 +751,111 @@ Await user instructions before pushing to remote repository. STRICTLY NO GIT PUS
 ### Signing Note
 SIGNED OFF BY: Harsh Patel (anonymousgrouphp-collab@users.noreply.github.com) — 2026-09-10 21:00 IST [VERIFIED]
 
+---
+
+## [10 September 2026] [23:05] IST
+
+### Task / Chunk
+Responsive Viewport Stabilization (Tablet 1024px & Mobile 390px 0px Overflow), Findings Ledger WCAG 2.1 AA Button Semantics, and Conflict Resolution Specific Officer Decision Rendering.
+
+### Status
+COMPLETE
+
+### Completed
+- **Header Responsive Architecture (`Header.tsx`, `ConnectivityBadge.tsx`):**
+  - Removed hardcoded `shrink-0` from Brand (line ~34) and Controls container (line ~58), enabling dynamic flex shrinkage.
+  - On mobile screens (`< sm`), abbreviated secondary title to `GOI • DoCA` (`<span className="inline sm:hidden">GOI</span>` / `<span className="inline sm:hidden">DoCA</span>`), hidden LMPC workstation badge (`hidden sm:inline-block`), and rendered compact status dot in `ConnectivityBadge`.
+  - On tablet screens (`< xl`, 1024px), made Circle selector dropdown responsive with `max-w-[140px] xl:max-w-[280px] truncate` and deferred officer profile text to `hidden xl:block`.
+  - Guaranteed `document.documentElement.scrollWidth <= document.documentElement.clientWidth` (0px horizontal overflow, `diff: 0`) across both Tablet 1024px and Mobile 390px viewports.
+- **Inspection Desk Mobile Filter Wrapping (`InspectionDesk.tsx`):**
+  - Replaced rigid non-wrapping row with `flex-wrap gap-2 sm:gap-2.5 w-full md:w-auto` on line ~301.
+  - Removed `shrink-0` from Workflow and Verdict filter containers, allowing search input and dropdowns to wrap gracefully within 390px mobile viewport without inducing page-level horizontal scrolling.
+- **Findings Ledger Semantic Accessibility (`FindingsLedger.tsx`):**
+  - Replaced non-semantic `<div role="button" tabIndex={0} aria-pressed={isSelected}>` with semantic `<button type="button" className="w-full text-left ...">` and native `aria-pressed={isSelected}` for full WCAG 2.1 AA keyboard navigation.
+- **Specific Officer Decision on Conflict Resolution Card (`ConflictResolutionCard.tsx`, `AdjudicationCanvas.tsx`):**
+  - Extended `EvidenceConflict` interface with `resolutionNote?: string` and `selectedDecision?: string`.
+  - Rendered specific recorded adjudication finding (e.g. `LMO Adjudicated: ${c.resolutionNote || c.selectedDecision}`) rather than a generic `Resolved by LMO` chip when conflict is resolved.
+  - Passed officer adjudication remarks and verdict from `caseData.adjudication` through `AdjudicationCanvas.tsx`.
+  - Added unit test in `tests/conflict_resolution.test.ts` asserting rendering of `LMO Adjudicated: Accepted Observed MRP`.
+- **Comprehensive Verification:**
+  - `npm test`: 105 passed, 0 failed across 34 suites (100% pass rate).
+  - `npm run build`: Clean production bundle compiled via Vite 5 in 17.71s with zero TypeScript errors.
+  - Automated Playwright responsive audit (`tests/playwright_responsive_audit.py`) executed across all 4 tiers (Desktop 1920x1080, Laptop 1366x768, Tablet 1024x768, Mobile 390x844) proving 0px horizontal overflow and verified findings ledger semantic button + conflict resolution card adjudication note.
+  - Executed Urvashi regression suite (`tests/playwright_urvashi_verification.py`), passing 100%.
+
+### Tests
+- `npm test` in `members/member-06-ui`: 105 passed, 0 failed in 15.12s.
+- `npm run build` in `members/member-06-ui`: Clean production build in 17.71s (`dist/index.html`, `dist/assets/index-*.js`, `dist/assets/index-*.css`).
+- `tests/playwright_responsive_audit.py`: 4 viewports audited, 0px overflow on all tiers, 2 feature checks PASSED.
+- `tests/playwright_urvashi_verification.py`: 3/3 suites passed with screenshots in `scratch/`.
+
+### Problems
+None. Resolved Vite HMR WebSocket connection timeout in Playwright audit by targeting `domcontentloaded`.
+
+### Decisions
+1. Used CSS `truncate` and `max-w-[140px]` on `< xl` circle select to show jurisdiction ID prefix and prevent tablet header overflow.
+2. Deferred officer name and employee id text to `xl:` breakpoint while preserving 32px officer avatar on tablet (1024px) to guarantee zero layout overflow.
+3. Decoupled `resolutionNote` and `selectedDecision` in `EvidenceConflict` so specific officer remarks take precedence over generic status chips.
+
+### Next Step
+Await user instructions. Repository is fully verified, green, and zero-overflow.
+
+### Signing Note
+SIGNED OFF BY: Harsh Patel (anonymousgrouphp-collab@users.noreply.github.com) — 2026-09-10 23:05 IST [VERIFIED]
+
+---
+
+## [10 September 2026] [23:15] IST
+
+### Task / Chunk
+Rigorous Peer Review & Fixes: Header Spec Conformance (`max-w-[150px]`, Tooltips), Conflict Resolution Card Layout & Typography Alignment, and FindingsLedger Dedicated Semantic Unit Tests.
+
+### Status
+COMPLETE
+
+### Completed
+- **Header Spec Conformance (`Header.tsx`):**
+  - Updated circle selector constraint from `max-w-[140px]` to exact specification requirement `max-w-[150px] xl:max-w-[280px] truncate`.
+  - Added dynamic `title` tooltip to `<select id="circle-select">` and static `title={c.label}` to options for full accessible name readout when text is visually truncated.
+  - Added accessible `title` tooltip to officer profile avatar (`title={isController ? "S.K. Verma (Controller • CTRL-DL-0012)" : "Rajesh Sharma (Legal Metrology Officer • INSP-DL-0842)"}`) to preserve identity visibility on `< xl` screens where text is hidden.
+- **Conflict Resolution Card Visual & Layout Polish (`ConflictResolutionCard.tsx`):**
+  - Widened left column on `sm:` viewports from `140px` to `180px` (`sm:grid-cols-[180px_1fr]`), preventing awkward 5-line crushing of multi-word adjudication findings (e.g. `Accepted Observed MRP and verified physical packaging deficit.`).
+  - Fixed status dot alignment on multi-line text by converting from `items-center` to `items-start` with `mt-0.5` on the dot, ensuring the green dot aligns neatly with the first line ("LMO Adjudicated:") instead of floating vertically in the middle of line 3.
+  - Added `break-words` and `leading-tight` to guarantee clean text wrapping without layout overflow.
+  - Verified and tested fallback to `selectedDecision` when `resolutionNote` is omitted, and fallback to `Resolved by LMO` when neither is supplied.
+- **Dedicated FindingsLedger Unit Test Suite (`tests/findings_ledger.test.ts`):**
+  - Created standalone test suite verifying native `<button type="button">` element rendering with `aria-pressed={isSelected}` for all ledger items.
+  - Verified anti-regression assertion ensuring 0 non-semantic `<div role="button">` elements in findings ledger.
+  - Verified distinction between automated AI finding status and officer adjudication decisions (`CONFIRMED`, `DISMISSED`, `RETEST_REQUESTED`).
+  - Verified safe empty state handling when no findings match selected filter tab.
+- **Conflict Resolution Card Unit Tests (`tests/conflict_resolution.test.ts`):**
+  - Added Test 7 verifying fallback to `selectedDecision` (`Confirmed Violation`).
+  - Added Test 8 verifying fallback to `Resolved by LMO` when note/decision are absent.
+- **Playwright Responsive Multi-Tier Audit (`tests/playwright_responsive_audit.py`):**
+  - Added Feature Check 3 verifying `max-w-[150px]`, `truncate`, and absence of `shrink-0` on Brand and Controls.
+  - Re-verified all 4 tiers (Desktop 1920x1080, Laptop 1366x768, Tablet 1024x768, Mobile 390x844) with 0px overflow (`diff: 0px`).
+
+### Tests
+- `npm test` in `members/member-06-ui`: 111 passed, 0 failed across 35 suites in 16.08s (100% pass rate).
+- `npm run build` in `members/member-06-ui`: Clean production bundle compiled via Vite 5 in 10.97s with zero TypeScript or build errors.
+- `& "C:\Users\ceoha\AppData\Local\Programs\Python\Python313\python.exe" tests/playwright_responsive_audit.py`: All 4 tiers audited with 0px overflow, all 3 feature checks passed (FindingsLedger buttons, ConflictResolutionCard LMO adjudication, Header responsive classes).
+
+### Problems
+- Discovered that `FindingsLedger` had 0 direct unit test coverage in `members/member-06-ui/tests/`. Created dedicated test suite `tests/findings_ledger.test.ts`.
+- Identified that multi-line adjudication text in `ConflictResolutionCard` caused the green status dot to vertically center on the 3rd line due to `items-center`. Fixed by switching to `items-start` with `mt-0.5`.
+- Identified that `Header.tsx` circle selector was set to `max-w-[140px]` instead of the spec's `max-w-[150px]`. Fixed and verified with 0px overflow.
+
+### Decisions
+1. Set `sm:grid-cols-[180px_1fr]` in `ConflictResolutionCard.tsx` to provide balanced proportion between field title/adjudication badge and description details.
+2. Standardized `FindingOfficerDecision` enum compliance in test fixtures.
+
+### Next Step
+All 4 original task issues and secondary review findings are completely solved, tested, and verified. Ready for staging deployment and integration.
+
+### Signing Note
+SIGNED OFF BY: Harsh Patel (anonymousgrouphp-collab@users.noreply.github.com) — 2026-09-10 23:15 IST [VERIFIED]
+
+
 
 
 

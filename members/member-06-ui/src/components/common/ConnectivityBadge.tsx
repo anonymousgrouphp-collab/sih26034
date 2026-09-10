@@ -75,18 +75,18 @@ export const ConnectivityBadge: React.FC<ConnectivityBadgeProps> = ({
 
   return (
     <div
-      className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-mono border ${status.borderColor} ${status.bgColor} ${status.textColor} transition-colors`}
+      className={`inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-2.5 py-1 rounded-full text-xs font-mono border ${status.borderColor} ${status.bgColor} ${status.textColor} transition-colors shrink-0`}
       title={status.tooltip}
     >
       <span
         className={`h-2 w-2 rounded-full ${status.dotColor} ${isChecking ? "animate-ping" : ""}`}
       />
-      <span className="font-semibold tracking-wide">{status.label}</span>
+      <span className="hidden sm:inline font-semibold tracking-wide">{status.label}</span>
       <button
         type="button"
         onClick={checkConnection}
         disabled={isChecking}
-        className="ml-1 opacity-70 hover:opacity-100 focus:outline-none"
+        className="ml-0.5 sm:ml-1 opacity-70 hover:opacity-100 focus:outline-none"
         title="Check Connectivity"
       >
         <svg

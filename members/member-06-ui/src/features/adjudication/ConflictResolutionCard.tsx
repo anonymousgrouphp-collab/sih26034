@@ -9,6 +9,8 @@ export interface EvidenceConflict {
   description: string;
   requiresHumanDecision?: boolean;
   resolved?: boolean;
+  resolutionNote?: string;
+  selectedDecision?: string;
 }
 
 export interface ConflictResolutionCardProps {
@@ -57,15 +59,22 @@ export const ConflictResolutionCard: React.FC<ConflictResolutionCardProps> = ({
       <div className="divide-y divide-amber-200/70">
         {conflicts.map((c) => (
           <div key={c.id} className="p-4 sm:p-5 hover:bg-amber-100/30 transition-colors">
-            <div className="grid gap-3 sm:grid-cols-[140px_1fr] items-start">
+            <div className="grid gap-3 sm:grid-cols-[180px_1fr] items-start">
               <div>
                 <span className="inline-block text-xs font-bold uppercase tracking-wider text-amber-900 bg-white px-2.5 py-1 rounded border border-amber-200 shadow-xs">
                   {c.field}
                 </span>
                 {c.resolved && (
-                  <span className="mt-1.5 block text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 w-fit">
-                    Resolved by LMO
-                  </span>
+                  <div className="mt-2">
+                    <span className="inline-flex items-start gap-1.5 text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-1 rounded border border-emerald-300 shadow-2xs font-mono leading-tight">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0 mt-0.5"></span>
+                      <span className="break-words">
+                        {c.resolutionNote || c.selectedDecision
+                          ? `LMO Adjudicated: ${c.resolutionNote || c.selectedDecision}`
+                          : "Resolved by LMO"}
+                      </span>
+                    </span>
+                  </div>
                 )}
               </div>
 
