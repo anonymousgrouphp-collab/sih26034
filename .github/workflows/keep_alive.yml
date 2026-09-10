@@ -1,0 +1,22 @@
+name: Keep Render Backend Alive (Anti-Sleep)
+
+on:
+  schedule:
+    # Runs every 14 minutes to prevent Render free instance spin-down (15-min timeout)
+    - cron: '*/14 * * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub Actions UI
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping NyayaDrishti Live Health Endpoint
+        run: |
+          echo "Pinging https://nyayadrishti-backend.onrender.com/api/v1/health ..."
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" -m 30 "https://nyayadrishti-backend.onrender.com/api/v1/health")
+          echo "Received HTTP status: $STATUS"
+          if [ "$STATUS" -eq 200 ]; then
+            echo "Render Backend is ACTIVE, WARM, and ALIVE!"
+          else
+            echo "Warning: Received status $STATUS"
+          fi

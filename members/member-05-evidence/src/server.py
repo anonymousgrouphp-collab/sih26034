@@ -161,12 +161,33 @@ storage_manager = DecoupledStorageManager()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Initializes database schema and default platform seeds upon startup."""
+    """Initializes database schema, seeds platform data, and maintains keepalive."""
     engine = get_database_engine()
     init_database(engine)
     with Session(engine) as session:
         seed_default_platform_data(session)
+
+    # Automated Anti-Sleep Keepalive Heartbeat for Cloud Free Tiers (Render)
+    import asyncio
+    keepalive_task = None
+    if os.getenv("RENDER") or os.getenv("RENDER_EXTERNAL_URL"):
+        async def keep_alive_heartbeat():
+            ext_url = os.getenv("RENDER_EXTERNAL_URL", "https://nyayadrishti-backend.onrender.com")
+            while True:
+                await asyncio.sleep(600)  # Ping every 10 minutes to prevent 15-min idle spin-down
+                try:
+                    import httpx
+                    async with httpx.AsyncClient(timeout=10.0) as client:
+                        await client.get(f"{ext_url}/api/v1/health")
+                except Exception:
+                    pass
+
+        keepalive_task = asyncio.create_task(keep_alive_heartbeat())
+
     yield
+
+    if keepalive_task:
+        keepalive_task.cancel()
 
 
 app = FastAPI(
