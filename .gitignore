@@ -100,3 +100,6 @@ temp/
 # Exclude scripts directory
 scripts/
 !members/*/scripts/
+
+# Runtime evidence storage
+storage/

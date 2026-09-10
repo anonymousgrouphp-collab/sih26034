@@ -352,6 +352,17 @@ def inspect_real_package(item: Dict[str, Any], ocr_engine: MultilingualOCREngine
 
     # Triage overall verdict
     all_evals = [font_eval, qty_eval]
+    if not qg_res.passed:
+        all_evals.append({
+            "rule_code": "STAGE_02_OPTICAL_QUALITY_GATE",
+            "statutory_reference": "Optical Quality Standards / Section 63 BSA 2023",
+            "status": "UNABLE_TO_VERIFY",
+            "severity": "CRITICAL",
+            "required_value": "Pass optical quality gate (blur >= 100.0, glare <= 8.0%)",
+            "measured_value": f"Blur {qg_res.blur_variance:.1f}, Glare {qg_res.glare_percentage:.2f}%",
+            "discrepancy": qg_res.advice,
+            "legal_consequence": "Image optically degraded; cannot certify metrological compliance under Section 63 BSA 2023",
+        })
     verdict = LegalMetrologyRuleEngine.triage_verdict(all_evals)
     print(f"      - Composite 4-State Epistemic Verdict: {verdict}")
 

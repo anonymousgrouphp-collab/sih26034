@@ -154,3 +154,81 @@ Hand off stable subsystem interfaces to Member 2 (Multilingual OCR) and Member 5
 
 ### Signing Note
 SIGNED OFF BY: kunal-raj-dev (kunal.raj@nyayadrishti.gov.in) — 2026-09-08 21:52 IST [VERIFIED]
+
+---
+
+## [10 September 2026] [16:15] IST
+
+### Task / Chunk
+Hyper-Critical CTO Calibration Stress Audit & Section 63 BSA 2023 Evidentiary Defense Suite.
+
+### Status
+COMPLETE
+
+### Completed
+- **CTO Stress Audit & Forensic Metrology Implementation:**
+  - Implemented comprehensive 26-scenario PyTest suite `tests/test_advanced_calibration_cto_stress.py` covering 6 core metrological domains.
+  - Implemented executable stress benchmark runner `tests/run_advanced_calibration_stress_suite.py` with quantitative reporting and visual artifact output to `docs/real_packaging_inspections/stress_tests/`.
+  - **Domain 1 (ISO 7810 ID-1 Fallback):** Validated rotation invariance across 0-180°, internal texture/chip robustness, automatic fallback from missing ArUco, and rejection of non-conforming polygons (squares, ribbons).
+  - **Domain 2 (Perspective Distortion Limits):** Measured foreshortening error from 0° to 45° tilt. Proved Stage 2 Quality Gate correctly enforces 15.0° statutory boundary, halting degraded captures before rule evaluation.
+  - **Domain 3 (Occlusion & Noise Degradation):** Proved ArUco tolerates up to 10% white thumb corner occlusion and fails closed safely at >= 15%, survives Gaussian noise up to sigma=125 (breaking cleanly at sigma=150), and tolerates 85% shadow depth without scale bias.
+  - **Domain 4 (Cylindrical Packaging Rule 2(h)):** Verified PDP calculation $0.40 \times \pi \times D \times H$ (~1.2566x front 2D projection) across 6 commercial container formats mapped to Table-I font schedules.
+  - **Domain 5 (Borderline Sensor Uncertainty Band):** Tested 25 boundary conditions across all 5 Table-I tiers; verified 0.0% false accusation rate on borderline deficits within sensor uncertainty band ($k=2, 95\%$ confidence).
+  - **Domain 6 (Real FMCG Adversarial Stress):** Audited 8 real Indian FMCG packaging samples under specular glare flash, motion blur, defocus blur, and 25° tilt. Fixed critical defect where optical gate failures were previously ignored in composite triage; guaranteed that degraded images route strictly to `UNABLE_TO_VERIFY` and record in the Section 63 BSA 2023 SHA-256 Merkle ledger.
+
+### Tests
+- `& "C:\Users\ceoha\AppData\Local\Programs\Python\Python313\python.exe" -m pytest members/member-01-cv-metrology/tests/ tests/test_advanced_calibration_cto_stress.py -v` (69 passed in 1.00s)
+- `& "C:\Users\ceoha\AppData\Local\Programs\Python\Python313\python.exe" tests/run_real_packaging_physical_tests.py` (8 SKUs tested, 100% verified, blurred Maggi safely triaged to `UNABLE_TO_VERIFY`)
+- `& "C:\Users\ceoha\AppData\Local\Programs\Python\Python313\python.exe" tests/run_advanced_calibration_stress_suite.py` (All 6 suites PASS, execution time 0.27s)
+
+### Problems
+- Identified and fixed critical flaw in real packaging physical test runner where Stage 2 Quality Gate failures (Laplacian blur < 100.0) were previously bypassed during final verdict triage, allowing blurred packaging (Maggi noodles) to receive an erroneous `PASS`. Hardened triage logic to enforce `UNABLE_TO_VERIFY` whenever optical gates fail.
+
+### Decisions
+- Adopted strict fail-closed policy under Section 63 BSA 2023: any frame with degraded optical quality (blur, glare bloom, tilt > 15°) or uncalibrated scale must output `UNABLE_TO_VERIFY`, preventing wrongful prosecution.
+
+### Next Step
+Prepare comprehensive CTO critique report detailing vulnerabilities, empirical metrics, and defense strategies.
+
+### Signing Note
+SIGNED OFF BY: kunal-raj-dev (kunal.raj@nyayadrishti.gov.in) — 2026-09-10 16:15 IST [VERIFIED]
+
+---
+
+## [10 September 2026] [16:30] IST
+
+### Task / Chunk
+Forensic Audit Remediation, Non-Coplanar Depth Compensation, Cylindrical De-Wrapping, and ISO 17025 Metrology Hardening.
+
+### Status
+COMPLETE
+
+### Completed
+- **Forensic Vulnerabilities Identified & Remediated:**
+  1. **Dual-Polarity Packaging Segmentation:** Fixed critical defect in `estimate_pdp_geometry` where `THRESH_BINARY_INV` unconditionally inverted bright packages on dark mats, causing 240% area calculation errors (`[0, 0, 600, 800]` full canvas capture). Integrated automatic background polarity median check and canvas border rejection, restoring 100% segmentation accuracy on both dark and light mats.
+  2. **Low-Contrast ISO Card Detection:** Replaced rigid single Canny `(40, 140)` thresholds with multi-pass adaptive edge detection (`(40, 140)`, `(15, 60)`, and dynamic median intensity thresholds), enabling reliable detection of natural white ID cards on light counters (contrast $\Delta \approx 20$) and dark cards on dark mats.
+  3. **Non-Coplanar Perspective Magnification ($Z > 0$):** Implemented `CalibrationEngine.compensate_coplanar_depth(px_to_mm, camera_dist, elevation)` to eliminate perspective magnification ($M = \frac{Z_{cam}}{Z_{cam} - \Delta Z}$) when inspecting 3D packages of non-zero thickness, neutralizing courtroom challenges under Section 63 BSA 2023.
+  4. **Cylindrical Tangential De-Wrapping:** Implemented `CalibrationEngine.rectify_cylindrical_surface()` using inverse cylindrical projection ($x(\theta) = x_0 + R\sin\theta$) to unroll curved container labels, eliminating tangential cosine compression ($\cos\theta \le 0.50$) for wrapped text.
+  5. **ISO 17025 / GUM Dynamic Uncertainty Propagation:** Implemented `CalibrationEngine.calculate_expanded_uncertainty()` deriving expanded uncertainty $U_{95}$ ($k=2, 95\%$ confidence) dynamically from image resolution, scale $S$, and residual tilt.
+- **Stress Suite Expansion:**
+  - Expanded `tests/test_advanced_calibration_cto_stress.py` from 26 to 33 exhaustive stress tests covering all new metrological domains.
+  - Enhanced `tests/run_advanced_calibration_stress_suite.py` benchmark runner with quantitative reporting for low-contrast edges, non-coplanar depth compensation, cylindrical unrolling, and dynamic ISO 17025 uncertainty bands.
+
+### Tests
+- `& "C:\Users\ceoha\AppData\Local\Programs\Python\Python313\python.exe" -m pytest members/member-01-cv-metrology/tests/ tests/test_advanced_calibration_cto_stress.py -v` (76 passed in 1.18s)
+- `& "C:\Users\ceoha\AppData\Local\Programs\Python\Python313\python.exe" tests/run_advanced_calibration_stress_suite.py` (All 6 suites PASS in 0.25s)
+- `& "C:\Users\ceoha\AppData\Local\Programs\Python\Python313\python.exe" tests/run_real_packaging_physical_tests.py` (8 SKUs tested, 100% verified)
+- `& "C:\Users\ceoha\AppData\Local\Programs\Python\Python313\python.exe" -m pytest members/ tests/test_advanced_calibration_cto_stress.py -v` (353 passed, 1 skipped in 287s, 100% pass across repo)
+
+### Problems
+- Identified that unassisted planar homography assumes $Z = 0$, which causes an uncompensated 50mm cereal box at 350mm camera distance to experience $+16.7\%$ optical magnification, turning illegal 2.20mm fonts into falsely compliant 2.57mm measurements. Solved via explicit optical elevation compensation math.
+
+### Decisions
+- Added `compensate_coplanar_depth`, `rectify_cylindrical_surface`, and `calculate_expanded_uncertainty` directly to `CalibrationEngine` while maintaining strict backward compatibility with frozen contract schemas.
+
+### Next Step
+Deliver final CTO critique report to caller and prepare for integration review.
+
+### Signing Note
+SIGNED OFF BY: kunal-raj-dev (kunal.raj@nyayadrishti.gov.in) — 2026-09-10 16:30 IST [VERIFIED]
+

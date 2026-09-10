@@ -152,12 +152,18 @@ class CalibrationEngine:
             gray = gray_or_bgr
 
         try:
-            # Multi-threshold Canny edge detection
-            edges = cv2.Canny(gray, 40, 140)
-            kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
-            edges_closed = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel)
+            # Multi-threshold adaptive Canny edge passes for robust edge extraction
+            v = float(np.median(gray))
+            lower_dyn = int(max(10, (1.0 - 0.50) * v))
+            upper_dyn = int(min(240, (1.0 + 0.50) * v))
 
-            contours, _ = cv2.findContours(edges_closed, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+            edge_passes = [
+                cv2.Canny(gray, 40, 140),
+                cv2.Canny(gray, 15, 60),
+                cv2.Canny(gray, lower_dyn, upper_dyn),
+            ]
+            kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+
             target_aspect = card_w_mm / card_h_mm  # 1.5858
             best_candidate = None
             min_aspect_diff = 0.15  # Tolerance on card aspect ratio (within 10%)
@@ -166,50 +172,56 @@ class CalibrationEngine:
             min_card_area = (w_img * h_img) * 0.005  # At least 0.5% of total frame
             max_card_area = (w_img * h_img) * 0.35   # At most 35% of total frame (distinguishes reference card from packaging)
 
-            for cnt in contours:
-                peri = cv2.arcLength(cnt, True)
-                approx = cv2.approxPolyDP(cnt, 0.025 * peri, True)
-                if len(approx) == 4 and cv2.isContourConvex(approx):
-                    area = cv2.contourArea(approx)
-                    if min_card_area < area < max_card_area:
-                        ordered = cls.order_corners(approx)
+            for edges in edge_passes:
+                edges_closed = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel)
+                contours, _ = cv2.findContours(edges_closed, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
-                        # Orthogonality check: interior angles must be approximately 90 deg (|cos| <= 0.35)
-                        orthogonal = True
-                        for i in range(4):
-                            v1 = ordered[(i - 1) % 4] - ordered[i]
-                            v2 = ordered[(i + 1) % 4] - ordered[i]
-                            n1, n2 = np.linalg.norm(v1), np.linalg.norm(v2)
-                            if n1 > 0 and n2 > 0:
-                                if abs(float(np.dot(v1, v2) / (n1 * n2))) > 0.35:
-                                    orthogonal = False
-                                    break
-                        if not orthogonal:
-                            continue
+                for cnt in contours:
+                    peri = cv2.arcLength(cnt, True)
+                    approx = cv2.approxPolyDP(cnt, 0.025 * peri, True)
+                    if len(approx) == 4 and cv2.isContourConvex(approx):
+                        area = cv2.contourArea(approx)
+                        if min_card_area < area < max_card_area:
+                            ordered = cls.order_corners(approx)
 
-                        w1 = np.linalg.norm(ordered[0] - ordered[1])
-                        w2 = np.linalg.norm(ordered[2] - ordered[3])
-                        h1 = np.linalg.norm(ordered[1] - ordered[2])
-                        h2 = np.linalg.norm(ordered[3] - ordered[0])
+                            # Orthogonality check: interior angles must be approximately 90 deg (|cos| <= 0.35)
+                            orthogonal = True
+                            for i in range(4):
+                                v1 = ordered[(i - 1) % 4] - ordered[i]
+                                v2 = ordered[(i + 1) % 4] - ordered[i]
+                                n1, n2 = np.linalg.norm(v1), np.linalg.norm(v2)
+                                if n1 > 0 and n2 > 0:
+                                    if abs(float(np.dot(v1, v2) / (n1 * n2))) > 0.35:
+                                        orthogonal = False
+                                        break
+                            if not orthogonal:
+                                continue
 
-                        avg_w = (w1 + w2) / 2.0
-                        avg_h = (h1 + h2) / 2.0
-                        if avg_h <= 1.0 or avg_w <= 1.0:
-                            continue
+                            w1 = np.linalg.norm(ordered[0] - ordered[1])
+                            w2 = np.linalg.norm(ordered[2] - ordered[3])
+                            h1 = np.linalg.norm(ordered[1] - ordered[2])
+                            h2 = np.linalg.norm(ordered[3] - ordered[0])
 
-                        long_side = max(avg_w, avg_h)
-                        short_side = min(avg_w, avg_h)
-                        aspect = long_side / short_side
+                            avg_w = (w1 + w2) / 2.0
+                            avg_h = (h1 + h2) / 2.0
+                            if avg_h <= 1.0 or avg_w <= 1.0:
+                                continue
 
-                        aspect_diff = abs(aspect - target_aspect)
-                        if aspect_diff < min_aspect_diff:
-                            min_aspect_diff = aspect_diff
-                            best_candidate = {
-                                "corners": ordered,
-                                "long_side_px": long_side,
-                                "short_side_px": short_side,
-                                "aspect_diff": aspect_diff,
-                            }
+                            long_side = max(avg_w, avg_h)
+                            short_side = min(avg_w, avg_h)
+                            aspect = long_side / short_side
+
+                            aspect_diff = abs(aspect - target_aspect)
+                            if aspect_diff < min_aspect_diff:
+                                min_aspect_diff = aspect_diff
+                                best_candidate = {
+                                    "corners": ordered,
+                                    "long_side_px": long_side,
+                                    "short_side_px": short_side,
+                                    "aspect_diff": aspect_diff,
+                                }
+                if best_candidate is not None and best_candidate["aspect_diff"] < 0.05:
+                    break
 
             if best_candidate is None:
                 return None
@@ -300,19 +312,29 @@ class CalibrationEngine:
         else:
             gray = image
 
-        # Find packaging boundary via morphological edge closure
+        # Find packaging boundary via morphological edge closure with background polarity adaptation
+        border_pixels = np.concatenate([gray[0, :], gray[-1, :], gray[:, 0], gray[:, -1]])
+        bg_is_dark = float(np.median(border_pixels)) < 127.0
+
         blur = cv2.GaussianBlur(gray, (5, 5), 0)
-        _, thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+        thresh_type = cv2.THRESH_BINARY if bg_is_dark else cv2.THRESH_BINARY_INV
+        _, thresh = cv2.threshold(blur, 0, 255, thresh_type + cv2.THRESH_OTSU)
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7))
         closed = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
         contours, _ = cv2.findContours(closed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
         box_ymin, box_xmin, box_ymax, box_xmax = 0, 0, h_px, w_px
-        if contours:
-            largest = max(contours, key=cv2.contourArea)
-            if cv2.contourArea(largest) > (w_px * h_px * 0.10):
-                x, y, w, h = cv2.boundingRect(largest)
-                box_xmin, box_ymin, box_xmax, box_ymax = x, y, x + w, y + h
+        valid_contours = []
+        for cnt in contours:
+            cnt_area = cv2.contourArea(cnt)
+            # Must be at least 5% of frame and not the full frame canvas (> 98%)
+            if (w_px * h_px * 0.05) < cnt_area < (w_px * h_px * 0.98):
+                valid_contours.append(cnt)
+
+        if valid_contours:
+            largest = max(valid_contours, key=cv2.contourArea)
+            x, y, w, h = cv2.boundingRect(largest)
+            box_xmin, box_ymin, box_xmax, box_ymax = x, y, x + w, y + h
 
         # Physical dimensions in cm: (pixels / px_to_mm) / 10.0
         width_cm = float(((box_xmax - box_xmin) / px_to_mm) / 10.0) if px_to_mm > 0 else 10.0
@@ -463,3 +485,98 @@ class CalibrationEngine:
             principal_display_panel=pdp_dto,
             homography_matrix=h_matrix_list,
         )
+
+    @classmethod
+    def compensate_coplanar_depth(
+        cls,
+        base_px_to_mm: float,
+        camera_distance_mm: float = 400.0,
+        package_elevation_mm: float = 0.0,
+    ) -> Tuple[float, float, float]:
+        """Compensates physical metric scale for non-coplanar packaging elevation (Z > 0).
+
+        Under pinhole perspective projection:
+            M = camera_distance_mm / max(10.0, (camera_distance_mm - package_elevation_mm))
+            corrected_px_to_mm = base_px_to_mm * M
+
+        Returns:
+            Tuple[float, float, float]:
+                - corrected_px_to_mm: Metric scale on elevated packaging face.
+                - magnification_factor: Perspective magnification ratio (M >= 1.0).
+                - depth_uncertainty_mm: Standard uncertainty induced by depth tolerance.
+        """
+        if base_px_to_mm <= 0.0:
+            raise ValueError("base_px_to_mm must be positive")
+        effective_depth = max(10.0, float(camera_distance_mm - package_elevation_mm))
+        magnification = float(camera_distance_mm / effective_depth)
+        corrected_scale = float(base_px_to_mm * magnification)
+        depth_uncertainty_mm = float((camera_distance_mm / (effective_depth ** 2)) * 2.0)
+        return corrected_scale, round(magnification, 4), round(depth_uncertainty_mm, 4)
+
+    @classmethod
+    def rectify_cylindrical_surface(
+        cls,
+        image: np.ndarray,
+        cylinder_bbox: Tuple[int, int, int, int],
+        angular_span_deg: float = 120.0,
+    ) -> np.ndarray:
+        """Unrolls a cylindrical surface to remove tangential cosine foreshortening.
+
+        Maps cylindrical projection x(theta) = x_0 + R * sin(theta) back to flat
+        arc-length coordinates u = R * theta, expanding compressed side characters.
+
+        Args:
+            image: Input image (grayscale or BGR).
+            cylinder_bbox: [ymin, xmin, ymax, xmax] of the cylinder ROI.
+            angular_span_deg: Angular field of cylinder to unroll (default: 120 deg).
+
+        Returns:
+            np.ndarray: Orthographically unrolled rectangular planar representation.
+        """
+        ymin, xmin, ymax, xmax = cylinder_bbox
+        h_roi = ymax - ymin
+        w_roi = xmax - xmin
+        if h_roi <= 0 or w_roi <= 0:
+            return image
+
+        r_px = w_roi / 2.0
+        x_center = xmin + r_px
+        max_theta = np.radians(min(85.0, angular_span_deg / 2.0))
+
+        unrolled_w = max(10, int(round(2.0 * r_px * max_theta)))
+        u = np.linspace(-max_theta, max_theta, unrolled_w, dtype=np.float32)
+        map_x = (x_center + r_px * np.sin(u)).astype(np.float32)
+        map_y = np.arange(ymin, ymax, dtype=np.float32)
+
+        map_x_grid, map_y_grid = np.meshgrid(map_x, map_y)
+        unrolled = cv2.remap(image, map_x_grid, map_y_grid, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE)
+        return unrolled
+
+    @classmethod
+    def calculate_expanded_uncertainty(
+        cls,
+        px_to_mm: float,
+        font_height_mm: float = 2.5,
+        corner_jitter_px: float = 0.75,
+        residual_tilt_deg: float = 4.0,
+        coverage_factor: float = 2.0,
+    ) -> float:
+        """Calculates expanded measurement uncertainty U_95 (k=2, 95% confidence) per ISO 17025 / GUM.
+
+        Integrates:
+            - u_seg: Pixel quantization / stroke boundary uncertainty (0.75 px / px_to_mm)
+            - u_scale: Fiducial scale propagation uncertainty
+            - u_tilt: Foreshortening residual under tilt
+
+        Returns:
+            float: Expanded uncertainty in millimeters (U_95).
+        """
+        if px_to_mm <= 0.0:
+            return 0.30
+        u_seg = float(corner_jitter_px / px_to_mm)
+        u_scale = float((corner_jitter_px / (50.0 * px_to_mm)) * font_height_mm)
+        rad_tilt = np.radians(abs(residual_tilt_deg))
+        u_tilt = float(font_height_mm * (1.0 - np.cos(rad_tilt)))
+        u_combined = float(np.sqrt(u_seg ** 2 + u_scale ** 2 + u_tilt ** 2))
+        return round(float(coverage_factor * u_combined), 4)
+
