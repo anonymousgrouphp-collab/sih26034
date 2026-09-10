@@ -14,23 +14,29 @@
   }
 }
 
-/* Custom scrollbars for high-density ledgers */
+/* Sleek custom scrollbars for high-density ledgers */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #F1F5F9;
+  background: #eef1f4;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
-  border-radius: 3px;
+  background: #b7c0ca;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: #8995a2;
+}
+
+@layer components {
+  .section-eyebrow {
+    @apply text-xs font-semibold uppercase tracking-wider text-slate-500;
+  }
 }
 
 /* Print-Friendly Layout Styles for Inspection Report View */

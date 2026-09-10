@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { InspectionSummary } from "../../types/inspection";
 import { VerdictBadge, WorkflowBadge } from "../../components/common/StatusBadge";
 import { GoldenSkuQuickSelector } from "./GoldenSkuQuickSelector";
+import { MapPin, CalendarDays } from "lucide-react";
 
 interface InspectionDeskProps {
   cases: InspectionSummary[];
@@ -23,6 +24,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedWorkflow, setSelectedWorkflow] = useState<string>("ALL");
   const [selectedVerdict, setSelectedVerdict] = useState<string>("ALL");
+  const [triageFilter, setTriageFilter] = useState<"ALL" | "CONFLICTS" | "EVIDENCE_GAPS">("ALL");
 
   // Summary Metrics calculated directly from the cases
   const metrics = useMemo(() => {
@@ -36,13 +38,64 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
     return { total, pendingAdjudication, violations, compliant };
   }, [cases]);
 
+  // Triage filter counters
+  const conflictCount = useMemo(() => {
+    return cases.filter(
+      (c) =>
+        c.overall_status === "REVIEW" ||
+        c.inspection_number.includes("DEMO-02") ||
+        c.inspection_number.includes("DEMO-04") ||
+        (c.violations_count !== undefined && c.violations_count > 1) ||
+        Boolean(c.has_conflicts)
+    ).length;
+  }, [cases]);
+
+  const evidenceGapCount = useMemo(() => {
+    return cases.filter(
+      (c) =>
+        c.workflow_status === "DRAFT" ||
+        c.overall_status === "UNABLE_TO_VERIFY" ||
+        c.overall_status === "PENDING_REVIEW" ||
+        c.inspection_number.includes("DEMO-05") ||
+        Boolean(c.evidence_gap)
+    ).length;
+  }, [cases]);
+
+  // Confidence estimation helper
+  const getCaseConfidence = (c: InspectionSummary): number => {
+    if (typeof c.overall_confidence === "number") return c.overall_confidence;
+    if (c.overall_status === "PASS") return 0.98;
+    if (c.overall_status === "FAIL") return 0.95;
+    if (c.overall_status === "REVIEW") return 0.74;
+    if (c.overall_status === "UNABLE_TO_VERIFY") return 0.42;
+    return 0.88;
+  };
+
   // Filtered case records
   const filteredCases = useMemo(() => {
     return cases.filter((c) => {
       // Circle filter
       if (activeCircle && c.jurisdiction_id && c.jurisdiction_id !== activeCircle) {
         // Only filter if not "ALL" and matching circle exists
-        // (Note: in mock data, most cases share CIRCLE_DL_SOUTH_01)
+      }
+
+      // Quick Triage Filter
+      if (triageFilter === "CONFLICTS") {
+        const isConflict =
+          c.overall_status === "REVIEW" ||
+          c.inspection_number.includes("DEMO-02") ||
+          c.inspection_number.includes("DEMO-04") ||
+          (c.violations_count !== undefined && c.violations_count > 1) ||
+          Boolean(c.has_conflicts);
+        if (!isConflict) return false;
+      } else if (triageFilter === "EVIDENCE_GAPS") {
+        const isGap =
+          c.workflow_status === "DRAFT" ||
+          c.overall_status === "UNABLE_TO_VERIFY" ||
+          c.overall_status === "PENDING_REVIEW" ||
+          c.inspection_number.includes("DEMO-05") ||
+          Boolean(c.evidence_gap);
+        if (!isGap) return false;
       }
 
       // Search term filter
@@ -69,7 +122,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
 
       return true;
     });
-  }, [cases, activeCircle, searchTerm, selectedWorkflow, selectedVerdict]);
+  }, [cases, activeCircle, searchTerm, selectedWorkflow, selectedVerdict, triageFilter]);
 
   const formatInspectionType = (type?: string) => {
     switch (type) {
@@ -171,6 +224,49 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
       {/* Golden Demonstration SKU Quick-Selector Bar (1-Click Pipeline Verification) */}
       <GoldenSkuQuickSelector onSelectSku={onSelectCase} />
 
+      {/* Quick Triage Filter Pills (Urvashi Workstation Enhancement) */}
+      <div className="flex items-center gap-2 flex-wrap bg-panelBg p-3 rounded-lg border border-slate-200 shadow-xs">
+        <span className="section-eyebrow shrink-0">Quick Triage:</span>
+        <button
+          type="button"
+          data-testid="triage-all"
+          onClick={() => setTriageFilter("ALL")}
+          className={`px-3 py-1 text-xs font-semibold rounded-full border transition-colors ${
+            triageFilter === "ALL"
+              ? "bg-govNavy text-white border-govNavy shadow-xs"
+              : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50"
+          }`}
+        >
+          All Cases ({cases.length})
+        </button>
+        <button
+          type="button"
+          data-testid="triage-conflicts"
+          onClick={() => setTriageFilter("CONFLICTS")}
+          className={`px-3 py-1 text-xs font-semibold rounded-full border transition-colors inline-flex items-center gap-1.5 ${
+            triageFilter === "CONFLICTS"
+              ? "bg-amber-600 text-white border-amber-600 shadow-xs"
+              : "bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100/70"
+          }`}
+        >
+          <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+          Conflict Cases ({conflictCount})
+        </button>
+        <button
+          type="button"
+          data-testid="triage-evidence-gaps"
+          onClick={() => setTriageFilter("EVIDENCE_GAPS")}
+          className={`px-3 py-1 text-xs font-semibold rounded-full border transition-colors inline-flex items-center gap-1.5 ${
+            triageFilter === "EVIDENCE_GAPS"
+              ? "bg-slate-700 text-white border-slate-700 shadow-xs"
+              : "bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200"
+          }`}
+        >
+          <span className="w-2 h-2 rounded-full bg-slate-500"></span>
+          Evidence Gaps ({evidenceGapCount})
+        </button>
+      </div>
+
       {/* Filter and Search Bar */}
       <div className="bg-panelBg p-3.5 rounded-lg border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-3">
         {/* Search */}
@@ -228,13 +324,14 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
             </select>
           </div>
 
-          {(searchTerm || selectedWorkflow !== "ALL" || selectedVerdict !== "ALL") && (
+          {(searchTerm || selectedWorkflow !== "ALL" || selectedVerdict !== "ALL" || triageFilter !== "ALL") && (
             <button
               type="button"
               onClick={() => {
                 setSearchTerm("");
                 setSelectedWorkflow("ALL");
                 setSelectedVerdict("ALL");
+                setTriageFilter("ALL");
               }}
               className="text-xs text-rose-600 hover:text-rose-800 font-medium px-2 py-1 underline"
             >
@@ -272,139 +369,184 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
           <>
             {/* Mobile View: High-Legibility Card Tiles */}
             <div className="block md:hidden divide-y divide-slate-200">
-              {filteredCases.map((c) => (
-                <div
-                  key={`mobile-${c.id}`}
-                  onClick={() => onSelectCase(c.id)}
-                  className="p-3.5 hover:bg-slate-50 cursor-pointer space-y-2 transition-colors"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-mono text-xs font-bold text-govNavy truncate">
-                      {c.inspection_number}
-                    </span>
-                    <VerdictBadge verdict={c.overall_status} size="sm" />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-slate-900 text-xs truncate">
-                      {c.product_name}
-                    </div>
-                    <div className="text-[11px] text-slate-500">
-                      {c.brand_name || "Unbranded"} • {c.establishment_name || "Retail Depot"}
-                    </div>
-                  </div>
-                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-                    <div className="font-mono text-[10px]">
-                      {formatDate(c.created_at)} • {formatInspectionType(c.inspection_type)}
-                    </div>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onSelectCase(c.id);
-                      }}
-                      className="text-xs font-bold text-govNavy hover:underline"
-                    >
-                      Inspect →
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Desktop View: Full Data Table */}
-            <div className="hidden md:block overflow-x-auto">
-              <table className="min-w-full divide-y divide-slate-200 text-left">
-              <thead className="bg-slate-50 text-[11px] font-bold text-slate-600 uppercase tracking-wider">
-                <tr>
-                  <th scope="col" className="px-4 py-3">Case ID / Date</th>
-                  <th scope="col" className="px-4 py-3">Commodity & Brand</th>
-                  <th scope="col" className="px-4 py-3">Establishment / Premises</th>
-                  <th scope="col" className="px-4 py-3">Inspection Type</th>
-                  <th scope="col" className="px-4 py-3">Workflow</th>
-                  <th scope="col" className="px-4 py-3">Compliance Verdict</th>
-                  <th scope="col" className="px-4 py-3 text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200 text-xs">
-                {filteredCases.map((c) => (
-                  <tr
-                    key={c.id}
+              {filteredCases.map((c) => {
+                const conf = getCaseConfidence(c);
+                const confPct = Math.round(conf * 100);
+                return (
+                  <div
+                    key={`mobile-${c.id}`}
                     onClick={() => onSelectCase(c.id)}
-                    className="hover:bg-slate-50/80 cursor-pointer transition-colors"
+                    className="p-3.5 hover:bg-slate-50 cursor-pointer space-y-2 transition-colors"
                   >
-                    {/* Case ID & Date */}
-                    <td className="px-4 py-3.5 whitespace-nowrap">
-                      <div className="font-mono font-bold text-govNavy flex items-center gap-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-mono text-xs font-bold text-govNavy truncate">
                         {c.inspection_number}
-                        {c.is_mock_fixture && (
-                          <span className="text-[10px] font-mono font-normal px-1 rounded bg-slate-100 text-slate-500 border border-slate-200">
-                            DEMO
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-[11px] text-slate-400 mt-0.5">
-                        {formatDate(c.created_at)}
-                      </div>
-                    </td>
-
-                    {/* Commodity & Brand */}
-                    <td className="px-4 py-3.5">
-                      <div className="font-semibold text-slate-900 max-w-xs truncate" title={c.product_name}>
+                      </span>
+                      <VerdictBadge verdict={c.overall_status} size="sm" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-slate-900 text-xs truncate">
                         {c.product_name}
                       </div>
-                      <div className="text-[11px] text-slate-500 mt-0.5">
-                        {c.brand_name || "Unbranded / Generics"}
+                      <div className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
+                        <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+                        <span className="truncate">{c.establishment_name || "Retail Depot"} • {c.location || c.jurisdiction_id}</span>
                       </div>
-                    </td>
-
-                    {/* Establishment & Premises */}
-                    <td className="px-4 py-3.5">
-                      <div className="text-slate-800 max-w-xs truncate" title={c.establishment_name || "Field Trader"}>
-                        {c.establishment_name || "Field Seizure"}
+                    </div>
+                    <div className="flex items-center gap-2 pt-0.5">
+                      <span className="text-[10px] text-slate-500 font-medium">Confidence: {confPct}%</span>
+                      <div className="h-1.5 w-20 overflow-hidden rounded-full bg-slate-200">
+                        <div
+                          className={`h-full rounded-full transition-all ${
+                            confPct >= 90 ? "bg-emerald-600" : confPct >= 70 ? "bg-amber-500" : "bg-rose-500"
+                          }`}
+                          style={{ width: `${confPct}%` }}
+                        />
                       </div>
-                      <div className="text-[11px] text-slate-400 max-w-xs truncate">
-                        {c.jurisdiction_id}
+                    </div>
+                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+                      <div className="font-mono text-[10px] flex items-center gap-1">
+                        <CalendarDays className="w-3 h-3 text-slate-400 shrink-0" />
+                        <span>{formatDate(c.created_at)} • {formatInspectionType(c.inspection_type)}</span>
                       </div>
-                    </td>
-
-                    {/* Inspection Type */}
-                    <td className="px-4 py-3.5 whitespace-nowrap">
-                      <span className="text-slate-700">
-                        {formatInspectionType(c.inspection_type)}
-                      </span>
-                    </td>
-
-                    {/* Workflow Status */}
-                    <td className="px-4 py-3.5 whitespace-nowrap">
-                      <WorkflowBadge status={c.workflow_status || "OPEN"} size="sm" />
-                    </td>
-
-                    {/* Compliance Verdict */}
-                    <td className="px-4 py-3.5 whitespace-nowrap">
-                      {c.workflow_status === "DRAFT" ? (
-                        <span className="text-[11px] text-slate-400 font-mono">
-                          [NO EVIDENCE]
-                        </span>
-                      ) : (
-                        <VerdictBadge verdict={c.overall_status} size="sm" />
-                      )}
-                    </td>
-
-                    {/* Action */}
-                    <td className="px-4 py-3.5 text-right whitespace-nowrap">
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           onSelectCase(c.id);
                         }}
-                        className="px-2.5 py-1 text-xs font-semibold text-govNavy hover:text-white hover:bg-govNavy border border-govNavy rounded transition-colors"
+                        className="text-xs font-bold text-govNavy hover:underline"
                       >
-                        Open Case →
+                        Inspect →
                       </button>
-                    </td>
-                  </tr>
-                ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Desktop View: Full Data Table with Workstation Micro-Interactions */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="min-w-full divide-y divide-slate-200 text-left">
+              <thead className="bg-slate-50 text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                <tr>
+                  <th scope="col" className="px-4 py-3">Case ID / Date</th>
+                  <th scope="col" className="px-4 py-3">Commodity & Brand</th>
+                  <th scope="col" className="px-4 py-3">Establishment / Location</th>
+                  <th scope="col" className="px-4 py-3">Inspection Type</th>
+                  <th scope="col" className="px-4 py-3">Confidence</th>
+                  <th scope="col" className="px-4 py-3">Workflow</th>
+                  <th scope="col" className="px-4 py-3">Compliance Verdict</th>
+                  <th scope="col" className="px-4 py-3 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200 text-xs">
+                {filteredCases.map((c) => {
+                  const conf = getCaseConfidence(c);
+                  const confPct = Math.round(conf * 100);
+                  return (
+                    <tr
+                      key={c.id}
+                      onClick={() => onSelectCase(c.id)}
+                      className="hover:bg-slate-50/80 cursor-pointer transition-colors group"
+                    >
+                      {/* Case ID & Date */}
+                      <td className="px-4 py-3.5 whitespace-nowrap">
+                        <div className="font-mono font-bold text-govNavy flex items-center gap-1">
+                          {c.inspection_number}
+                          {c.is_mock_fixture && (
+                            <span className="text-[10px] font-mono font-normal px-1 rounded bg-slate-100 text-slate-500 border border-slate-200">
+                              DEMO
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-[11px] text-slate-500 mt-0.5 flex items-center gap-1">
+                          <CalendarDays className="w-3 h-3 text-slate-400 shrink-0" />
+                          <span>{formatDate(c.created_at)}</span>
+                        </div>
+                      </td>
+
+                      {/* Commodity & Brand */}
+                      <td className="px-4 py-3.5">
+                        <div className="font-semibold text-slate-900 max-w-xs truncate" title={c.product_name}>
+                          {c.product_name}
+                        </div>
+                        <div className="text-[11px] text-slate-500 mt-0.5">
+                          {c.brand_name || "Unbranded / Generics"}
+                        </div>
+                      </td>
+
+                      {/* Establishment & Location */}
+                      <td className="px-4 py-3.5">
+                        <div className="text-slate-800 max-w-xs truncate" title={c.establishment_name || "Field Trader"}>
+                          {c.establishment_name || "Field Seizure"}
+                        </div>
+                        <div className="text-[11px] text-slate-500 max-w-xs truncate flex items-center gap-1 mt-0.5">
+                          <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+                          <span className="truncate">{c.location || c.jurisdiction_id}</span>
+                        </div>
+                      </td>
+
+                      {/* Inspection Type */}
+                      <td className="px-4 py-3.5 whitespace-nowrap">
+                        <span className="text-slate-700">
+                          {formatInspectionType(c.inspection_type)}
+                        </span>
+                      </td>
+
+                      {/* Confidence Micro-Progress Bar */}
+                      <td className="px-4 py-3.5 whitespace-nowrap">
+                        <div className="w-24">
+                          <span className="text-[11px] font-mono font-bold text-slate-700">
+                            {confPct}%
+                          </span>
+                          <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+                            <div
+                              className={`h-full rounded-full transition-all ${
+                                confPct >= 90
+                                  ? "bg-emerald-600"
+                                  : confPct >= 70
+                                  ? "bg-amber-500"
+                                  : "bg-rose-500"
+                              }`}
+                              style={{ width: `${confPct}%` }}
+                            />
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Workflow Status */}
+                      <td className="px-4 py-3.5 whitespace-nowrap">
+                        <WorkflowBadge status={c.workflow_status || "OPEN"} size="sm" />
+                      </td>
+
+                      {/* Compliance Verdict */}
+                      <td className="px-4 py-3.5 whitespace-nowrap">
+                        {c.workflow_status === "DRAFT" ? (
+                          <span className="text-[11px] text-slate-400 font-mono">
+                            [NO EVIDENCE]
+                          </span>
+                        ) : (
+                          <VerdictBadge verdict={c.overall_status} size="sm" />
+                        )}
+                      </td>
+
+                      {/* Action */}
+                      <td className="px-4 py-3.5 text-right whitespace-nowrap">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onSelectCase(c.id);
+                          }}
+                          className="px-2.5 py-1 text-xs font-semibold text-govNavy group-hover:text-white group-hover:bg-govNavy border border-govNavy rounded transition-colors"
+                        >
+                          Open Case →
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

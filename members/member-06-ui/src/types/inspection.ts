@@ -424,6 +424,10 @@ export interface InspectionSummary {
   violations_count?: number;
   adjudicated?: boolean;
   is_mock_fixture?: boolean;
+  location?: string;
+  overall_confidence?: number;
+  has_conflicts?: boolean;
+  evidence_gap?: boolean;
 }
 
 export interface CreateInspectionPayload {
