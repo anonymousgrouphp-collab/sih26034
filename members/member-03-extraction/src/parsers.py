@@ -15,6 +15,29 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 # Devanagari numeral conversion mapping (०-९ -> 0-9)
 DEVANAGARI_DIGITS_MAP = str.maketrans("०१२३४५६७८९", "0123456789")
 
+# Unicode Homoglyph Normalization Map (Cyrillic, Greek lookalikes, dashes, quotes -> ASCII)
+HOMOGLYPH_MAP = str.maketrans({
+    # Cyrillic lookalikes to Latin
+    "\u0430": "a", "\u0441": "c", "\u0435": "e", "\u0456": "i", "\u0458": "j",
+    "\u043e": "o", "\u0440": "p", "\u0443": "y", "\u0445": "x", "\u0455": "s",
+    "\u043c": "m", "\u043b": "l",
+    "\u0410": "A", "\u0412": "B", "\u0421": "C", "\u0415": "E", "\u041d": "H",
+    "\u0406": "I", "\u0408": "J", "\u041a": "K", "\u041c": "M", "\u041b": "L",
+    "\u041e": "O", "\u0420": "P", "\u0422": "T", "\u0425": "X", "\u04ae": "Y",
+    # Greek lookalikes to Latin
+    "\u03b1": "a", "\u03b2": "b", "\u03b5": "e", "\u03b9": "i", "\u03ba": "k",
+    "\u03bd": "v", "\u03bf": "o", "\u03c1": "p", "\u03c4": "t", "\u03c5": "u", "\u03c7": "x",
+    "\u0391": "A", "\u0392": "B", "\u0395": "E", "\u0397": "H", "\u0399": "I",
+    "\u039a": "K", "\u039c": "M", "\u039d": "N", "\u039f": "O", "\u03a1": "P",
+    "\u03a4": "T", "\u03a7": "X", "\u03a5": "Y", "\u0396": "Z",
+    # Hyphens, dashes, and minus
+    "\u2010": "-", "\u2011": "-", "\u2012": "-", "\u2013": "-", "\u2014": "-", "\u2015": "-", "\u2212": "-",
+    # Quotes
+    "\u2018": "'", "\u2019": "'", "\u201a": "'", "\u201b": "'",
+    "\u201c": '"', "\u201d": '"', "\u201e": '"', "\u201f": '"',
+})
+
+
 # Prohibited units: Strictly capitalized 'ML' or 'Ml' or 'M.L.' (whereas lowercase 'ml' or standard 'mL' is valid)
 # Under Section 11 & Rule 12, capitalized 'ML' represents Mega-Litre (1,000,000 litres), an illegal declaration.
 # Detects ML, Ml, M.L., M.L, M.l., M.l without trailing character bounds.
@@ -262,6 +285,8 @@ class StatutoryDeclarationParser:
             .replace("\u202f", " ")
         )
         converted = cleaned.translate(DEVANAGARI_DIGITS_MAP)
+        # Normalize Unicode homoglyphs (Cyrillic, Greek lookalikes, typographic dashes, quotes)
+        converted = converted.translate(HOMOGLYPH_MAP)
         # Normalize mixed fractions (e.g. '1 ½', '1 1/2', '2 ¼', '2 1/4', '3 ¾', '3 3/4')
         converted = re.sub(r"(?<=\d)\s+(?:1/2|½)", ".5", converted)
         converted = re.sub(r"(?<=\d)\s+(?:1/4|¼)", ".25", converted)
@@ -269,6 +294,7 @@ class StatutoryDeclarationParser:
         # Normalize standalone Unicode vulgar fractions
         converted = converted.replace("½", "0.5").replace("¼", "0.25").replace("¾", "0.75")
         return converted
+
 
 
     @classmethod
@@ -289,8 +315,10 @@ class StatutoryDeclarationParser:
         if not text:
             return False, None
 
+        norm_text = cls.convert_indic_digits(text)
+
         # Mask email addresses and web URLs to avoid false positives on domains (e.g. care@ml.com, www.ml.com, nestle.com/ML)
-        masked_text = re.sub(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b", " ", text)
+        masked_text = re.sub(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b", " ", norm_text)
         masked_text = re.sub(
             r"(?:https?://\S+|www\.[A-Za-z0-9.-]+\.[A-Za-z]{2,}\S*|\b[A-Za-z0-9.-]+\.(?:com|org|net|in|co\.in|gov|io|edu)(?:/[^\s]*)?)",
             " ",
@@ -432,8 +460,8 @@ class StatutoryDeclarationParser:
             except (ValueError, IndexError):
                 pass
 
-        # Regex for magnitude supporting standard floats, comma numbers (with spaces), leading dots, and simple fractions
-        mag_pattern = r"(-?)(?:([0-9]+)\s*/\s*([0-9]+)|([0-9]+(?:,\s*[0-9]+)*(?:\.[0-9]+)?|\.[0-9]+))"
+        # Regex for magnitude supporting standard floats, comma numbers, optical OCR typos (I/l->1, O->0), leading dots, and simple fractions
+        mag_pattern = r"(-?)(?:([0-9IlO]+)\s*/\s*([0-9IlO]+)|([0-9IlO]+(?:,\s*[0-9IlO]+)*(?:\.[0-9IlO]+)?|\.[0-9IlO]+))"
         unit_pattern = r"([a-zA-Z²³\.\u0900-\u097F]+(?:\s+[a-zA-Z²³\.\u0900-\u097F]+)?|\b[NU]\b)"
 
         # 1. Match with explicit quantity prefix (highest priority)
@@ -472,11 +500,13 @@ class StatutoryDeclarationParser:
 
         if frac_num and frac_den:
             try:
-                magnitude = float(frac_num) / float(frac_den)
+                f_num = frac_num.translate(str.maketrans("OoIl", "0011"))
+                f_den = frac_den.translate(str.maketrans("OoIl", "0011"))
+                magnitude = float(f_num) / float(f_den)
             except (ValueError, ZeroDivisionError):
                 return None
         elif decimal_raw:
-            clean_num_str = decimal_raw.replace(",", "").replace(" ", "")
+            clean_num_str = decimal_raw.translate(str.maketrans("OoIl", "0011")).replace(",", "").replace(" ", "")
             try:
                 magnitude = float(clean_num_str)
             except ValueError:
@@ -486,6 +516,7 @@ class StatutoryDeclarationParser:
 
         if frac_sign == "-":
             magnitude = -magnitude
+
 
         if magnitude <= 0:
             return None
@@ -585,8 +616,29 @@ class StatutoryDeclarationParser:
             r"including\s*(?:of)?\s*all\s*(?:taxes?|gst)|"
             r"कर\s*सहित|सभी\s*कर(?:ों)?\s*सहित)"
         )
-        curr = r"(?:Rs?\.?|R\s*s\.?|Re\.?|INR|₹|रु\.?|रू\.?|रुपये|रुपए)"
-        amount_re = r"([0-9]+(?:,\s*[0-9]+)*(?:\s*\.\s*[0-9]{1,2})?)"
+        curr = r"(?:(?<![a-zA-Z])(?:Rs\.?|R\s*s\.?|R[58]\.?|Ps\.?|Re\.?|INR|₹|रु\.?|रू\.?|रुपये|रुपए))"
+        amount_re = r"((?=[0-9Ool]*[0-9])[0-9Ool]+(?:,\s*[0-9Ool]+)*(?:\s*\.\s*[0-9Ool]{1,2})?)"
+        unit_den_re = r"\s*(?:/|per|प्रति)\s*(?:[0-9]+\s*)?(?:g(?:m|ms)?|kg(?:m|ms)?|m?l|ltrs?|units?|pcs?|nos?|items?|packs?|सेंटीमीटर|सेमी|मीटर|ग्राम|ग्रा|किग्रा|कि\.ग्रा|मिलीलीटर|मिली|मि\.ली|लीटर|ली|नग|इकाई|N)\b"
+
+        # Priority 0: Struck-through crossed price (common in e-commerce: ~~₹199~~ ₹99 or <s>199</s> 99)
+        # Under Rule 6(1)(e), the original struck-through amount is the statutory MRP, not the discounted deal price
+        struck_re = re.compile(
+            rf"(?:~~|<s>|<del>|<strike>)\s*(?:M\.?R\.?P\.?\s*[:\-]?\s*)?(?:{curr})?\s*[:\-]?\s*{amount_re}\s*(?:~~|</s>|</del>|</strike>)",
+            re.IGNORECASE
+        )
+        m_struck = struck_re.search(norm_text)
+        if m_struck:
+            amount_str = m_struck.group(1).translate(str.maketrans("OoIl", "0011")).replace(",", "").replace(" ", "")
+            try:
+                amount = float(amount_str)
+                if amount > 0:
+                    return {
+                        "amount": amount,
+                        "currency": "INR",
+                        "tax_inclusive": tax_inclusive,
+                    }
+            except ValueError:
+                pass
 
         # Pattern 1: Explicit MRP prefix, with optional intervening tax clause or currency
         p1 = re.compile(
@@ -594,12 +646,17 @@ class StatutoryDeclarationParser:
             re.IGNORECASE
         )
         match = p1.search(norm_text)
+        if match:
+            # Reject if the matched MRP amount is immediately followed by a per-unit denominator (e.g. MRP: Rs. 0.50/g or Rs. 25/100g)
+            after_amount = norm_text[match.end():min(len(norm_text), match.end() + 20)]
+            if re.match(unit_den_re, after_amount, re.IGNORECASE):
+                match = None
 
         # Pattern 2: Standalone currency symbol followed by amount (ONLY if NOT part of a USP declaration or discount)
         if not match:
             # Reject if string is explicitly marked as USP or contains unit denominator (/g, /ml, per unit)
-            is_usp = bool(re.search(r"(?:USP|Unit\s*Sale\s*Price|/(?:\s*[a-zA-Z²³\.]+)|\bper\b)", norm_text, re.IGNORECASE))
-            is_discount = bool(re.search(r"\b(?:save|discount|off|cashback)\b", norm_text, re.IGNORECASE))
+            is_usp = bool(re.search(rf"(?:USP|Unit\s*Sale\s*Price|{unit_den_re})", norm_text, re.IGNORECASE))
+            is_discount = bool(re.search(r"\b(?:save|discount|off|cashback|deal\s*price|selling\s*price|offer\s*price|special\s*price|our\s*price|now)\b", norm_text, re.IGNORECASE))
 
             if not is_usp and not is_discount:
                 p2 = re.compile(
@@ -607,17 +664,22 @@ class StatutoryDeclarationParser:
                     re.IGNORECASE
                 )
                 match = p2.search(norm_text)
+                if match:
+                    after_amount = norm_text[match.end():min(len(norm_text), match.end() + 20)]
+                    if re.match(unit_den_re, after_amount, re.IGNORECASE):
+                        match = None
 
         if not match:
             return None
 
-        amount_str = match.group(1).replace(",", "").replace(" ", "")
+        amount_str = match.group(1).translate(str.maketrans("OoIl", "0011")).replace(",", "").replace(" ", "")
         try:
             amount = float(amount_str)
             if amount <= 0:
                 return None
         except ValueError:
             return None
+
 
         return {
             "amount": amount,
@@ -750,9 +812,9 @@ class StatutoryDeclarationParser:
         )
 
         def extract_date_from_text(prefix_re: str, target_text: str) -> Tuple[Optional[int], Optional[int]]:
-            # Sub-pattern A: Named/Alpha month (e.g. '15-Mar-2024', 'Mar 2024', 'March 2024')
+            # Sub-pattern A: Named/Alpha month (e.g. '15-Mar-2024', 'Mar 2024', 'March 2024', 'Mar 2O26')
             alpha_re = re.compile(
-                rf"{prefix_re}\s*[:\-]?\s*(?:(\d{{1,2}})\s*[\/\-\.\s]\s*)?([a-zA-Z\u0900-\u097F]+)\s*[\/\-\.\s,]?\s*(\d{{2,4}})",
+                rf"{prefix_re}\s*[:\-]?\s*(?:(\d{{1,2}})\s*[\/\-\.\s]\s*)?([a-zA-Z\u0900-\u097F]+)\s*[\/\-\.\s,]?\s*([0-9OolI]{{2,4}})",
                 re.IGNORECASE
             )
             m_alpha = alpha_re.search(target_text)
@@ -760,47 +822,59 @@ class StatutoryDeclarationParser:
                 _, m_name, yr_str = m_alpha.groups()
                 m_clean = m_name.lower()[:3] if m_name.isascii() else m_name
                 month = MONTH_NAMES.get(m_clean) or MONTH_NAMES.get(m_name.lower())
-                yr = int(yr_str)
-                year = yr + (2000 if yr < 100 else 0)
-                if month and 2000 <= year <= 2035:
-                    return month, year
+                yr_clean = yr_str.translate(str.maketrans("OoIl", "0011"))
+                if yr_clean.isdigit():
+                    yr = int(yr_clean)
+                    year = yr + (2000 if yr < 100 else 0)
+                    if month and 2000 <= year <= 2035:
+                        return month, year
 
-            # Sub-pattern B: ISO numeric date (e.g. '2024-04', '2024/04', '2024-04-15')
+            # Sub-pattern B: ISO numeric date (e.g. '2024-04', '2024/04', '2024-04-15', '2O24-04')
             iso_re = re.compile(
-                rf"{prefix_re}\s*[:\-]?\s*(20[2-3][0-9])\s*[\/\-\.]\s*(0[1-9]|1[0-2])(?:\s*[\/\-\.]\s*(?:[0-3]?[0-9]))?(?!\d)",
+                rf"{prefix_re}\s*[:\-]?\s*(2[0O][2-3][0-9OolI])\s*[\/\-\.]\s*(0[1-9]|1[0-2])(?:\s*[\/\-\.]\s*(?:[0-3]?[0-9]))?(?!\d)",
                 re.IGNORECASE
             )
             m_iso = iso_re.search(target_text)
             if m_iso:
-                year = int(m_iso.group(1))
-                month = int(m_iso.group(2))
-                return month, year
+                year_clean = m_iso.group(1).translate(str.maketrans("OoIl", "0011"))
+                if year_clean.isdigit():
+                    year = int(year_clean)
+                    month = int(m_iso.group(2))
+                    return month, year
 
-            # Sub-pattern C: Standard numeric date (e.g. '15/04/2024', '04/2024', '04 / 2024', '04-24')
+            # Sub-pattern C: Standard numeric date (e.g. '15/04/2024', '04/2024', '04 / 2024', '04-24', '04/2O26')
             num_re = re.compile(
-                rf"{prefix_re}\s*[:\-]?\s*(?:(\d{{1,2}})\s*[\/\-\.\s]\s*)?(\d{{1,2}})\s*[\/\-\.\s]\s*(\d{{2,4}})",
+                rf"{prefix_re}\s*[:\-]?\s*(?:([0-9OolI]{{1,2}})\s*[\/\-\.\s]\s*)?([0-9OolI]{{1,2}})\s*[\/\-\.\s]\s*([0-9OolI]{{2,4}})",
                 re.IGNORECASE
             )
             m_num = num_re.search(target_text)
             if m_num:
                 d1, d2, yr_str = m_num.groups()
-                yr = int(yr_str)
-                year = yr + (2000 if yr < 100 else 0)
-                if d1 is not None:
-                    val1, val2 = int(d1), int(d2)
-                    # Disambiguate DD/MM/YYYY vs MM/DD/YYYY
-                    if val2 > 12 and 1 <= val1 <= 12:
-                        month = val1  # MM/DD/YYYY
-                    elif 1 <= val2 <= 12:
-                        month = val2  # DD/MM/YYYY
-                    else:
-                        month = None
-                else:
-                    val2 = int(d2)
-                    month = val2 if 1 <= val2 <= 12 else None
+                yr_clean = yr_str.translate(str.maketrans("OoIl", "0011"))
+                if yr_clean.isdigit():
+                    yr = int(yr_clean)
+                    year = yr + (2000 if yr < 100 else 0)
+                    d2_clean = d2.translate(str.maketrans("OoIl", "0011"))
+                    if d2_clean.isdigit():
+                        if d1 is not None:
+                            d1_clean = d1.translate(str.maketrans("OoIl", "0011"))
+                            if d1_clean.isdigit():
+                                val1, val2 = int(d1_clean), int(d2_clean)
+                                # Disambiguate DD/MM/YYYY vs MM/DD/YYYY
+                                if val2 > 12 and 1 <= val1 <= 12:
+                                    month = val1  # MM/DD/YYYY
+                                elif 1 <= val2 <= 12:
+                                    month = val2  # DD/MM/YYYY
+                                else:
+                                    month = None
+                            else:
+                                month = None
+                        else:
+                            val2 = int(d2_clean)
+                            month = val2 if 1 <= val2 <= 12 else None
 
-                if month and 2000 <= year <= 2035:
-                    return month, year
+                        if month and 2000 <= year <= 2035:
+                            return month, year
 
             return None, None
 
@@ -810,26 +884,30 @@ class StatutoryDeclarationParser:
             result["mfg_month"] = m_mfg
             result["mfg_year"] = y_mfg
         else:
-            # Standalone fallback date check (e.g. '03/2024', '03 / 2024', '04.2024', '2024-04')
-            sa_re = re.compile(r"(?<![0-9])(0[1-9]|1[0-2])\s*[\/\-\.]\s*(20[2-3][0-9]|[2-3][0-9])(?![0-9])")
+            # Standalone fallback date check (e.g. '03/2024', '03 / 2024', '04.2024', '2024-04', '03/2O26')
+            sa_re = re.compile(r"(?<![0-9])(0[1-9]|1[0-2])\s*[\/\-\.]\s*(2[0O][2-3][0-9OolI]|[2-3][0-9])(?![0-9])")
             m_sa = sa_re.search(norm_text)
             if m_sa:
                 month = int(m_sa.group(1))
-                yr = int(m_sa.group(2))
-                year = yr + (2000 if yr < 100 else 0)
-                if 1 <= month <= 12 and 2000 <= year <= 2030:
-                    result["mfg_month"] = month
-                    result["mfg_year"] = year
-            else:
-                # Standalone ISO format: YYYY-MM or YYYY/MM or YYYY.MM (e.g. '2024-04')
-                iso_sa_re = re.compile(r"(?<![0-9])(20[2-3][0-9])\s*[\/\-\.]\s*(0[1-9]|1[0-2])(?![0-9])")
-                m_iso_sa = iso_sa_re.search(norm_text)
-                if m_iso_sa:
-                    year = int(m_iso_sa.group(1))
-                    month = int(m_iso_sa.group(2))
+                yr_clean = m_sa.group(2).translate(str.maketrans("OoIl", "0011"))
+                if yr_clean.isdigit():
+                    yr = int(yr_clean)
+                    year = yr + (2000 if yr < 100 else 0)
                     if 1 <= month <= 12 and 2000 <= year <= 2030:
                         result["mfg_month"] = month
                         result["mfg_year"] = year
+            else:
+                # Standalone ISO format: YYYY-MM or YYYY/MM or YYYY.MM (e.g. '2024-04', '2O24-04')
+                iso_sa_re = re.compile(r"(?<![0-9])(2[0O][2-3][0-9OolI])\s*[\/\-\.]\s*(0[1-9]|1[0-2])(?![0-9])")
+                m_iso_sa = iso_sa_re.search(norm_text)
+                if m_iso_sa:
+                    year_clean = m_iso_sa.group(1).translate(str.maketrans("OoIl", "0011"))
+                    if year_clean.isdigit():
+                        year = int(year_clean)
+                        month = int(m_iso_sa.group(2))
+                        if 1 <= month <= 12 and 2000 <= year <= 2030:
+                            result["mfg_month"] = month
+                            result["mfg_year"] = year
 
         # 3. Extract Expiry Date
         m_exp, y_exp = extract_date_from_text(exp_prefix, norm_text)
@@ -877,17 +955,26 @@ class StatutoryDeclarationParser:
             "units", "unit", "tablets", "capsules", "nos"
         ]
 
-        pin_re = re.compile(r"(?<![a-zA-Z0-9])([1-9][0-9]{2})\s*[\-]?\s*([0-9]{3})(?![a-zA-Z0-9])")
+        pin_re = re.compile(r"(?<![a-zA-Z0-9])([1-9I][0-9OolI]{2})\s*[\-]?\s*([0-9OolI]{3})(?![a-zA-Z0-9])")
         for m in pin_re.finditer(norm_text):
-            cand = m.group(1) + m.group(2)
+            raw_cand = m.group(1) + m.group(2)
+            cand = raw_cand.translate(str.maketrans("OoIl", "0011"))
+            if not (cand.isdigit() and len(cand) == 6 and cand[0] != '0'):
+                continue
+
+            # Require at least 2 genuine digits or postal/address anchor context to prevent purely alphabetic matches
+            genuine_digits = sum(1 for c in raw_cand if c.isdigit())
             start, end = m.span()
 
             prefix_window = norm_text[max(0, start - 35):start]
             suffix_window = norm_text[end:min(len(norm_text), end + 15)].lower().strip()
 
-            # If an explicit address anchor (Regd Office, Address) appears in the prefix window,
+            # If an explicit address anchor (Regd Office, Address, PIN) appears in the prefix window,
             # it resets previous clause context (e.g. 'Lic. under FSSAI Act. Regd Office: Mumbai 400001')
-            addr_anchor = re.search(r"\b(?:regd?\.?\s*off(?:ice)?|address|works|factory|निर्माता)\b", prefix_window, re.IGNORECASE)
+            addr_anchor = re.search(r"\b(?:regd?\.?\s*off(?:ice)?|address|works|factory|निर्माता|pin(?:\s*code)?|postal)\b", prefix_window, re.IGNORECASE)
+            if genuine_digits < 2 and not addr_anchor:
+                continue
+
             effective_prefix = prefix_window[addr_anchor.start():] if addr_anchor else prefix_window
 
             # Disallow matches immediately preceded by telephone, batch, price, or license keywords

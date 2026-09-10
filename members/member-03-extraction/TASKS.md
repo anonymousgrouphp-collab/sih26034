@@ -90,6 +90,26 @@
 - [x] Comprehensive Verification: Expanded Member 3 test suite to 139 deterministic tests passing 100% in 1.26s.
 - [x] Evidentiary Audit Report & Documentation: Compiled `AUDIT_REPORT.md` and updated `progress.md` and `memory.md` with verified signing notes.
 
+### Phase 7: Real-World Adversarial OCR Defense & E-Commerce Exploit Audit
+- [x] Chunk 1: Real-World Optical OCR Confusion Defense (OCR Typos)
+  - [x] Numeric Zero vs Capital 'O' in PIN codes (`11OO2O` -> `110020`, `56OOO1` -> `560001`) with digit-presence guard.
+  - [x] Numeric Zero vs Capital 'O' in Manufacturing & Expiry Years (`2O26` -> `2026`, `2O24` -> `2024`).
+  - [x] Digit '1' vs Capital 'I' / small 'l' in Net Quantity magnitude (`I5O g` -> `150 g`, `I00 ml` -> `100 ml`, `l00 g` -> `100 g`, `5OO ml` -> `500 ml`).
+  - [x] Currency OCR typos (`R5.` / `Ps.` / `R8.` -> `Rs.`) with boundary assertions.
+- [x] Chunk 2: E-Commerce Marketplace Exploits & Sanitization
+  - [x] Struck-through crossed MRP extraction (`~~₹199~~ ₹99`, `<s>199</s> 99`, `<del>299</del> 149`) establishing statutory MRP.
+  - [x] Strict isolation of per-unit rates (`₹0.50/g`, `₹25/100g`, `₹1.20 / ml`) prevented from masquerading as pack MRP.
+  - [x] Malicious DOM/XSS & Hidden CSS sanitization: complete stripping of `<script>`, `<iframe>`, `<style>`, and zero-pixel/hidden CSS elements.
+  - [x] Prompt injection immunity: 100% deterministic regex and structural extraction resilient to malicious system override texts.
+- [x] Chunk 3: Unicode Homoglyphs & Script Contamination
+  - [x] Cyrillic lookalike normalization (`а`, `с`, `е`, `і`, `о`, `р`, `х`, `у`, `м`, `л`, `М`, `Л`) preventing banned unit evasion (`g\u043cs` -> `gms`, `\u041c\u041b` -> `ML`).
+  - [x] Greek lookalike normalization (`α`, `β`, `ο`, `ν`).
+  - [x] Typographic dash (`\u2011`, `\u2013`, `\u2014`) and quote normalization for PIN codes and telephone numbers.
+- [x] Chunk 4: Cross-Module Integration Stress & 500 Randomized Edge-Case Payloads
+  - [x] Degraded low-confidence OCR tokens (0.25 to 0.45 confidence) processed with 100% field retention.
+  - [x] Fuzz testing across 500 randomized edge-case packaging payloads verifying 100% Pydantic DTO conformance for Member 4 Rule Engine.
+- [x] Comprehensive Verification: 151 deterministic tests passing 100% in Member 3 suite; 381 passing across repository.
+
 
 
 

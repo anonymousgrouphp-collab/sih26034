@@ -137,8 +137,14 @@ class CommodityFactExtractor:
             raw_text = ocr_data
             # Strip HTML tags if HTML is detected
             if "<" in raw_text and ">" in raw_text:
-                # Replace line-breaking HTML tags with newlines to preserve statutory reading blocks
-                clean_lines = re.sub(r"(?i)<(?:br|/p|/div|/li|/tr|/h[1-6])[^>]*>", "\n", raw_text)
+                # 1. Strip script, style, iframe, noscript, object, embed tags and their inner content
+                sanitized = re.sub(r"(?is)<(?:script|style|iframe|noscript|object|embed)[^>]*>.*?</(?:script|style|iframe|noscript|object|embed)>", " ", raw_text)
+                # 2. Strip hidden CSS elements that attempt to inject adversarial/misleading text
+                sanitized = re.sub(r'(?is)<[^>]+style=["\'][^"\']*(?:display\s*:\s*none|visibility\s*:\s*hidden|font-size\s*:\s*0|opacity\s*:\s*0)[^"\']*["\'][^>]*>.*?</[^>]+>', " ", sanitized)
+                # 3. Convert struck-through tags (<del>, <s>, <strike>) to markdown ~~...~~ for MRP parsing
+                sanitized = re.sub(r"(?i)<(?:del|s|strike)[^>]*>(.*?)</(?:del|s|strike)>", r" ~~\1~~ ", sanitized)
+                # 4. Replace line-breaking HTML tags with newlines to preserve statutory reading blocks
+                clean_lines = re.sub(r"(?i)<(?:br|/p|/div|/li|/tr|/h[1-6])[^>]*>", "\n", sanitized)
                 clean_lines = re.sub(r"<[^>]+>", " ", clean_lines)
             else:
                 clean_lines = raw_text
