@@ -71,6 +71,7 @@ export const App: React.FC = () => {
             loadCases();
           }}
           officerRole={officerRole}
+          onSelectCase={handleSelectCase}
         />
       );
     }

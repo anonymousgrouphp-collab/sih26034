@@ -599,3 +599,49 @@ Await user instructions before pushing to remote repository.
 ### Signing Note
 SIGNED OFF BY: Parmarth Kumar (parmarthk26@gmail.com) — 2026-09-10 18:25 IST [VERIFIED]
 
+---
+
+## [10 September 2026] [19:05] IST
+
+### Task / Chunk
+Port Standout Features from HTML Test UI to React SPA & Clean Up Redundancy (Strictly Single Enterprise UI).
+
+### Status
+COMPLETE
+
+### Completed
+- **Feature Porting from HTML Test UI to React 18 SPA:**
+  - Evaluated standout UX capabilities of `integration/test_ui/index.html`. Identified the 1-Click Golden Demonstration SKU Quick-Selector Bar as the most valuable asset for rapid hackathon evaluations.
+  - Implemented `GoldenSkuQuickSelector.tsx` in `members/member-06-ui/src/features/desk/` with high-contrast, accessible Government of India design tokens.
+  - Placed Golden SKU Quick-Selector directly above the Inspection Desk filter strip (`InspectionDesk.tsx`), enabling evaluators/officers to execute any of the 6 Golden SKUs (`SKU-DEMO-01` to `06`) in 1 click with color-coded verdict badges (`FAIL`, `PASS`, `REVIEW`, `UNABLE_TO_VERIFY`), product details, and statutory deficit summaries.
+  - Added in-workspace compact scenario switcher to `CaseHeader.tsx` and `CaseWorkspace.tsx`, allowing users to switch between Golden SKUs without returning to the desk.
+- **Redundancy Cleanup (Single UI Mandate):**
+  - Removed duplicate `members/member-06-ui/standalone/` folder and `members/member-06-ui/public/test-ui.html`.
+  - Cleaned up `"test-ui"` script in `package.json`.
+  - Compiled clean production build in `members/member-06-ui/dist/` (`dist/index.html`, `dist/assets/*`).
+- **Unit Testing & Verification:**
+  - Added dedicated test suite `tests/golden_sku_selector.test.ts` (9 tests covering 6 SKUs, 4 epistemic states, Table-I font, USP, banned units, and ApiService mapping).
+  - Executed `npm test`: **95 passed across 32 suites** in 30.6s (100% green).
+  - Executed `npm run build`: Zero errors, completed in 4.33s.
+  - Verified full Python suite: **425 passed, 1 skipped** in 25.80s.
+  - Zero AGPL-3.0 dependencies, zero prohibited claims.
+
+### Tests
+- `npm test` in `members/member-06-ui`: 95 passed, 0 failed.
+- `npm run build` in `members/member-06-ui`: Clean production bundle in `dist/`.
+- Full repo pytest: 425 passed, 1 skipped in 25.80s.
+
+### Problems
+None. Redundant duplicate files eliminated; full React SPA is now strictly the primary interface.
+
+### Decisions
+1. Embedded the Golden Demonstration SKU Quick-Selector directly into the React Inspection Desk and Case Workspace, combining the rapid demo speed of the test UI with the security, type safety, and offline resilience of the React SPA.
+2. Eliminated duplicate HTML and server files to ensure strictly ONE unified UI across the entire project.
+
+### Next Step
+Await user instructions before pushing to remote repository.
+
+### Signing Note
+SIGNED OFF BY: Parmarth Kumar (parmarthk26@gmail.com) — 2026-09-10 19:05 IST [VERIFIED]
+
+

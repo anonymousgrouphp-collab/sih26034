@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { InspectionSummary } from "../../types/inspection";
 import { VerdictBadge, WorkflowBadge } from "../../components/common/StatusBadge";
+import { GoldenSkuQuickSelector } from "./GoldenSkuQuickSelector";
 
 interface InspectionDeskProps {
   cases: InspectionSummary[];
@@ -164,9 +165,11 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
         <div className="bg-panelBg p-4 rounded-lg border border-slate-200 shadow-sm">
           <div className="text-xs font-medium text-emerald-700 uppercase tracking-wider">Compliant Products</div>
           <div className="text-2xl font-bold text-verdictPass mt-1 font-mono">{metrics.compliant}</div>
-          <div className="text-[11px] text-slate-400 mt-0.5">Verified Standard Labels</div>
         </div>
       </div>
+
+      {/* Golden Demonstration SKU Quick-Selector Bar (1-Click Pipeline Verification) */}
+      <GoldenSkuQuickSelector onSelectSku={onSelectCase} />
 
       {/* Filter and Search Bar */}
       <div className="bg-panelBg p-3.5 rounded-lg border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-3">

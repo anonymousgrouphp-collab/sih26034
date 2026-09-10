@@ -19,6 +19,7 @@ interface CaseWorkspaceProps {
   onBack: () => void;
   onCaseUpdated: (updatedCase: InspectionCase) => void;
   officerRole?: OfficerRole;
+  onSelectCase?: (caseId: string) => void;
 }
 
 export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
@@ -26,6 +27,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
   onBack,
   onCaseUpdated,
   officerRole = "INSPECTOR",
+  onSelectCase,
 }) => {
   const [isSubmittingEvidence, setIsSubmittingEvidence] = useState(false);
   const [isAnalyzingPipeline, setIsAnalyzingPipeline] = useState(false);
@@ -132,6 +134,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
         caseData={caseData}
         onBack={onBack}
         isProcessing={isSubmittingEvidence || isAnalyzingPipeline}
+        onSelectSku={onSelectCase}
       />
 
       {/* Action Error Banner */}

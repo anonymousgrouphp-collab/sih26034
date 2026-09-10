@@ -2,17 +2,20 @@ import React from "react";
 import { InspectionCase } from "../../types/inspection";
 import { VerdictBadge, WorkflowBadge } from "../../components/common/StatusBadge";
 import { ApiService } from "../../services/api";
+import { GoldenSkuQuickSelector } from "../desk/GoldenSkuQuickSelector";
 
 interface CaseHeaderProps {
   caseData: InspectionCase;
   onBack: () => void;
   isProcessing?: boolean;
+  onSelectSku?: (caseId: string) => void;
 }
 
 export const CaseHeader: React.FC<CaseHeaderProps> = ({
   caseData,
   onBack,
   isProcessing = false,
+  onSelectSku,
 }) => {
   const isMock = caseData.is_mock_fixture || ApiService.isMockMode();
 
@@ -55,6 +58,17 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
           )}
         </div>
       </div>
+
+      {/* Quick Demo Scenario Switcher (Compact Bar) */}
+      {onSelectSku && (
+        <div className="pt-0.5 pb-1 border-b border-slate-100">
+          <GoldenSkuQuickSelector
+            onSelectSku={onSelectSku}
+            activeSkuId={caseData.sku_demo_id || caseData.id}
+            isCompact={true}
+          />
+        </div>
+      )}
 
       {/* Details Row: Commodity, Trader, Registration Date */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
