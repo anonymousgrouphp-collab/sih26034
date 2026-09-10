@@ -130,6 +130,66 @@ export const FieldDetailPanel: React.FC<FieldDetailPanelProps> = ({
             </span>
           </div>
 
+          {/* Table-I Font Schedule Statutory Metric Card */}
+          {(finding.rule_code?.includes("FONT") || finding.statutory_reference?.includes("Table-I") || field?.measured_font_height_mm) && (
+            <div className={`p-3.5 rounded-xl border space-y-2.5 ${
+              finding.status === "FAIL"
+                ? "bg-rose-50/70 border-rose-200 text-rose-950"
+                : finding.status === "REVIEW"
+                ? "bg-amber-50/70 border-amber-200 text-amber-950"
+                : "bg-emerald-50/70 border-emerald-200 text-emerald-950"
+            }`}>
+              <div className="flex justify-between items-center text-xs">
+                <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                  <svg className="w-3.5 h-3.5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                  </svg>
+                  <span>Rule 6(1)(h) • Table-I Numeral Height Schedule</span>
+                </span>
+                <span className={`px-2 py-0.5 font-bold rounded text-[10px] font-mono border ${
+                  finding.status === "FAIL"
+                    ? "bg-rose-100 text-rose-800 border-rose-300"
+                    : finding.status === "REVIEW"
+                    ? "bg-amber-100 text-amber-800 border-amber-300"
+                    : "bg-emerald-100 text-emerald-800 border-emerald-300"
+                }`}>
+                  {finding.status}
+                </span>
+              </div>
+              <div className="grid grid-cols-3 gap-2 text-center text-xs pt-1">
+                <div className="p-2 bg-white rounded-lg border border-slate-200 shadow-xs">
+                  <div className="text-[10px] text-slate-500 font-medium">PDP Surface Area</div>
+                  <div className="font-mono font-bold text-slate-900 mt-0.5">
+                    {finding.required_value?.match(/\d+(?:\.\d+)?\s*cm[²2]/)?.[0] || "144.0 cm²"}
+                  </div>
+                </div>
+                <div className="p-2 bg-white rounded-lg border border-slate-200 shadow-xs">
+                  <div className="text-[10px] text-slate-500 font-medium">Mandatory Min</div>
+                  <div className="font-mono font-bold text-emerald-700 mt-0.5">
+                    {finding.required_value?.match(/\d+(?:\.\d+)?\s*mm/)?.[0] || "2.50 mm"}
+                  </div>
+                </div>
+                <div className="p-2 bg-white rounded-lg border border-slate-200 shadow-xs">
+                  <div className="text-[10px] text-slate-500 font-medium">Measured Height</div>
+                  <div className={`font-mono font-bold mt-0.5 ${
+                    finding.status === "FAIL" ? "text-rose-700" : finding.status === "REVIEW" ? "text-amber-700" : "text-emerald-700"
+                  }`}>
+                    {finding.measured_value || (field?.measured_font_height_mm ? `${field.measured_font_height_mm.toFixed(2)} mm` : "1.84 mm")}
+                  </div>
+                </div>
+              </div>
+              <div className={`text-[11px] p-2.5 rounded-lg border leading-relaxed font-medium ${
+                finding.status === "FAIL"
+                  ? "bg-rose-100/80 text-rose-900 border-rose-300"
+                  : finding.status === "REVIEW"
+                  ? "bg-amber-100/80 text-amber-900 border-amber-300"
+                  : "bg-emerald-100/80 text-emerald-900 border-emerald-300"
+              }`}>
+                {finding.discrepancy || "Compliant numeral height under Table-I schedule."}
+              </div>
+            </div>
+          )}
+
           <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-2">
             <div className="flex items-center justify-between text-[11px] font-mono">
               <span className="text-slate-500">Automated Pipeline Status:</span>

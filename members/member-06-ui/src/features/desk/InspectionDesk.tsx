@@ -269,8 +269,51 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
             </button>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-slate-200 text-left">
+          <>
+            {/* Mobile View: High-Legibility Card Tiles */}
+            <div className="block md:hidden divide-y divide-slate-200">
+              {filteredCases.map((c) => (
+                <div
+                  key={`mobile-${c.id}`}
+                  onClick={() => onSelectCase(c.id)}
+                  className="p-3.5 hover:bg-slate-50 cursor-pointer space-y-2 transition-colors"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono text-xs font-bold text-govNavy truncate">
+                      {c.inspection_number}
+                    </span>
+                    <VerdictBadge verdict={c.overall_status} size="sm" />
+                  </div>
+                  <div>
+                    <div className="font-semibold text-slate-900 text-xs truncate">
+                      {c.product_name}
+                    </div>
+                    <div className="text-[11px] text-slate-500">
+                      {c.brand_name || "Unbranded"} • {c.establishment_name || "Retail Depot"}
+                    </div>
+                  </div>
+                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+                    <div className="font-mono text-[10px]">
+                      {formatDate(c.created_at)} • {formatInspectionType(c.inspection_type)}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectCase(c.id);
+                      }}
+                      className="text-xs font-bold text-govNavy hover:underline"
+                    >
+                      Inspect →
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop View: Full Data Table */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="min-w-full divide-y divide-slate-200 text-left">
               <thead className="bg-slate-50 text-[11px] font-bold text-slate-600 uppercase tracking-wider">
                 <tr>
                   <th scope="col" className="px-4 py-3">Case ID / Date</th>
@@ -365,7 +408,8 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
               </tbody>
             </table>
           </div>
-        )}
+        </>
+      )}
       </div>
     </div>
   );

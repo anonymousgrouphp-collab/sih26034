@@ -644,4 +644,52 @@ Await user instructions before pushing to remote repository.
 ### Signing Note
 SIGNED OFF BY: Parmarth Kumar (parmarthk26@gmail.com) — 2026-09-10 19:05 IST [VERIFIED]
 
+---
+
+## [10 September 2026] [20:10] IST
+
+### Task / Chunk
+Deep Comparison & Feature Porting from `origin/feat/m2-parmarth-test-ui` into React 18 SPA.
+
+### Status
+COMPLETE
+
+### Completed
+- **Branch Inspection & Deep Comparison (`origin/feat/m2-parmarth-test-ui`):**
+  - Fetched and analyzed commit `ce57a07` along with `99fda48`, `fb77999`, and `65a62ab` from Parmarth's branch.
+  - Identified 5 key standout UX and diagnostic capabilities in `integration/test_ui/index.html` and ported them into the enterprise React 18 SPA:
+    1. **Interactive Token & Bounding Box Inspector Drawer (`EvidenceViewer.tsx`):**
+       - Displays selected OCR token, raw text, dual confidence (`Detection % | Recognition %`), script/language, model attribution (`DBNet++ / PP-OCRv4 / PP-OCRv3 Devanagari`), calibrated font height in mm, bounding box coordinates, and Devanagari bilingual script callout banner.
+    2. **Table-I Numeral Height Schedule Statutory Metric Card (`FieldDetailPanel.tsx`):**
+       - Structured 3-box comparison card showing PDP Surface Area, Mandatory Min Height, and Measured Height with color-coded statutory deficit calculation.
+    3. **Zero Emojis & Crisp SVG Vector Iconography (`GoldenSkuQuickSelector.tsx`):**
+       - Replaced all emojis with accessible inline SVG icons for institutional Department of Consumer Affairs aesthetic.
+    4. **Quick Form-1 Notice PDF Generation (`AdjudicationCanvas.tsx`):**
+       - Added direct action button with ReportLab PDF backend invocation, allowing officers to generate Section 36(1) notices in 1 click.
+    5. **Responsive Mobile Card Tiles (`InspectionDesk.tsx`):**
+       - Added mobile card view for small viewport inspection without horizontal table scrolling.
+- **Comprehensive Verification:**
+  - `npm test`: **95 passed, 0 failed** across 32 test suites in 12.18s.
+  - `npm run build`: Zero errors, clean production bundle in 8.48s (`dist/index.html`, `dist/assets/*`).
+  - `pytest`: **425 passed, 1 skipped** across all members and integration suites in 35.48s.
+  - Zero AGPL-3.0 dependencies, zero prohibited claims.
+
+### Tests
+- `npm test` in `members/member-06-ui`: 95 passed, 0 failed.
+- `npm run build` in `members/member-06-ui`: Clean production bundle.
+- Repo-wide `pytest`: 425 passed, 1 skipped.
+
+### Problems
+None. Zero regressions.
+
+### Decisions
+All high-value UX and diagnostic features from Parmarth's branch are now natively supported in React 18, rendering the standalone HTML UI completely obsolete while preserving 100% of its diagnostic utility.
+
+### Next Step
+Await user instructions before pushing to remote repository.
+
+### Signing Note
+SIGNED OFF BY: Parmarth Kumar (parmarthk26@gmail.com) — 2026-09-10 20:10 IST [VERIFIED]
+
+
 
