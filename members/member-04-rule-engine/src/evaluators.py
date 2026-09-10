@@ -48,28 +48,29 @@ class Table1FontSchedule:
         - If height >= required: PASS
         - If height < required beyond uncertainty: FAIL
         """
-        required_mm = cls.get_required_font_height_mm(pdp_area_cm2)
-
-        if measured_height_mm is None or measured_height_mm <= 0:
+        if pdp_area_cm2 is None or pdp_area_cm2 <= 0 or measured_height_mm is None or measured_height_mm <= 0:
+            req_val = cls.get_required_font_height_mm(pdp_area_cm2) if (pdp_area_cm2 and pdp_area_cm2 > 0) else 0.0
             return {
                 "rule_code": "RULE_06_1_H_NET_QTY_FONT",
                 "statutory_reference": "Rule 6(1)(h) read with Table-I, G.S.R. 629(E)",
                 "citation": "Rule 6(1)(h) read with Table-I, G.S.R. 629(E)",
                 "status": "UNABLE_TO_VERIFY",
                 "severity": "CRITICAL",
-                "required_value": f">= {required_mm:.2f} mm (PDP area {pdp_area_cm2:.1f} cm2)",
+                "required_value": f">= {req_val:.2f} mm (PDP area {pdp_area_cm2 or 0.0:.1f} cm2)",
                 "measured_value": "UNAVAILABLE",
-                "required_mm": required_mm,
+                "required_mm": req_val,
                 "measured_mm": 0.0,
                 "deficit_mm": 0.0,
-                "discrepancy": "Font height could not be measured from degraded/missing imagery",
+                "discrepancy": "Font height or PDP area could not be measured from degraded/missing imagery",
                 "legal_consequence": "Unable to verify font compliance under Section 36(1) LM Act 2009",
             }
+
+        required_mm = cls.get_required_font_height_mm(pdp_area_cm2)
 
         diff = measured_height_mm - required_mm
 
         # Epistemic boundary triage: within sensor uncertainty band -> REVIEW
-        if abs(diff) <= uncertainty_mm and diff < 0:
+        if round(abs(diff), 4) <= round(uncertainty_mm, 4) and diff < 0:
             status = "REVIEW"
             consequence = "Borderline measurement within sensor uncertainty; requires human officer review"
         elif diff >= 0:
@@ -886,11 +887,15 @@ class LegalMetrologyRuleEngine:
 
         # 7. Rule 6(1)(n) Consumer Care
         if consumer_care:
+            has_phone = bool(consumer_care.get("has_phone") or consumer_care.get("phone"))
+            has_email = bool(consumer_care.get("has_email") or consumer_care.get("email"))
+            has_addr = bool(consumer_care["has_address"]) if "has_address" in consumer_care else bool(consumer_care.get("address", True))
+            has_name = bool(consumer_care["has_contact_name"]) if "has_contact_name" in consumer_care else bool(consumer_care.get("name", True))
             evaluations.append(Rule6DeclarationsEvaluator.evaluate_consumer_care(
-                has_phone=consumer_care.get("has_phone", False),
-                has_email=consumer_care.get("has_email", False),
-                has_address=consumer_care.get("has_address", True),
-                has_contact_name=consumer_care.get("has_contact_name", True),
+                has_phone=has_phone,
+                has_email=has_email,
+                has_address=has_addr,
+                has_contact_name=has_name,
             ))
         else:
             evaluations.append(Rule6DeclarationsEvaluator.evaluate_consumer_care(False, False))
