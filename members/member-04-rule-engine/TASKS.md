@@ -34,3 +34,9 @@
 - [x] Audit to guarantee zero LLM calls or ungrounded heuristic guesses.
 - [x] Complete Definition of Done checklist.
 - [x] Update `progress.md` and `memory.md`.
+
+### Phase 3: Courtroom-Admissible AST Hardening, Rule 24 Wholesale Multi-Packs & Jan Vishwas 2023
+- [x] Chunk 1: USP Mathematical Edge-Cases (cross-unit conversions $g \leftrightarrow kg$, $ml \leftrightarrow l$, per $100\text{g}/100\text{ml}$, per piece, IEEE 754 precision defense, NaN/Inf input safety).
+- [x] Chunk 2: Rule 24 Wholesale Multi-Pack & Multi-Piece Package Compliance (piece count, individual piece net quantity, quantity arithmetic validation, and multi-pack USP).
+- [x] Chunk 3: Jan Vishwas (Amendment of Provisions) Act, 2023 (Act No. 18 of 2023) Decriminalization & Compounding Schedule Calculator (Form-1 Statutory Improvement Notices with 14-day cure window for first-time technical defaults, compounding tiers up to ₹25,000 / ₹50,000 / ₹1,00,000 with imprisonment repealed).
+- [x] Chunk 4: Courtroom-admissible AST evidence integration, 100% Pydantic contract compliance (`ComplianceVerdictResult` / `RuleEvaluationDTO`), sub-5ms execution latency, and comprehensive 42-test suite.
