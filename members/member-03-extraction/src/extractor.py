@@ -166,12 +166,62 @@ class CommodityFactExtractor:
             raise ValueError(f"Unsupported OCR input type: {type(ocr_data)}")
 
         image_id = data.get("image_id") or data.get("url") or "unknown_image"
-        tokens = data.get("tokens", []) or []
+        raw_tokens = data.get("tokens", []) or []
         full_text = data.get("full_text", "")
 
-        # Fallback if dict has text/html content but no pre-tokenized bounding boxes
+        # Sanitize any raw tokens provided to ensure clean string text and valid 4-element bboxes
+        tokens: List[Dict[str, Any]] = []
+        for t in raw_tokens:
+            if not isinstance(t, dict):
+                continue
+            t_text = str(t.get("text") or "").strip()
+            t_bbox = t.get("bounding_box")
+            if not isinstance(t_bbox, (list, tuple)) or len(t_bbox) < 4:
+                clean_bbox = [0, 0, 0, 0]
+            else:
+                try:
+                    clean_bbox = [
+                        int(round(float(t_bbox[0]))),
+                        int(round(float(t_bbox[1]))),
+                        int(round(float(t_bbox[2]))),
+                        int(round(float(t_bbox[3])))
+                    ]
+                except (ValueError, TypeError):
+                    clean_bbox = [0, 0, 0, 0]
+            try:
+                conf = float(t.get("confidence", 0.95))
+            except (ValueError, TypeError):
+                conf = 0.95
+            tokens.append({
+                "token_id": str(t.get("token_id") or ""),
+                "text": t_text,
+                "confidence": conf,
+                "bounding_box": clean_bbox,
+            })
+
+        # Fallback if dict has text/html content or arbitrary attributes but no pre-tokenized bounding boxes
         if not tokens:
             alt_text = data.get("text") or data.get("html") or data.get("page_content") or data.get("listing_text") or ""
+            if not alt_text:
+                # Synthesize text from dictionary key-value entries (e.g. scraped product specifications or marketplace JSON)
+                alt_lines = []
+                for k, v in data.items():
+                    if k not in ("image_id", "calibration", "calibration_data", "px_to_mm", "tokens", "url") and v is not None:
+                        if isinstance(v, (str, int, float, bool)):
+                            v_str = str(v).strip()
+                            if v_str:
+                                alt_lines.append(f"{k}: {v_str}")
+                        elif isinstance(v, list):
+                            items_str = ", ".join(str(item).strip() for item in v if item is not None and str(item).strip())
+                            if items_str:
+                                alt_lines.append(f"{k}: {items_str}")
+                        elif isinstance(v, dict):
+                            for sub_k, sub_v in v.items():
+                                if sub_v is not None and str(sub_v).strip():
+                                    alt_lines.append(f"{sub_k}: {str(sub_v).strip()}")
+                if alt_lines:
+                    alt_text = "\n".join(alt_lines)
+
             if alt_text:
                 if "<" in alt_text and ">" in alt_text:
                     clean_lines = re.sub(r"(?i)<(?:br|/p|/div|/li|/tr|/h[1-6])[^>]*>", "\n", alt_text)
@@ -197,8 +247,13 @@ class CommodityFactExtractor:
         if not tokens:
             return []
 
-        # Sort primarily by vertical position ymin, then horizontal xmin
-        return sorted(tokens, key=lambda t: (t.get("bounding_box", [0, 0, 0, 0])[0], t.get("bounding_box", [0, 0, 0, 0])[1]))
+        def _token_sort_key(t: Dict[str, Any]) -> Tuple[int, int]:
+            bbox = t.get("bounding_box")
+            if isinstance(bbox, (list, tuple)) and len(bbox) >= 2:
+                return (bbox[0], bbox[1])
+            return (0, 0)
+
+        return sorted(tokens, key=_token_sort_key)
 
     def _cluster_horizontal_lines(self, tokens: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Merges adjacent tokens on approximately the same vertical level into composite lines.
@@ -209,17 +264,21 @@ class CommodityFactExtractor:
         if not tokens:
             return []
 
-        sorted_tokens = sorted(tokens, key=lambda t: (t.get("bounding_box", [0, 0, 0, 0])[0], t.get("bounding_box", [0, 0, 0, 0])[1]))
+        sorted_tokens = self._sort_tokens_reading_order(tokens)
         lines: List[List[Dict[str, Any]]] = []
 
         for token in sorted_tokens:
-            bbox = token.get("bounding_box", [0, 0, 0, 0])
+            bbox = token.get("bounding_box")
+            if not isinstance(bbox, (list, tuple)) or len(bbox) < 4:
+                bbox = [0, 0, 0, 0]
             ymin, xmin, ymax, xmax = bbox[0], bbox[1], bbox[2], bbox[3]
             token_mid_y = (ymin + ymax) / 2.0
 
             placed = False
             for line in lines:
-                prev_bbox = line[-1].get("bounding_box", [0, 0, 0, 0])
+                prev_bbox = line[-1].get("bounding_box")
+                if not isinstance(prev_bbox, (list, tuple)) or len(prev_bbox) < 4:
+                    prev_bbox = [0, 0, 0, 0]
                 prev_mid_y = (prev_bbox[0] + prev_bbox[2]) / 2.0
                 y_diff = abs(token_mid_y - prev_mid_y)
                 x_gap = xmin - prev_bbox[3]
@@ -371,9 +430,9 @@ class CommodityFactExtractor:
             "marketed & distributed by", "marketed and distributed by",
             "manufactured in india by", "manufactured in bharat by", "mfd in india by", "mfd. in india by",
             "packed in india by", "pkd in india by", "pkd. in india by",
-            "manufactured by", "mfd by", "mfd. by", "mfg by", "mfg. by", "produced by",
-            "packed by", "pkd by", "pkd. by", "packaging by", "pre-packed by",
-            "imported by", "importer", "marketed by", "address", "registered office",
+            "manufactured by", "manufacturer:", "manufacturer", "mfd by", "mfd. by", "mfg by", "mfg. by", "produced by",
+            "packed by", "packer:", "packer", "pkd by", "pkd. by", "packaging by", "pre-packed by",
+            "imported by", "importer:", "importer", "marketed by", "marketer:", "marketer", "address", "registered office",
             "works:", "factory:", "mfg unit:", "unit:",
             "निर्माता", "पैकर", "निर्मित", "आयातकर्ता", "मार्केटेड"
         ]
@@ -749,13 +808,13 @@ class CommodityFactExtractor:
                 text = unit["text"]
                 text_lower = text.lower()
                 if any(k in text_lower for k in [
-                    "mfd by", "manufactured by", "mfg by", "marketed by", "pkd by",
-                    "packed by", "imported by", "factory", "address", "निर्माता", "पैकर",
+                    "mfd by", "manufactured by", "manufacturer", "mfg by", "marketed by", "marketer", "pkd by",
+                    "packed by", "packer", "imported by", "importer", "factory", "address", "निर्माता", "पैकर",
                     "manufactured in", "packed in", "mfd in", "mfd. in"
                 ]):
-                    role = "PACKER" if any(p in text_lower for p in ["pack", "pkd", "पैकर"]) and not any(m in text_lower for m in ["mfd", "mfg", "manufactur"]) else (
-                        "IMPORTER" if "import" in text_lower else (
-                            "MARKETER" if any(m in text_lower for m in ["marketed", "मार्केटेड"]) else "MANUFACTURER"
+                    role = "PACKER" if any(p in text_lower for p in ["pack", "pkd", "packer", "पैकर"]) and not any(m in text_lower for m in ["mfd", "mfg", "manufactur"]) else (
+                        "IMPORTER" if any(imp in text_lower for imp in ["import", "आयातकर्ता"]) else (
+                            "MARKETER" if any(m in text_lower for m in ["marketed", "marketer", "मार्केटेड"]) else "MANUFACTURER"
                         )
                     )
                     parsed_addr = self.parser.parse_address(text)
@@ -824,7 +883,7 @@ class CommodityFactExtractor:
             for unit in composite_lines:
                 text = unit["text"]
                 parsed_addr = self.parser.parse_address(text)
-                if parsed_addr and (parsed_addr.get("pin_code") or parsed_addr.get("state")):
+                if parsed_addr and (parsed_addr.get("pin_code") or parsed_addr.get("is_complete") or (parsed_addr.get("state") and parsed_addr.get("name"))):
                     extracted_mfg = AddressValue(**parsed_addr)
                     font_mm, font_conf = compute_font_height(unit["bounding_box"])
                     raw_fields.append(

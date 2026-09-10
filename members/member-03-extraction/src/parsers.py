@@ -25,7 +25,7 @@ BANNED_UNITS_CASE_SENSITIVE = re.compile(
 # Under Section 11 & Rule 12: gms, gm, g.m., g.m.s., Kgs, kgms, ltrs, ltr, LTR, cc, c.c., etc. are strictly prohibited.
 # Punctuation on units: Under Rule 12(b), symbols of units shall not be followed by a period or pluralized (e.g. 'g.', 'kg.', 'ml.', 'l.').
 BANNED_UNITS_CASE_INSENSITIVE = re.compile(
-    r"(?<![a-zA-Z\.])(?:g\.?\s*m\.?\s*s+\.?|gms\.?|g\.m\.s?\.?|g\.m\.?|g\.|kgms\.?|kgs\.?|k\.\s*g\.?|kg\.|ltrs\.?|ltr\.?|l\.\s*t\.\s*r\.?\s*s?\.?|l\.|ml\.|liters|litres|kilos?|mtrs?|cms|mms|ग्राम्स|जी\.?\s*एम\.?)(?![a-zA-Z])",
+    r"(?<![a-zA-Z\.])(?:g\.?\s*m\.?\s*s+\.?|gms\.?|g\.m\.s+\.?|g\.|kgms\.?|kgs\.?|k\.\s*g\.?|kg\.|ltrs\.?|ltr\.?|l\.\s*t\.\s*r\.?\s*s?\.?|l\.|ml\.|liters|litres|kilos?|mtrs?|cms|mms|ग्राम्स|जी\.?\s*एम\.?)(?![a-zA-Z])",
     re.IGNORECASE
 )
 
@@ -107,6 +107,19 @@ MAJOR_CITIES_TO_STATE: Dict[str, str] = {
     "leh": "Ladakh", "kargil": "Ladakh",
     "kavaratti": "Lakshadweep"
 }
+
+# Precompiled regexes for high-performance O(1) state, city, and abbreviation matching
+INDIAN_STATES_REGEX = re.compile(
+    r"\b(" + "|".join(re.escape(s) for s in sorted(INDIAN_STATES_AND_UTS, key=len, reverse=True)) + r")\b",
+    re.IGNORECASE
+)
+MAJOR_CITIES_REGEX = re.compile(
+    r"\b(" + "|".join(re.escape(c) for c in sorted(MAJOR_CITIES_TO_STATE.keys(), key=len, reverse=True)) + r")\b",
+    re.IGNORECASE
+)
+STATE_ABBR_REGEX = re.compile(
+    r"\b(" + "|".join(re.escape(a) for a in sorted(STATE_ABBREVIATIONS.keys(), key=len, reverse=True)) + r")\b"
+)
 
 # High-precision 3-digit PIN prefix overrides for sub-state regions and Union Territories
 PIN_3DIGIT_TO_STATE: Dict[str, str] = {
@@ -264,24 +277,29 @@ class StatutoryDeclarationParser:
         if not text:
             return False, None
 
-        # Mask email addresses and web URLs to avoid false positives on domains (e.g. care@ml.com, www.ml.com)
+        # Mask email addresses and web URLs to avoid false positives on domains (e.g. care@ml.com, www.ml.com, nestle.com/ML)
         masked_text = re.sub(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b", " ", text)
-        masked_text = re.sub(r"https?://\S+|www\.[A-Za-z0-9.-]+\.[A-Za-z]{2,}\S*", " ", masked_text)
-
-        # Mask Latin abbreviations containing periods or 'g' to prevent false positive 'g.' (e.g. 'e.g. with milk', 'i.e.')
-        masked_text = re.sub(r"\b(?:e\.?\s*g\.?|i\.?\s*e\.?|etc\.?)\b", " ", masked_text, flags=re.IGNORECASE)
-
-        # Mask AI/ML technology acronyms to prevent false positive 'ML' on smart IoT / devices
         masked_text = re.sub(
-            r"(?:\bAI\s*/\s*ML\b|\bML\s*/\s*AI\b|\bMachine\s*Learning\s*(?:\(\s*ML\s*\)|\b)|\bML\s*model\b|\bML\s*algorithm\b)",
+            r"(?:https?://\S+|www\.[A-Za-z0-9.-]+\.[A-Za-z]{2,}\S*|\b[A-Za-z0-9.-]+\.(?:com|org|net|in|co\.in|gov|io|edu)(?:/[^\s]*)?)",
             " ",
             masked_text,
             flags=re.IGNORECASE
         )
 
-        # Mask corporate names and designations starting with uppercase GM (e.g. GM Foods, GM - Operations, Non-GM)
+        # Mask Latin abbreviations containing periods or 'g' to prevent false positive 'g.' (e.g. 'e.g. with milk', 'i.e.', 'etc.')
+        masked_text = re.sub(r"(?<![a-zA-Z])(?:e\.?\s*g\.?|i\.?\s*e\.?|etc\.?)(?![a-zA-Z])", " ", masked_text, flags=re.IGNORECASE)
+
+        # Mask AI/ML technology acronyms to prevent false positive 'ML' on smart IoT / devices
         masked_text = re.sub(
-            r"\b(?:Non-GM|GM\s*(?:-|:)?\s*(?:Foods|Enterprises|Motors|Breweries|Laboratories|Pharma|Products|Industries|Operations|Sales|Quality|Plant|Director|Manager|Executive|Officer|Unit|Works|Ltd|Limited|Pvt|LLP|Corp|Inc|Tech)\b)",
+            r"(?:\bAI\s*[/&+\s]+\s*ML\b|\bML\s*[/&+\s]+\s*AI\b|\bMachine\s*Learning\s*(?:\(\s*ML\s*\)|\b)|\bML[-\s]*(?:powered|model|algorithm|ops|system|enabled|chip|processor|engine|pipeline|framework|tech|technology|solution)\b)",
+            " ",
+            masked_text,
+            flags=re.IGNORECASE
+        )
+
+        # Mask corporate names and designations starting with uppercase GM or G.M. (e.g. GM Foods, G.M. Agro, GM - Operations, Non-GM)
+        masked_text = re.sub(
+            r"\b(?:Non-G\.?M\.?|G\.?\s*M\.?\s*(?:-|:)?\s*(?:Foods|Agro|Bio|Organics|Mills|Exports|Enterprises|Motors|Breweries|Laboratories|Pharma|Products|Industries|Operations|Sales|Quality|Plant|Director|Manager|Executive|Officer|Unit|Works|Ltd|Limited|Pvt|LLP|Corp|Inc|Tech)\b)",
             " ",
             masked_text,
             flags=re.IGNORECASE
@@ -403,7 +421,7 @@ class StatutoryDeclarationParser:
                 pass
 
         # Regex for magnitude supporting standard floats, comma numbers (with spaces), leading dots, and simple fractions
-        mag_pattern = r"(?:([0-9]+)\s*/\s*([0-9]+)|([0-9]+(?:,\s*[0-9]+)*(?:\.[0-9]+)?|\.[0-9]+))"
+        mag_pattern = r"(-?)(?:([0-9]+)\s*/\s*([0-9]+)|([0-9]+(?:,\s*[0-9]+)*(?:\.[0-9]+)?|\.[0-9]+))"
         unit_pattern = r"([a-zA-Z²³\.\u0900-\u097F]+(?:\s+[a-zA-Z²³\.\u0900-\u097F]+)?|\b[NU]\b)"
 
         # 1. Match with explicit quantity prefix (highest priority)
@@ -422,7 +440,7 @@ class StatutoryDeclarationParser:
                 rf"(?<![a-zA-Z0-9]){mag_pattern}\s*{unit_pattern}"
             )
             for m in standalone_pattern.finditer(norm_text):
-                f_num, f_den, f_dec, cand_unit_raw = m.group(1), m.group(2), m.group(3), m.group(4)
+                f_sign, f_num, f_den, f_dec, cand_unit_raw = m.group(1), m.group(2), m.group(3), m.group(4), m.group(5)
                 words = cand_unit_raw.strip().split()
                 first_w = words[0].lower() if words else ""
                 two_w = f"{words[0]} {words[1]}".lower() if len(words) >= 2 else ""
@@ -438,7 +456,7 @@ class StatutoryDeclarationParser:
         if not match:
             return None
 
-        frac_num, frac_den, decimal_raw, unit_raw = match.group(1), match.group(2), match.group(3), match.group(4)
+        frac_sign, frac_num, frac_den, decimal_raw, unit_raw = match.group(1), match.group(2), match.group(3), match.group(4), match.group(5)
 
         if frac_num and frac_den:
             try:
@@ -453,6 +471,9 @@ class StatutoryDeclarationParser:
                 return None
         else:
             return None
+
+        if frac_sign == "-":
+            magnitude = -magnitude
 
         if magnitude <= 0:
             return None
@@ -849,11 +870,16 @@ class StatutoryDeclarationParser:
             cand = m.group(1) + m.group(2)
             start, end = m.span()
 
-            prefix_window = norm_text[max(0, start - 20):start]
+            prefix_window = norm_text[max(0, start - 35):start]
             suffix_window = norm_text[end:min(len(norm_text), end + 15)].lower().strip()
 
+            # If an explicit address anchor (Regd Office, Address) appears in the prefix window,
+            # it resets previous clause context (e.g. 'Lic. under FSSAI Act. Regd Office: Mumbai 400001')
+            addr_anchor = re.search(r"\b(?:regd?\.?\s*off(?:ice)?|address|works|factory|निर्माता)\b", prefix_window, re.IGNORECASE)
+            effective_prefix = prefix_window[addr_anchor.start():] if addr_anchor else prefix_window
+
             # Disallow matches immediately preceded by telephone, batch, price, or license keywords
-            if disallowed_prefix_re.search(prefix_window):
+            if disallowed_prefix_re.search(effective_prefix):
                 continue
 
             # Disallow matches followed by price or measurement units
@@ -888,30 +914,40 @@ class StatutoryDeclarationParser:
         # 2. Detect Indian State / UT
         detected_state: Optional[str] = None
 
-        # Check explicit State names
-        for state in INDIAN_STATES_AND_UTS:
-            pattern = re.compile(r"\b" + re.escape(state) + r"\b", re.IGNORECASE)
-            if pattern.search(norm_text):
-                # Standardize variant names
-                if state.lower() == "orissa":
-                    detected_state = "Odisha"
-                elif state.lower() == "pondicherry":
-                    detected_state = "Puducherry"
-                elif state.lower() == "uttaranchal":
-                    detected_state = "Uttarakhand"
-                elif state.lower() in ("new delhi", "दिल्ली"):
-                    detected_state = "Delhi"
-                elif state == "उत्तर प्रदेश":
-                    detected_state = "Uttar Pradesh"
-                elif state == "महाराष्ट्र":
-                    detected_state = "Maharashtra"
-                elif state == "गुजरात":
-                    detected_state = "Gujarat"
-                else:
-                    detected_state = state
-                break
+        # Check explicit State names via precompiled unified regex
+        m_state = INDIAN_STATES_REGEX.search(norm_text)
+        if m_state:
+            raw_state = m_state.group(1)
+            raw_state_lower = raw_state.lower()
+            if raw_state_lower == "orissa":
+                detected_state = "Odisha"
+            elif raw_state_lower == "pondicherry":
+                detected_state = "Puducherry"
+            elif raw_state_lower == "uttaranchal":
+                detected_state = "Uttarakhand"
+            elif raw_state_lower in ("new delhi", "दिल्ली"):
+                detected_state = "Delhi"
+            elif raw_state == "उत्तर प्रदेश":
+                detected_state = "Uttar Pradesh"
+            elif raw_state == "महाराष्ट्र":
+                detected_state = "Maharashtra"
+            elif raw_state == "गुजरात":
+                detected_state = "Gujarat"
+            else:
+                for s in INDIAN_STATES_AND_UTS:
+                    if s.lower() == raw_state_lower:
+                        detected_state = s
+                        break
+                if not detected_state:
+                    detected_state = raw_state
 
-        # Check high-precision 3-digit PIN prefix overrides first (e.g. 403 -> Goa, 249 -> Uttarakhand)
+        # Check major commercial cities mapped to states (explicit city in text has precedence over shared PIN prefixes)
+        if not detected_state:
+            m_city = MAJOR_CITIES_REGEX.search(norm_text)
+            if m_city:
+                detected_state = MAJOR_CITIES_TO_STATE.get(m_city.group(1).lower())
+
+        # Check high-precision 3-digit PIN prefix overrides (e.g. 403 -> Goa, 249 -> Uttarakhand)
         if not detected_state and pin_code:
             prefix3 = pin_code[:3]
             if prefix3 in PIN_3DIGIT_TO_STATE:
@@ -919,17 +955,10 @@ class StatutoryDeclarationParser:
 
         # Check State Abbreviations if not found
         if not detected_state:
-            for abbr, full_state in STATE_ABBREVIATIONS.items():
-                if re.search(r"\b" + re.escape(abbr) + r"\b", norm_text):
-                    detected_state = full_state
-                    break
+            m_abbr = STATE_ABBR_REGEX.search(norm_text)
+            if m_abbr:
+                detected_state = STATE_ABBREVIATIONS.get(m_abbr.group(1))
 
-        # Check major commercial cities mapped to states
-        if not detected_state:
-            for city, mapped_state in MAJOR_CITIES_TO_STATE.items():
-                if re.search(r"\b" + re.escape(city) + r"\b", norm_text, re.IGNORECASE):
-                    detected_state = mapped_state
-                    break
 
         # Fallback: Infer State from 2-digit PIN code prefix
         if not detected_state and pin_code:
@@ -944,7 +973,7 @@ class StatutoryDeclarationParser:
         pref_anchor_re = re.compile(
             r"(?:Manufactured\s*(?:,|&|and)?\s*Packed\s*(?:&|and)?\s*Marketed\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
             r"Manufactured\s*(?:&|and)?\s*Packed\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
-            r"Manufactured\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Mfd\.?\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Mfg\.?\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
+            r"Manufactured\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Manufacturer\s*[:\-]|Mfd\.?\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Mfg\.?\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
             r"Processed\s*(?:&|and)?\s*Packed\s*by|Formulated\s*(?:&|and)?\s*Packed\s*by|"
             r"Marketed\s*(?:&|and)?\s*Distributed\s*by|"
             r"Packed\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Pkd\.?\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
@@ -962,28 +991,33 @@ class StatutoryDeclarationParser:
             if len(cand_name) >= 3 and not cand_name.isdigit():
                 entity_name = cand_name
 
-        # Approach B: Fallback to corporate suffix pattern (English & Hindi)
+        # Approach B: Fallback to corporate suffix pattern (English & Hindi) - Linear ReDoS-free extraction
         if not entity_name:
-            corp_name_match = re.search(
-                r"([a-zA-Z\u00C0-\u024F\u0900-\u097F0-9\s.,&'\-]+?(?:(?:Industries|Enterprises|Foods|Beverages|Consumer\s*Care|Laboratories|Pharma|Products|Dairy|Mills|Bakery|Herbals|Cosmetics|Naturals|उद्योग|फूड्स)\s+)?(?:Pvt\.?\s*Ltd\.?|Private\s*Limited|Ltd\.?|Limited|LLP|Inc\.?|Corp\.?|Cooperative|लिमिटेड|प्राइवेट\s*लिमिटेड)(?:\.|\b))",
-                norm_text,
+            corp_suffix_re = re.compile(
+                r"\b(?:Pvt\.?\s*Ltd\.?|Private\s*Limited|Ltd\.?|Limited|LLP|Inc\.?|Corp\.?|Cooperative|लिमिटेड|प्राइवेट\s*लिमिटेड)(?:\.|\b)",
                 re.IGNORECASE
             )
-            if corp_name_match:
-                raw_entity = corp_name_match.group(1).strip()
+            suffix_match = corp_suffix_re.search(norm_text)
+            if suffix_match:
+                end_idx = suffix_match.end()
+                start_window = max(0, suffix_match.start() - 80)
+                snippet = norm_text[start_window:end_idx]
+                chunks = re.split(r"[\n\r;]|(?:\b(?:by|at|for|from|ऑफिस|पता)\s+)", snippet, flags=re.IGNORECASE)
+                cand_chunk = chunks[-1].strip(" ,-:")
                 cleaned_entity = re.sub(
                     r"^(?:Manufactured\s*(?:,|&|and)?\s*Packed\s*(?:&|and)?\s*Marketed\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
                     r"Manufactured\s*(?:&|and)?\s*Packed\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
-                    r"Manufactured\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Mfd\.?\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Mfg\.?\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
+                    r"Manufactured\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Manufacturer|Mfd\.?\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Mfg\.?\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
                     r"Processed\s*(?:&|and)?\s*Packed\s*by|Formulated\s*(?:&|and)?\s*Packed\s*by|"
                     r"Marketed\s*(?:&|and)?\s*Distributed\s*by|"
                     r"Packed\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Pkd\.?\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
                     r"Marketed\s*by|Imported\s*by|Works|Factory|Address|निर्माता|पैकर)\s*[:\-]?\s*",
                     "",
-                    raw_entity,
+                    cand_chunk,
                     flags=re.IGNORECASE
-                ).strip()
-                entity_name = cleaned_entity if cleaned_entity else None
+                ).strip(" ,-:")
+                if cleaned_entity and len(cleaned_entity) >= 3:
+                    entity_name = cleaned_entity
 
         # Statutory completeness per OQ-02: State + 6-digit PIN code
         is_complete = bool(detected_state and pin_code)

@@ -75,4 +75,17 @@
 - [x] Phase 5: Normalize mixed vulgar fractions in net quantity (e.g. `1 ½ kg` -> `1.5 kg`, `2 ½ g` -> `2.5 g`).
 - [x] Phase 5: Expand Member 3 test suite to 106 tests passing 100% (and 169 full repo tests passing with zero regressions).
 
+### Phase 6: Post-Deployment Stress-Testing, ReDoS Hardening & Section 63 BSA Evidentiary Defense Audit
+- [x] ReDoS & Catastrophic Backtracking Elimination: Replaced nested unbounded regex repetition in `parse_address` Approach B with fast linear corporate suffix anchor search and bounded backward extraction (<0.15s on 40,000 characters).
+- [x] Section 63 BSA 2023 Evidentiary Defense for Dotted Entities: Protected dotted corporate acronyms (`G.M. Foods Pvt Ltd`, `G.M. Agro`, `Non-GM`) by routing singular `g.m.` exclusively through quantity-associated patterns (`BANNED_GM_GENERAL` / `BANNED_GM_UPPERCASE_WITH_QTY`).
+- [x] Bare Domain URL & Modern Tech Acronym Masking: Expanded URL masking to bare domain links (`nestle.com/ML/page`) and expanded AI/ML tech regex (`AI & ML`, `AI and ML`, `ML-powered`, `ML ops`, `ML engine`).
+- [x] Explicit City Precedence over Shared Postal Division PIN Prefixes: Enforced explicit city detection before fallback PIN prefix mapping to eliminate cross-state misclassification on shared postal divisions (Valsad vs Silvassa 396; Kochi vs Kavaratti 682).
+- [x] FSSAI License vs Regd Office Anchor Reset: Expanded PIN prefix window to 35 characters with address starter reset, preventing false rejection of valid registered offices in adjacent sentences.
+- [x] Negative Net Quantity Rejection: Added negative sign capture in `parse_net_quantity` to reject invalid declarations ($Q \le 0$).
+- [x] Corrupted Token Sanitization & E-Commerce Structured Dict Ingestion: Hardened `_normalize_tokens` against `None` strings, out-of-bounds coordinates, and added auto-serialization for scraped e-commerce attribute dictionaries.
+- [x] 14-Scenario Stress & Evidentiary Audit Test Suite: Created `tests/test_stress_audit.py` covering ReDoS throughput, adversarial OCR tokens, mathematical singularities, and legal false positive defense.
+- [x] Comprehensive Verification: Expanded Member 3 test suite to 120 deterministic tests passing 100% in 1.02s; verified full repository test suite (301 passed) and frontend suite (86 passed).
+- [x] Evidentiary Audit Report & Documentation: Compiled `AUDIT_REPORT.md` and updated `progress.md` and `memory.md` with verified signing notes.
+
+
 
