@@ -33,6 +33,14 @@
       "tax_inclusive": true
     },
     "declared_usp": 20.0,
+    "manufacturer": {
+      "name": "Aqua Pure Beverages Pvt. Ltd.",
+      "address": "Plot 42, Industrial Area Phase-II, Haridwar 249403, Uttarakhand, India",
+      "address_line": "Plot 42, Industrial Area Phase-II, Haridwar 249403, Uttarakhand, India",
+      "pin_code": "249403",
+      "state": "Uttarakhand",
+      "source": "SYNTHETIC — Demo fixture for fully-compliant packaging"
+    },
     "measured_font_height_mm": 3.10,
     "consumer_care": {
       "has_email": true,

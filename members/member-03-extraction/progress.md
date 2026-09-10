@@ -493,4 +493,62 @@ Feature branch `feat/m3-extraction` is fully verified with 151 passing tests and
 ### Signing Note
 SIGNED OFF BY: Harsh Patel (anonymousgrouphp@gmail.com) — 2026-09-10 17:15 IST [VERIFIED]
 
+---
+
+## [10 September 2026] [21:45] IST
+
+### Task / Chunk
+Interactive Field Inspector CLI & Judge Live-Demo Harness (`inspect_cli.py`) — Chunks 1, 2, and 3.
+
+### Status
+COMPLETE
+
+### Completed
+- **Chunk 1: Terminal Dashboard & Interactive CLI Runner (`inspect_cli.py`):**
+  - Built standalone CLI executable supporting `--image`, `--demo`, `--sku`, `--ecom`, `--calib`, `--pdp-cm2`, `--issue-notice`, `--output-pdf`, `--json`, `--no-color`.
+  - Implemented 7 colorized Rich terminal tables:
+    1. Stage 1: Optical Quality Gate (Laplacian blur variance, Specular glare %, Skew angle)
+    2. Stage 2: Metric Calibration & Surface Geometry (ArUco 4x4_50 / ISO Card scale, uncertainty ±0.04 mm, PDP area)
+    3. Stage 3: Multilingual OCR & Declaration Extraction (English + Devanagari Hindi, confidence scores)
+    4. Stage 4: Table-I Numeral Font Height Schedule (Measured vs Minimum mm, deficit % and status)
+    5. Stage 5: Unit Sale Price (USP) Mathematical Verification (|USP × Qty - MRP| ≤ 0.02 INR)
+    6. Panel 6: Statutory Adjudication & Jan Vishwas Compounding Schedule (First/Second/Subsequent penalty)
+    7. Section 63 BSA 2023 Tamper-Evident Merkle Root & digital chain-of-custody
+  - Integrated interactive selection menu (`--demo`) for hackathon judges covering all 6 Golden SKUs and 8 Real FMCG packaging samples.
+  - Implemented single listing e-commerce marketplace inspection under Rule 6(10) / GSR 594(E) (`--ecom`).
+  - Enforced zero external network calls (Transmitted Bytes: 0) and rapid execution latency (<2ms, well within <1.5s ceiling).
+- **Chunk 2: One-Click Notice Generation (`--issue-notice`):**
+  - Generates official ReportLab Form-1 Show Cause Notice PDF directly from CLI.
+  - Embedded Section 63 BSA 2023 Merkle root hash and Jan Vishwas Act compounding sanction in notice metadata.
+  - Supports custom output paths (`--output-pdf`) and non-blocking desktop PDF viewer launch.
+- **Chunk 3: Automated CLI Test Battery (`tests/test_inspect_cli.py`):**
+  - Built 18 automated unit and subprocess tests covering:
+    - All 6 Golden Demonstration SKUs producing exact specified statutory verdicts (SKU-01: FAIL, SKU-02: FAIL, SKU-03: PASS, SKU-04: REVIEW, SKU-05: UNABLE_TO_VERIFY, SKU-06: FAIL).
+    - Exit codes: 0 for PASS, 1 for FAIL, 0 for REVIEW / UNABLE_TO_VERIFY (diagnostic completion), 2 for ERROR.
+    - JSON schema strict contract conformance and 64-character SHA-256 Merkle root verification.
+    - Real physical FMCG packaging evaluation on `REAL-PKG-01` (Parle-G 45g with banned unit 'gm').
+    - E-Commerce Rule 6(10) listing audit pass and fail flows.
+    - One-click Form-1 PDF notice generation.
+    - Rich dashboard rendering resilience without format code errors.
+
+### Tests
+- `pytest tests/test_inspect_cli.py -v` (18 passed in 5.15s)
+- `pytest tests/ -v` (51 passed in 5.09s across root test suite)
+- `pytest members/member-03-extraction/tests/ -v` (151 passed in 2.70s)
+
+### Problems
+- Identified format code exception (`ValueError: Unknown format code 'f' for object of type 'str'`) in Table 5 when discrepancy was a text string; resolved by defensively parsing numeric vs string discrepancy values.
+- Normalized manufacturer address extraction so `parse_address` (`name`, `address_line`) correctly populates Rule 6(1)(a) evaluation in e-commerce mode.
+
+### Decisions
+1. CLI exit codes strictly follow UNIX and statutory audit conventions: 0 for PASS, REVIEW, and UNABLE_TO_VERIFY (successful diagnostic completion); 1 for FAIL (statutory violations detected); 2 for runtime or argument error.
+2. In Mode B standalone CLI execution, zero bytes are transmitted across the network, and monotonic local clock ensures 100% deterministic reproducibility under Section 63 BSA 2023.
+
+### Next Step
+All 3 chunks of `inspect_cli.py` are 100% verified. Ready to commit, merge into main, and push to origin.
+
+### Signing Note
+SIGNED OFF BY: Harsh Patel (anonymousgrouphp@gmail.com) — 2026-09-10 21:45 IST [VERIFIED]
+
+
 

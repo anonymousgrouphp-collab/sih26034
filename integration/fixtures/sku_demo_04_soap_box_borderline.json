@@ -32,6 +32,21 @@
       "currency": "INR",
       "tax_inclusive": true
     },
+    "declared_usp": 0.36,
+    "manufacturer": {
+      "name": "Herbal Care India Ltd.",
+      "address_line": "Plot 10, Industrial Estate, Haridwar 249403, Uttarakhand, India",
+      "pin_code": "249403",
+      "state": "Uttarakhand",
+      "source": "SYNTHETIC — Demo fixture for borderline compliance"
+    },
+    "consumer_care": {
+      "has_email": true,
+      "has_phone": true,
+      "has_address": true,
+      "is_complete": true
+    },
+    "country_of_origin": "India",
     "measured_font_height_mm": 2.46
   },
   "expected_violations": [
