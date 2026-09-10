@@ -8,6 +8,7 @@ import { ApiService } from "./services/api";
 import {
   InspectionSummary,
   InspectionCase,
+  OfficerRole,
 } from "./types/inspection";
 
 export const App: React.FC = () => {
@@ -18,6 +19,7 @@ export const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCase, setSelectedCase] = useState<InspectionCase | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
+  const [officerRole, setOfficerRole] = useState<OfficerRole>("INSPECTOR");
 
   // Load inspection cases for current jurisdiction
   const loadCases = useCallback(async () => {
@@ -68,6 +70,7 @@ export const App: React.FC = () => {
             setSelectedCase(updated);
             loadCases();
           }}
+          officerRole={officerRole}
         />
       );
     }
@@ -192,6 +195,8 @@ export const App: React.FC = () => {
           setSelectedCase(null);
         }}
         onRefresh={loadCases}
+        officerRole={officerRole}
+        onOfficerRoleChange={setOfficerRole}
       />
 
       {/* Main Workspace: Sidebar + Content */}

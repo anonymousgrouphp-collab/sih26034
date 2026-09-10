@@ -227,13 +227,13 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
             <div className="p-3 bg-slate-50 border border-slate-200 rounded space-y-1">
               <div className="font-bold text-slate-700">Multilingual OCR Provenance:</div>
               <div className="text-[11px] text-slate-600">
-                DBNet++ Detection
+                DBNet++ Text Detection
                 <br />
-                PP-OCRv4 Latin / En
+                PP-OCRv4 English recognition
                 <br />
-                PP-OCRv3 Devanagari Hindi
+                PP-OCRv3 Devanagari recognition
                 <br />
-                Tesseract Engine Fallback
+                Tesseract v5 Fallback
               </div>
             </div>
           </div>

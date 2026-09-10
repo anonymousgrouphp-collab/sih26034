@@ -362,6 +362,12 @@ export interface PipelineStageProgress {
   execution_time_ms?: number;
 }
 
+export type OfficerRole = "INSPECTOR" | "CONTROLLER";
+
+export type ApiOperatingMode = "LIVE" | "MOCK" | "DEMO_FIXTURE";
+
+export type PipelineSource = "LIVE_BACKEND" | "BACKEND_SIMULATION" | "DEMO_FIXTURES";
+
 export interface InspectionCase {
   id: string;
   inspection_number: string;
@@ -396,6 +402,8 @@ export interface InspectionCase {
   is_mock_fixture?: boolean;
   sku_demo_id?: string;
   notes?: string;
+  pipeline_source?: PipelineSource;
+  officer_role?: OfficerRole;
 }
 
 export interface InspectionSummary {
@@ -494,3 +502,75 @@ export interface ApiState<T> {
   status: AsyncStatus;
   error: ApiError | null;
 }
+
+// -----------------------------------------------------------------------------
+// 13. Canonical Inspection API Service Contract
+// -----------------------------------------------------------------------------
+
+export interface IInspectionApiService {
+  getDashboardSummary(circleId?: string): Promise<DashboardSummary>;
+  listInspections(params?: {
+    circleId?: string;
+    status?: string;
+    workflowStatus?: string;
+    search?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<{ total: number; items: InspectionSummary[] }>;
+  createInspection(payload: CreateInspectionPayload): Promise<InspectionCase>;
+  getInspection(id: string): Promise<InspectionCase>;
+  uploadEvidence(
+    file: File | Blob,
+    metadata: {
+      inspection_id: string;
+      panel_type?: "PDP_FRONT" | "SIDE_PANEL" | "BACK_PANEL" | "ECOMMERCE_SNAPSHOT";
+      original_filename?: string;
+      file_size_bytes?: number;
+      mime_type?: string;
+      image_width?: number;
+      image_height?: number;
+      preview_url?: string;
+      demo_scenario?: "PASS" | "FAIL" | "REVIEW" | "UNABLE_TO_VERIFY" | "DEFAULT";
+    }
+  ): Promise<{
+    inspection_id: string;
+    image_id: string;
+    raw_sha256: string;
+    quality_gate: QualityGateResult;
+    asset: EvidenceAsset;
+  }>;
+  executePipeline(
+    imageId: string,
+    inspectionId?: string,
+    scenario?: "PASS" | "FAIL" | "REVIEW" | "UNABLE_TO_VERIFY"
+  ): Promise<InspectionCase>;
+  submitAdjudication(
+    inspectionId: string,
+    request: AdjudicationRequest
+  ): Promise<OfficerDecision>;
+  submitFindingAdjudication(
+    inspectionId: string,
+    findingId: string,
+    decision: FindingOfficerDecision,
+    remarks: string,
+    actionOrder?: OfficerActionOrder
+  ): Promise<FindingAdjudication>;
+  getAuditTrail(inspectionId: string): Promise<AuditEvent[]>;
+  getCaseReadiness(inspectionId: string): Promise<CaseReadinessChecklist>;
+  closeInspection(inspectionId: string, remarks?: string): Promise<InspectionCase>;
+  generateNotice(payload: GenerateNoticePayload): Promise<LegalNoticeResult>;
+  getNoticePdfUrl(noticeId: string): string;
+  getSystemHealth(): Promise<{
+    status: string;
+    statutory_mandate: string;
+    repealed_acts_cited: null;
+    version: string;
+  }>;
+  verifyAuditChain(): Promise<{
+    chain_intact: boolean;
+    total_audit_records: number;
+    statutory_standard: string;
+    verification_timestamp: string;
+  }>;
+}
+

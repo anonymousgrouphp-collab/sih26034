@@ -12,16 +12,20 @@ import { InspectionReportView } from "./InspectionReportView";
 import { ApiService } from "../../services/api";
 import { AdjudicationRequest } from "../../types/inspection";
 
+import { OfficerRole } from "../../types/inspection";
+
 interface CaseWorkspaceProps {
   caseData: InspectionCase;
   onBack: () => void;
   onCaseUpdated: (updatedCase: InspectionCase) => void;
+  officerRole?: OfficerRole;
 }
 
 export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
   caseData,
   onBack,
   onCaseUpdated,
+  officerRole = "INSPECTOR",
 }) => {
   const [isSubmittingEvidence, setIsSubmittingEvidence] = useState(false);
   const [isAnalyzingPipeline, setIsAnalyzingPipeline] = useState(false);
@@ -275,6 +279,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
               onOpenCanvas={() => setActiveWorkspaceView("CANVAS")}
               onOpenAudit={() => setActiveWorkspaceView("AUDIT")}
               onCloseCase={handleCloseCase}
+              officerRole={officerRole}
             />
           ) : activeWorkspaceView === "REPORT" ? (
             /* View 5: Read-Only Formal Inspection Report */

@@ -3,6 +3,7 @@ import {
   InspectionCase,
   CaseReadinessChecklist,
   EvidenceAsset,
+  OfficerRole,
 } from "../../types/inspection";
 import { CaseClosureModal } from "./CaseClosureModal";
 import { computeCaseReadiness } from "../../services/mockData";
@@ -13,6 +14,7 @@ interface InspectionOutcomeProps {
   onOpenCanvas: () => void;
   onOpenAudit: () => void;
   onCloseCase?: (remarks: string) => Promise<void>;
+  officerRole?: OfficerRole;
 }
 
 export const InspectionOutcome: React.FC<InspectionOutcomeProps> = ({
@@ -21,6 +23,7 @@ export const InspectionOutcome: React.FC<InspectionOutcomeProps> = ({
   onOpenCanvas,
   onOpenAudit,
   onCloseCase,
+  officerRole = "INSPECTOR",
 }) => {
   const [isClosureModalOpen, setIsClosureModalOpen] = useState(false);
   const [isSubmittingClosure, setIsSubmittingClosure] = useState(false);
@@ -321,17 +324,54 @@ export const InspectionOutcome: React.FC<InspectionOutcomeProps> = ({
               )}
             </div>
           ) : readiness.readiness_state === "READY_FOR_LEGAL_NOTICE_DISPATCH" ? (
-            <div className="p-4 bg-rose-50 border border-rose-200 rounded-lg space-y-2 text-xs text-rose-950">
-              <div className="flex items-center gap-2 font-bold text-rose-900">
-                <span className="h-2 w-2 rounded-full bg-rose-600 animate-pulse" />
-                <span>Downstream Legal Workflow: Ready for Authorized Next Step</span>
+            <div className="p-4 bg-rose-50 border border-rose-200 rounded-lg space-y-3 text-xs text-rose-950">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <div className="flex items-center gap-2 font-bold text-rose-900">
+                  <span className="h-2 w-2 rounded-full bg-rose-600 animate-pulse" />
+                  <span>Downstream Legal Workflow: Ready for Statutory Notice</span>
+                </div>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-200/80 text-rose-900 font-bold border border-rose-300">
+                  AUTHORITY: CONTROLLER OF LEGAL METROLOGY
+                </span>
               </div>
+
               <p className="text-rose-900">
                 {readiness.downstream_action_guidance ||
                   "Statutory violation confirmed by inspecting officer. Case dossier is ready for Form-1 Show Cause Notice preparation."}
               </p>
-              <div className="p-2.5 bg-white/70 border border-rose-200 rounded text-[11px] text-rose-800">
-                <strong>Administrative Notice:</strong> Form-1 Legal Notices require authorized officer signature and formal administrative dispatch. NyayaDrishti-LM never autonomously dispatches legal notices or issues compounding fees.
+
+              <div className="flex items-center justify-between p-3 bg-white border border-rose-200 rounded-lg flex-wrap gap-3">
+                <div>
+                  <span className="font-bold text-slate-800 block text-xs">
+                    {officerRole === "CONTROLLER"
+                      ? "Controller Statutory Authority Confirmed"
+                      : "Inspector Escalation Required"}
+                  </span>
+                  <span className="text-[11px] text-slate-600 block">
+                    {officerRole === "CONTROLLER"
+                      ? "You are logged in with Controller credentials. You are authorized to issue Form-1 Show Cause Notices and determine compounding fees."
+                      : "Under Rule 6 and Section 36(1) LM Act 2009, only the Controller may formally issue Form-1 Notices. Inspectors escalate vetted findings."}
+                  </span>
+                </div>
+
+                {officerRole === "CONTROLLER" ? (
+                  <button
+                    type="button"
+                    onClick={onViewReport}
+                    className="px-4 py-2 text-xs font-bold text-white bg-purple-700 hover:bg-purple-800 rounded-md transition-colors shadow-sm whitespace-nowrap"
+                  >
+                    Prepare Form-1 Legal Notice (Controller Authorization) →
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    disabled
+                    className="px-4 py-2 text-xs font-bold text-slate-400 bg-slate-100 border border-slate-300 rounded-md cursor-not-allowed whitespace-nowrap"
+                    title="Escalated to Controller for administrative notice review and dispatch"
+                  >
+                    Escalated to Controller for Notice Issuance
+                  </button>
+                )}
               </div>
             </div>
           ) : readiness.readiness_state === "ACTION_REQUIRED_RETEST" ? (

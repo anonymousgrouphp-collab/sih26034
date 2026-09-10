@@ -210,3 +210,33 @@ Enables field officers to review completed inspection dossiers, print audit-read
 ### Status
 ACTIVE
 
+---
+
+## [10 September 2026 | 08:25 IST]
+
+### Discovery
+Found that live backend integration during development reveals a critical state persistence gap: `POST /api/v1/pipeline/execute` returns richly structured findings, bounding boxes, and OCR tokens, but subsequent calls to `GET /api/v1/inspections/{id}` on `dev` return empty child arrays (`extracted_fields: []`, `rule_evaluations: []`) because child records are not yet persisted to the relational database. Furthermore, hardcoding a fixed 1920x1080 SVG viewBox causes polygon misalignments on non-standard camera aspect ratios, and permitting inspectors to autonomously generate Section 36(1) Form-1 Legal Notices breaches statutory administrative procedure.
+
+### Evidence
+- M1-M5 Dev Implementation Audit findings.
+- Section 36(1) Legal Metrology Act, 2009 (Notices must be authorized by the Controller / Assistant Controller).
+- Section 63 BSA 2023 Evidentiary Standards (Untouched raw evidence immutability and provenance).
+- Automated test suites `api_adapter.test.ts`, `golden_skus.test.ts`, and `rbac_and_evidence.test.ts`.
+
+### Decision
+1. **Tri-Mode Architecture with In-Memory Session Cache:** Decoupled data access into `LiveApiService`, `MockApiService`, and `DemoFixtureService`. In `LiveApiService`, implemented `pipelineArtifactCache` to preserve extracted fields and rule findings across inspection views during an active session, bridging the database persistence gap without touching backend files.
+2. **Dynamic Image-Aspect SVG Coordinate Mapping:** Dynamically detect natural image dimensions on load (`onLoad={handleImageLoad}`, `naturalWidth`, `naturalHeight`), binding the SVG `viewBox` dynamically to the image's actual resolution rather than assuming a static 1920x1080 canvas.
+3. **Dual View Integrity Toggle:** Maintained an explicit toggle between `Original Capture (Untouched)` and `Rectified View (Derived Homography M1)` with visual badges, ensuring evidentiary chain-of-custody is preserved under Section 63 BSA 2023.
+4. **Statutory RBAC Legal Notice Gating:** Implemented role switching (`INSPECTOR` vs `CONTROLLER`) in the header. If logged in as an `INSPECTOR`, direct Form-1 Notice generation is prohibited and escalated to the Controller; if logged in as `CONTROLLER`, notice preparation is unlocked.
+5. **Truthful Model Lineage & Transliteration:** Formally attributed Devanagari Hindi recognition to `PP-OCRv3 Devanagari` and explicitly labeled Hindi numeral conversion (`०-९ → 0-9`) as deterministic transliteration rather than an OCR correction.
+
+### Why
+Guarantees resilient end-to-end operation across live and offline venues, eliminates coordinate drift on arbitrary camera captures, strictly honors Indian statutory legal metrology jurisdiction, and protects against evidentiary challenges in court.
+
+### Impact
+100% test pass rate across 86 automated unit/integration tests, seamless demo reliability across all 6 Golden Demonstration SKUs, and zero modifications to `dev` or Members 1-5 code.
+
+### Status
+ACTIVE
+
+

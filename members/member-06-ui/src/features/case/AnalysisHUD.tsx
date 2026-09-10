@@ -77,7 +77,7 @@ export const AnalysisHUD: React.FC<AnalysisHUDProps> = ({
         ? `${ocr.total_tokens} tokens • ${(ocr.mean_confidence * 100).toFixed(1)}% conf`
         : isUnableToVerify
         ? "Halted"
-        : "DBNet++ / PP-OCRv4 (En) / PP-OCRv3 (Hi)",
+        : "DBNet++ / PP-OCRv4 English / PP-OCRv3 Devanagari recognition",
     },
     {
       id: "EXTRACTION",
@@ -323,7 +323,7 @@ export const AnalysisHUD: React.FC<AnalysisHUDProps> = ({
             </h4>
           </div>
           <span className="text-[10px] font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-            DBNet++ • PP-OCRv4 (En) • PP-OCRv3 (Hi)
+            DBNet++ • PP-OCRv4 English • PP-OCRv3 Devanagari recognition
           </span>
         </div>
 

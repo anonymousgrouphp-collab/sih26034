@@ -1,0 +1,273 @@
+/**
+ * Demo Fixture Service for NyayaDrishti-LM
+ * Provides dedicated, read-only access to the 6 Golden Demonstration SKUs
+ * (SKU-DEMO-01 to SKU-DEMO-06) per 12_DEMO_PLAN.md and 11_TESTING_AND_VALIDATION_PLAN.md.
+ * 
+ * Strict boundary:
+ * - Read-only fixtures. Never modifies production state.
+ * - Truthfully tags all cases with pipeline_source = "DEMO_FIXTURES".
+ * - Never claims live backend inference.
+ */
+
+import {
+  IInspectionApiService,
+  InspectionCase,
+  InspectionSummary,
+  DashboardSummary,
+  QualityGateResult,
+  AdjudicationRequest,
+  OfficerDecision,
+  FindingOfficerDecision,
+  FindingAdjudication,
+  OfficerActionOrder,
+  AuditEvent,
+  CaseReadinessChecklist,
+  GenerateNoticePayload,
+  LegalNoticeResult,
+  CreateInspectionPayload,
+  EvidenceAsset,
+  ApiError,
+} from "../types/inspection";
+import {
+  GOLDEN_SKU_CASES,
+  MOCK_DASHBOARD_SUMMARY,
+  computeCaseReadiness,
+} from "./mockData";
+
+export class DemoFixtureService implements IInspectionApiService {
+  private static instance: DemoFixtureService;
+
+  public static getInstance(): DemoFixtureService {
+    if (!DemoFixtureService.instance) {
+      DemoFixtureService.instance = new DemoFixtureService();
+    }
+    return DemoFixtureService.instance;
+  }
+
+  public async getDashboardSummary(circleId?: string): Promise<DashboardSummary> {
+    return {
+      ...MOCK_DASHBOARD_SUMMARY,
+      jurisdiction_circle: circleId || MOCK_DASHBOARD_SUMMARY.jurisdiction_circle,
+    };
+  }
+
+  public async listInspections(params?: {
+    circleId?: string;
+    status?: string;
+    workflowStatus?: string;
+    search?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<{ total: number; items: InspectionSummary[] }> {
+    const allCases = Object.values(GOLDEN_SKU_CASES).map((c) => ({
+      id: c.id,
+      inspection_number: c.inspection_number,
+      product_name: c.product_name,
+      brand_name: c.brand_name,
+      manufacturer_name: c.manufacturer_name,
+      establishment_name: c.establishment_name,
+      inspection_type: c.inspection_type,
+      category: c.category,
+      package_type: c.package_type,
+      workflow_status: c.workflow_status || "OPEN",
+      overall_status: c.overall_status,
+      ai_verdict: c.ai_verdict,
+      jurisdiction_id: c.jurisdiction_id,
+      created_at: c.created_at,
+      violations_count: c.rule_evaluations.filter((e) => e.status === "FAIL").length,
+      adjudicated: !!c.adjudication,
+      is_mock_fixture: true,
+    }));
+
+    let items = allCases;
+    if (params?.status) {
+      items = items.filter((i) => i.overall_status === params.status);
+    }
+    if (params?.workflowStatus) {
+      items = items.filter((i) => i.workflow_status === params.workflowStatus);
+    }
+    if (params?.circleId) {
+      items = items.filter((i) => i.jurisdiction_id === params.circleId);
+    }
+    if (params?.search) {
+      const query = params.search.toLowerCase();
+      items = items.filter(
+        (i) =>
+          i.product_name.toLowerCase().includes(query) ||
+          i.inspection_number.toLowerCase().includes(query) ||
+          (i.brand_name && i.brand_name.toLowerCase().includes(query)) ||
+          (i.establishment_name && i.establishment_name.toLowerCase().includes(query))
+      );
+    }
+
+    return { total: items.length, items };
+  }
+
+  public async createInspection(_payload: CreateInspectionPayload): Promise<InspectionCase> {
+    throw {
+      error_code: "READ_ONLY_MODE",
+      status: 403,
+      message: "Cannot create new inspection cases while in Golden Demo Fixture mode.",
+      remediation: "Switch to Live Backend or Mock Workspace mode to create interactive inspections.",
+    } as ApiError;
+  }
+
+  public async getInspection(id: string): Promise<InspectionCase> {
+    const found =
+      GOLDEN_SKU_CASES[id] ||
+      Object.values(GOLDEN_SKU_CASES).find(
+        (c) => c.id === id || c.sku_demo_id === id || c.inspection_number === id
+      );
+
+    if (!found) {
+      throw {
+        error_code: "DEMO_CASE_NOT_FOUND",
+        status: 404,
+        message: `Golden Demo SKU '${id}' not found in fixture catalog.`,
+        remediation: "Select one of SKU-DEMO-01 through SKU-DEMO-06.",
+      } as ApiError;
+    }
+
+    return {
+      ...found,
+      pipeline_source: "DEMO_FIXTURES",
+      is_mock_fixture: true,
+    };
+  }
+
+  public async uploadEvidence(): Promise<{
+    inspection_id: string;
+    image_id: string;
+    raw_sha256: string;
+    quality_gate: QualityGateResult;
+    asset: EvidenceAsset;
+  }> {
+    throw {
+      error_code: "READ_ONLY_MODE",
+      status: 403,
+      message: "Evidence upload is disabled in read-only Golden Demo Fixture mode.",
+      remediation: "Switch to Live Backend or Mock Workspace mode to upload evidence.",
+    } as ApiError;
+  }
+
+  public async executePipeline(
+    imageId: string,
+    inspectionId?: string,
+    _scenario?: "PASS" | "FAIL" | "REVIEW" | "UNABLE_TO_VERIFY"
+  ): Promise<InspectionCase> {
+    const targetCase = inspectionId
+      ? await this.getInspection(inspectionId)
+      : Object.values(GOLDEN_SKU_CASES).find((c) =>
+          c.evidence_assets.some((a) => a.image_id === imageId)
+        ) || GOLDEN_SKU_CASES["SKU-DEMO-01"];
+
+    return {
+      ...targetCase,
+      pipeline_source: "DEMO_FIXTURES",
+      is_mock_fixture: true,
+    };
+  }
+
+  public async submitAdjudication(
+    inspectionId: string,
+    _request: AdjudicationRequest
+  ): Promise<OfficerDecision> {
+    const targetCase = await this.getInspection(inspectionId);
+    if (targetCase.adjudication) {
+      return targetCase.adjudication;
+    }
+    return {
+      decision_id: `dec_demo_${inspectionId}`,
+      inspection_id: inspectionId,
+      officer_id: "INSP-DL-0842",
+      badge_number: "INSP-DL-0842",
+      officer_name: "Rajesh Sharma",
+      verdict: "CONFIRM_VIOLATION",
+      override_applied: false,
+      remarks: "Golden SKU demonstration adjudication record.",
+      timestamp_utc: new Date().toISOString(),
+      action_order: "GENERATE_LEGAL_NOTICE_FORM_1",
+    };
+  }
+
+  public async submitFindingAdjudication(
+    _inspectionId: string,
+    findingId: string,
+    decision: FindingOfficerDecision,
+    remarks: string,
+    actionOrder?: OfficerActionOrder
+  ): Promise<FindingAdjudication> {
+    return {
+      finding_id: findingId,
+      decision,
+      officer_id: "INSP-DL-0842",
+      officer_name: "Rajesh Sharma",
+      badge_number: "INSP-DL-0842",
+      remarks: remarks.trim(),
+      timestamp_utc: new Date().toISOString(),
+      action_order: actionOrder,
+    };
+  }
+
+  public async getAuditTrail(inspectionId: string): Promise<AuditEvent[]> {
+    const c = await this.getInspection(inspectionId);
+    return c.audit_trail || [];
+  }
+
+  public async getCaseReadiness(inspectionId: string): Promise<CaseReadinessChecklist> {
+    const c = await this.getInspection(inspectionId);
+    return computeCaseReadiness(c);
+  }
+
+  public async closeInspection(inspectionId: string): Promise<InspectionCase> {
+    const c = await this.getInspection(inspectionId);
+    return {
+      ...c,
+      workflow_status: "COMPLETED",
+      pipeline_source: "DEMO_FIXTURES",
+    };
+  }
+
+  public async generateNotice(_payload: GenerateNoticePayload): Promise<LegalNoticeResult> {
+    return {
+      notice_id: `not_demo_${Date.now()}`,
+      notice_reference_number: "LMO/DL/SOUTH/2026/0842",
+      bsa_certificate_number: "CERT-BSA2023-20260910-0842",
+      statutory_mandate: "Section 36(1) of Legal Metrology Act, 2009 read with Section 63 BSA 2023",
+      pdf_download_url: `/api/v1/notices/demo/pdf`,
+      merkle_entry_hash: "8c42b9101adfa9280194bc0281efca891048bca120938a1ef908123bcdef0123",
+    };
+  }
+
+  public getNoticePdfUrl(noticeId: string): string {
+    return `/api/v1/notices/${noticeId}/pdf`;
+  }
+
+  public async getSystemHealth(): Promise<{
+    status: string;
+    statutory_mandate: string;
+    repealed_acts_cited: null;
+    version: string;
+  }> {
+    return {
+      status: "DEMO_FIXTURES_MODE",
+      statutory_mandate: "Section 63 Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)",
+      repealed_acts_cited: null,
+      version: "1.0.0-sih26034",
+    };
+  }
+
+  public async verifyAuditChain(): Promise<{
+    chain_intact: boolean;
+    total_audit_records: number;
+    statutory_standard: string;
+    verification_timestamp: string;
+  }> {
+    return {
+      chain_intact: true,
+      total_audit_records: 6,
+      statutory_standard: "Section 63 Bharatiya Sakshya Adhiniyam, 2023",
+      verification_timestamp: new Date().toISOString(),
+    };
+  }
+}

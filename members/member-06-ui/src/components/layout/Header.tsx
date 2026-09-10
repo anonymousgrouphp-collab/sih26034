@@ -1,10 +1,13 @@
 import React from "react";
 import { ConnectivityBadge } from "../common/ConnectivityBadge";
+import { OfficerRole } from "../../types/inspection";
 
 interface HeaderProps {
   activeCircle: string;
   onCircleChange: (circleId: string) => void;
   onRefresh?: () => void;
+  officerRole?: OfficerRole;
+  onOfficerRoleChange?: (role: OfficerRole) => void;
 }
 
 export const JURISDICTION_CIRCLES = [
@@ -18,7 +21,11 @@ export const Header: React.FC<HeaderProps> = ({
   activeCircle,
   onCircleChange,
   onRefresh,
+  officerRole = "INSPECTOR",
+  onOfficerRoleChange,
 }) => {
+  const isController = officerRole === "CONTROLLER";
+
   return (
     <header className="bg-govNavy text-white border-b-2 border-amber-500 shadow-md sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -47,7 +54,7 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Controls: Circle Selector, Connectivity, Officer Profile */}
+          {/* Controls: Circle Selector, Connectivity, RBAC Role Toggle, Officer Profile */}
           <div className="flex items-center space-x-3 sm:space-x-4">
             {/* Jurisdiction Circle Selector */}
             <div className="hidden md:flex items-center space-x-2 bg-govNavy-dark/60 px-3 py-1.5 rounded-md border border-slate-700">
@@ -68,23 +75,65 @@ export const Header: React.FC<HeaderProps> = ({
               </select>
             </div>
 
+            {/* RBAC Role Toggle */}
+            {onOfficerRoleChange && (
+              <div className="hidden sm:flex items-center bg-govNavy-dark/80 p-0.5 rounded-md border border-slate-700 text-xs">
+                <button
+                  type="button"
+                  onClick={() => onOfficerRoleChange("INSPECTOR")}
+                  className={`px-2 py-1 rounded text-[11px] font-semibold transition-colors ${
+                    !isController
+                      ? "bg-amber-500 text-govNavy font-bold shadow-xs"
+                      : "text-slate-300 hover:text-white"
+                  }`}
+                  title="Switch to Legal Metrology Officer (Inspector) Role"
+                >
+                  Inspector
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onOfficerRoleChange("CONTROLLER")}
+                  className={`px-2 py-1 rounded text-[11px] font-semibold transition-colors ${
+                    isController
+                      ? "bg-purple-600 text-white font-bold shadow-xs"
+                      : "text-slate-300 hover:text-white"
+                  }`}
+                  title="Switch to Controller of Legal Metrology (Notice Issuing Authority) Role"
+                >
+                  Controller
+                </button>
+              </div>
+            )}
+
             {/* Connectivity Badge */}
             <ConnectivityBadge onRefresh={onRefresh} />
 
             {/* Officer Profile Badge */}
             <div className="flex items-center space-x-2.5 pl-2 border-l border-slate-700">
-              <div className="w-8 h-8 rounded-full bg-govNavy-light flex items-center justify-center text-xs font-bold text-amber-300 border border-slate-500 shadow-inner">
-                RS
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border shadow-inner ${
+                  isController
+                    ? "bg-purple-900 text-purple-200 border-purple-400"
+                    : "bg-govNavy-light text-amber-300 border-slate-500"
+                }`}
+              >
+                {isController ? "SKV" : "RS"}
               </div>
               <div className="hidden lg:block text-left">
                 <div className="text-xs font-bold text-white flex items-center gap-1.5">
-                  Rajesh Sharma
-                  <span className="text-[10px] font-mono px-1 py-0.2 rounded bg-amber-400/20 text-amber-300 border border-amber-400/30">
-                    LMO
+                  {isController ? "S.K. Verma" : "Rajesh Sharma"}
+                  <span
+                    className={`text-[10px] font-mono px-1 py-0.2 rounded border ${
+                      isController
+                        ? "bg-purple-500/20 text-purple-300 border-purple-400/40"
+                        : "bg-amber-400/20 text-amber-300 border-amber-400/30"
+                    }`}
+                  >
+                    {isController ? "CONTROLLER" : "LMO / INSP"}
                   </span>
                 </div>
                 <div className="text-[11px] font-mono text-slate-300">
-                  INSP-DL-0842
+                  {isController ? "CTRL-DL-0012" : "INSP-DL-0842"}
                 </div>
               </div>
             </div>

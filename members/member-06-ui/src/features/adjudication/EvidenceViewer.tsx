@@ -32,6 +32,8 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
   // Zoom state: 0.5x to 3.0x
   const [zoomLevel, setZoomLevel] = useState<number>(1.0);
   const [isLoupeActive, setIsLoupeActive] = useState<boolean>(false);
+  const [viewMode, setViewMode] = useState<"ORIGINAL" | "RECTIFIED">("ORIGINAL");
+  const [naturalDimensions, setNaturalDimensions] = useState<{ width: number; height: number } | null>(null);
   const [loupePos, setLoupePos] = useState<{
     containerX: number;
     containerY: number;
@@ -45,8 +47,18 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
   const imgRef = useRef<HTMLImageElement>(null);
 
   const tokens: OCRToken[] = asset.ocr?.tokens || [];
-  const imgWidth = asset.image_width || 1920;
-  const imgHeight = asset.image_height || 1080;
+  // Dynamic natural dimensions mapped from loaded image, with fallback to asset metadata
+  const imgWidth = naturalDimensions?.width || asset.image_width || 1920;
+  const imgHeight = naturalDimensions?.height || asset.image_height || 1080;
+
+  const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+      setNaturalDimensions({ width: img.naturalWidth, height: img.naturalHeight });
+    }
+  };
+
+  const hasRectifiedSupport = !!asset.calibration?.homography_matrix;
 
   // Zoom handlers
   const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 0.25, 3.0));
@@ -101,11 +113,50 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
     <div className="bg-panelBg rounded-lg border border-slate-200 shadow-sm flex flex-col h-full overflow-hidden">
       {/* 1. Header Toolbar */}
       <div className="p-3 border-b border-slate-200 flex items-center justify-between gap-2 flex-wrap bg-slate-50/80">
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-govNavy text-white font-mono text-[10px] font-bold border border-amber-400/50 shadow-sm">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            ORIGINAL EVIDENCE
-          </span>
+        <div className="flex items-center gap-2 flex-wrap">
+          {viewMode === "ORIGINAL" ? (
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-govNavy text-white font-mono text-[10px] font-bold border border-amber-400/50 shadow-sm">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              ORIGINAL CAPTURE (UNTOUCHED)
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-purple-800 text-white font-mono text-[10px] font-bold border border-purple-400 shadow-sm">
+              <span className="h-1.5 w-1.5 rounded-full bg-purple-300" />
+              DERIVED RECTIFIED VIEW (HOMOGRAPHY M1)
+            </span>
+          )}
+
+          {/* Perspective View Toggle */}
+          <div className="inline-flex rounded border border-slate-300 bg-white p-0.5 text-xs font-medium">
+            <button
+              type="button"
+              onClick={() => setViewMode("ORIGINAL")}
+              className={`px-2 py-0.5 rounded text-[11px] transition-colors ${
+                viewMode === "ORIGINAL"
+                  ? "bg-govNavy text-white font-bold shadow-xs"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+              }`}
+            >
+              Original Capture
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("RECTIFIED")}
+              className={`px-2 py-0.5 rounded text-[11px] transition-colors ${
+                viewMode === "RECTIFIED"
+                  ? "bg-purple-800 text-white font-bold shadow-xs"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+              }`}
+              title={
+                hasRectifiedSupport
+                  ? "Planar homography rectified perspective projection (M1 Metrology)"
+                  : "Planar homography perspective projection (derived)"
+              }
+            >
+              Rectified View
+            </button>
+          </div>
+
           <span className="text-xs font-mono text-slate-600 truncate max-w-xs font-semibold" title={asset.original_filename || asset.image_id}>
             {asset.original_filename || asset.image_id}
           </span>
@@ -197,12 +248,23 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
             }}
             className="relative max-w-full inline-block shadow-2xl rounded"
           >
+            {/* Rectified View Banner if active */}
+            {viewMode === "RECTIFIED" && (
+              <div className="absolute top-2 left-2 z-20 bg-purple-950/90 text-purple-200 border border-purple-500/80 px-2 py-1 rounded text-[10px] font-mono shadow-md backdrop-blur-xs flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
+                <span>Planar Homography Rectification (M1 Derived View)</span>
+              </div>
+            )}
+
             {/* Base Packaging Image */}
             <img
               ref={imgRef}
               src={imageSrc}
               alt={`Packaging inspection evidence for ${productName}`}
-              className="block max-h-[520px] w-auto h-auto object-contain rounded"
+              onLoad={handleImageLoad}
+              className={`block max-h-[520px] w-auto h-auto object-contain rounded transition-all ${
+                viewMode === "RECTIFIED" ? "ring-2 ring-purple-500/50 filter brightness-105" : ""
+              }`}
               draggable={false}
             />
 

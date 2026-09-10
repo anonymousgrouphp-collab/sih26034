@@ -657,6 +657,17 @@ export const GOLDEN_SKU_CASES: Record<string, InspectionCase> = {
         discrepancy: "Listing lacks statutory Country of Origin declaration",
         legal_consequence: "Violation under Rule 6(10) enforceable under Section 36(1) LM Act 2009",
       },
+      {
+        finding_id: "eval_06_02",
+        rule_code: "RULE_06_10_MFG_DATE_EXEMPTION",
+        statutory_reference: "Rule 6(10) / G.S.R. 594(E)",
+        status: "NOT_APPLICABLE",
+        severity: "MINOR",
+        required_value: "Statutory Exemption under Rule 6(10)",
+        measured_value: "EXEMPT_DIGITAL_LISTING",
+        discrepancy: "Digital e-commerce listings are statutory exempt from declaring date of manufacture under Rule 6(10) GSR 594(E).",
+        legal_consequence: "No penalty; statutory exemption recorded for audit trail",
+      },
     ],
   },
 };

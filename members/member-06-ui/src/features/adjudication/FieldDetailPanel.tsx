@@ -2,6 +2,41 @@ import React from "react";
 import { RuleFinding, ExtractedField, OCRToken, OfficerDecision, FindingAdjudication } from "../../types/inspection";
 import { VerdictBadge } from "../../components/common/StatusBadge";
 
+const DEVANAGARI_DIGITS_MAP: Record<string, string> = {
+  "०": "0", "१": "1", "२": "2", "३": "3", "४": "4",
+  "५": "5", "६": "6", "७": "7", "८": "8", "९": "9",
+};
+
+function hasDevanagariNumerals(text: string): boolean {
+  return /[०-९]/.test(text);
+}
+
+function extractDevanagariNumerals(text: string): string {
+  const matches = text.match(/[०-९]+/g);
+  return matches ? matches.join(" ") : "";
+}
+
+function transliterateDevanagari(text: string): string {
+  return text.replace(/[०-९]/g, (char) => DEVANAGARI_DIGITS_MAP[char] || char);
+}
+
+function getModelDisplayName(tok: OCRToken): string {
+  const hasDevanagari = /[\u0900-\u097F]/.test(tok.text);
+  if (tok.model_source === "PP-OCRv3_Devanagari" || hasDevanagari || tok.language === "hi") {
+    return "PP-OCRv3 Devanagari recognition";
+  }
+  if (tok.model_source === "PP-OCRv4_Latin" || tok.language === "en") {
+    return "PP-OCRv4 English recognition";
+  }
+  if (tok.model_source === "DBNet++") {
+    return "DBNet++ text detection";
+  }
+  if (tok.model_source === "Tesseract_v5") {
+    return "Tesseract v5 fallback";
+  }
+  return tok.model_source || "PP-OCRv4 English recognition";
+}
+
 interface FieldDetailPanelProps {
   finding?: RuleFinding;
   field?: ExtractedField;
@@ -235,15 +270,60 @@ export const FieldDetailPanel: React.FC<FieldDetailPanelProps> = ({
           <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
             Semantic Extraction Record
           </h4>
-          <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-2">
+          <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-2.5">
             <div>
-              <span className="text-[10px] text-slate-500 font-bold block font-mono">Raw OCR Text Stream</span>
+              <span className="text-[10px] text-slate-500 font-bold block font-mono uppercase">Raw OCR Observed Text</span>
               <div className="p-2 bg-white rounded border border-slate-200 font-sans text-xs text-slate-800 font-medium">
                 {field.raw_ocr_text}
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 text-[11px] font-mono text-slate-600">
+            {/* Devanagari Numeral Normalization Inspection */}
+            {hasDevanagariNumerals(field.raw_ocr_text) && (
+              <div className="p-2.5 bg-blue-50/90 border border-blue-200 rounded-md space-y-1.5">
+                <div className="flex items-center justify-between text-[11px] flex-wrap gap-1">
+                  <span className="font-bold text-blue-900 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
+                    Indic Numeral Normalization
+                  </span>
+                  <span className="text-[10px] font-mono px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded font-semibold border border-blue-300">
+                    Deterministic Transliteration (०-९ → 0-9)
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs font-mono pt-1">
+                  <div className="bg-white p-1.5 rounded border border-blue-100">
+                    <span className="text-[10px] text-slate-500 block font-sans uppercase">Observed Indic</span>
+                    <span className="font-bold text-slate-900 text-sm font-sans">{extractDevanagariNumerals(field.raw_ocr_text)}</span>
+                  </div>
+                  <div className="bg-white p-1.5 rounded border border-blue-100">
+                    <span className="text-[10px] text-slate-500 block font-sans uppercase">Normalized Standard</span>
+                    <span className="font-bold text-emerald-800 text-sm">{transliterateDevanagari(extractDevanagariNumerals(field.raw_ocr_text))}</span>
+                  </div>
+                </div>
+
+                <p className="text-[10px] text-blue-700 italic">
+                  Deterministic numeral transliteration per LMPC Sixth Schedule. Not an OCR error correction.
+                </p>
+              </div>
+            )}
+
+            {/* Structured Normalized Fact */}
+            {field.normalized_value && Object.keys(field.normalized_value).length > 0 && (
+              <div>
+                <span className="text-[10px] text-slate-500 font-bold block font-mono uppercase">Normalized Structured Fact</span>
+                <div className="p-2 bg-white rounded border border-slate-200 font-mono text-[11px] text-slate-800">
+                  {Object.entries(field.normalized_value).map(([key, val]) => (
+                    <div key={key} className="flex items-center justify-between py-0.5">
+                      <span className="text-slate-500">{key}:</span>
+                      <span className="font-bold text-slate-900">{typeof val === "object" ? JSON.stringify(val) : String(val)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-2 text-[11px] font-mono text-slate-600 pt-1">
               <div>
                 <span className="text-[10px] text-slate-500 block uppercase">Extraction Confidence</span>
                 <span className="font-bold text-slate-800">{(field.detection_confidence * 100).toFixed(1)}%</span>
@@ -278,10 +358,10 @@ export const FieldDetailPanel: React.FC<FieldDetailPanelProps> = ({
                 onClick={() => onSelectToken && onSelectToken(tok.token_id)}
                 className="p-2.5 bg-slate-900 text-slate-100 rounded-lg border border-slate-800 font-mono text-xs space-y-1.5 cursor-pointer hover:border-slate-600 transition-colors"
               >
-                <div className="flex items-center justify-between text-[11px]">
+                <div className="flex items-center justify-between text-[11px] flex-wrap gap-1">
                   <span className="text-amber-400 font-bold">#{tok.token_id}</span>
-                  <span className="text-slate-400 text-[10px]">
-                    {tok.model_source || "PP-OCR"} • Conf: {(tok.confidence * 100).toFixed(1)}%
+                  <span className="text-slate-300 text-[10px] bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700">
+                    {getModelDisplayName(tok)} • Conf: {(tok.confidence * 100).toFixed(1)}%
                   </span>
                 </div>
 
