@@ -80,6 +80,55 @@ def test_run_golden_sku_03_bottled_water_pass():
     assert data["overall_status"] == "PASS"
 
 
+def test_run_golden_sku_02_curry_pouch_usp_mismatch():
+    """Verify POST /api/v1/demo/skus/SKU-DEMO-02/run flags USP mismatch and missing consumer email."""
+    resp = client.post("/api/v1/demo/skus/SKU-DEMO-02/run")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["status"] == "SUCCESS"
+    assert data["sku_id"] == "SKU-DEMO-02"
+    assert data["overall_status"] == "FAIL"
+    evals = data["rule_evaluations"]
+    assert any("USP" in e.get("rule_code", "") and e["status"] == "FAIL" for e in evals)
+    assert any("CONSUMER_CARE" in e.get("rule_code", "") for e in evals)
+
+
+def test_run_golden_sku_04_soap_box_borderline_review():
+    """Verify POST /api/v1/demo/skus/SKU-DEMO-04/run returns REVIEW for borderline measurement."""
+    resp = client.post("/api/v1/demo/skus/SKU-DEMO-04/run")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["status"] == "SUCCESS"
+    assert data["sku_id"] == "SKU-DEMO-04"
+    assert data["overall_status"] == "REVIEW"
+    assert any(b.get("recognized_script") == "DEVANAGARI" for b in data.get("bounding_boxes", []))
+
+
+def test_run_golden_sku_05_chips_glare_unable_to_verify():
+    """Verify POST /api/v1/demo/skus/SKU-DEMO-05/run returns UNABLE_TO_VERIFY due to glare."""
+    resp = client.post("/api/v1/demo/skus/SKU-DEMO-05/run")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["status"] == "SUCCESS"
+    assert data["sku_id"] == "SKU-DEMO-05"
+    assert data["overall_status"] == "UNABLE_TO_VERIFY"
+    assert data["quality_gate"]["passed"] is False
+    assert len(data.get("bounding_boxes", [])) == 0
+
+
+def test_run_golden_sku_06_ecom_listing_fail():
+    """Verify POST /api/v1/demo/skus/SKU-DEMO-06/run flags missing Country of Origin under Rule 6(10)."""
+    resp = client.post("/api/v1/demo/skus/SKU-DEMO-06/run")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["status"] == "SUCCESS"
+    assert data["sku_id"] == "SKU-DEMO-06"
+    assert data["overall_status"] == "FAIL"
+    evals = data["rule_evaluations"]
+    assert any("RULE_06_10_ECOMM_MANDATORY_DECLARATIONS" in e.get("rule_code", "") for e in evals)
+    assert any("RULE_06_10_MFG_DATE_EXEMPTION" in e.get("rule_code", "") for e in evals)
+
+
 def test_golden_sku_not_found():
     """Verify 404 response for invalid SKU ID."""
     resp = client.post("/api/v1/demo/skus/SKU-NON-EXISTENT/run")
