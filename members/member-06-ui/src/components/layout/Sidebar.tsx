@@ -16,7 +16,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   pendingCasesCount = 0,
 }) => {
   return (
-    <aside className="w-64 bg-panelBg border-r border-slate-200 flex flex-col justify-between shrink-0 shadow-sm hidden md:flex">
+    <aside className="w-64 bg-panelBg border-r border-slate-200 flex flex-col justify-between shrink-0 shadow-xs hidden md:flex sticky top-[4.25rem] h-[calc(100vh-4.25rem)] overflow-y-auto">
       {/* Top Action & Navigation */}
       <div className="p-4 space-y-4">
         {/* Primary CTA: New Case Registration */}
@@ -88,7 +88,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Bottom Information Card */}
-      <div className="p-4 border-t border-slate-200 bg-slate-50">
+      <div className="p-3.5 m-3 border border-slate-200 bg-slate-50/90 rounded-lg shadow-2xs">
         <div className="text-[11px] font-mono space-y-1.5 text-slate-600">
           <div className="flex items-center justify-between">
             <span className="font-semibold text-slate-700">Statute:</span>

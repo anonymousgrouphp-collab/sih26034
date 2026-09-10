@@ -27,27 +27,27 @@ export const Header: React.FC<HeaderProps> = ({
   const isController = officerRole === "CONTROLLER";
 
   return (
-    <header className="bg-govNavy text-white border-b-2 border-amber-500 shadow-md sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <header className="bg-govNavy text-white border-b-2 border-amber-500 shadow-md sticky top-0 z-40 w-full">
+      <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between min-h-[4.25rem] py-2 sm:py-2.5">
           {/* Brand & Ministry */}
-          <div className="flex items-center space-x-3.5">
-            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-govNavy font-bold text-xs shadow-sm border border-amber-400">
-              <span className="font-serif tracking-tighter text-sm text-govNavy font-black">GOI</span>
+          <div className="flex items-center space-x-3.5 shrink-0 py-0.5">
+            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-govNavy font-bold text-xs shadow-sm border border-amber-400 shrink-0">
+              <span className="font-serif tracking-tighter text-sm text-govNavy font-black leading-none">GOI</span>
             </div>
-            <div>
-              <div className="flex items-center space-x-2">
-                <span className="text-xs uppercase tracking-wider font-semibold text-amber-400">
+            <div className="flex flex-col justify-center">
+              <div className="flex items-center space-x-2 leading-none">
+                <span className="text-[11px] uppercase tracking-wider font-semibold text-amber-400 whitespace-nowrap">
                   Government of India
                 </span>
                 <span className="text-slate-400 text-xs">•</span>
-                <span className="text-xs text-slate-300 font-medium">
+                <span className="text-[11px] text-slate-300 font-medium whitespace-nowrap">
                   Department of Consumer Affairs
                 </span>
               </div>
-              <h1 className="text-sm sm:text-base font-bold tracking-tight text-white flex items-center gap-2">
-                NyayaDrishti-LM
-                <span className="text-xs font-mono font-normal px-2 py-0.5 rounded bg-govNavy-light border border-slate-600 text-slate-200">
+              <h1 className="text-sm sm:text-base font-bold tracking-tight text-white flex items-center gap-2 mt-1 leading-tight">
+                <span className="whitespace-nowrap">NyayaDrishti-LM</span>
+                <span className="text-[10px] sm:text-xs font-mono font-normal px-2 py-0.5 rounded bg-govNavy-light border border-slate-600 text-slate-200 whitespace-nowrap">
                   LMPC Rules, 2011 Workstation
                 </span>
               </h1>
@@ -55,7 +55,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Controls: Circle Selector, Connectivity, RBAC Role Toggle, Officer Profile */}
-          <div className="flex items-center space-x-3 sm:space-x-4">
+          <div className="flex items-center space-x-3 sm:space-x-4 shrink-0">
             {/* Jurisdiction Circle Selector */}
             <div className="hidden md:flex items-center space-x-2 bg-govNavy-dark/60 px-3 py-1.5 rounded-md border border-slate-700">
               <label htmlFor="circle-select" className="text-xs text-slate-300 whitespace-nowrap font-medium">
@@ -65,7 +65,7 @@ export const Header: React.FC<HeaderProps> = ({
                 id="circle-select"
                 value={activeCircle}
                 onChange={(e) => onCircleChange(e.target.value)}
-                className="bg-transparent text-xs text-amber-200 font-medium focus:outline-none cursor-pointer pr-2"
+                className="bg-transparent text-xs text-amber-200 font-medium focus:outline-none cursor-pointer pr-2 max-w-[280px] truncate"
               >
                 {JURISDICTION_CIRCLES.map((c) => (
                   <option key={c.id} value={c.id} className="bg-govNavy text-white">

@@ -200,7 +200,7 @@ export const App: React.FC = () => {
       />
 
       {/* Main Workspace: Sidebar + Content */}
-      <div className="flex-1 flex max-w-7xl w-full mx-auto">
+      <div className="flex-1 flex w-full max-w-[1700px] mx-auto">
         <Sidebar
           currentTab={currentTab}
           onTabChange={(tab) => {
