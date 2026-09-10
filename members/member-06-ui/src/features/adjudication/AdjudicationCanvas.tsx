@@ -219,7 +219,27 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
       }
     }
 
-    // 3. Golden SKU specific conflicts
+    // 3. Epistemic sensor uncertainty band findings (k=2 REVIEW state)
+    for (const f of findings) {
+      if (f.status === "REVIEW") {
+        const alreadyAdded = list.some((c) => c.field.includes("FONT") || c.id.includes(f.finding_id));
+        if (!alreadyAdded) {
+          list.push({
+            id: `conflict_review_${f.finding_id}`,
+            field: f.field_type || "NUMERAL FONT HEIGHT",
+            expected: f.required_value,
+            observed: `${f.measured_value} (±0.04 mm k=2 CI)`,
+            description:
+              f.discrepancy ||
+              "Measurement falls within sensor uncertainty band (95% CI). Physical caliper verification recommended before notice issuance.",
+            requiresHumanDecision: true,
+            resolved: Boolean(caseData.adjudication),
+          });
+        }
+      }
+    }
+
+    // 4. Golden SKU specific conflicts fallback
     if (list.length === 0 && caseData.sku_demo_id === "SKU-DEMO-02") {
       list.push({
         id: "conflict_sku_demo_02_usp",
@@ -451,7 +471,8 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
       </div>
 
       {/* Metric Calibration Mathematical Traceability Block (Table-I Schedule & ADR-06) */}
-      {(activeAsset?.calibration?.is_calibrated || caseData.evidence_assets.some((a) => a.calibration?.is_calibrated)) && (
+      {/* Metric Calibration Mathematical Traceability Block (Table-I Schedule & ADR-06) */}
+      {(activeAsset?.calibration?.is_calibrated || caseData.evidence_assets.some((a) => a.calibration?.is_calibrated)) ? (
         <div
           data-testid="calibration-math-block"
           className="rounded-lg border border-slate-200 bg-white p-4 shadow-workstation space-y-2 text-xs"
@@ -498,6 +519,21 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
               </p>
             </div>
           </div>
+        </div>
+      ) : (
+        <div
+          data-testid="calibration-uncalibrated-card"
+          className="rounded-lg border border-amber-200 bg-amber-50/70 p-4 shadow-workstation space-y-1 text-xs"
+        >
+          <div className="flex items-center gap-2 text-amber-900 font-bold">
+            <svg className="w-4 h-4 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <span>Metric Calibration Unavailable · Physical Reference Required</span>
+          </div>
+          <p className="text-amber-800/90 text-[11px] leading-relaxed">
+            No valid ArUco fiducial target detected on physical packaging. Dimensional measurements and numeral font height verifications must not be treated as calibrated statutory evidence under Section 63 BSA 2023.
+          </p>
         </div>
       )}
 

@@ -61,14 +61,23 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
     ).length;
   }, [cases]);
 
-  // Confidence estimation helper
+  // Confidence estimation helper with robust bounds clamping [0.0 - 1.0] and percentage handling
   const getCaseConfidence = (c: InspectionSummary): number => {
-    if (typeof c.overall_confidence === "number") return c.overall_confidence;
-    if (c.overall_status === "PASS") return 0.98;
-    if (c.overall_status === "FAIL") return 0.95;
-    if (c.overall_status === "REVIEW") return 0.74;
-    if (c.overall_status === "UNABLE_TO_VERIFY") return 0.42;
-    return 0.88;
+    let val: number;
+    if (typeof c.overall_confidence === "number") {
+      val = c.overall_confidence > 1 ? c.overall_confidence / 100 : c.overall_confidence;
+    } else if (c.overall_status === "PASS") {
+      val = 0.98;
+    } else if (c.overall_status === "FAIL") {
+      val = 0.95;
+    } else if (c.overall_status === "REVIEW") {
+      val = 0.74;
+    } else if (c.overall_status === "UNABLE_TO_VERIFY") {
+      val = 0.42;
+    } else {
+      val = 0.88;
+    }
+    return Math.max(0, Math.min(1, val));
   };
 
   // Filtered case records
@@ -371,7 +380,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
             <div className="block md:hidden divide-y divide-slate-200">
               {filteredCases.map((c) => {
                 const conf = getCaseConfidence(c);
-                const confPct = Math.round(conf * 100);
+                const confPct = Math.min(100, Math.max(0, Math.round(conf * 100)));
                 return (
                   <div
                     key={`mobile-${c.id}`}
@@ -443,7 +452,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
               <tbody className="divide-y divide-slate-200 text-xs">
                 {filteredCases.map((c) => {
                   const conf = getCaseConfidence(c);
-                  const confPct = Math.round(conf * 100);
+                  const confPct = Math.min(100, Math.max(0, Math.round(conf * 100)));
                   return (
                     <tr
                       key={c.id}

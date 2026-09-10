@@ -70,15 +70,23 @@ export const ConflictResolutionCard: React.FC<ConflictResolutionCardProps> = ({
               </div>
 
               <div className="space-y-2">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded bg-white px-2.5 py-1 text-xs font-semibold text-slate-800 border border-amber-200/80 shadow-xs font-mono">
-                    Expected: {c.expected}
-                  </span>
-                  <ArrowRight className="w-3.5 h-3.5 text-amber-700 shrink-0" />
-                  <span className="rounded bg-rose-50 border border-rose-200 px-2.5 py-1 text-xs font-semibold text-rose-800 shadow-xs font-mono">
-                    Observed: {c.observed}
-                  </span>
-                </div>
+                {(c.expected || c.observed) && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    {c.expected && (
+                      <span className="rounded bg-white px-2.5 py-1 text-xs font-semibold text-slate-800 border border-amber-200/80 shadow-xs font-mono">
+                        Expected: {c.expected}
+                      </span>
+                    )}
+                    {c.expected && c.observed && (
+                      <ArrowRight className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+                    )}
+                    {c.observed && (
+                      <span className="rounded bg-rose-50 border border-rose-200 px-2.5 py-1 text-xs font-semibold text-rose-800 shadow-xs font-mono">
+                        Observed: {c.observed}
+                      </span>
+                    )}
+                  </div>
+                )}
 
                 <p className="text-xs leading-relaxed text-amber-950 font-medium">
                   {c.description}
