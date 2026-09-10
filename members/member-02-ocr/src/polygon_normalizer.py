@@ -15,13 +15,29 @@ import cv2
 
 class PolygonNormalizer:
     @staticmethod
-    def polygon_to_axis_aligned_box(polygon: List[List[int]]) -> List[int]:
-        """Converts 4-point polygon [[x1, y1], [x2, y2], [x3, y3], [x4, y4]] to [ymin, xmin, ymax, xmax]."""
+    def polygon_to_axis_aligned_box(
+        polygon: List[List[Union[int, float]]],
+        image_width: Optional[int] = None,
+        image_height: Optional[int] = None
+    ) -> List[int]:
+        """Converts 4-point polygon [[x1, y1], [x2, y2], [x3, y3], [x4, y4]] to [ymin, xmin, ymax, xmax] with bounds clipping."""
         if len(polygon) < 4:
             raise ValueError("Polygon must contain at least 4 coordinate pairs")
-        xs = [pt[0] for pt in polygon]
-        ys = [pt[1] for pt in polygon]
-        return [int(min(ys)), int(min(xs)), int(max(ys)), int(max(xs))]
+        xs = [float(pt[0]) for pt in polygon]
+        ys = [float(pt[1]) for pt in polygon]
+        ymin = int(round(min(ys)))
+        xmin = int(round(min(xs)))
+        ymax = int(round(max(ys)))
+        xmax = int(round(max(xs)))
+
+        if image_height is not None and image_height > 0:
+            ymin = max(0, min(ymin, image_height))
+            ymax = max(ymin, min(ymax, image_height))
+        if image_width is not None and image_width > 0:
+            xmin = max(0, min(xmin, image_width))
+            xmax = max(xmin, min(xmax, image_width))
+
+        return [ymin, xmin, ymax, xmax]
 
     @staticmethod
     def normalize_coordinates(
@@ -34,10 +50,10 @@ class PolygonNormalizer:
             raise ValueError(f"Invalid image dimensions: {image_width}x{image_height}")
         ymin, xmin, ymax, xmax = box
         return [
-            float(ymin / image_height),
-            float(xmin / image_width),
-            float(ymax / image_height),
-            float(xmax / image_width),
+            float(max(0.0, min(1.0, ymin / image_height))),
+            float(max(0.0, min(1.0, xmin / image_width))),
+            float(max(0.0, min(1.0, ymax / image_height))),
+            float(max(0.0, min(1.0, xmax / image_width))),
         ]
 
     @staticmethod
@@ -56,6 +72,8 @@ class PolygonNormalizer:
             raise ValueError(f"Expected exactly 4 points for polygon, got {len(polygon)}")
 
         pts = np.array(polygon, dtype=np.float32)
+        if not np.all(np.isfinite(pts)):
+            raise ValueError("Polygon coordinates contain non-finite values (NaN or Inf)")
 
         # 1. Order points cyclically in clockwise order around centroid
         centroid = np.mean(pts, axis=0)
@@ -176,6 +194,16 @@ class PolygonNormalizer:
         if image is None or image.size == 0:
             raise ValueError("Input image is empty or None")
 
+        img = np.ascontiguousarray(image)
+        if len(img.shape) == 2:
+            img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+        elif len(img.shape) == 3 and img.shape[2] == 4:
+            img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
+        elif len(img.shape) == 3 and img.shape[2] == 1:
+            img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+        elif len(img.shape) != 3 or img.shape[2] != 3:
+            raise ValueError(f"Unsupported image shape for crop extraction: {img.shape}")
+
         canonical_pts = cls.canonicalize_polygon(polygon)
         src_pts = np.array(canonical_pts, dtype=np.float32)
 
@@ -192,6 +220,10 @@ class PolygonNormalizer:
         if max_width <= 0 or max_height <= 0:
             raise ValueError(f"Degenerate polygon dimensions: {max_width}x{max_height}")
 
+        # Guard against pathological allocation bomb
+        max_width = min(max_width, 8192)
+        max_height = min(max_height, 8192)
+
         dst_pts = np.array([
             [0, 0],
             [max_width - 1, 0],
@@ -201,7 +233,7 @@ class PolygonNormalizer:
 
         transform_matrix = cv2.getPerspectiveTransform(src_pts, dst_pts)
         crop = cv2.warpPerspective(
-            image,
+            img,
             transform_matrix,
             (max_width, max_height),
             flags=cv2.INTER_CUBIC,
@@ -210,7 +242,7 @@ class PolygonNormalizer:
 
         if target_height is not None and target_height > 0:
             aspect_ratio = max_width / max_height
-            scaled_width = max(int(target_height * aspect_ratio), 16)
+            scaled_width = max(min(int(round(target_height * aspect_ratio)), 4096), 16)
             crop = cv2.resize(crop, (scaled_width, target_height), interpolation=cv2.INTER_CUBIC)
 
         return crop

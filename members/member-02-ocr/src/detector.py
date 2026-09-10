@@ -139,13 +139,21 @@ class DBNetTextDetector:
 
         resized = cv2.resize(image, (target_w, target_h), interpolation=cv2.INTER_LINEAR)
 
-        # Convert to float32 RGB
+        # Convert to 3-channel RGB cleanly across 1-ch, 3-ch, and 4-ch inputs
         if len(resized.shape) == 2:
             resized = cv2.cvtColor(resized, cv2.COLOR_GRAY2RGB)
-        elif resized.shape[2] == 3:
-            resized = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
+        elif len(resized.shape) == 3:
+            if resized.shape[2] == 4:
+                resized = cv2.cvtColor(resized, cv2.COLOR_BGRA2RGB)
+            elif resized.shape[2] == 1:
+                resized = cv2.cvtColor(resized, cv2.COLOR_GRAY2RGB)
+            elif resized.shape[2] == 3:
+                resized = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
+            else:
+                resized = resized[:, :, :3]
 
-        img_float = resized.astype(np.float32) / 255.0
+        img_float = np.nan_to_num(resized.astype(np.float32) / 255.0, nan=0.0, posinf=1.0, neginf=0.0)
+        img_float = np.clip(img_float, 0.0, 1.0)
         mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
         std = np.array([0.229, 0.224, 0.225], dtype=np.float32)
         normalized = (img_float - mean) / std
@@ -297,7 +305,7 @@ class DBNetTextDetector:
         If not loaded and allow_classical_fallback is True, executes algorithmic fallback.
         Otherwise raises RuntimeError preventing silent unverified fallback.
         """
-        if image is None or image.size == 0:
+        if image is None or image.size == 0 or len(image.shape) < 2 or image.shape[0] < 4 or image.shape[1] < 4:
             return []
 
         if self.session is not None:

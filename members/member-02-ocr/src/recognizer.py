@@ -74,9 +74,13 @@ class CTCLabelDecode:
         Returns:
             (decoded_text, mean_confidence, per_character_confidences)
         """
+        if logits is None or logits.size == 0:
+            return "", 0.0, []
+
         if logits.ndim == 3:
             logits = logits[0]  # Squeeze batch dim
 
+        logits = np.nan_to_num(logits, nan=0.0, posinf=10.0, neginf=-10.0)
         time_steps, vocab_size = logits.shape
 
         # If values already sum to ~1.0, they are already softmax probabilities from ONNX
@@ -257,6 +261,12 @@ class PPOCRv4Recognizer:
         """Preprocesses a single crop patch to height 48 with aspect ratio preservation.
         Normalizes pixel intensities to [-1.0, 1.0] and produces a C-contiguous float32 CHW tensor.
         """
+        if crop is None or crop.size == 0:
+            return np.zeros((3, self.rec_image_height, 16), dtype=np.float32)
+
+        if not np.isfinite(crop).all():
+            crop = np.nan_to_num(crop, nan=0.0, posinf=255.0, neginf=0.0)
+
         img_h, img_w = crop.shape[:2]
         h = self.rec_image_height
 
@@ -265,23 +275,30 @@ class PPOCRv4Recognizer:
         else:
             aspect = img_w / max(img_h, 1)
             w = int(round(h * aspect))
-        w = max(w, 16)
+        w = min(max(w, 16), 4096)
 
         if img_h == h and img_w == w:
             resized = crop
         else:
             resized = cv2.resize(crop, (w, h), interpolation=cv2.INTER_LINEAR)
 
-        # Convert to RGB if needed
+        # Convert to RGB if needed across 1-ch, 3-ch, and 4-ch inputs
         if len(resized.shape) == 2:
             resized = cv2.cvtColor(resized, cv2.COLOR_GRAY2RGB)
-        elif resized.shape[2] == 3:
-            resized = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
+        elif len(resized.shape) == 3:
+            if resized.shape[2] == 4:
+                resized = cv2.cvtColor(resized, cv2.COLOR_BGRA2RGB)
+            elif resized.shape[2] == 1:
+                resized = cv2.cvtColor(resized, cv2.COLOR_GRAY2RGB)
+            elif resized.shape[2] == 3:
+                resized = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
+            else:
+                resized = resized[:, :, :3]
 
         # Vectorized C-contiguous normalization: (x / 255.0 - 0.5) / 0.5 == x * (2.0 / 255.0) - 1.0
         scale = np.float32(2.0 / 255.0)
         bias = np.float32(-1.0)
-        chw = np.transpose(resized, (2, 0, 1))
+        chw = np.ascontiguousarray(np.transpose(resized, (2, 0, 1)))
         tensor = np.empty((3, h, w), dtype=np.float32)
         np.multiply(chw, scale, out=tensor, casting="unsafe")
         np.add(tensor, bias, out=tensor)
