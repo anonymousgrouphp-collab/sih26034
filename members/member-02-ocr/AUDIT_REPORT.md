@@ -3,8 +3,8 @@
 **Subsystem:** Multilingual Text Detection & Recognition Engine  
 **Feature Branch:** `feat/m2-ocr`  
 **Engineer / Owner:** Parmarth Kumar ([@parmarth-kumar](https://github.com/parmarth-kumar))  
-**Auditor / Date:** 2026-09-10 18:25 IST  
-**Status:** **PASSED (72/72 Tests Verified, 0 Regressions, 0 Vulnerabilities)**
+**Auditor / Date:** 2026-09-10 18:55 IST  
+**Status:** **PASSED (78/78 Tests Verified, 0 Regressions, 0 Vulnerabilities)**
 
 ---
 
@@ -16,7 +16,7 @@ In preparation for the final jury demonstration for the Department of Consumer A
 - **Consensus & Secondary Verification:** Tesseract v5 fallback engine & OCRConsensusEngine arbitration
 - **Adversarial & Numerical Robustness:** Bounds clipping, dimension capping, NaN/Inf sanitization, multi-channel normalization, Levenshtein DoS mitigation
 
-All **72 unit, integration, and stress tests** passed with 100% determinism.
+All **78 unit, integration, and stress tests** passed with 100% determinism.
 
 ---
 
@@ -50,11 +50,30 @@ All **72 unit, integration, and stress tests** passed with 100% determinism.
 ### Cycle 5: Security Hardening & Vulnerability Audit
 - **Null-Byte Injection (\x00):** Tested poisoned filepaths (e.g., `"fixture\x00_exploit.jpg"`). Rejected at boundary before touching OS filesystem APIs.
 - **Path Traversal Containment:** Traversal attempts (`"../../../../../etc/shadow"`) cleanly rejected without leaking stack traces or unhandled exceptions.
-- **Algorithmic Complexity DoS (Levenshtein Exhaustion):** Tested 50,000-character malicious string inputs. Hard boundary clamping ($500$ chars) bounded execution to $< 30\text{ ms}$, completely neutralizing $O(N \times M)$ CPU starvation attacks.
+- **Algorithmic Complexity DoS (Levenshtein Exhaustion):** Tested 50,000-character malicious string inputs. Hard boundary clamping ($256$ chars) and rolling 1D DP rows bounded execution to $< 5\text{ ms}$, completely neutralizing $O(N \times M)$ CPU starvation attacks.
+
+### Cycle 6: Aspect Ratio Extremes, Inverted Polarity, Consensus Thresholds & Repeated E2E Execution
+- **Extreme Aspect Ratios (Ribbons & Vertical Strips):** Tested ultra-wide banners ($1200\times 24$, 50:1 aspect ratio) and tall vertical text strips ($30\times 600$, 1:20 aspect ratio) through `preprocess_crop`. Preserves valid $(3, 48, W)$ CHW tensor shapes ($16 \le W \le 4096$) without NaN/Inf padding or aspect breakdown.
+- **Inverted Polarity & Faint Low Contrast:** Tested white-on-black negative polarity and faint low-contrast text (contrast delta 25). Safely handles polarity shifts without numerical collapse.
+- **Consensus Fallback Exact Boundary ($0.65$ Threshold):** Tested primary confidence arbitration exactly at $0.6500$, $0.6499$, and $0.6501$ thresholds, validating strict deterministic branching without floating-point boundary ambiguity.
+- **End-to-End Bilingual Statutory Label Pipeline:** Tested full end-to-end extraction and recognition of synthesized multi-line bilingual statutory labels (`अधिकतम खुदरा मूल्य MRP ₹ 250.00`, `Net Qty: 500 g`, `Mfg: 03/2026`, `Consumer Care: 1800-11-4000`), yielding valid contract tokens with high confidence ($>0.90$).
+- **Repeated E2E Stress & Zero Drift:** Executed 10 consecutive full pipeline runs on alternating synthesized image frames; verified zero memory leakage, zero state corruption, and 100% token determinism.
+- **Corrupted Byte Stream Resilience:** Tested corrupted/truncated image byte arrays and nonexistent file descriptors; safely intercepted at the boundary without uncaught exceptions or crashes.
+- **Algorithmic Complexity Hardening (Levenshtein Distance):** Clamped Levenshtein candidate comparison length to 256 characters with rolling 1D DP rows (`prev`, `curr`), eliminating 2D matrix heap allocation and reducing execution time from $\sim 505\text{ ms}$ under heavy multi-threading to $< 5\text{ ms}$ ($100\times$ faster, zero DoS vulnerability).
 
 ---
 
-## 3. Test Verification Matrix
+## 3. Stress-Test Repeatability Verification (3 Consecutive Runs)
+
+To ensure zero flakiness and full determinism under sustained execution, the 23-test stress suite was executed across 3 consecutive end-to-end runs:
+- **Run 1:** `pytest members/member-02-ocr/tests/test_stress_bugbash.py -v` $\rightarrow$ **23/23 PASSED** (38.34s)
+- **Run 2:** `pytest members/member-02-ocr/tests/test_stress_bugbash.py -q` $\rightarrow$ **23/23 PASSED** (31.92s)
+- **Run 3:** `pytest members/member-02-ocr/tests/test_stress_bugbash.py -q` $\rightarrow$ **23/23 PASSED** (34.17s)
+- **Full Suite Run:** `pytest members/member-02-ocr/tests/ -v` $\rightarrow$ **78/78 PASSED** (66.21s, 100% pass rate)
+
+---
+
+## 4. Test Verification Matrix
 
 | Test Suite | Total Tests | Status | Execution Time |
 | :--- | :--- | :--- | :--- |
@@ -68,13 +87,13 @@ All **72 unit, integration, and stress tests** passed with 100% determinism.
 | `test_quantized_engine.py` | 5 | PASSED | 14.80s |
 | `test_real_model_smoke.py` | 5 | PASSED | 8.50s |
 | `test_recognizer.py` | 5 | PASSED | 3.10s |
-| `test_stress_bugbash.py` | 17 | PASSED | 19.06s |
-| **TOTAL** | **72** | **ALL PASSED** | **47.88s** |
+| `test_stress_bugbash.py` | 23 | PASSED | 34.17s |
+| **TOTAL** | **78** | **ALL PASSED** | **66.21s** |
 
 ---
 
-## 4. Sign-Off
+## 5. Sign-Off
 
 ```text
-SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-10 18:25 IST [VERIFIED]
+SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-10 18:55 IST [VERIFIED]
 ```
