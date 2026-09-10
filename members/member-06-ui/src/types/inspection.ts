@@ -242,6 +242,80 @@ export interface OfficerDecision {
 }
 
 // -----------------------------------------------------------------------------
+// 8B. Finding-Level Adjudication (Preserves original RuleFinding.status)
+// -----------------------------------------------------------------------------
+
+export type FindingOfficerDecision = "CONFIRMED" | "DISMISSED" | "RETEST_REQUESTED";
+
+export interface FindingAdjudication {
+  finding_id: string;
+  decision: FindingOfficerDecision;
+  officer_id: string;
+  officer_name: string;
+  badge_number: string;
+  remarks: string;
+  timestamp_utc: string;
+  action_order?: OfficerActionOrder;
+}
+
+// -----------------------------------------------------------------------------
+// 8C. Chronological Audit Trail & Activity Record
+// Append-only chronological record per 08_DATABASE_SPECIFICATION.md audit_logs
+// -----------------------------------------------------------------------------
+
+export type AuditActorType = "SYSTEM" | "OFFICER";
+
+export type AuditEventType =
+  | "INSPECTION_CREATED"
+  | "IMAGE_UPLOADED"
+  | "AI_INFERENCE_EXECUTED"
+  | "OFFICER_ADJUDICATION_RECORDED"
+  | "OFFICER_OVERRIDE_APPLIED"
+  | "RETEST_REQUESTED"
+  | "BSA_CERTIFICATE_ISSUED"
+  | "HANDOFF_PREPARED";
+
+export interface AuditEvent {
+  id: string;
+  sequence_number: number;
+  timestamp_utc: string;
+  event_type: AuditEventType | string;
+  event_label: string;
+  actor_type: AuditActorType;
+  actor_id: string;
+  actor_name: string;
+  entity_type: "INSPECTION" | "EVIDENCE" | "FINDING" | "ADJUDICATION" | "HANDOFF";
+  entity_id: string;
+  related_finding_id?: string;
+  related_evidence_id?: string;
+  decision?: string;
+  remarks?: string;
+  metadata?: Record<string, any>;
+  previous_hash?: string;
+  entry_hash?: string;
+}
+
+// -----------------------------------------------------------------------------
+// 8D. Case Readiness & Downstream Handoff
+// Evaluates readiness without autonomous notice generation or client legal math
+// -----------------------------------------------------------------------------
+
+export type HandoffReadinessState =
+  | "PENDING_OFFICER_REVIEW"
+  | "ACTION_REQUIRED_RETEST"
+  | "READY_FOR_CASE_CLOSURE"
+  | "READY_FOR_LEGAL_NOTICE_DISPATCH";
+
+export interface CaseReadinessChecklist {
+  evidence_available: boolean;
+  automated_analysis_completed: boolean;
+  officer_adjudication_completed: boolean;
+  audit_record_complete: boolean;
+  readiness_state: HandoffReadinessState;
+  downstream_action_guidance?: string;
+}
+
+// -----------------------------------------------------------------------------
 // 9. Complete Inspection Case & Asset Entities
 // Central UI domain entity. Everything belongs to the case.
 // -----------------------------------------------------------------------------
@@ -314,6 +388,8 @@ export interface InspectionCase {
   adjudication?: OfficerDecision;
   evidence_graph?: EvidenceGraph;
   bsa_certificate?: Section63Certificate;
+  audit_trail?: AuditEvent[];
+  finding_decisions?: Record<string, FindingAdjudication>;
   notice_reference?: string;
   epoch_applied?: string;
   is_mock_fixture?: boolean;

@@ -47,8 +47,10 @@
 - [x] Update Mock API service to record officer decisions with audit log preservation (`api.ts`, `mockData.ts`).
 - [x] Implement comprehensive automated test suite verifying bidirectional traceability, SVG polygon rendering, 4-state epistemic triage, Unicode preservation, backend truth invariants, and officer overrides (`tests/adjudication_canvas.test.ts`).
 
-### Day 5: Evidence DAG Audit, Legal Notice Preview & End-to-End Polish (Chunk 6)
-- [ ] Implement dynamic Merkle DAG interactive visualizer with Section 63 BSA 2023 evidence node inspection.
-- [ ] Implement Form-1 Legal Notice preview with statutory penalty schedule.
-- [ ] Finalize end-to-end demo flow matching the 3-minute jury pitch script (`12_DEMO_PLAN.md`).
-- [ ] Complete Definition of Done checklist.
+### Day 5: HITL Decision Workflow, Audit Trail, Evidence Provenance & Handoff Readiness (Chunk 6)
+- [x] Implement dynamic Evidence DAG visualizer with Section 63 BSA 2023 evidence node inspection (`EvidenceProvenancePanel.tsx`).
+- [x] Implement chronological append-only audit timeline distinguishing SYSTEM pipeline events from OFFICER adjudications (`AuditTimeline.tsx`).
+- [x] Implement finding-level officer decision workflow preserving automated findings without mutation (`FindingsLedger.tsx`, `FieldDetailPanel.tsx`, `api.ts`).
+- [x] Implement downstream case handoff readiness checklist and action guidance without autonomous notice generation (`CaseHandoffState.tsx`).
+- [x] Implement automated test suite covering HITL decision immutability, append-only audit, dynamic DAG, and readiness state (`tests/hitl_audit_provenance.test.ts`).
+- [x] Complete Definition of Done checklist and verify zero prohibited claims.

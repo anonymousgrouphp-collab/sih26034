@@ -1,5 +1,5 @@
 import React from "react";
-import { RuleFinding, ExtractedField, OCRToken } from "../../types/inspection";
+import { RuleFinding, ExtractedField, OCRToken, OfficerDecision, FindingAdjudication } from "../../types/inspection";
 import { VerdictBadge } from "../../components/common/StatusBadge";
 
 interface FieldDetailPanelProps {
@@ -7,6 +7,8 @@ interface FieldDetailPanelProps {
   field?: ExtractedField;
   tokens: OCRToken[];
   onSelectToken?: (tokenId: string) => void;
+  findingAdjudication?: FindingAdjudication;
+  caseAdjudication?: OfficerDecision;
 }
 
 export const FieldDetailPanel: React.FC<FieldDetailPanelProps> = ({
@@ -14,6 +16,8 @@ export const FieldDetailPanel: React.FC<FieldDetailPanelProps> = ({
   field,
   tokens,
   onSelectToken,
+  findingAdjudication,
+  caseAdjudication,
 }) => {
   if (!finding && !field && tokens.length === 0) {
     return (
@@ -78,27 +82,41 @@ export const FieldDetailPanel: React.FC<FieldDetailPanelProps> = ({
         </div>
       )}
 
-      {/* 3. Canonical Rule Engine Findings */}
+      {/* 3. Original Automated Finding (Immutable Diagnostic Output) */}
       {finding && (
         <div className="space-y-2 text-xs">
-          <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-            Backend Statutory Evaluation
-          </h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-blue-600" />
+              Original Automated Finding
+            </h4>
+            <span className="text-[10px] font-mono text-slate-500">
+              Source: Rule Engine (AST)
+            </span>
+          </div>
+
           <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-2">
+            <div className="flex items-center justify-between text-[11px] font-mono">
+              <span className="text-slate-500">Automated Pipeline Status:</span>
+              <span className="font-bold text-slate-900 px-1.5 py-0.5 rounded bg-white border border-slate-200">
+                {finding.status}
+              </span>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 font-mono">
               <div>
-                <span className="text-[10px] text-slate-500 font-bold block">Observed Measurement</span>
+                <span className="text-[10px] text-slate-500 font-bold block uppercase">Observed Measurement</span>
                 <span className="font-bold text-slate-900 text-xs">{finding.measured_value}</span>
               </div>
               <div>
-                <span className="text-[10px] text-slate-500 font-bold block">Prescribed Threshold</span>
+                <span className="text-[10px] text-slate-500 font-bold block uppercase">Prescribed Statutory Threshold</span>
                 <span className="font-semibold text-slate-700 text-xs">{finding.required_value}</span>
               </div>
             </div>
 
             {finding.discrepancy && (
               <div className="pt-1.5 border-t border-slate-200">
-                <span className="text-[10px] text-slate-500 font-bold block font-mono">Quantified Discrepancy</span>
+                <span className="text-[10px] text-slate-500 font-bold block font-mono uppercase">Quantified Discrepancy</span>
                 <span className="text-slate-800 text-[11px] font-sans font-medium">
                   {finding.discrepancy}
                 </span>
@@ -114,7 +132,7 @@ export const FieldDetailPanel: React.FC<FieldDetailPanelProps> = ({
               </div>
               {finding.legal_consequence && (
                 <div className="flex items-start justify-between gap-2 text-[11px]">
-                  <span className="text-slate-500 font-semibold">Legal Consequence:</span>
+                  <span className="text-slate-500 font-semibold">Legal Provision:</span>
                   <span className="text-rose-700 font-semibold text-right truncate max-w-xs" title={finding.legal_consequence}>
                     {finding.legal_consequence}
                   </span>
@@ -124,6 +142,92 @@ export const FieldDetailPanel: React.FC<FieldDetailPanelProps> = ({
           </div>
         </div>
       )}
+
+      {/* 4. Officer Adjudication (Human-in-the-Loop Determination) */}
+      {(() => {
+        const decisionRecord = findingAdjudication || (caseAdjudication ? {
+          finding_id: finding?.finding_id || "case_level",
+          decision: (caseAdjudication.verdict === "CONFIRM_VIOLATION" ? "CONFIRMED" : caseAdjudication.verdict === "DISMISS_AS_COMPLIANT" ? "DISMISSED" : "RETEST_REQUESTED") as any,
+          officer_id: caseAdjudication.officer_id,
+          officer_name: caseAdjudication.officer_name,
+          badge_number: caseAdjudication.badge_number,
+          remarks: caseAdjudication.remarks,
+          timestamp_utc: caseAdjudication.timestamp_utc,
+          action_order: caseAdjudication.action_order,
+        } : undefined);
+
+        return (
+          <div className="space-y-2 text-xs">
+            <div className="flex items-center justify-between">
+              <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                <span className={`w-2 h-2 rounded-full ${decisionRecord ? "bg-emerald-600" : "bg-amber-500"}`} />
+                Officer Adjudication (HITL)
+              </h4>
+              <span className="text-[10px] font-mono text-slate-500">
+                {decisionRecord ? "Official Determination" : "Pending Sign-off"}
+              </span>
+            </div>
+
+            {decisionRecord ? (
+              <div className="bg-emerald-50/60 p-3 rounded-lg border border-emerald-200 space-y-2 text-xs">
+                <div className="flex items-center justify-between border-b border-emerald-100 pb-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-slate-600 text-[11px]">Officer Decision:</span>
+                    <span className={`font-mono font-bold px-2 py-0.5 rounded text-[11px] ${
+                      decisionRecord.decision === "CONFIRMED"
+                        ? "bg-rose-100 text-rose-900 border border-rose-300"
+                        : decisionRecord.decision === "DISMISSED"
+                        ? "bg-emerald-100 text-emerald-900 border border-emerald-300"
+                        : "bg-amber-100 text-amber-900 border border-amber-300"
+                    }`}>
+                      {decisionRecord.decision}
+                    </span>
+                  </div>
+
+                  <span className="font-mono text-[10px] text-slate-500">
+                    {new Date(decisionRecord.timestamp_utc).toLocaleString("en-IN", {
+                      dateStyle: "short",
+                      timeStyle: "short",
+                    })}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-slate-700 font-mono">
+                  <div>
+                    <span className="text-[10px] text-slate-500 font-sans block uppercase">Adjudicating Officer</span>
+                    <span className="font-bold text-slate-900 font-sans">{decisionRecord.officer_name}</span>
+                    <span className="text-[10px] text-slate-400 block">Badge: {decisionRecord.badge_number}</span>
+                  </div>
+                  {decisionRecord.action_order && (
+                    <div>
+                      <span className="text-[10px] text-slate-500 font-sans block uppercase">Statutory Action Order</span>
+                      <span className="font-bold text-slate-800 text-[10px] truncate block" title={decisionRecord.action_order}>
+                        {decisionRecord.action_order}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="pt-1.5 border-t border-emerald-100">
+                  <span className="text-[10px] text-slate-500 font-bold uppercase font-mono block">
+                    Mandatory Officer Remarks:
+                  </span>
+                  <p className="mt-0.5 text-slate-800 text-[11px] font-sans italic bg-white p-2 rounded border border-emerald-150 leading-relaxed">
+                    "{decisionRecord.remarks}"
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs text-slate-500 space-y-1">
+                <div className="font-semibold text-slate-700">Awaiting Officer Adjudication</div>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  Automated findings provide diagnostic assistance only. The adjudicating officer retains statutory authority to confirm, dismiss, or order re-tests.
+                </p>
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* 4. Extracted Field Details (Rule 6 LMPC Declarations) */}
       {field && (

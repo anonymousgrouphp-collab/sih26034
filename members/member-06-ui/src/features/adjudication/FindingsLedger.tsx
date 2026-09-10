@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { RuleFinding, ExtractedField, EpistemicVerdict } from "../../types/inspection";
+import { RuleFinding, ExtractedField, EpistemicVerdict, OfficerDecision, FindingAdjudication } from "../../types/inspection";
 import { VerdictBadge } from "../../components/common/StatusBadge";
 import { findFieldForFinding } from "./AdjudicationTraceability";
 
@@ -8,6 +8,8 @@ interface FindingsLedgerProps {
   extractedFields: ExtractedField[];
   selectedFindingId?: string;
   onSelectFinding: (findingId: string) => void;
+  caseAdjudication?: OfficerDecision;
+  findingDecisions?: Record<string, FindingAdjudication>;
 }
 
 export const FindingsLedger: React.FC<FindingsLedgerProps> = ({
@@ -15,6 +17,8 @@ export const FindingsLedger: React.FC<FindingsLedgerProps> = ({
   extractedFields,
   selectedFindingId,
   onSelectFinding,
+  caseAdjudication,
+  findingDecisions,
 }) => {
   const [filter, setFilter] = useState<"ALL" | "FAIL" | "REVIEW" | "PASS" | "UNABLE_TO_VERIFY">("ALL");
 
@@ -199,8 +203,49 @@ export const FindingsLedger: React.FC<FindingsLedgerProps> = ({
                   </p>
                 )}
 
+                {/* Automated Finding vs Officer Adjudication Distinction Strip */}
+                {(() => {
+                  const findingAdj = findingDecisions?.[finding.finding_id];
+                  const officerDecisionText = findingAdj
+                    ? findingAdj.decision
+                    : caseAdjudication
+                    ? (caseAdjudication.verdict === "CONFIRM_VIOLATION"
+                        ? "CONFIRMED"
+                        : caseAdjudication.verdict === "DISMISS_AS_COMPLIANT"
+                        ? "DISMISSED"
+                        : "RETEST_ORDERED")
+                    : undefined;
+
+                  return (
+                    <div className="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-mono">
+                      <div className="flex items-center gap-1">
+                        <span className="text-slate-500 font-sans text-[10px] uppercase font-semibold">AI Finding:</span>
+                        <span className="font-bold text-slate-800">{finding.status}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <span className="text-slate-500 font-sans text-[10px] uppercase font-semibold">Officer Adjudication:</span>
+                        {officerDecisionText ? (
+                          <span
+                            className={`font-bold px-1.5 py-0.2 rounded text-[10px] ${
+                              officerDecisionText.includes("CONFIRM")
+                                ? "bg-rose-100 text-rose-900 border border-rose-200"
+                                : officerDecisionText.includes("DISMISS")
+                                ? "bg-emerald-100 text-emerald-900 border border-emerald-200"
+                                : "bg-amber-100 text-amber-900 border border-amber-200"
+                            }`}
+                          >
+                            {officerDecisionText}
+                          </span>
+                        ) : (
+                          <span className="text-slate-400 italic text-[10px] font-sans">Pending Review</span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 {/* Relational Evidence Link */}
-                <div className="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-mono text-slate-500">
+                <div className="mt-1.5 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-mono text-slate-500">
                   <span className="flex items-center gap-1">
                     <svg className="w-3 h-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />

@@ -16,13 +16,26 @@ import {
   QualityGateResult,
   AdjudicationRequest,
   OfficerDecision,
+  OfficerActionOrder,
+  FindingAdjudication,
+  FindingOfficerDecision,
+  AuditEvent,
+  CaseReadinessChecklist,
   LegalNoticeResult,
   GenerateNoticePayload,
   CreateInspectionPayload,
   ApiError,
   EvidenceAsset,
 } from "../types/inspection";
-import { GOLDEN_SKU_CASES, MOCK_DASHBOARD_SUMMARY, getMockCases, addMockCase, updateMockCase } from "./mockData";
+import {
+  GOLDEN_SKU_CASES,
+  MOCK_DASHBOARD_SUMMARY,
+  getMockCases,
+  addMockCase,
+  updateMockCase,
+  appendAuditEvent,
+  computeCaseReadiness,
+} from "./mockData";
 import { StorageService } from "./storage";
 
 export class ApiService {
@@ -598,9 +611,27 @@ export class ApiService {
         action_order: request.action_order,
       };
 
+      // 1. Update case status and adjudication, preserving all rule evaluations and findings
       updateMockCase(inspectionId, {
         adjudication: decision,
         workflow_status: "COMPLETED",
+      });
+
+      // 2. Append chronological audit event (append-only)
+      appendAuditEvent(inspectionId, {
+        event_type: request.override_applied ? "OFFICER_OVERRIDE_APPLIED" : "OFFICER_ADJUDICATION_RECORDED",
+        event_label: request.override_applied ? "Officer Adjudication Override" : "Officer Adjudication Recorded",
+        actor_type: "OFFICER",
+        actor_id: "INSP-DL-0842",
+        actor_name: "Rajesh Sharma",
+        entity_type: "ADJUDICATION",
+        entity_id: decision.decision_id,
+        decision: request.adjudication_verdict,
+        remarks: request.officer_remarks,
+        metadata: {
+          action_order: request.action_order,
+          override_applied: request.override_applied,
+        },
       });
 
       return decision;
@@ -637,6 +668,96 @@ export class ApiService {
     } catch (e: any) {
       throw this.normalizeError(e, "Officer adjudication submission failed.");
     }
+  }
+
+  /**
+   * Adjudicates an individual statutory finding without mutating the original finding status.
+   */
+  public static async submitFindingAdjudication(
+    inspectionId: string,
+    findingId: string,
+    decision: FindingOfficerDecision,
+    remarks: string,
+    actionOrder?: OfficerActionOrder
+  ): Promise<FindingAdjudication> {
+    if (!remarks || remarks.trim().length === 0) {
+      throw {
+        error_code: "MISSING_OFFICER_REMARKS",
+        status: 400,
+        message: "Mandatory officer justification remarks required for statutory record.",
+        remediation: "Provide detailed reasoning for adjudication decision before proceeding.",
+      } as ApiError;
+    }
+
+    const findingAdj: FindingAdjudication = {
+      finding_id: findingId,
+      decision,
+      officer_id: "INSP-DL-0842",
+      officer_name: "Rajesh Sharma",
+      badge_number: "INSP-DL-0842",
+      remarks: remarks.trim(),
+      timestamp_utc: new Date().toISOString(),
+      action_order: actionOrder,
+    };
+
+    if (this.useMockMode) {
+      const mockCases = getMockCases();
+      const current = Object.values(mockCases).find(
+        (c) => c.id === inspectionId || c.sku_demo_id === inspectionId || c.inspection_number === inspectionId
+      );
+      const existingDecisions = current?.finding_decisions || {};
+      const updatedDecisions = { ...existingDecisions, [findingId]: findingAdj };
+
+      updateMockCase(inspectionId, {
+        finding_decisions: updatedDecisions,
+      });
+
+      appendAuditEvent(inspectionId, {
+        event_type: "OFFICER_ADJUDICATION_RECORDED",
+        event_label: `Finding Adjudicated: ${decision}`,
+        actor_type: "OFFICER",
+        actor_id: "INSP-DL-0842",
+        actor_name: "Rajesh Sharma",
+        entity_type: "FINDING",
+        entity_id: findingId,
+        related_finding_id: findingId,
+        decision,
+        remarks: remarks.trim(),
+      });
+
+      return findingAdj;
+    }
+
+    return findingAdj;
+  }
+
+  /**
+   * Retrieves chronological audit history for an inspection case.
+   */
+  public static async getAuditTrail(inspectionId: string): Promise<AuditEvent[]> {
+    if (this.useMockMode) {
+      const c = await this.getInspection(inspectionId);
+      return c.audit_trail || [];
+    }
+
+    try {
+      const res = await fetch(`${this.baseUrl}/inspections/${inspectionId}/audit-trail`, {
+        headers: this.getHeaders(),
+      });
+      if (!res.ok) throw await res.json();
+      return await res.json();
+    } catch {
+      const c = await this.getInspection(inspectionId);
+      return c.audit_trail || [];
+    }
+  }
+
+  /**
+   * Computes downstream case readiness checklist for handoff.
+   */
+  public static async getCaseReadiness(inspectionId: string): Promise<CaseReadinessChecklist> {
+    const c = await this.getInspection(inspectionId);
+    return computeCaseReadiness(c);
   }
 
   // ---------------------------------------------------------------------------

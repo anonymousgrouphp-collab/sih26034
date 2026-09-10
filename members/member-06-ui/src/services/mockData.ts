@@ -9,6 +9,11 @@
 import {
   InspectionCase,
   DashboardSummary,
+  AuditEvent,
+  AuditEventType,
+  AuditActorType,
+  HandoffReadinessState,
+  CaseReadinessChecklist,
 } from "../types/inspection";
 
 export const GOLDEN_SKU_CASES: Record<string, InspectionCase> = {
@@ -686,22 +691,251 @@ export const MOCK_DASHBOARD_SUMMARY: DashboardSummary = {
 
 const dynamicCases: Map<string, InspectionCase> = new Map(Object.entries(GOLDEN_SKU_CASES));
 
+/**
+ * Creates a baseline chronological audit record for an inspection case
+ * according to 08_DATABASE_SPECIFICATION.md audit_logs specifications.
+ */
+export function createDefaultAuditTrail(caseData: InspectionCase): AuditEvent[] {
+  const events: AuditEvent[] = [];
+  let seq = 1;
+  const createdAt = caseData.created_at || "2026-09-10T09:15:00Z";
+
+  // 1. Case registered
+  events.push({
+    id: `evt_${caseData.id}_01`,
+    sequence_number: seq++,
+    timestamp_utc: createdAt,
+    event_type: "INSPECTION_CREATED",
+    event_label: "Inspection Case Registered",
+    actor_type: "OFFICER",
+    actor_id: caseData.officer_id || "INSP-DL-0842",
+    actor_name: "Rajesh Sharma",
+    entity_type: "INSPECTION",
+    entity_id: caseData.id,
+    remarks: `Registered case ${caseData.inspection_number} for commodity: ${caseData.product_name}.`,
+    previous_hash: "0000000000000000000000000000000000000000000000000000000000000000",
+    entry_hash: "e1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f80",
+  });
+
+  // 2. Evidence asset ingested
+  const asset = caseData.evidence_assets[0];
+  if (asset) {
+    events.push({
+      id: `evt_${caseData.id}_02`,
+      sequence_number: seq++,
+      timestamp_utc: asset.uploaded_at || createdAt,
+      event_type: "IMAGE_UPLOADED",
+      event_label: "Physical Evidence Ingested",
+      actor_type: "OFFICER",
+      actor_id: caseData.officer_id || "INSP-DL-0842",
+      actor_name: "Rajesh Sharma",
+      entity_type: "EVIDENCE",
+      entity_id: asset.image_id,
+      related_evidence_id: asset.image_id,
+      metadata: {
+        raw_sha256: asset.raw_sha256,
+        panel_type: asset.panel_type,
+        dimensions: `${asset.image_width}x${asset.image_height}`,
+      },
+      remarks: `Captured ${asset.panel_type} packaging photograph. Canonical SHA-256 registered.`,
+      previous_hash: events[events.length - 1].entry_hash,
+      entry_hash: "f2b3c4d5e6f7a819203b4c5d6e7f8091a2b3c4d5e6f7a819203b4c5d6e7f8091",
+    });
+  }
+
+  // 3. AI Pipeline Inference Executed
+  if (caseData.rule_evaluations && caseData.rule_evaluations.length > 0) {
+    events.push({
+      id: `evt_${caseData.id}_03`,
+      sequence_number: seq++,
+      timestamp_utc: "2026-09-10T09:17:30Z",
+      event_type: "AI_INFERENCE_EXECUTED",
+      event_label: "Pipeline Analysis Completed",
+      actor_type: "SYSTEM",
+      actor_id: "SYSTEM_PIPELINE",
+      actor_name: "NyayaDrishti Automated Pipeline",
+      entity_type: "INSPECTION",
+      entity_id: caseData.id,
+      related_evidence_id: asset?.image_id,
+      metadata: {
+        rule_evaluations_count: caseData.rule_evaluations.length,
+        overall_status: caseData.overall_status,
+      },
+      remarks: `Evaluated ${caseData.rule_evaluations.length} statutory rule items. Epistemic verdict: ${caseData.overall_status}.`,
+      previous_hash: events[events.length - 1].entry_hash,
+      entry_hash: "03c4d5e6f7a819203b4c5d6e7f8091a2b3c4d5e6f7a819203b4c5d6e7f8091a2",
+    });
+  }
+
+  // 4. Officer Adjudication Recorded
+  if (caseData.adjudication) {
+    events.push({
+      id: `evt_${caseData.id}_04`,
+      sequence_number: seq++,
+      timestamp_utc: caseData.adjudication.timestamp_utc,
+      event_type: caseData.adjudication.override_applied ? "OFFICER_OVERRIDE_APPLIED" : "OFFICER_ADJUDICATION_RECORDED",
+      event_label: caseData.adjudication.override_applied ? "Officer Adjudication Override" : "Officer Adjudication Recorded",
+      actor_type: "OFFICER",
+      actor_id: caseData.adjudication.officer_id,
+      actor_name: caseData.adjudication.officer_name,
+      entity_type: "ADJUDICATION",
+      entity_id: caseData.adjudication.decision_id,
+      decision: caseData.adjudication.verdict,
+      remarks: caseData.adjudication.remarks,
+      metadata: {
+        action_order: caseData.adjudication.action_order,
+        override_applied: caseData.adjudication.override_applied,
+      },
+      previous_hash: events[events.length - 1].entry_hash,
+      entry_hash: "14d5e6f7a819203b4c5d6e7f8091a2b3c4d5e6f7a819203b4c5d6e7f8091a2b3",
+    });
+  }
+
+  return events;
+}
+
+/**
+ * Appends an audit event to a case in a strictly append-only manner.
+ * Historical records cannot be modified or deleted.
+ */
+export function appendAuditEvent(
+  inspectionId: string,
+  eventData: {
+    event_type: AuditEventType | string;
+    event_label: string;
+    actor_type: AuditActorType;
+    actor_id: string;
+    actor_name: string;
+    entity_type: "INSPECTION" | "EVIDENCE" | "FINDING" | "ADJUDICATION" | "HANDOFF";
+    entity_id: string;
+    related_finding_id?: string;
+    related_evidence_id?: string;
+    decision?: string;
+    remarks?: string;
+    metadata?: Record<string, any>;
+  }
+): AuditEvent {
+  let targetKey: string | undefined = undefined;
+  if (dynamicCases.has(inspectionId)) {
+    targetKey = inspectionId;
+  } else {
+    for (const [key, val] of dynamicCases.entries()) {
+      if (val.id === inspectionId || val.sku_demo_id === inspectionId || val.inspection_number === inspectionId) {
+        targetKey = key;
+        break;
+      }
+    }
+  }
+
+  const existing = targetKey ? dynamicCases.get(targetKey) : undefined;
+  const currentTrail: AuditEvent[] = existing?.audit_trail && existing.audit_trail.length > 0
+    ? existing.audit_trail
+    : existing ? createDefaultAuditTrail(existing) : [];
+
+  const seq = currentTrail.length + 1;
+  const prevHash = currentTrail.length > 0
+    ? currentTrail[currentTrail.length - 1].entry_hash || "0000000000000000000000000000000000000000000000000000000000000000"
+    : "0000000000000000000000000000000000000000000000000000000000000000";
+
+  const entryHash = `${seq}a8b7c6d5e4f3210987654321fedcba0987654321fedcba0987654321fedcba0${seq % 10}`.slice(0, 64);
+
+  const newEvent: AuditEvent = {
+    id: `evt_${inspectionId}_${Date.now()}_${seq}`,
+    sequence_number: seq,
+    timestamp_utc: new Date().toISOString(),
+    event_type: eventData.event_type,
+    event_label: eventData.event_label,
+    actor_type: eventData.actor_type,
+    actor_id: eventData.actor_id,
+    actor_name: eventData.actor_name,
+    entity_type: eventData.entity_type,
+    entity_id: eventData.entity_id,
+    related_finding_id: eventData.related_finding_id,
+    related_evidence_id: eventData.related_evidence_id,
+    decision: eventData.decision,
+    remarks: eventData.remarks,
+    metadata: eventData.metadata,
+    previous_hash: prevHash,
+    entry_hash: entryHash,
+  };
+
+  const updatedTrail = [...currentTrail, newEvent];
+  if (targetKey && existing) {
+    dynamicCases.set(targetKey, {
+      ...existing,
+      audit_trail: updatedTrail,
+    });
+  }
+
+  return newEvent;
+}
+
+/**
+ * Computes downstream case handoff readiness without client-side legal calculations.
+ * Driven strictly by case state and officer adjudication.
+ */
+export function computeCaseReadiness(caseData: InspectionCase): CaseReadinessChecklist {
+  const evidenceAvailable = caseData.evidence_assets && caseData.evidence_assets.length > 0;
+  const automatedAnalysisCompleted = !!(caseData.rule_evaluations && caseData.rule_evaluations.length > 0);
+  const officerAdjudicationCompleted = !!caseData.adjudication;
+  const auditRecordComplete = !!(caseData.audit_trail && caseData.audit_trail.length > 0);
+
+  let readinessState: HandoffReadinessState = "PENDING_OFFICER_REVIEW";
+  let guidance = "Officer adjudication required before case dossier can be handed off.";
+
+  if (!officerAdjudicationCompleted) {
+    readinessState = "PENDING_OFFICER_REVIEW";
+    guidance = "Automated findings require authorized Legal Metrology Officer review and adjudication.";
+  } else {
+    const verdict = caseData.adjudication!.verdict;
+    const actionOrder = caseData.adjudication!.action_order;
+
+    if (verdict === "REQUEST_RETEST" || actionOrder === "REQUEST_PHYSICAL_CALIPER_CHECK") {
+      readinessState = "ACTION_REQUIRED_RETEST";
+      guidance = "Physical caliper re-measurement or packaging re-capture ordered by inspecting officer.";
+    } else if (verdict === "DISMISS_AS_COMPLIANT" || actionOrder === "CLOSE_INSPECTION_COMPLIANT") {
+      readinessState = "READY_FOR_CASE_CLOSURE";
+      guidance = "Inspection record marked compliant by officer. Ready for administrative filing and case closure.";
+    } else if (verdict === "CONFIRM_VIOLATION" || actionOrder === "GENERATE_LEGAL_NOTICE_FORM_1") {
+      readinessState = "READY_FOR_LEGAL_NOTICE_DISPATCH";
+      guidance = "Statutory violation confirmed by officer. Ready for Form-1 Show Cause Notice preparation.";
+    }
+  }
+
+  return {
+    evidence_available: evidenceAvailable,
+    automated_analysis_completed: automatedAnalysisCompleted,
+    officer_adjudication_completed: officerAdjudicationCompleted,
+    audit_record_complete: auditRecordComplete,
+    readiness_state: readinessState,
+    downstream_action_guidance: guidance,
+  };
+}
+
 export function getMockCases(): Record<string, InspectionCase> {
   const res: Record<string, InspectionCase> = {};
   dynamicCases.forEach((val, key) => {
+    if (!val.audit_trail || val.audit_trail.length === 0) {
+      val.audit_trail = createDefaultAuditTrail(val);
+    }
     res[key] = val;
   });
   return res;
 }
 
 export function addMockCase(c: InspectionCase): void {
+  if (!c.audit_trail || c.audit_trail.length === 0) {
+    c.audit_trail = createDefaultAuditTrail(c);
+  }
   dynamicCases.set(c.id, c);
 }
 
 export function resetMockCases(): void {
   dynamicCases.clear();
   Object.entries(GOLDEN_SKU_CASES).forEach(([k, v]) => {
-    dynamicCases.set(k, JSON.parse(JSON.stringify(v)));
+    const cloned: InspectionCase = JSON.parse(JSON.stringify(v));
+    cloned.audit_trail = createDefaultAuditTrail(cloned);
+    dynamicCases.set(k, cloned);
   });
 }
 

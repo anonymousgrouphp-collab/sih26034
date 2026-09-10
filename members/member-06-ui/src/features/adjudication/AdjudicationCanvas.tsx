@@ -11,6 +11,9 @@ import { EvidenceViewer } from "./EvidenceViewer";
 import { FindingsLedger } from "./FindingsLedger";
 import { FieldDetailPanel } from "./FieldDetailPanel";
 import { OfficerAdjudicationModal } from "./OfficerAdjudicationModal";
+import { AuditTimeline } from "../audit/AuditTimeline";
+import { EvidenceProvenancePanel } from "../audit/EvidenceProvenancePanel";
+import { CaseHandoffState } from "../audit/CaseHandoffState";
 import {
   findFieldForFinding,
   findTokensForFinding,
@@ -43,7 +46,7 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
     findings[0]?.finding_id
   );
   const [selectedTokenId, setSelectedTokenId] = useState<string | undefined>(undefined);
-  const [rightTab, setRightTab] = useState<"FINDINGS" | "DETAILS" | "EVIDENCE_DAG">("FINDINGS");
+  const [rightTab, setRightTab] = useState<"FINDINGS" | "DETAILS" | "AUDIT" | "PROVENANCE" | "HANDOFF">("FINDINGS");
   const [isAdjudicationModalOpen, setIsAdjudicationModalOpen] = useState<boolean>(false);
   const [isSubmittingAdjudication, setIsSubmittingAdjudication] = useState<boolean>(false);
 
@@ -188,14 +191,14 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
           )}
         </div>
 
-        {/* Right Column (6 cols): Findings Ledger & Forensic Detail Inspector */}
+        {/* Right Column (6 cols): Findings Ledger, Forensic Inspector, Audit, Provenance, Handoff */}
         <div className="lg:col-span-6 space-y-3">
           {/* Right Pane Tabs */}
-          <div className="flex items-center border-b border-slate-200 bg-slate-50 p-1.5 rounded-t-lg gap-1">
+          <div className="flex items-center border-b border-slate-200 bg-slate-50 p-1.5 rounded-t-lg gap-1 flex-wrap">
             <button
               type="button"
               onClick={() => setRightTab("FINDINGS")}
-              className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors ${
+              className={`px-2.5 py-1.5 text-xs font-bold rounded-md transition-colors ${
                 rightTab === "FINDINGS"
                   ? "bg-white text-govNavy shadow-sm"
                   : "text-slate-600 hover:text-slate-900"
@@ -206,7 +209,7 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
             <button
               type="button"
               onClick={() => setRightTab("DETAILS")}
-              className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors ${
+              className={`px-2.5 py-1.5 text-xs font-bold rounded-md transition-colors ${
                 rightTab === "DETAILS"
                   ? "bg-white text-govNavy shadow-sm"
                   : "text-slate-600 hover:text-slate-900"
@@ -216,14 +219,36 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
             </button>
             <button
               type="button"
-              onClick={() => setRightTab("EVIDENCE_DAG")}
-              className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors ${
-                rightTab === "EVIDENCE_DAG"
+              onClick={() => setRightTab("AUDIT")}
+              className={`px-2.5 py-1.5 text-xs font-bold rounded-md transition-colors ${
+                rightTab === "AUDIT"
                   ? "bg-white text-govNavy shadow-sm"
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              Section 63 BSA DAG ({caseData.evidence_graph?.nodes.length || 0})
+              Audit Timeline ({caseData.audit_trail?.length || 0})
+            </button>
+            <button
+              type="button"
+              onClick={() => setRightTab("PROVENANCE")}
+              className={`px-2.5 py-1.5 text-xs font-bold rounded-md transition-colors ${
+                rightTab === "PROVENANCE"
+                  ? "bg-white text-govNavy shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              Provenance & DAG
+            </button>
+            <button
+              type="button"
+              onClick={() => setRightTab("HANDOFF")}
+              className={`px-2.5 py-1.5 text-xs font-bold rounded-md transition-colors ${
+                rightTab === "HANDOFF"
+                  ? "bg-white text-govNavy shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              Case Readiness
             </button>
           </div>
 
@@ -234,6 +259,8 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
               extractedFields={fields}
               selectedFindingId={selectedFinding?.finding_id}
               onSelectFinding={handleSelectFinding}
+              caseAdjudication={caseData.adjudication}
+              findingDecisions={caseData.finding_decisions}
             />
           )}
 
@@ -244,54 +271,34 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
               field={selectedField}
               tokens={selectedTokens}
               onSelectToken={handleSelectToken}
+              caseAdjudication={caseData.adjudication}
+              findingAdjudication={selectedFinding ? caseData.finding_decisions?.[selectedFinding.finding_id] : undefined}
             />
           )}
 
-          {/* Tab 3: Evidence Graph (Section 63 BSA DAG) */}
-          {rightTab === "EVIDENCE_DAG" && (
-            <div className="bg-panelBg rounded-lg border border-slate-200 p-4 space-y-3">
-              <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-                <div>
-                  <h4 className="text-xs font-bold uppercase text-govNavy">
-                    Section 63 BSA 2023 Merkle Evidence Chain
-                  </h4>
-                  <p className="text-[11px] text-slate-500">
-                    Cryptographic audit trail of transformations from raw capture to judicial certificate.
-                  </p>
-                </div>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold border border-emerald-300">
-                  CHAIN VERIFIED
-                </span>
-              </div>
+          {/* Tab 3: Chronological Audit Record */}
+          {rightTab === "AUDIT" && (
+            <AuditTimeline
+              auditTrail={caseData.audit_trail || []}
+              onSelectFinding={handleSelectFinding}
+            />
+          )}
 
-              {/* Dynamic DAG Nodes */}
-              <div className="space-y-2 max-h-[460px] overflow-y-auto">
-                {caseData.evidence_graph?.nodes && caseData.evidence_graph.nodes.length > 0 ? (
-                  caseData.evidence_graph.nodes.map((node, idx) => (
-                    <div
-                      key={node.node_id || idx}
-                      className="p-2.5 bg-slate-50 rounded border border-slate-200 text-xs font-mono space-y-1"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-govNavy">
-                          #{idx + 1} {node.stage_name}
-                        </span>
-                        <span className="text-[10px] text-slate-400">
-                          {node.timestamp_utc ? new Date(node.timestamp_utc).toLocaleTimeString() : ""}
-                        </span>
-                      </div>
-                      <div className="text-[11px] text-slate-600 truncate" title={node.payload_sha256}>
-                        SHA-256: {node.payload_sha256}
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="p-6 text-center text-xs text-slate-500 italic">
-                    Evidence DAG nodes will be generated upon pipeline execution.
-                  </div>
-                )}
-              </div>
-            </div>
+          {/* Tab 4: Evidence Provenance & Dynamic DAG */}
+          {rightTab === "PROVENANCE" && (
+            <EvidenceProvenancePanel
+              caseData={caseData}
+              activeAsset={activeAsset}
+              onSelectFinding={handleSelectFinding}
+            />
+          )}
+
+          {/* Tab 5: Case Handoff Readiness Checklist */}
+          {rightTab === "HANDOFF" && (
+            <CaseHandoffState
+              caseData={caseData}
+              onOpenAdjudication={() => setIsAdjudicationModalOpen(true)}
+            />
           )}
         </div>
       </div>

@@ -4,6 +4,9 @@ import { CaseHeader } from "./CaseHeader";
 import { EvidenceIntake } from "./EvidenceIntake";
 import { AnalysisHUD } from "./AnalysisHUD";
 import { AdjudicationCanvas } from "../adjudication/AdjudicationCanvas";
+import { AuditTimeline } from "../audit/AuditTimeline";
+import { EvidenceProvenancePanel } from "../audit/EvidenceProvenancePanel";
+import { CaseHandoffState } from "../audit/CaseHandoffState";
 import { ApiService } from "../../services/api";
 import { AdjudicationRequest } from "../../types/inspection";
 
@@ -21,7 +24,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
   const [isSubmittingEvidence, setIsSubmittingEvidence] = useState(false);
   const [isAnalyzingPipeline, setIsAnalyzingPipeline] = useState(false);
   const [isRetakeMode, setIsRetakeMode] = useState(false);
-  const [activeWorkspaceView, setActiveWorkspaceView] = useState<"CANVAS" | "HUD">(
+  const [activeWorkspaceView, setActiveWorkspaceView] = useState<"CANVAS" | "HUD" | "AUDIT">(
     caseData.rule_evaluations && caseData.rule_evaluations.length > 0 ? "CANVAS" : "HUD"
   );
   const [actionError, setActionError] = useState<string | null>(null);
@@ -192,6 +195,20 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                   </svg>
                   <span>Pipeline Diagnostic HUD</span>
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveWorkspaceView("AUDIT")}
+                  className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors flex items-center gap-1.5 ${
+                    activeWorkspaceView === "AUDIT"
+                      ? "bg-govNavy text-white shadow-sm"
+                      : "text-slate-600 hover:text-slate-900 bg-white border border-slate-200"
+                  }`}
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>Audit & Provenance</span>
+                </button>
               </div>
 
               <span className="text-[11px] font-mono text-slate-500 pr-2 hidden sm:inline font-semibold">
@@ -208,6 +225,27 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
               onRetakeRequested={() => setIsRetakeMode(true)}
               onSwitchToDiagnosticHUD={() => setActiveWorkspaceView("HUD")}
             />
+          ) : activeWorkspaceView === "AUDIT" ? (
+            /* View 3: Dedicated Audit, Provenance & Case Readiness View */
+            <div className="space-y-4">
+              <CaseHandoffState
+                caseData={caseData}
+                onOpenAdjudication={() => setActiveWorkspaceView("CANVAS")}
+              />
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                <div className="lg:col-span-6">
+                  <EvidenceProvenancePanel
+                    caseData={caseData}
+                    activeAsset={activeAsset}
+                  />
+                </div>
+                <div className="lg:col-span-6">
+                  <AuditTimeline
+                    auditTrail={caseData.audit_trail || []}
+                  />
+                </div>
+              </div>
+            </div>
           ) : (
             /* View 2: Evidence Summary & Analysis HUD (Diagnostic Stage View) */
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
