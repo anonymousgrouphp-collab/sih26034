@@ -32,3 +32,58 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #94A3B8;
 }
+
+/* Print-Friendly Layout Styles for Inspection Report View */
+@media print {
+  /* Hide application chrome, navigation, buttons, and screen-only controls */
+  header,
+  nav,
+  aside,
+  .screen-only,
+  button,
+  .modal-overlay,
+  [role="dialog"] {
+    display: none !important;
+  }
+
+  body {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    font-size: 11pt !important;
+  }
+
+  /* Make main container and printable report fill page cleanly */
+  main,
+  .printable-report {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: #FFFFFF !important;
+  }
+
+  /* Preserve background fills and border accents on printable components */
+  *,
+  *::before,
+  *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Avoid awkward page splits across statutory findings and audit rows */
+  section,
+  table,
+  tr,
+  .print-avoid-break {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Ensure links are readable without underlines in print */
+  a {
+    text-decoration: none !important;
+    color: inherit !important;
+  }
+}
+

@@ -792,6 +792,76 @@ export class ApiService {
     return computeCaseReadiness(c);
   }
 
+  /**
+   * Records formal case closure when backend readiness permits.
+   * Gated strictly by readiness state (READY_FOR_CASE_CLOSURE).
+   */
+  public static async closeInspection(
+    inspectionId: string,
+    remarks?: string
+  ): Promise<InspectionCase> {
+    const caseData = await this.getInspection(inspectionId);
+    const readiness = computeCaseReadiness(caseData);
+
+    if (readiness.readiness_state !== "READY_FOR_CASE_CLOSURE") {
+      throw {
+        error_code: "CASE_NOT_READY_FOR_CLOSURE",
+        status: 400,
+        message: "Case is not marked ready for closure by current workflow state.",
+        remediation: "Complete officer review and ensure all findings are resolved before case closure.",
+      } as ApiError;
+    }
+
+    if (this.useMockMode) {
+      const closureRemarks =
+        remarks?.trim() ||
+        "Inspection concluded. Case reviewed against backend statutory records and marked closed.";
+
+      // Update case status to COMPLETED
+      updateMockCase(inspectionId, {
+        workflow_status: "COMPLETED",
+        readiness_checklist: {
+          ...readiness,
+          downstream_action_guidance: "Case officially closed and archived in inspection registry.",
+        },
+      });
+
+      // Append chronological audit event
+      appendAuditEvent(inspectionId, {
+        event_type: "INSPECTION_CLOSED",
+        event_label: "Inspection Case Closed",
+        actor_type: "OFFICER",
+        actor_id: "INSP-DL-0842",
+        actor_name: "Rajesh Sharma",
+        entity_type: "INSPECTION",
+        entity_id: inspectionId,
+        decision: "CASE_CLOSED",
+        remarks: closureRemarks,
+      });
+
+      return await this.getInspection(inspectionId);
+    }
+
+    try {
+      const res = await fetch(`${this.baseUrl}/inspections/${inspectionId}/close`, {
+        method: "POST",
+        headers: {
+          ...this.getHeaders(),
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ remarks }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw err;
+      }
+      return await this.getInspection(inspectionId);
+    } catch (e: any) {
+      throw this.normalizeError(e, "Case closure failed.");
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // 6. Court-Ready Notice & Section 63 BSA Document Generation
   // ---------------------------------------------------------------------------

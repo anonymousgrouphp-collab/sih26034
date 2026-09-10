@@ -443,3 +443,61 @@ Chunk 7 / Sprint Review & Team Lead Direction. STOPPED per protocol.
 
 ### Signing Note
 SIGNED OFF BY: Team Lead — 2026-09-10 07:30 IST [VERIFIED]
+
+---
+
+## [10 September 2026] [07:45] IST
+
+### Task / Chunk
+Chunk 7: Inspection Outcome View + Traceable Report View + Controlled Case Closure + Print-Ready Demo (`members/member-06-ui/`).
+
+### Status
+COMPLETE
+
+### Completed
+- **Inspector Case Outcome View (`InspectionOutcome.tsx`):**
+  - Implemented case outcome summary displaying commodity identity, establishment context, workflow status, and verification state.
+  - Implemented automated findings breakdown counts (`PASS`, `FAIL`, `REVIEW`, `UNABLE_TO_VERIFY`) without synthesizing an overall legal verdict in React.
+  - Implemented officer adjudication breakdown counts (Confirmed, Dismissed, Retest Requested, Pending Review).
+  - Integrated evidence integrity and audit trail indicators preserving original asset records and chronological activity log.
+  - Displayed downstream case readiness handoff card (`READY_FOR_CASE_CLOSURE`, `READY_FOR_LEGAL_NOTICE_DISPATCH`, `ACTION_REQUIRED_RETEST`, `PENDING_OFFICER_REVIEW`).
+  - Added primary inspector action buttons: "Formal Report View", "Adjudication Canvas", and "Close Inspection Case".
+- **Read-Only Formal Inspection Report View (`InspectionReportView.tsx`):**
+  - Implemented formal government inspection report layout optimized for screen review and monochrome print filing.
+  - Designed complete statutory findings traceability table: Finding ID, Statutory Field, Gazette Citation, Prescribed vs Measured values, AI Finding, Officer Decision, and Traceability Linkages (`Evidence ID -> OCR Token -> Extracted Field -> Finding`).
+  - Preserved `ORIGINAL EVIDENCE — UNTOUCHED` card with native dimensions, MIME type, and canonical SHA-256 digest.
+  - Cites Section 63 BSA 2023 evidentiary certificate and multilingual OCR provenance stack (`DBNet++ / PP-OCRv4 English / PP-OCRv3 Devanagari / Tesseract`).
+  - Integrated native `window.print()` trigger with dedicated `.screen-only` controls exclusion.
+- **Controlled Case Closure Workflow (`CaseClosureModal.tsx`, `api.ts`):**
+  - Implemented accessible confirmation modal with focus trapping, Escape key handling, and ARIA attributes.
+  - Enforced strict backend readiness gating: case closure is rejected if readiness is not `READY_FOR_CASE_CLOSURE`.
+  - Enforced mandatory officer closure remarks.
+  - Added `closeInspection` to `ApiService`: updates `workflow_status: "COMPLETED"` (adhering strictly to canonical enum without adding non-standard status values) and appends `INSPECTION_CLOSED` audit record with sequential ID, officer actor, and chained SHA-256 hash.
+- **Monochrome Print-Ready Stylesheet (`index.css`):**
+  - Implemented comprehensive `@media print` CSS rules hiding navigation, sidebars, buttons, modals, and screen toolbars.
+  - Enforced high-contrast typography, solid borders, exact print color reproduction (`print-color-adjust: exact`), and page-break rules (`break-inside: avoid`).
+- **Comprehensive Chunk 7 Automated Test Suite (`tests/inspection_outcome.test.ts`):**
+  - Added 12 rigorous tests verifying backend workflow state preservation, zero fabricated verdicts, finding/adjudication separation, report traceability, original evidence preservation, 4 epistemic states, closure gating, absence of autonomous notice generation, print layout markers, missing data resilience, Golden SKU compatibility, and regression integrity.
+- **Workspace Navigation Integration (`CaseWorkspace.tsx`):**
+  - Wired `InspectionOutcome` and `InspectionReportView` into `activeWorkspaceView` mode switcher.
+
+### Tests
+- `npm test`: 70 passed across 28 suites in 1.45s (100% green, 0 failed, 0 skipped).
+- `npm run build`: Clean production build in 3.90s (`dist/index.html`, `dist/assets/index-CwiIvzmJ.js` [374.12 kB], `dist/assets/index-DQtzJSc7.css` [39.43 kB]).
+- Prohibited claims audit: 0 matches across `src/`.
+- Privacy audit: 0 personal emails across `members/member-06-ui/`.
+
+### Problems
+None. Resolved test assertion environment ESM imports and fixed TypeScript types for `CreateInspectionPayload` and `findFieldForFinding`.
+
+### Decisions
+1. **No Invented Overall Verdicts:** The frontend strictly tallies finding counts for display; it never synthesizes an overall statutory compliance verdict.
+2. **Canonical Workflow Status:** Used canonical `"COMPLETED"` for closed cases; did not invent a non-standard `"CLOSED"` enum value.
+3. **Native Browser Printing:** Used native `@media print` styles and `window.print()` rather than client-side PDF generation libraries, avoiding AGPL code and browser bloat.
+4. **Strict Closure Gating:** Case closure is impossible without prior officer review and explicit `READY_FOR_CASE_CLOSURE` backend state.
+
+### Next Step
+Chunk 7 complete. All 7 chunks of Member 6 implemented, verified, and ready for dev branch integration review.
+
+### Signing Note
+SIGNED OFF BY: Team Lead — 2026-09-10 07:45 IST [VERIFIED]

@@ -54,3 +54,11 @@
 - [x] Implement downstream case handoff readiness checklist and action guidance without autonomous notice generation (`CaseHandoffState.tsx`).
 - [x] Implement automated test suite covering HITL decision immutability, append-only audit, dynamic DAG, and readiness state (`tests/hitl_audit_provenance.test.ts`).
 - [x] Complete Definition of Done checklist and verify zero prohibited claims.
+
+### Day 6: Inspection Outcome, Traceable Report View & Controlled Case Closure (Chunk 7)
+- [x] Implement inspector-facing Case Outcome review view (`InspectionOutcome.tsx`) with findings breakdown counts and officer adjudication summaries without fabricating overall legal verdicts.
+- [x] Implement read-only formal Inspection Report View (`InspectionReportView.tsx`) with end-to-end statutory traceability table, untouched original evidence records, and Section 63 BSA citation.
+- [x] Implement controlled Case Closure workflow (`CaseClosureModal.tsx`, `api.ts`) gated strictly by backend readiness state (`READY_FOR_CASE_CLOSURE`) and appending `INSPECTION_CLOSED` audit records.
+- [x] Implement monochrome print-ready CSS stylesheet (`index.css`) hiding interactive controls and formatting print dossier for physical filing.
+- [x] Implement comprehensive automated test suite verifying workflow state preservation, absence of fabricated verdicts, report traceability, closure gating, and print structure (`tests/inspection_outcome.test.ts`).
+- [x] Complete Definition of Done checklist, verified 70/70 passing tests, clean production build, and zero prohibited claims.

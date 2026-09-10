@@ -7,6 +7,8 @@ import { AdjudicationCanvas } from "../adjudication/AdjudicationCanvas";
 import { AuditTimeline } from "../audit/AuditTimeline";
 import { EvidenceProvenancePanel } from "../audit/EvidenceProvenancePanel";
 import { CaseHandoffState } from "../audit/CaseHandoffState";
+import { InspectionOutcome } from "./InspectionOutcome";
+import { InspectionReportView } from "./InspectionReportView";
 import { ApiService } from "../../services/api";
 import { AdjudicationRequest } from "../../types/inspection";
 
@@ -24,9 +26,9 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
   const [isSubmittingEvidence, setIsSubmittingEvidence] = useState(false);
   const [isAnalyzingPipeline, setIsAnalyzingPipeline] = useState(false);
   const [isRetakeMode, setIsRetakeMode] = useState(false);
-  const [activeWorkspaceView, setActiveWorkspaceView] = useState<"CANVAS" | "HUD" | "AUDIT">(
-    caseData.rule_evaluations && caseData.rule_evaluations.length > 0 ? "CANVAS" : "HUD"
-  );
+  const [activeWorkspaceView, setActiveWorkspaceView] = useState<
+    "CANVAS" | "HUD" | "AUDIT" | "OUTCOME" | "REPORT"
+  >(caseData.rule_evaluations && caseData.rule_evaluations.length > 0 ? "CANVAS" : "HUD");
   const [actionError, setActionError] = useState<string | null>(null);
 
   const activeAsset: EvidenceAsset | undefined = caseData.evidence_assets[caseData.evidence_assets.length - 1];
@@ -103,6 +105,18 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
       onCaseUpdated(updated);
     } catch (err: any) {
       setActionError(err.message || "Failed to record officer adjudication.");
+      throw err;
+    }
+  };
+
+  // Handle case closure
+  const handleCloseCase = async (remarks: string) => {
+    setActionError(null);
+    try {
+      const updated = await ApiService.closeInspection(caseData.id, remarks);
+      onCaseUpdated(updated);
+    } catch (err: any) {
+      setActionError(err.message || "Failed to record case closure.");
       throw err;
     }
   };
@@ -209,6 +223,34 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                   </svg>
                   <span>Audit & Provenance</span>
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveWorkspaceView("OUTCOME")}
+                  className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors flex items-center gap-1.5 ${
+                    activeWorkspaceView === "OUTCOME"
+                      ? "bg-govNavy text-white shadow-sm"
+                      : "text-slate-600 hover:text-slate-900 bg-white border border-slate-200"
+                  }`}
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                  </svg>
+                  <span>Case Outcome</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveWorkspaceView("REPORT")}
+                  className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors flex items-center gap-1.5 ${
+                    activeWorkspaceView === "REPORT"
+                      ? "bg-govNavy text-white shadow-sm"
+                      : "text-slate-600 hover:text-slate-900 bg-white border border-slate-200"
+                  }`}
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                  </svg>
+                  <span>Formal Report</span>
+                </button>
               </div>
 
               <span className="text-[11px] font-mono text-slate-500 pr-2 hidden sm:inline font-semibold">
@@ -224,6 +266,22 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
               onAdjudicationSubmitted={handleAdjudicationSubmitted}
               onRetakeRequested={() => setIsRetakeMode(true)}
               onSwitchToDiagnosticHUD={() => setActiveWorkspaceView("HUD")}
+            />
+          ) : activeWorkspaceView === "OUTCOME" ? (
+            /* View 4: Inspector Case Outcome Review */
+            <InspectionOutcome
+              caseData={caseData}
+              onViewReport={() => setActiveWorkspaceView("REPORT")}
+              onOpenCanvas={() => setActiveWorkspaceView("CANVAS")}
+              onOpenAudit={() => setActiveWorkspaceView("AUDIT")}
+              onCloseCase={handleCloseCase}
+            />
+          ) : activeWorkspaceView === "REPORT" ? (
+            /* View 5: Read-Only Formal Inspection Report */
+            <InspectionReportView
+              caseData={caseData}
+              onBackToWorkspace={() => setActiveWorkspaceView("CANVAS")}
+              onBackToOutcome={() => setActiveWorkspaceView("OUTCOME")}
             />
           ) : activeWorkspaceView === "AUDIT" ? (
             /* View 3: Dedicated Audit, Provenance & Case Readiness View */

@@ -182,3 +182,31 @@ Zero false accusations, complete transparency between automated telemetry and of
 
 ### Status
 ACTIVE
+
+---
+
+## [10 September 2026 | 07:45 IST]
+
+### Discovery
+Found that attempting to summarize overall case legality in the frontend by synthesizing automated finding counts into an overall verdict (e.g. `evaluations.some(f => f.status === 'FAIL') ? 'FAIL' : 'PASS'`) or adding a non-standard `"CLOSED"` status to `WorkflowStatus` violates canonical backend contracts and introduces client-side legal hallucinations. Under statutory procedure and canonical contracts, case lifecycle status is defined as `"DRAFT" | "OPEN" | "PROCESSING" | "PENDING_REVIEW" | "COMPLETED"`. Case closure must be an explicit officer action updating `workflow_status: "COMPLETED"` and appending an `INSPECTION_CLOSED` audit entry, gated strictly by backend case readiness (`READY_FOR_CASE_CLOSURE`). Furthermore, official inspection reports must be printable directly via native browser print stylesheets (`@media print`) without relying on heavy external PDF libraries or altering original evidence records.
+
+### Evidence
+- `07_API_AND_INTERFACE_CONTRACTS.md` (`WorkflowStatus` enum definition: DRAFT, OPEN, PROCESSING, PENDING_REVIEW, COMPLETED).
+- Section 63 BSA 2023 Evidentiary Defense Standards (Chain of custody, zero false accusations, untampered original evidence).
+- Chunk 7 Specification directives (zero client-side legal engine, no autonomous notice dispatch, native browser printing).
+
+### Decision
+1. **Outcome Breakdown Without Fabricated Verdicts:** Implemented `InspectionOutcome.tsx` displaying individual findings counts breakdown (`PASS`, `FAIL`, `REVIEW`, `UNABLE_TO_VERIFY`) and officer adjudication summary counts without synthesizing an overall legal verdict in React.
+2. **Read-Only Formal Inspection Report View:** Implemented `InspectionReportView.tsx` with a formal tabular layout presenting statutory findings, prescribed vs observed values, original evidence SHA-256 digests, Section 63 BSA certification metadata, and complete traceability linkages (`Evidence ID -> OCR Token -> Extracted Field -> Finding`).
+3. **Strictly Gated Case Closure Workflow:** Implemented `CaseClosureModal.tsx` and `ApiService.closeInspection` gated strictly by backend readiness `READY_FOR_CASE_CLOSURE`. Validates mandatory officer closure remarks, sets `workflow_status: "COMPLETED"`, and appends an `INSPECTION_CLOSED` audit record.
+4. **Clean Print-Ready Styling:** Enforced `@media print` CSS in `index.css` that hides all screen navigation, toolbars, and action buttons, preserves high-contrast monochrome legibility (`print-color-adjust: exact`), and prevents awkward page breaks across tables.
+
+### Why
+Maintains 100% fidelity to canonical contracts, protects judicial admissibility by preventing client-side legal synthesis, ensures complete traceability from physical evidence to officer closure, and delivers clean print dossiers for official filing.
+
+### Impact
+Enables field officers to review completed inspection dossiers, print audit-ready reports, and close compliant cases without risk of legal errors or client-side calculation drift. Validated by 70 passing automated tests.
+
+### Status
+ACTIVE
+
