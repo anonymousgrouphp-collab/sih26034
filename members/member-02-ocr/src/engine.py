@@ -49,7 +49,8 @@ class MultilingualOCREngine:
         det_num_threads: int = 4,
         rec_num_threads: int = 6,
         num_threads: Optional[int] = None,
-        execution_mode: str = "FP32"
+        execution_mode: str = "FP32",
+        allow_classical_fallback: bool = False
     ):
         self.execution_mode = execution_mode.upper()
         if num_threads is not None:
@@ -57,7 +58,8 @@ class MultilingualOCREngine:
             rec_num_threads = num_threads
         self.detector = detector if detector is not None else DBNetTextDetector(
             num_threads=det_num_threads,
-            execution_mode=self.execution_mode
+            execution_mode=self.execution_mode,
+            allow_classical_fallback=allow_classical_fallback
         )
         self.recognizer = recognizer if recognizer is not None else PPOCRv4Recognizer(
             num_threads=rec_num_threads,
@@ -67,21 +69,62 @@ class MultilingualOCREngine:
         self.fallback_threshold = fallback_threshold
 
     def _load_image(self, image_input: Union[np.ndarray, str, Path]) -> Optional[np.ndarray]:
-        """Loads and normalizes image input into a NumPy array."""
+        """Loads and normalizes image input into a standard BGR uint8 NumPy array."""
+        img: Optional[np.ndarray] = None
+
         if isinstance(image_input, (str, Path)):
             path_str = str(image_input)
+            if "\x00" in path_str:
+                logger.error("Rejected image path containing null byte")
+                return None
             if not os.path.exists(path_str):
                 logger.error(f"Image path does not exist: {path_str}")
                 return None
             img = cv2.imread(path_str)
-            return img
-
-        if isinstance(image_input, np.ndarray):
-            if image_input.size == 0:
+            if img is None:
                 return None
-            return image_input
 
-        return None
+        elif isinstance(image_input, np.ndarray):
+            if image_input.size == 0 or len(image_input.shape) < 2:
+                return None
+            img = image_input
+
+        if img is None:
+            return None
+
+        # Sanitize non-finite values
+        if not np.isfinite(img).all():
+            img = np.nan_to_num(img, nan=0.0, posinf=255.0, neginf=0.0)
+
+        # Decompression / allocation bomb guard (cap max dimension to 4096)
+        h, w = img.shape[:2]
+        if max(h, w) > 8192:
+            scale = 4096.0 / max(h, w)
+            new_w = max(int(round(w * scale)), 16)
+            new_h = max(int(round(h * scale)), 16)
+            img = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
+
+        # Coerce floating-point arrays to uint8
+        if np.issubdtype(img.dtype, np.floating):
+            if img.max() <= 1.0 and img.min() >= 0.0:
+                img = (img * 255.0).clip(0, 255).astype(np.uint8)
+            else:
+                img = np.clip(img, 0, 255).astype(np.uint8)
+        elif img.dtype != np.uint8:
+            img = np.clip(img, 0, 255).astype(np.uint8)
+
+        # Ensure standard 3-channel BGR layout
+        if len(img.shape) == 2:
+            img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+        elif len(img.shape) == 3:
+            if img.shape[2] == 4:
+                img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
+            elif img.shape[2] == 1:
+                img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+            elif img.shape[2] > 3:
+                img = img[:, :, :3]
+
+        return np.ascontiguousarray(img)
 
     def process_image(
         self,

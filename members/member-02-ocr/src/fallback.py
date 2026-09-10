@@ -142,6 +142,10 @@ class OCRConsensusEngine:
         if not s1 or not s2:
             return 0.0
 
+        # Bound maximum string length to prevent O(N*M) CPU exhaustion
+        s1 = s1[:500]
+        s2 = s2[:500]
+
         n, m = len(s1), len(s2)
         dp = [[0] * (m + 1) for _ in range(n + 1)]
         for i in range(n + 1):
