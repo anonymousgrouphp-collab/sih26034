@@ -700,17 +700,31 @@ export function addMockCase(c: InspectionCase): void {
 
 export function resetMockCases(): void {
   dynamicCases.clear();
-  Object.entries(GOLDEN_SKU_CASES).forEach(([k, v]) => dynamicCases.set(k, v));
+  Object.entries(GOLDEN_SKU_CASES).forEach(([k, v]) => {
+    dynamicCases.set(k, JSON.parse(JSON.stringify(v)));
+  });
 }
 
 export function updateMockCase(id: string, updates: Partial<InspectionCase>): InspectionCase | undefined {
-  const existing = dynamicCases.get(id);
-  if (!existing) return undefined;
+  let targetKey: string | undefined = undefined;
+  if (dynamicCases.has(id)) {
+    targetKey = id;
+  } else {
+    for (const [key, val] of dynamicCases.entries()) {
+      if (val.id === id || val.sku_demo_id === id || val.inspection_number === id) {
+        targetKey = key;
+        break;
+      }
+    }
+  }
+
+  if (!targetKey) return undefined;
+  const existing = dynamicCases.get(targetKey)!;
   const updated: InspectionCase = {
     ...existing,
     ...updates,
   };
-  dynamicCases.set(id, updated);
+  dynamicCases.set(targetKey, updated);
   return updated;
 }
 

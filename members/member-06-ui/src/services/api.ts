@@ -585,7 +585,7 @@ export class ApiService {
     }
 
     if (this.useMockMode) {
-      return {
+      const decision: OfficerDecision = {
         decision_id: `dec_${Date.now()}`,
         inspection_id: inspectionId,
         officer_id: "INSP-DL-0842",
@@ -597,6 +597,13 @@ export class ApiService {
         timestamp_utc: new Date().toISOString(),
         action_order: request.action_order,
       };
+
+      updateMockCase(inspectionId, {
+        adjudication: decision,
+        workflow_status: "COMPLETED",
+      });
+
+      return decision;
     }
 
     try {

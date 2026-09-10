@@ -36,10 +36,19 @@
 - [x] Implement CaseWorkspace coordinating intake and dual-column inspection view (`CaseWorkspace.tsx`).
 - [x] Implement automated test suite covering evidence intake, optical rejection, pipeline progression, and retry (`tests/evidence_hud.test.ts`).
 
-### Day 4: Flagship Split-View Adjudication Canvas & Evidence Ingestion HUD (Chunk 5)
-- [ ] Implement dual-pane layout: Calibrated image canvas with pixel loupe (left) + Statutory rule ledger (right).
-- [ ] Implement interactive bounding box visual overlays with confidence coloring.
-- [ ] Implement officer override dialog with mandatory justification remarks logging.
-- [ ] Implement dynamic Merkle DAG interactive visualizer and Form-1 Legal Notice preview.
-- [ ] Complete Definition of Done checklist.
+### Day 4: Flagship Split-View Adjudication Canvas & Bidirectional Traceability (Chunk 5)
+- [x] Implement dual-pane layout: Calibrated packaging image canvas with pixel inspection loupe (left) + Statutory rule ledger (right) (`AdjudicationCanvas.tsx`).
+- [x] Implement interactive SVG bounding polygon overlays with status styling, hover tooltips, and bidirectional highlighting (`EvidenceViewer.tsx`).
+- [x] Implement 4-state statutory compliance triage ledger (`PASS`, `FAIL`, `REVIEW`, `UNABLE_TO_VERIFY`) with filter tabs and count badges (`FindingsLedger.tsx`).
+- [x] Implement forensic detail panel for extracted fields, raw OCR streams, and rule engine findings (`FieldDetailPanel.tsx`).
+- [x] Implement multilingual OCR token inspector preserving Devanagari Hindi (`शुद्ध मात्रा: २०० ग्राम`), Indic numerals (`२००`), and Rupee symbol (`₹`) (`FieldDetailPanel.tsx`).
+- [x] Implement bidirectional relational traceability: `Finding ↔ Extracted Field ↔ OCR Token ↔ Image Polygon ↔ Evidence ID` (`AdjudicationTraceability.ts`).
+- [x] Implement Human-in-the-Loop Officer Adjudication modal with mandatory justification remarks validation (`OfficerAdjudicationModal.tsx`).
+- [x] Update Mock API service to record officer decisions with audit log preservation (`api.ts`, `mockData.ts`).
+- [x] Implement comprehensive automated test suite verifying bidirectional traceability, SVG polygon rendering, 4-state epistemic triage, Unicode preservation, backend truth invariants, and officer overrides (`tests/adjudication_canvas.test.ts`).
+
+### Day 5: Evidence DAG Audit, Legal Notice Preview & End-to-End Polish (Chunk 6)
+- [ ] Implement dynamic Merkle DAG interactive visualizer with Section 63 BSA 2023 evidence node inspection.
+- [ ] Implement Form-1 Legal Notice preview with statutory penalty schedule.
 - [ ] Finalize end-to-end demo flow matching the 3-minute jury pitch script (`12_DEMO_PLAN.md`).
+- [ ] Complete Definition of Done checklist.

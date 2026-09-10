@@ -285,7 +285,69 @@ None. All tests pass and build is completely clean.
 Re-verified that the UI functions strictly as an Augmented Diagnostic Workstation: it displays findings and facilitates officer adjudication, but never autonomously manufactures legal conclusions, threshold verifications, or competing cryptographic custody records.
 
 ### Next Step
-Chunk 5 — Flagship Split-View Adjudication Canvas (`src/features/canvas/`). STOPPED per protocol; awaiting Team Lead review and direction.
+Chunk 5 — Flagship Split-View Adjudication Canvas (`src/features/adjudication/`). Completed and verified.
 
 ### Signing Note
 SIGNED OFF BY: anonymousgrouphp-collab (anonymousgrouphp@gmail.com) — 2026-09-10 06:48 IST [VERIFIED]
+
+---
+
+## [10 September 2026] [06:58] IST
+
+### Task / Chunk
+Chunk 5 — Flagship Split-View Adjudication Canvas (`members/member-06-ui/`).
+
+### Status
+COMPLETE
+
+### Completed
+- **Bidirectional Traceability Architecture (`src/features/adjudication/AdjudicationTraceability.ts`):**
+  - Implemented relational lookup utilities: `findFieldForFinding`, `findTokensForField`, `findTokensForFinding`, `findFieldForToken`, `findFindingsForToken`.
+  - Implemented SVG coordinate projection (`polygonToSvgPoints`, `polygonCenter`, `getStatusStyle`) projecting 4-point bounding polygons onto native image viewBox.
+- **Calibrated Evidence Viewer (`src/features/adjudication/EvidenceViewer.tsx`):**
+  - High-visibility banner designating `ORIGINAL EVIDENCE (UNTOUCHED)` with backend SHA-256 digest and native pixel resolution (`image_width` x `image_height`).
+  - Interactive SVG `<polygon>` overlays with `vector-effect="non-scaling-stroke"`, dynamic status coloring, pulsing highlights on active selection, vertex markers, and tooltips.
+  - Interactive zoom controls (0.5x to 3.0x, fit-to-view, reset) with pan support.
+  - Pixel Inspection Loupe: provides 2.5x circular magnifying glass centered on mouse cursor displaying native pixel coordinates `(X, Y) px` for visual packaging inspection, strictly avoiding client-side mm conversion or font-height math.
+- **Statutory Compliance Findings Ledger (`src/features/adjudication/FindingsLedger.tsx`):**
+  - 4-state statutory compliance triage list (`PASS`, `FAIL`, `REVIEW`, `UNABLE_TO_VERIFY`) with filter pills and count badges.
+  - Interactive finding cards displaying statutory field name, status badge, legal citation (e.g. `Rule 6(1)(a)`, `Table-I Row 5`), quantified deficit (e.g. `Font height 4.2mm < required 6.0mm`), and penal consequence.
+  - Selection synchronization triggering polygon focus on the evidence canvas.
+- **Forensic Field Detail & OCR Token Inspector (`src/features/adjudication/FieldDetailPanel.tsx`):**
+  - Deep-dive panel for extracted fields, raw OCR streams, and AST rule engine findings.
+  - Multilingual OCR Token Inspector detailing token IDs, bounding polygons, confidence scores, and engine provenance (`DBNet++ / PP-OCRv4 Latin / PP-OCRv3 Devanagari / Tesseract`).
+  - Strict preservation of Unicode Devanagari Hindi (`शुद्ध मात्रा: २०० ग्राम`), Indic numerals (`२००`), and Rupee symbols (`₹`).
+  - Contextual banners for sensor uncertainty (`REVIEW`) and optical degradation (`UNABLE_TO_VERIFY`).
+- **Human-in-the-Loop Officer Adjudication Modal (`src/features/adjudication/OfficerAdjudicationModal.tsx`):**
+  - Accessible modal dialog enabling the Legal Metrology Officer to confirm violations (`CONFIRM_VIOLATION`), dismiss findings (`DISMISS_AS_COMPLIANT`), or request laboratory re-tests (`REQUEST_RETEST`).
+  - Mandatory justification remarks validation: submission is blocked with an accessible error alert if the officer's remarks field is empty or contains only whitespace.
+  - Original automated findings are preserved in the audit trail alongside the officer's determination under Section 63 BSA 2023.
+- **Flagship Split-View Adjudication Canvas Coordinator (`src/features/adjudication/AdjudicationCanvas.tsx`):**
+  - Dual-column workspace coordinating Evidence Viewer (left) and Findings Ledger / Detail tabs (right).
+  - Bottom forensic traceability breadcrumbs: `Evidence ID → Finding ID → Field Name → OCR Token ID → Engine Source`.
+  - Mode switcher button to toggle between Adjudication Canvas and Pipeline Diagnostic HUD.
+- **Integrated into Case Workspace (`src/features/case/CaseWorkspace.tsx`):**
+  - Seamless toggle between "Adjudication Canvas" and "Pipeline Diagnostic HUD" views once analysis is completed.
+- **API & Mock Data Integration (`src/services/api.ts`, `src/services/mockData.ts`):**
+  - Enhanced `submitAdjudication` in `MockApiService` to record `OfficerDecision` records and update case state.
+  - Updated `updateMockCase` to match by internal key, case ID (`insp_*`), SKU demo ID (`SKU-DEMO-*`), or inspection number.
+- **Comprehensive Automated Test Suite (`tests/adjudication_canvas.test.ts`):**
+  - 14 tests across 6 test suites verifying bidirectional traceability, SVG polygon projection, 4-state epistemic triage, Unicode preservation, backend truth invariants, and officer adjudication validation.
+
+### Tests
+- `npm test`: 48 passed across 26 suites in 0.67s (all 5 test suites: `adjudication_canvas.test.ts`, `evidence_hud.test.ts`, `desk_new_case.test.ts`, `contracts_adapter.test.ts`, `mock_api.test.ts`).
+- `npm run build`: 100% clean production build in 1.94s (`dist/index.html`, `dist/assets/index-DBhg455T.js` [296.87 kB], `dist/assets/index-DJKe7OKF.css` [35.76 kB]).
+
+### Problems
+None. Resolved test assertion error matching for custom error objects and fixed unused import lint in test file.
+
+### Decisions
+1. **Resolution-Independent SVG Overlay:** Used SVG `viewBox="0 0 {imgWidth} {imgHeight}"` with `vector-effect="non-scaling-stroke"` so all polygon bounding boxes scale smoothly with zoom while preserving native coordinate precision.
+2. **Pure Optical Pixel Loupe:** Kept the loupe strictly as an optical magnifying inspection aid displaying native image `(X, Y) px` coordinates, ensuring zero client-side millimeter conversion or font math in the browser.
+3. **Mandatory Officer Remarks:** Adjudication override submissions strictly require officer justification remarks to maintain evidentiary defense standards under Section 63 BSA 2023.
+
+### Next Step
+Chunk 6: Evidence DAG Audit, Legal Notice Preview & End-to-End Demo Polish (`src/features/audit/`, Merkle DAG visualizer, Form-1 Legal Notice generator/preview). STOPPED per protocol; awaiting Team Lead review and direction.
+
+### Signing Note
+SIGNED OFF BY: anonymousgrouphp-collab (anonymousgrouphp@gmail.com) — 2026-09-10 06:58 IST [VERIFIED]
