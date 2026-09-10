@@ -143,26 +143,28 @@ class OCRConsensusEngine:
             return 0.0
 
         # Bound maximum string length to prevent O(N*M) CPU exhaustion
-        s1 = s1[:500]
-        s2 = s2[:500]
+        # Single OCR token strings never exceed 256 characters under statutory labeling
+        s1 = s1[:256]
+        s2 = s2[:256]
 
         n, m = len(s1), len(s2)
-        dp = [[0] * (m + 1) for _ in range(n + 1)]
-        for i in range(n + 1):
-            dp[i][0] = i
-        for j in range(m + 1):
-            dp[0][j] = j
+        # Memory-efficient and cache-friendly rolling 1D DP rows
+        prev = list(range(m + 1))
+        curr = [0] * (m + 1)
 
         for i in range(1, n + 1):
+            curr[0] = i
+            c1 = s1[i - 1].lower()
             for j in range(1, m + 1):
-                cost = 0 if s1[i - 1].lower() == s2[j - 1].lower() else 1
-                dp[i][j] = min(
-                    dp[i - 1][j] + 1,      # Deletion
-                    dp[i][j - 1] + 1,      # Insertion
-                    dp[i - 1][j - 1] + cost  # Substitution
+                cost = 0 if c1 == s2[j - 1].lower() else 1
+                curr[j] = min(
+                    prev[j] + 1,       # Deletion
+                    curr[j - 1] + 1,   # Insertion
+                    prev[j - 1] + cost # Substitution
                 )
+            prev, curr = curr, prev
 
-        dist = dp[n][m]
+        dist = prev[m]
         max_len = max(n, m)
         return float(1.0 - (dist / max_len))
 

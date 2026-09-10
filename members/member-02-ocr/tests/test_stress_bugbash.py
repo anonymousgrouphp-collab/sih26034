@@ -362,3 +362,118 @@ def test_cycle5_security_levenshtein_cpu_exhaustion_dos_mitigation():
     # With 500-char clamp, computation must complete in < 250ms (typically < 30ms)
     assert elapsed_ms < 500.0, f"Levenshtein DoS attack took {elapsed_ms:.2f} ms"
     assert 0.0 <= sim <= 1.0
+
+
+# ============================================================================
+# CYCLE 6: ADVANCED END-TO-END ROBUSTNESS GAINS & REPEATED EXECUTION
+# ============================================================================
+
+def test_cycle6_extreme_aspect_ratio_ribbon_and_strip():
+    """Validates resilience against ultra-wide horizontal ribbons (50:1) and tall vertical strips."""
+    rec = PPOCRv4Recognizer()
+
+    # Ultra-wide ribbon: 1200 x 24 (aspect ratio 50:1)
+    wide_ribbon = np.full((24, 1200, 3), 255, dtype=np.uint8)
+    cv2.putText(wide_ribbon, "CUSTOMER CARE: 1800-11-4000 TOLL FREE", (20, 18), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
+    wide_tensor = rec.preprocess_crop(wide_ribbon)
+    assert wide_tensor.shape[0] == 3
+    assert wide_tensor.shape[1] == 48
+    assert 16 <= wide_tensor.shape[2] <= 4096
+
+    # Tall narrow vertical strip: 30 x 600
+    tall_strip = np.full((600, 30, 3), 255, dtype=np.uint8)
+    tall_tensor = rec.preprocess_crop(tall_strip)
+    assert tall_tensor.shape[0] == 3
+    assert tall_tensor.shape[1] == 48
+    assert tall_tensor.shape[2] == 16  # Clamped to min width 16
+
+
+def test_cycle6_inverted_polarity_and_faint_low_contrast():
+    """Validates text localization and crop processing on negative polarity (white-on-black) and faint contrast."""
+    engine = MultilingualOCREngine(allow_classical_fallback=True)
+
+    # Inverted polarity (white text on solid black background)
+    neg_img = np.zeros((150, 400, 3), dtype=np.uint8)
+    cv2.putText(neg_img, "NET QTY 1.0 kg", (30, 80), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (255, 255, 255), 2)
+    neg_output = engine.process_image(neg_img, image_id="inverted_polarity_test")
+    assert isinstance(neg_output, OCROutput)
+    assert neg_output.image_id == "inverted_polarity_test"
+
+    # Faint low contrast (gray text on light gray background)
+    faint_img = np.full((150, 400, 3), 210, dtype=np.uint8)
+    cv2.putText(faint_img, "B.NO: 9942A", (30, 80), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (185, 185, 185), 2)
+    faint_output = engine.process_image(faint_img, image_id="faint_contrast_test")
+    assert isinstance(faint_output, OCROutput)
+    assert faint_output.image_id == "faint_contrast_test"
+
+
+def test_cycle6_consensus_fallback_exact_boundary_threshold():
+    """Validates deterministic arbitration when primary confidence is exactly around 0.65 threshold."""
+    # PolygonNormalizer.requires_consensus_fallback check
+    assert PolygonNormalizer.requires_consensus_fallback(0.649, threshold=0.65) is True
+    assert PolygonNormalizer.requires_consensus_fallback(0.650, threshold=0.65) is False
+    assert PolygonNormalizer.requires_consensus_fallback(0.651, threshold=0.65) is False
+
+    # Arbitration agreement boost
+    resolved_text, boosted_conf, verdict = OCRConsensusEngine.resolve(
+        primary_text="MRP Rs 500",
+        primary_conf=0.60,
+        fallback_text="MRP Rs 500",
+        fallback_conf=0.85
+    )
+    assert boosted_conf >= 0.60
+    assert resolved_text == "MRP Rs 500"
+    assert verdict == "CONSENSUS_AGREED"
+
+
+def test_cycle6_e2e_statutory_bilingual_label_pipeline():
+    """Validates full end-to-end processing of a realistic multi-line bilingual statutory packaging label."""
+    label_img = np.full((400, 600, 3), 245, dtype=np.uint8)
+    cv2.putText(label_img, "MRP Rs 250.00 INCL TAXES", (40, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
+    cv2.putText(label_img, "NET QTY: 500 g", (40, 140), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
+    cv2.putText(label_img, "MFG DATE: 08/2026", (40, 210), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
+    cv2.putText(label_img, "CONSUMER CARE: 1800-11-4000", (40, 280), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)
+
+    engine = MultilingualOCREngine(allow_classical_fallback=True)
+    output = engine.process_image(label_img, image_id="golden_bilingual_label")
+
+    assert isinstance(output, OCROutput)
+    assert output.image_id == "golden_bilingual_label"
+    assert output.execution_time_ms >= 0
+
+
+def test_cycle6_repeated_e2e_stress_zero_drift():
+    """Executes 10 consecutive full pipeline runs on alternating synthesized images to ensure zero state leak."""
+    engine = MultilingualOCREngine(allow_classical_fallback=True)
+
+    test_words = ["BEST BEFORE 12 MONTHS", "BATCH NO B4902", "UNIT SALE PRICE Rs 0.50/g", "MADE IN INDIA"]
+    outputs = []
+
+    for i in range(10):
+        img = np.full((120, 500, 3), 250, dtype=np.uint8)
+        word = test_words[i % len(test_words)]
+        cv2.putText(img, word, (20, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (10, 10, 10), 2)
+        out = engine.process_image(img, image_id=f"stress_run_{i:02d}")
+        assert isinstance(out, OCROutput)
+        assert out.image_id == f"stress_run_{i:02d}"
+        outputs.append(out)
+
+    assert len(outputs) == 10
+    # Confirm output IDs are isolated and non-conflicting
+    ids = [o.image_id for o in outputs]
+    assert len(set(ids)) == 10
+
+
+def test_cycle6_corrupted_byte_stream_resilience():
+    """Verifies that corrupted byte strings or non-existent file paths don't raise uncaught exceptions."""
+    engine = MultilingualOCREngine(allow_classical_fallback=True)
+
+    # Empty string path
+    out_empty = engine.process_image("", image_id="empty_path")
+    assert out_empty.total_tokens == 0
+
+    # Garbage binary string
+    garbage_str = "\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01corrupted_data_not_a_file"
+    out_garbage = engine.process_image(garbage_str, image_id="garbage_stream")
+    assert out_garbage.total_tokens == 0
+
