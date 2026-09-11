@@ -1,7 +1,0 @@
-import {mockInspections} from "../data/mockData"; import type {Inspection,InspectionStatus} from "../types";
-const delay=(ms:number)=>new Promise(r=>setTimeout(r,ms));
-export async function getInspections():Promise<Inspection[]>{await delay(250);return mockInspections}
-export async function getInspection(id:string):Promise<Inspection|undefined>{await delay(200);return mockInspections.find(i=>i.id===id)}
-export async function createInspection(files:File[],officer:string):Promise<Inspection>{await delay(700);const timestamp=new Date().toISOString();return {...mockInspections[0],id:`INS-${Date.now()}`,caseNumber:`LM/NEW/2026/${Math.floor(Math.random()*900000+100000)}`,status:"PROCESSING",officer,createdAt:timestamp,updatedAt:timestamp,images:files.map((file,index)=>({id:`NEW-IMG-${index}`,url:URL.createObjectURL(file),filename:file.name,capturedAt:timestamp,type:index===0?"FRONT_LABEL":"BACK_LABEL",width:1200,height:900}))}}
-export async function runInspectionPipeline(inspection:Inspection):Promise<Inspection>{await delay(1500);return {...inspection,status:"PASSED",updatedAt:new Date().toISOString(),processingDuration:1500}}
-export async function updateInspectionStatus(id:string,status:InspectionStatus){await delay(300);const i=mockInspections.find(x=>x.id===id);if(i){i.status=status;i.updatedAt=new Date().toISOString()}return i}

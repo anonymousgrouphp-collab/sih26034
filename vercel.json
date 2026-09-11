@@ -1,6 +1,6 @@
 {
-  "buildCommand": "cd members/member-06-ui && npm install && npm run build",
-  "outputDirectory": "members/member-06-ui/dist",
+  "buildCommand": "cd ui-combined && npm install && npm run build",
+  "outputDirectory": "ui-combined/dist",
   "framework": "vite",
   "rewrites": [
     {

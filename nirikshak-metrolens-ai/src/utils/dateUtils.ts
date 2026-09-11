@@ -1,4 +1,0 @@
-export function formatDate(dateString:string):string{return new Intl.DateTimeFormat("en-IN",{day:"2-digit",month:"short",year:"numeric"}).format(new Date(dateString))}
-export function formatDateTime(dateString:string):string{return new Intl.DateTimeFormat("en-IN",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"}).format(new Date(dateString))}
-export function relativeTime(dateString:string):string{const seconds=Math.floor((Date.now()-new Date(dateString).getTime())/1000);if(seconds<60)return"Just now";const minutes=Math.floor(seconds/60);if(minutes<60)return`${minutes} min ago`;const hours=Math.floor(minutes/60);if(hours<24)return`${hours} hr ago`;const days=Math.floor(hours/24);return`${days} day${days>1?"s":""} ago`}
-export function formatPercent(value:number):string{return`${Math.round(value*100)}%`}

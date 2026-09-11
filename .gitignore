@@ -116,6 +116,4 @@ scripts/
 *.bak
 page_*_img_*.png
 
-# Duplicate work directory
-frontend-unified/
 
