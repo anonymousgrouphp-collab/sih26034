@@ -1491,3 +1491,56 @@ Present comprehensive verification walkthrough to the user.
 ### Signing Note
 SIGNED OFF BY: kunal-raj-dev (kunal.raj.dev@gmail.com) — 2026-09-12 01:30 IST [VERIFIED]
 
+---
+
+## [12 September 2026] [02:44] IST
+
+### Task / Chunk
+Canonical Production Frontend Consolidation (`ui-combined/`) & Complete Legacy Code Removal (`members/member-06-ui/`).
+
+### Status
+COMPLETE
+
+### Completed
+- **Single Canonical Frontend Established (`ui-combined/`)**:
+  - Preserved and solidified `ui-combined/` as the sole official frontend application for all deployment targets (Vercel, Render, and Docker Compose).
+  - Migrated and preserved all 14 packaging assets (8 real packaging samples `REAL-PKG-01` through `REAL-PKG-08` and 6 demo packaging images `sku_demo_*`) into `ui-combined/public/storage/uploads/`.
+  - Migrated all mock API fixtures into `ui-combined/fixtures/api/`.
+  - Migrated all 14 automated unit test suites into `ui-combined/tests/`.
+  - Added direct Vercel deployment configuration `ui-combined/vercel.json` with `/api/*` rewrite proxy to Render backend and `/(.*)` rewrite to `/index.html`.
+  - Added `"test": "npx tsx --test tests/**/*.test.ts"` to `ui-combined/package.json`.
+- **Deployment & Monolith Pipeline Alignment**:
+  - Updated root `Dockerfile`: Stage 1 and Stage 2 now build and package `ui-combined`.
+  - Updated `main.py`: `DIST_DIR = REPO_ROOT / "ui-combined" / "dist"` so the FastAPI monolith serves `ui-combined/dist`.
+  - Updated `.gitignore`: Whitelist updated from `!members/member-06-ui/public/storage/` to `!ui-combined/public/storage/`.
+  - Updated `docs/DEPLOYMENT_GUIDE.md`: Documented repository root and `ui-combined` as official deployment targets.
+  - Updated `AGENTS.md`: Noted `ui-combined/` as the consolidated production application.
+- **Legacy Frontend Code Removal**:
+  - Safely deleted 47 legacy source files (`members/member-06-ui/src/`).
+  - Safely deleted legacy public assets, builds, node_modules, and test files (`members/member-06-ui/public/`, `dist/`, `fixtures/`, `tests/`, `node_modules/`).
+  - Safely deleted legacy config files (`package.json`, `package-lock.json`, `tsconfig.json`, `tsconfig.node.json`, `vite.config.ts`, `tailwind.config.js`, `postcss.config.js`, `index.html`, `nginx.conf`, `Dockerfile`, `vercel.json`).
+  - Removed 57MB obsolete `ui-combined.zip` archive from repository root.
+  - Updated `members/member-06-ui/README.md` with explicit consolidation notice.
+  - Preserved all statutory governance and audit documentation in `members/member-06-ui/` (`progress.md`, `memory.md`, `TASKS.md`, `RESEARCH.md`, `BACKEND_INTEGRATION_HANDOFF.md`).
+
+### Tests
+- `cd ui-combined && npx tsc -b`: 0 errors.
+- `cd ui-combined && npm run build`: Vite production build passed in 4.82s (`dist/index.html`, `dist/assets/index-*.js`, `dist/assets/index-*.css`).
+- `cd ui-combined && npm test`: 111 passed, 0 failed across 35 test suites in 1.24s (100% pass rate).
+- `.venv\Scripts\python.exe -m pytest tests/test_inspect_cli.py -v`: 18 passed in 3.50s.
+
+### Problems
+- Fixed `EvidenceConflict` interface in `ConflictResolutionCard.tsx` to include `resolutionNote` and `selectedDecision`.
+- Provided safe fallback in `useLanguage()` for isolated component test mounting without throwing errors.
+
+### Decisions
+1. Kept the Section 63 BSA 2023 evidentiary documentation intact in `members/member-06-ui/` while removing all obsolete source code to prevent split-brain maintenance.
+2. Standardized on `ui-combined/` as the single canonical frontend for all cloud and local deployment runtimes.
+
+### Next Step
+Provide detailed walkthrough to the user.
+
+### Signing Note
+SIGNED OFF BY: kunal-raj-dev (kunal.raj.dev@gmail.com) — 2026-09-12 02:44 IST [VERIFIED]
+
+

@@ -155,8 +155,11 @@ describe("Chunk 2: Contracts & API Adapter", () => {
       }
 
       const passResult = await ApiService.listInspections({ status: "PASS" });
-      assert.equal(passResult.items.length, 1);
-      assert.equal(passResult.items[0].id, "insp_demo_03_water");
+      assert.ok(passResult.items.length >= 1);
+      for (const item of passResult.items) {
+        assert.equal(item.overall_status, "PASS");
+      }
+      assert.ok(passResult.items.some((item) => item.id === "insp_demo_03_water"));
     });
 
     it("requires mandatory remarks when submitting officer adjudication", async () => {

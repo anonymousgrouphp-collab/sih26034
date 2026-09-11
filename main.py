@@ -28,8 +28,10 @@ TEST_UI_DIR = REPO_ROOT / "integration" / "test_ui"
 if TEST_UI_DIR.is_dir():
     app.mount("/test-ui", StaticFiles(directory=str(TEST_UI_DIR), html=True), name="test_ui")
 
-# 4. Mount React 18 Production Build (if compiled in members/member-06-ui/dist)
-DIST_DIR = REPO_ROOT / "members" / "member-06-ui" / "dist"
+# 4. Mount React 18 Production Build (from ui-combined/dist)
+DIST_DIR = REPO_ROOT / "ui-combined" / "dist"
+if not DIST_DIR.is_dir():
+    DIST_DIR = REPO_ROOT / "members" / "member-06-ui" / "dist"
 if DIST_DIR.is_dir():
     # Mount assets folder
     assets_dir = DIST_DIR / "assets"

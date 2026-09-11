@@ -1,15 +1,24 @@
 # Member 6 — Frontend, Web UX & Integration
 
+> [!IMPORTANT]
+> **Production Consolidation Notice**:
+> The Member 6 frontend application has been permanently consolidated into **`ui-combined/`** as the single canonical production frontend for the entire repository and deployment targets (Vercel, Render, and Docker Compose).
+> 
+> All active development, components, assets, localizations, and unit tests reside in:
+> **[`ui-combined/`](file:///c:/Users/kunal/Desktop/updated%20SIH26034%20-%2010th%20sep/ui-combined/)**
+> 
+> The markdown records in this folder (`progress.md`, `memory.md`, `TASKS.md`, `RESEARCH.md`, and `BACKEND_INTEGRATION_HANDOFF.md`) are preserved for Section 63 BSA 2023 evidentiary audit and architectural continuity.
+
 **Assigned Engineer:** **Parmarth Kumar** ([@parmarth-kumar](https://github.com/parmarth-kumar)) *(Reassigned by Team Lead)*  
 **Assigned Workstream:** React 18 SPA, Officer Viewfinder HUD, Split-View Adjudication Canvas, Central Dashboard, Standalone Zero-Build HUD & Mode B Resilient UX  
-**Assigned Folder:** `members/member-06-ui/`  
+**Canonical Production Application:** `ui-combined/`  
 **Git Feature Branch:** `feat/m6-ui`  
 
 ---
 
 ## 1. What is my job?
-Your job is to build the web user interface for field inspectors and supervisory controllers.
-You build:
+The web user interface for field inspectors and supervisory controllers now lives in `ui-combined/`.
+It provides:
 - Responsive Single Page Application (SPA) using React 18, Vite, and Tailwind CSS.
 - Inspector Mobile/Tablet Capture HUD with real-time optical quality indicator (`FRAME_OPTIMAL`, `IMAGE_BLURRED`, `SPECULAR_GLARE`).
 - Split-View Adjudication Canvas: calibrated image zoom/pan with visual bounding box overlays on the left; structured statutory rule ledger on the right.
@@ -62,7 +71,7 @@ You must NOT edit other member directories or root specification files.
 
 ## 7. How do I run my module?
 ```bash
-cd members/member-06-ui
+cd ui-combined
 npm install
 npm run dev
 ```
@@ -71,6 +80,7 @@ npm run dev
 
 ## 8. How do I run tests?
 ```bash
+cd ui-combined
 npm test
 ```
 

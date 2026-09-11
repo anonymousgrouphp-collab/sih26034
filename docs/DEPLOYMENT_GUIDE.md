@@ -59,7 +59,7 @@ Because all underlying Computer Vision, Multilingual OCR (DBNet++ / PP-OCRv4 / P
 3. Import the GitHub repository: `anonymousgrouphp-collab/sih26034`.
 4. Configure Project Settings:
    - **Framework Preset:** `Vite`
-   - **Root Directory:** Edit and select `members/member-06-ui` (or leave as root; root [`vercel.json`](file:///c:/Users/ceoha/OneDrive/Desktop/sih26034/vercel.json) handles both).
+   - **Root Directory:** Leave as repository root (recommended; root [`vercel.json`](file:///c:/Users/ceoha/OneDrive/Desktop/sih26034/vercel.json) handles building `ui-combined`), or select `ui-combined`.
    - **Build Command:** `npm run build`
    - **Output Directory:** `dist`
 5. Set Environment Variables under **Environment Variables**:
@@ -121,7 +121,7 @@ For offline field inspections or laptop demonstrations with zero external depend
 pip install -r requirements.txt
 
 # 2. Build frontend assets (or use pre-built dist/)
-cd members/member-06-ui && npm run build && cd ../..
+cd ui-combined && npm run build && cd ..
 
 # 3. Launch unified server (SQLite storage activates automatically)
 python main.py

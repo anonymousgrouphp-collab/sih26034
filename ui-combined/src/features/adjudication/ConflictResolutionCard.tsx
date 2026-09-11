@@ -10,6 +10,8 @@ export interface EvidenceConflict {
   description: string;
   requiresHumanDecision?: boolean;
   resolved?: boolean;
+  resolutionNote?: string;
+  selectedDecision?: string;
 }
 
 export interface ConflictResolutionCardProps {
@@ -69,8 +71,13 @@ export const ConflictResolutionCard: React.FC<ConflictResolutionCardProps> = ({
                   {c.field}
                 </span>
                 {c.resolved && (
-                  <span className="mt-1.5 block text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 w-fit">
-                    {language === "hi" ? "अधिकारी द्वारा निस्तारित" : "Resolved by LMO"}
+                  <span className="mt-1.5 inline-flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 w-fit">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0 mt-0.5"></span>
+                    <span className="break-words">
+                      {c.resolutionNote || c.selectedDecision
+                        ? (language === "hi" ? `एलएमओ अधिनिर्णय: ${c.resolutionNote || c.selectedDecision}` : `LMO Adjudicated: ${c.resolutionNote || c.selectedDecision}`)
+                        : (language === "hi" ? "अधिकारी द्वारा निस्तारित" : "Resolved by LMO")}
+                    </span>
                   </span>
                 )}
               </div>

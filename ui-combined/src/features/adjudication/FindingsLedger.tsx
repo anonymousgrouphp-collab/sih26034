@@ -140,19 +140,13 @@ export const FindingsLedger: React.FC<FindingsLedgerProps> = ({
             const linkedField = findFieldForFinding(finding, extractedFields);
 
             return (
-              <div
+              <button
                 key={finding.finding_id}
-                role="button"
-                tabIndex={0}
+                type="button"
+                data-testid={`finding-item-${finding.finding_id}`}
                 aria-pressed={isSelected}
                 onClick={() => onSelectFinding(finding.finding_id)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    onSelectFinding(finding.finding_id);
-                  }
-                }}
-                className={`p-3 rounded-lg border transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-govNavy ${
+                className={`w-full text-left p-3 rounded-lg border transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-govNavy ${
                   isSelected
                     ? "border-govNavy bg-blue-50/40 shadow-sm ring-1 ring-govNavy"
                     : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/60"
@@ -280,7 +274,7 @@ export const FindingsLedger: React.FC<FindingsLedgerProps> = ({
                     {language === "hi" ? "पैकेज पर ट्रेस करें ↗" : "Click to trace on package ↗"}
                   </span>
                 </div>
-              </div>
+              </button>
             );
           })
         )}

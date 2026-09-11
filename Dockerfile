@@ -10,10 +10,10 @@
 FROM node:20-alpine AS frontend-builder
 WORKDIR /app/frontend
 
-COPY members/member-06-ui/package*.json ./
+COPY ui-combined/package*.json ./
 RUN npm ci --prefer-offline --no-audit
 
-COPY members/member-06-ui/ ./
+COPY ui-combined/ ./
 RUN npm run build
 
 # -----------------------------------------------------------------------------
@@ -50,7 +50,7 @@ COPY integration/ ./integration/
 COPY main.py .
 
 # Copy built React frontend assets into destination served by main.py
-COPY --from=frontend-builder /app/frontend/dist ./members/member-06-ui/dist
+COPY --from=frontend-builder /app/frontend/dist ./ui-combined/dist
 
 # Ensure storage directories exist
 RUN mkdir -p storage/evidence storage/uploads

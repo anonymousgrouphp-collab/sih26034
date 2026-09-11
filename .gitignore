@@ -103,7 +103,7 @@ scripts/
 
 # Runtime evidence storage
 /storage/
-!members/member-06-ui/public/storage/
+!ui-combined/public/storage/
 
 # Archives & compressed blobs
 *.zip

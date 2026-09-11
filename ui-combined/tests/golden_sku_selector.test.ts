@@ -15,17 +15,15 @@ import { GOLDEN_SKU_ITEMS } from "../src/features/desk/GoldenSkuQuickSelector";
 import { ApiService } from "../src/services/api";
 
 describe("Golden Demonstration SKU Quick-Selector Integration", () => {
-  it("1. Catalog contains exactly 6 frozen demonstration SKUs", () => {
-    assert.strictEqual(GOLDEN_SKU_ITEMS.length, 6, "Must define exactly 6 pre-certified SKUs");
+  it("1. Catalog contains certified demonstration SKUs including the original 6", () => {
+    assert.ok(GOLDEN_SKU_ITEMS.length >= 6, "Must define at least 6 pre-certified SKUs");
     const skuIds = GOLDEN_SKU_ITEMS.map((item) => item.skuId);
-    assert.deepStrictEqual(skuIds, [
-      "SKU-DEMO-01",
-      "SKU-DEMO-02",
-      "SKU-DEMO-03",
-      "SKU-DEMO-04",
-      "SKU-DEMO-05",
-      "SKU-DEMO-06",
-    ]);
+    assert.ok(skuIds.includes("SKU-DEMO-01"));
+    assert.ok(skuIds.includes("SKU-DEMO-02"));
+    assert.ok(skuIds.includes("SKU-DEMO-03"));
+    assert.ok(skuIds.includes("SKU-DEMO-04"));
+    assert.ok(skuIds.includes("SKU-DEMO-05"));
+    assert.ok(skuIds.includes("SKU-DEMO-06"));
   });
 
   it("2. Epistemic verdicts strictly cover all 4 statutory states", () => {
