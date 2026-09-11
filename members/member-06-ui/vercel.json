@@ -1,5 +1,5 @@
 {
-  "buildCommand": "node build-root.cjs",
+  "buildCommand": "node build-bridge.cjs",
   "outputDirectory": "dist",
   "rewrites": [
     {

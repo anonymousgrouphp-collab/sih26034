@@ -1,0 +1,9 @@
+{
+  "name": "nyayadrishti-member-06-ui",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "node build-bridge.cjs"
+  },
+  "dependencies": {}
+}

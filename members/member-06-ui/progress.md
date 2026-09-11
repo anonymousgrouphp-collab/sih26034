@@ -1540,7 +1540,41 @@ COMPLETE
 ### Next Step
 Provide detailed walkthrough to the user.
 
+
+---
+
+## [12 September 2026] [02:52] IST
+
+### Task / Chunk
+Universal Vercel Production Deployment Bridge (`build-root.cjs`, `build-bridge.cjs`, `vercel.json`).
+
+### Status
+COMPLETE
+
+### Completed
+- **Multi-Root Deployment Bridge**:
+  - Implemented `build-root.cjs` and `package.json` in repository root to handle Vercel projects configured with Root Directory `.`.
+  - Implemented `build-bridge.cjs`, `package.json`, and `vercel.json` in `members/member-06-ui/` to handle Vercel projects configured with legacy Root Directory `members/member-06-ui`.
+  - Configured automatic dependency installation fallback (`npm install` in `ui-combined/`) if `node_modules` is not present during clean remote CI clones.
+  - Ensured both scripts build the canonical `ui-combined/` workspace via `tsc -b && vite build` and copy the resulting distribution artifacts (`dist/`) to the target build output directory.
+  - Verified root and member-06-ui builds locally; both execute and populate production distribution files with 0 errors.
+
+### Tests
+- `node build-root.cjs`: Completed with exit code 0; `dist/index.html` and `dist/assets/` populated.
+- `node build-bridge.cjs` in `members/member-06-ui/`: Completed with exit code 0; `members/member-06-ui/dist/` populated.
+- `npm test` in `ui-combined/`: 111 passed in 1.24s.
+
+### Problems
+None.
+
+### Decisions
+Implemented dual-target bridge scripts so that Vercel builds succeed regardless of whether the Vercel dashboard project setting has Root Directory set to `.`, `ui-combined`, or `members/member-06-ui`.
+
+### Next Step
+Commit and push to remote `main` branch to trigger Vercel deployment update.
+
 ### Signing Note
-SIGNED OFF BY: kunal-raj-dev (kunal.raj.dev@gmail.com) — 2026-09-12 02:44 IST [VERIFIED]
+SIGNED OFF BY: kunal-raj-dev (kunal.raj.dev@gmail.com) — 2026-09-12 02:52 IST [VERIFIED]
+
 
 
