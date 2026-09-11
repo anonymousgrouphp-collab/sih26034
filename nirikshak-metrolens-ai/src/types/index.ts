@@ -1,0 +1,16 @@
+export type InspectionStatus="PASSED"|"MANUAL_REVIEW_REQUIRED"|"INSUFFICIENT_EVIDENCE"|"PROCESSING"|"DRAFT";
+export type PipelineStatus="completed"|"active"|"pending"|"failed";
+export type Severity="LOW"|"MEDIUM"|"HIGH"|"CRITICAL";
+export type RuleStatus="PASS"|"FAIL"|"MANUAL_REVIEW"|"NOT_EVALUATED";
+export interface InspectionImage{id:string;url:string;filename:string;capturedAt:string;type:"FRONT_LABEL"|"BACK_LABEL"|"MRP"|"CALIBRATION"|"WEIGHT";width:number;height:number}
+export interface BoundingBox{id:string;label:string;x:number;y:number;width:number;height:number;confidence:number;type:"MRP"|"NET_QUANTITY"|"PACKER"|"DATE"|"UNIT"|"OTHER"}
+export interface OCRField{id:string;field:string;value:string;confidence:number;sourceImageId:string;boundingBoxId?:string}
+export interface Calibration{available:boolean;method:string;referenceObject:string;referenceLengthMm:number;measuredPixels:number;scaleMmPerPixel:number;uncertaintyMm:number;timestamp?:string;operator?:string}
+export interface Measurement{id:string;name:string;observedValue:number;declaredValue:number;unit:string;toleranceMin?:number;toleranceMax?:number;deviation?:number;status:RuleStatus;source:string}
+export interface RuleResult{id:string;ruleCode:string;title:string;description:string;category:string;status:RuleStatus;severity:Severity;observedValue?:string;expectedValue?:string;evidenceIds:string[];rationale:string}
+export interface Conflict{id:string;field:string;expected:string;observed:string;severity:Severity;description:string;requiresHumanDecision:boolean;resolved:boolean}
+export interface AuditEvent{id:string;timestamp:string;actor:string;action:string;details:string;type:"SYSTEM"|"OFFICER"|"REVIEW"}
+export interface EvidenceItem{id:string;type:"IMAGE"|"OCR"|"CALIBRATION"|"MEASUREMENT"|"RULE_RESULT";title:string;description:string;source?:string;confidence?:number;createdAt:string}
+export interface Inspection{id:string;caseNumber:string;status:InspectionStatus;productName:string;category:string;manufacturer:string;packSize:string;batchNumber:string;mrp:string;declaredQuantity:string;location:string;officer:string;createdAt:string;updatedAt:string;images:InspectionImage[];boundingBoxes:BoundingBox[];ocrFields:OCRField[];calibration:Calibration;measurements:Measurement[];ruleResults:RuleResult[];conflicts:Conflict[];evidence:EvidenceItem[];auditTrail:AuditEvent[];overallConfidence:number;processingDuration?:number;notes?:string}
+export interface PipelineStep{id:string;label:string;description:string;status:PipelineStatus}
+export interface KPI{label:string;value:string|number;helper:string;trend?:string;trendDirection?:"up"|"down"|"neutral"}

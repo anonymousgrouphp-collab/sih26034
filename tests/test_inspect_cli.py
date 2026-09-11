@@ -20,7 +20,7 @@ import tempfile
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-PYTHON_EXE = r"C:\Users\ceoha\AppData\Local\Programs\Python\Python313\python.exe"
+PYTHON_EXE = sys.executable
 CLI_SCRIPT = str(REPO_ROOT / "inspect_cli.py")
 
 # Ensure imports work directly

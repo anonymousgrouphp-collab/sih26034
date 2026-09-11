@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 280" fill="none">
+  <!-- Clean Container -->
+  <rect width="520" height="280" rx="16" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5"/>
+
+  <!-- HEADER -->
+  <text x="24" y="32" font-family="system-ui, sans-serif" font-size="13" font-weight="800" fill="#071526" letter-spacing="0.5">METRIC CALIBRATION &amp; SCALE RECOVERY</text>
+  <text x="24" y="48" font-family="system-ui, sans-serif" font-size="10.5" font-weight="500" fill="#64748B">Legal Metrology Act, 2009 • Table-I Numeral Height Verification Principle</text>
+
+  <!-- 3 STEP BLOCKS -->
+  <!-- STEP 1: PHYSICAL REFERENCE -->
+  <g transform="translate(24, 70)">
+    <rect width="140" height="180" rx="10" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <rect x="12" y="12" width="116" height="24" rx="5" fill="#EFF6FF"/>
+    <text x="70" y="28" font-family="system-ui, sans-serif" font-size="9" font-weight="800" fill="#1D4ED8" text-anchor="middle">1. KNOWN GROUND TRUTH</text>
+    
+    <!-- ArUco Marker Graphic -->
+    <rect x="40" y="50" width="60" height="60" rx="4" fill="#0F172A"/>
+    <rect x="46" y="56" width="48" height="48" fill="#000000"/>
+    <rect x="52" y="62" width="12" height="12" fill="#FFFFFF"/>
+    <rect x="76" y="62" width="12" height="12" fill="#FFFFFF"/>
+    <rect x="64" y="74" width="12" height="12" fill="#FFFFFF"/>
+    <rect x="76" y="86" width="12" height="12" fill="#FFFFFF"/>
+
+    <!-- Caliper Width -->
+    <line x1="40" y1="122" x2="100" y2="122" stroke="#D97706" stroke-width="1.5"/>
+    <path d="M40 118L40 126M100 118L100 126" stroke="#D97706" stroke-width="1.5"/>
+    <text x="70" y="136" font-family="system-ui, sans-serif" font-size="10" font-weight="900" fill="#D97706" text-anchor="middle">W = 50.0 mm</text>
+    <text x="70" y="152" font-family="system-ui, sans-serif" font-size="8.5" font-weight="500" fill="#64748B" text-anchor="middle">ISO 7810 Standard</text>
+  </g>
+
+  <!-- ARROW 1 -->
+  <g transform="translate(172, 150)">
+    <line x1="0" y1="0" x2="20" y2="0" stroke="#0284C7" stroke-width="2"/>
+    <path d="M16 -4L22 0L16 4" fill="#0284C7"/>
+  </g>
+
+  <!-- STEP 2: SENSOR PIXEL SAMPLING -->
+  <g transform="translate(200, 70)">
+    <rect width="140" height="180" rx="10" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <rect x="12" y="12" width="116" height="24" rx="5" fill="#FEF3C7"/>
+    <text x="70" y="28" font-family="system-ui, sans-serif" font-size="9" font-weight="800" fill="#B45309" text-anchor="middle">2. SENSOR PIXELS</text>
+    
+    <!-- Coordinate Mesh -->
+    <rect x="25" y="48" width="90" height="64" rx="4" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <path d="M25 64H115M25 80H115M25 96H115" stroke="#E2E8F0" stroke-width="1"/>
+    <path d="M47 48V112M70 48V112M92 48V112" stroke="#E2E8F0" stroke-width="1"/>
+    <rect x="42" y="60" width="56" height="40" rx="2" fill="#38BDF8" fill-opacity="0.2" stroke="#0284C7" stroke-width="1.5" stroke-dasharray="2 2"/>
+
+    <text x="70" y="130" font-family="monospace" font-size="9.5" font-weight="700" fill="#0369A1" text-anchor="middle">N = 420 px</text>
+    <text x="70" y="145" font-family="monospace" font-size="9" font-weight="800" fill="#0F172A" text-anchor="middle">s = 50 / 420</text>
+    <text x="70" y="160" font-family="system-ui, sans-serif" font-size="9.5" font-weight="800" fill="#059669" text-anchor="middle">0.119 mm / px</text>
+  </g>
+
+  <!-- ARROW 2 -->
+  <g transform="translate(348, 150)">
+    <line x1="0" y1="0" x2="20" y2="0" stroke="#059669" stroke-width="2"/>
+    <path d="M16 -4L22 0L16 4" fill="#059669"/>
+  </g>
+
+  <!-- STEP 3: STATUTORY VERDICT -->
+  <g transform="translate(376, 70)">
+    <rect width="120" height="180" rx="10" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <rect x="10" y="12" width="100" height="24" rx="5" fill="#ECFDF5"/>
+    <text x="60" y="28" font-family="system-ui, sans-serif" font-size="9" font-weight="800" fill="#047857" text-anchor="middle">3. LEGAL TABLE-I</text>
+    
+    <!-- Height measurement of numeral -->
+    <text x="60" y="90" font-family="monospace" font-size="34" font-weight="900" fill="#071526" text-anchor="middle">5</text>
+    <line x1="32" y1="62" x2="32" y2="92" stroke="#059669" stroke-width="1.5"/>
+    <path d="M30 62L34 62M30 92L34 92" stroke="#059669" stroke-width="1.5"/>
+    <text x="24" y="80" font-family="system-ui, sans-serif" font-size="8" font-weight="800" fill="#059669" text-anchor="end">h = 3.2mm</text>
+
+    <rect x="12" y="122" width="96" height="22" rx="4" fill="#D1FAE5" stroke="#059669" stroke-width="1"/>
+    <text x="60" y="137" font-family="system-ui, sans-serif" font-size="9" font-weight="900" fill="#065F46" text-anchor="middle">≥ 2.5 mm PASS</text>
+
+    <text x="60" y="158" font-family="system-ui, sans-serif" font-size="8" font-weight="600" fill="#64748B" text-anchor="middle">±0.08 mm Bound</text>
+  </g>
+</svg>

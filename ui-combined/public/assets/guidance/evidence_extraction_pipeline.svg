@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 180" fill="none">
+  <!-- Clean Background -->
+  <rect width="640" height="180" rx="14" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5"/>
+
+  <!-- PIPELINE STAGES -->
+  <!-- 1. CAPTURE -->
+  <g transform="translate(20, 25)">
+    <rect width="105" height="130" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <rect x="8" y="8" width="89" height="18" rx="4" fill="#EFF6FF"/>
+    <text x="52" y="21" font-family="system-ui, sans-serif" font-size="8.5" font-weight="800" fill="#1D4ED8" text-anchor="middle">1. EVIDENCE</text>
+    <rect x="22" y="36" width="61" height="55" rx="4" fill="#F1F5F9" stroke="#94A3B8"/>
+    <rect x="42" y="58" width="20" height="20" rx="2" fill="#0F172A"/>
+    <text x="52" y="106" font-family="system-ui, sans-serif" font-size="8.5" font-weight="700" fill="#0F172A" text-anchor="middle">PDP + ArUco</text>
+    <text x="52" y="118" font-family="monospace" font-size="7.5" font-weight="500" fill="#64748B" text-anchor="middle">Raw Sensor</text>
+  </g>
+
+  <!-- ARROW 1 -->
+  <path d="M130 90H145M145 90L141 86M145 90L141 94" stroke="#0284C7" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- 2. OPTICAL QUALITY & SCALE -->
+  <g transform="translate(150, 25)">
+    <rect width="105" height="130" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <rect x="8" y="8" width="89" height="18" rx="4" fill="#F0FDF4"/>
+    <text x="52" y="21" font-family="system-ui, sans-serif" font-size="8.5" font-weight="800" fill="#15803D" text-anchor="middle">2. CALIBRATION</text>
+    <circle cx="52" cy="62" r="22" stroke="#059669" stroke-width="2" stroke-dasharray="3 2"/>
+    <line x1="38" y1="62" x2="66" y2="62" stroke="#059669" stroke-width="1.5"/>
+    <text x="52" y="106" font-family="system-ui, sans-serif" font-size="8.5" font-weight="700" fill="#0F172A" text-anchor="middle">mm/px Ratio</text>
+    <text x="52" y="118" font-family="monospace" font-size="7.5" font-weight="500" fill="#64748B" text-anchor="middle">Homography</text>
+  </g>
+
+  <!-- ARROW 2 -->
+  <path d="M260 90H275M275 90L271 86M275 90L271 94" stroke="#059669" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- 3. MULTILINGUAL OCR -->
+  <g transform="translate(280, 25)">
+    <rect width="105" height="130" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <rect x="8" y="8" width="89" height="18" rx="4" fill="#FEF3C7"/>
+    <text x="52" y="21" font-family="system-ui, sans-serif" font-size="8.5" font-weight="800" fill="#B45309" text-anchor="middle">3. OCR ENGINE</text>
+    <rect x="18" y="38" width="69" height="48" rx="4" fill="#FFFBEB" stroke="#F59E0B" stroke-dasharray="2 2"/>
+    <text x="52" y="58" font-family="system-ui, sans-serif" font-size="9" font-weight="800" fill="#78350F" text-anchor="middle">MRP ₹ 120</text>
+    <text x="52" y="74" font-family="system-ui, sans-serif" font-size="8" font-weight="700" fill="#B45309" text-anchor="middle">मात्रा 500g</text>
+    <text x="52" y="106" font-family="system-ui, sans-serif" font-size="8.5" font-weight="700" fill="#0F172A" text-anchor="middle">Tokens Extracted</text>
+    <text x="52" y="118" font-family="monospace" font-size="7.5" font-weight="500" fill="#64748B" text-anchor="middle">DBNet / PP-OCR</text>
+  </g>
+
+  <!-- ARROW 3 -->
+  <path d="M390 90H405M405 90L401 86M405 90L401 94" stroke="#D97706" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- 4. AST RULE VERIFICATION -->
+  <g transform="translate(410, 25)">
+    <rect width="100" height="130" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <rect x="8" y="8" width="84" height="18" rx="4" fill="#FDF2F8"/>
+    <text x="50" y="21" font-family="system-ui, sans-serif" font-size="8.5" font-weight="800" fill="#BE185D" text-anchor="middle">4. AST RULES</text>
+    <rect x="16" y="44" width="68" height="18" rx="4" fill="#FCE7F3"/>
+    <text x="50" y="56.5" font-family="monospace" font-size="8" font-weight="800" fill="#9D174D" text-anchor="middle">Table-I Check</text>
+    <rect x="16" y="66" width="68" height="18" rx="4" fill="#FCE7F3"/>
+    <text x="50" y="78.5" font-family="monospace" font-size="8" font-weight="800" fill="#9D174D" text-anchor="middle">USP Match ≤2p</text>
+    <text x="50" y="106" font-family="system-ui, sans-serif" font-size="8.5" font-weight="700" fill="#0F172A" text-anchor="middle">Statutory AST</text>
+    <text x="50" y="118" font-family="monospace" font-size="7.5" font-weight="500" fill="#64748B" text-anchor="middle">LMPC 2011</text>
+  </g>
+
+  <!-- ARROW 4 -->
+  <path d="M515 90H530M530 90L526 86M530 90L526 94" stroke="#4F46E5" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- 5. BSA 2023 PROVENANCE -->
+  <g transform="translate(535, 25)">
+    <rect width="85" height="130" rx="8" fill="#071526" stroke="#1E293B" stroke-width="1.5"/>
+    <rect x="6" y="8" width="73" height="18" rx="4" fill="#1E293B"/>
+    <text x="42" y="21" font-family="system-ui, sans-serif" font-size="8.5" font-weight="800" fill="#38BDF8" text-anchor="middle">5. SEC 63 BSA</text>
+    <circle cx="42.5" cy="58" r="16" fill="#0F172A" stroke="#F59E0B" stroke-width="1.5"/>
+    <path d="M37 58L41 62L49 54" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="42" y="102" font-family="system-ui, sans-serif" font-size="8" font-weight="800" fill="#FFFFFF" text-anchor="middle">Court Proof</text>
+    <text x="42" y="114" font-family="monospace" font-size="7" font-weight="600" fill="#94A3B8" text-anchor="middle">SHA-256 DAG</text>
+    <text x="42" y="125" font-family="monospace" font-size="6.5" font-weight="700" fill="#10B981" text-anchor="middle">ADMISSIBLE</text>
+  </g>
+</svg>

@@ -104,3 +104,18 @@ scripts/
 # Runtime evidence storage
 /storage/
 !members/member-06-ui/public/storage/
+
+# Archives & compressed blobs
+*.zip
+*.tar.gz
+
+# Tool cache & telemetry
+.mimosa/
+
+# Backups & scratch images
+*.bak
+page_*_img_*.png
+
+# Duplicate work directory
+frontend-unified/
+

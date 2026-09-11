@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 160" fill="none">
+  <!-- Subtle Background Aura -->
+  <circle cx="100" cy="80" r="65" fill="#F8FAFC"/>
+  
+  <!-- Dossier Document Graphic -->
+  <rect x="55" y="35" width="75" height="95" rx="6" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+  <rect x="65" y="48" width="55" height="6" rx="2" fill="#E2E8F0"/>
+  <rect x="65" y="60" width="45" height="5" rx="2" fill="#F1F5F9"/>
+  <rect x="65" y="71" width="50" height="5" rx="2" fill="#F1F5F9"/>
+  <rect x="65" y="82" width="35" height="5" rx="2" fill="#F1F5F9"/>
+  
+  <!-- Inspection Magnifying Glass Overlay -->
+  <circle cx="118" cy="92" r="28" fill="#FFFFFF" stroke="#071526" stroke-width="3"/>
+  <circle cx="118" cy="92" r="21" fill="#FEF3C7" fill-opacity="0.4"/>
+  <!-- Question / Search mark in lens -->
+  <path d="M114 85C114 82 116 80 119 80C122 80 124 82 124 84C124 86 122 88 120 89V93" stroke="#D97706" stroke-width="2.2" stroke-linecap="round"/>
+  <circle cx="120" cy="97" r="1.2" fill="#D97706"/>
+  <!-- Handle -->
+  <line x1="138" y1="112" x2="158" y2="132" stroke="#071526" stroke-width="4.5" stroke-linecap="round"/>
+  <line x1="138" y1="112" x2="148" y2="122" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Zero Results Badge -->
+  <rect x="52" y="132" width="96" height="20" rx="10" fill="#F1F5F9" stroke="#E2E8F0"/>
+  <text x="100" y="145.5" font-family="system-ui, sans-serif" font-size="9.5" font-weight="700" fill="#64748B" text-anchor="middle">NO DOSSIERS MATCH</text>
+</svg>

@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 320" fill="none">
+  <!-- Clean Neutral Background Container -->
+  <rect width="520" height="320" rx="16" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5"/>
+
+  <!-- TITLE HEADER -->
+  <text x="24" y="32" font-family="system-ui, sans-serif" font-size="13" font-weight="800" fill="#071526" letter-spacing="0.5">STATUTORY FIELD CAPTURE PROTOCOL</text>
+  <text x="24" y="48" font-family="system-ui, sans-serif" font-size="10.5" font-weight="500" fill="#64748B">Legal Metrology Packaged Commodities (LMPC) Rule 6 &amp; Table-I Verification</text>
+
+  <!-- WORKSPACE TABLE SURFACE -->
+  <rect x="24" y="66" width="472" height="236" rx="12" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+  <path d="M24 240L496 240" stroke="#F1F5F9" stroke-width="1"/>
+
+  <!-- 1. PACKAGED COMMODITY (PDP) -->
+  <g transform="translate(60, 95)">
+    <!-- Package Box Shadow & Body -->
+    <rect x="0" y="0" width="150" height="180" rx="8" fill="#F1F5F9" stroke="#94A3B8" stroke-width="2"/>
+    <!-- Package Header Brand -->
+    <rect x="12" y="14" width="70" height="12" rx="3" fill="#0284C7" fill-opacity="0.8"/>
+    <rect x="12" y="32" width="126" height="8" rx="2" fill="#CBD5E1"/>
+    <!-- Statutory Net Qty / Declarations Area -->
+    <rect x="12" y="110" width="126" height="54" rx="4" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.2" stroke-dasharray="3 3"/>
+    <text x="20" y="126" font-family="monospace" font-size="9" font-weight="700" fill="#B45309">NET QTY: 500 g</text>
+    <text x="20" y="140" font-family="monospace" font-size="8.5" font-weight="600" fill="#78350F">MRP: ₹ 120.00 (INCL. TAXES)</text>
+    <text x="20" y="153" font-family="monospace" font-size="8" font-weight="500" fill="#78350F">MFD: 08/2026 • REG: DL-09</text>
+    
+    <!-- PDP Boundary Annotation Label -->
+    <rect x="36" y="-10" width="78" height="18" rx="4" fill="#071526"/>
+    <text x="75" y="2" font-family="system-ui, sans-serif" font-size="8.5" font-weight="800" fill="#FFFFFF" text-anchor="middle">PDP SURFACE</text>
+  </g>
+
+  <!-- 2. ARUCO 4X4 50MM FIDUCIAL REFERENCE MARKER -->
+  <g transform="translate(230, 160)">
+    <!-- Outer Card 50mm -->
+    <rect x="0" y="0" width="70" height="70" rx="4" fill="#FFFFFF" stroke="#071526" stroke-width="2"/>
+    <!-- 4x4 ArUco Matrix Inner Grid -->
+    <rect x="9" y="9" width="52" height="52" fill="#000000"/>
+    <rect x="15" y="15" width="13" height="13" fill="#FFFFFF"/>
+    <rect x="41" y="15" width="13" height="13" fill="#FFFFFF"/>
+    <rect x="28" y="28" width="13" height="13" fill="#FFFFFF"/>
+    <rect x="41" y="41" width="13" height="13" fill="#FFFFFF"/>
+    <!-- Metric Dimension Callout -->
+    <line x1="0" y1="78" x2="70" y2="78" stroke="#D97706" stroke-width="1.5"/>
+    <path d="M0 75L0 81M70 75L70 81" stroke="#D97706" stroke-width="1.5"/>
+    <text x="35" y="90" font-family="system-ui, sans-serif" font-size="8.5" font-weight="800" fill="#D97706" text-anchor="middle">50 mm CALIBRATION</text>
+  </g>
+
+  <!-- 3. SMARTPHONE OVERHEAD INSPECTION VIEW -->
+  <g transform="translate(340, 90)">
+    <!-- Phone Body -->
+    <rect x="0" y="0" width="130" height="195" rx="18" fill="#1E293B" stroke="#071526" stroke-width="3"/>
+    <!-- Screen Viewfinder -->
+    <rect x="7" y="14" width="116" height="167" rx="10" fill="#0F172A"/>
+    
+    <!-- Active Camera Framing Reticle on Screen -->
+    <rect x="18" y="28" width="94" height="138" rx="6" fill="none" stroke="#38BDF8" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <!-- Golden Corner Crosshairs -->
+    <path d="M18 42V28H32" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M98 28H112V42" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M18 152V166H32" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M98 166H112V152" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round"/>
+    
+    <!-- Screen Mini ArUco Target Reticle -->
+    <rect x="68" y="112" width="28" height="28" rx="2" fill="none" stroke="#10B981" stroke-width="1.5"/>
+    <text x="82" y="106" font-family="system-ui, sans-serif" font-size="6" font-weight="700" fill="#10B981" text-anchor="middle">ARUCO</text>
+
+    <!-- Top Speaker Notch -->
+    <rect x="50" y="6" width="30" height="4" rx="2" fill="#475569"/>
+    
+    <!-- Shutter Button Graphic -->
+    <circle cx="65" cy="162" r="10" fill="#FFFFFF" fill-opacity="0.9"/>
+    <circle cx="65" cy="162" r="8" fill="#F59E0B"/>
+  </g>
+
+  <!-- 4. CONNECTING OPTICAL RAY GUIDELINES -->
+  <path d="M210 185C250 185 290 180 340 170" stroke="#0284C7" stroke-width="1.5" stroke-dasharray="3 3"/>
+  <circle cx="210" cy="185" r="3" fill="#0284C7"/>
+  <circle cx="340" cy="170" r="3" fill="#0284C7"/>
+
+  <!-- GUIDANCE CALLOUT CHIPS -->
+  <g transform="translate(60, 280)">
+    <circle cx="6" cy="6" r="6" fill="#059669"/>
+    <path d="M3.5 6L5.5 8L8.5 4" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="18" y="10" font-family="system-ui, sans-serif" font-size="10" font-weight="700" fill="#0F172A">Parallel 90° Plane</text>
+  </g>
+
+  <g transform="translate(200, 280)">
+    <circle cx="6" cy="6" r="6" fill="#059669"/>
+    <path d="M3.5 6L5.5 8L8.5 4" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="18" y="10" font-family="system-ui, sans-serif" font-size="10" font-weight="700" fill="#0F172A">ArUco on Same Surface</text>
+  </g>
+
+  <g transform="translate(360, 280)">
+    <circle cx="6" cy="6" r="6" fill="#059669"/>
+    <path d="M3.5 6L5.5 8L8.5 4" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="18" y="10" font-family="system-ui, sans-serif" font-size="10" font-weight="700" fill="#0F172A">No Direct Flash Glare</text>
+  </g>
+</svg>

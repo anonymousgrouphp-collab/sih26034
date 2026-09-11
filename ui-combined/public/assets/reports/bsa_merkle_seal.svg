@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Outer Rosette / Scalloped Edge -->
+  <circle cx="100" cy="100" r="95" stroke="#071526" stroke-width="2" stroke-dasharray="3 3"/>
+  <circle cx="100" cy="100" r="90" stroke="#071526" stroke-width="1.5"/>
+  <circle cx="100" cy="100" r="85" stroke="#D97706" stroke-width="2"/>
+  
+  <!-- Outer Text Circular Path -->
+  <path id="circlePathTop" d="M 30,100 A 70,70 0 1,1 170,100" fill="none"/>
+  <path id="circlePathBottom" d="M 170,100 A 70,70 0 1,1 30,100" fill="none"/>
+
+  <text font-family="system-ui, sans-serif" font-size="8.5" font-weight="900" fill="#071526" letter-spacing="1.2">
+    <textPath href="#circlePathTop" startOffset="50%" text-anchor="middle">
+      BHARATIYA SAKSHYA ADHINIYAM, 2023
+    </textPath>
+  </text>
+  
+  <text font-family="system-ui, sans-serif" font-size="7.5" font-weight="800" fill="#D97706" letter-spacing="1">
+    <textPath href="#circlePathBottom" startOffset="50%" text-anchor="middle">
+      • SECTION 63 DIGITAL EVIDENCE •
+    </textPath>
+  </text>
+
+  <!-- Inner Concentric Seal -->
+  <circle cx="100" cy="100" r="60" fill="#071526"/>
+  <circle cx="100" cy="100" r="56" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="4 2"/>
+
+  <!-- Tamper Evident Padlock & Scales Symbol -->
+  <path d="M92 84V78C92 73.5817 95.5817 70 100 70C104.418 70 108 73.5817 108 78V84" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round"/>
+  <rect x="88" y="84" width="24" height="20" rx="3" fill="#F59E0B"/>
+  <circle cx="100" cy="92" r="2" fill="#071526"/>
+  <path d="M99 93L98 98H102L101 93Z" fill="#071526"/>
+
+  <!-- SHA-256 Provenance Ledger Ribbon -->
+  <rect x="58" y="112" width="84" height="14" rx="3" fill="#1E293B" stroke="#38BDF8" stroke-width="0.8"/>
+  <text x="100" y="122.5" font-family="monospace" font-size="7.5" font-weight="800" fill="#38BDF8" text-anchor="middle">SHA-256 VERIFIED</text>
+  
+  <!-- Star Accents -->
+  <polygon points="100,132 102,137 107,137 103,140 105,145 100,142 95,145 97,140 93,137 98,137" fill="#F59E0B"/>
+</svg>
