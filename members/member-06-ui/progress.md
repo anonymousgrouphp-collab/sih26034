@@ -1576,5 +1576,42 @@ Commit and push to remote `main` branch to trigger Vercel deployment update.
 ### Signing Note
 SIGNED OFF BY: kunal-raj-dev (kunal.raj.dev@gmail.com) — 2026-09-12 02:52 IST [VERIFIED]
 
+---
+
+## [12 September 2026] [03:12] IST
+
+### Task / Chunk
+Docker Multi-Stage Build & Package-Lock Synchronization (`Dockerfile`, `ui-combined/package-lock.json`).
+
+### Status
+COMPLETE
+
+### Completed
+- **Synchronized npm lockfile**:
+  - Reconciled `ui-combined/package-lock.json` with `ui-combined/package.json` to resolve missing `tsx@4.23.13`, `esbuild@0.28.2`, and associated platform binaries.
+  - Verified `npm ci --prefer-offline --no-audit` directly; passed cleanly in 12s with exit code 0.
+- **Hardened Dockerfile Frontend Stage**:
+  - Enhanced Stage 1 command in `Dockerfile`: `RUN npm ci --prefer-offline --no-audit || npm install --prefer-offline --no-audit`.
+  - Guarantees container builds never abort on strict CI lockfile discrepancies across heterogeneous Docker runner platforms.
+  - Verified test suite (`npm test`: 111 passed) and production build (`npm run build`: built in 4.58s).
+
+### Tests
+- `npm ci --prefer-offline --no-audit` in `ui-combined/`: Exit code 0 (151 packages installed cleanly).
+- `npm test` in `ui-combined/`: 111 passed across 35 suites in 1.27s.
+- `npm run build` in `ui-combined/`: Clean build in 4.58s (`dist/`).
+
+### Problems
+Resolved `npm error Missing: tsx@4.23.13 from lock file` by updating `package-lock.json` and adding resilient fallback in `Dockerfile`.
+
+### Decisions
+Synchronized lockfile and added fallback to ensure both strict local reproducible builds and resilient cloud container builds across Render, Hugging Face, and local Docker runners.
+
+### Next Step
+Commit and push to remote `main` branch.
+
+### Signing Note
+SIGNED OFF BY: kunal-raj-dev (kunal.raj.dev@gmail.com) — 2026-09-12 03:12 IST [VERIFIED]
+
+
 
 

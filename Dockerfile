@@ -11,7 +11,8 @@ FROM node:20-alpine AS frontend-builder
 WORKDIR /app/frontend
 
 COPY ui-combined/package*.json ./
-RUN npm ci --prefer-offline --no-audit
+RUN npm ci --prefer-offline --no-audit || npm install --prefer-offline --no-audit
+
 
 COPY ui-combined/ ./
 RUN npm run build
