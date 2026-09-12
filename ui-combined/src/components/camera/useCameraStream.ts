@@ -41,6 +41,7 @@ export function useCameraStream() {
   });
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const analyzerCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const analyzerIntervalRef = useRef<number | null>(null);
   const previousLumaRef = useRef<number | null>(null);
@@ -52,14 +53,15 @@ export function useCameraStream() {
       analyzerIntervalRef.current = null;
     }
 
-    if (stream) {
-      stream.getTracks().forEach((track) => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => {
         try {
           track.stop();
         } catch (e) {
           console.warn("Failed to stop camera track:", e);
         }
       });
+      streamRef.current = null;
       setStream(null);
     }
 
@@ -69,7 +71,7 @@ export function useCameraStream() {
 
     setTorchOn(false);
     setStatus("IDLE");
-  }, [stream]);
+  }, []);
 
   // Translate browser DOMExceptions into clear officer-friendly errors
   const mapMediaError = (err: any): CameraError => {
@@ -150,8 +152,9 @@ export function useCameraStream() {
       }
 
       // Stop existing tracks before switching
-      if (stream) {
-        stream.getTracks().forEach((t) => t.stop());
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((t) => t.stop());
+        streamRef.current = null;
       }
 
       setStatus("REQUESTING");
@@ -182,6 +185,7 @@ export function useCameraStream() {
           });
         }
 
+        streamRef.current = activeStream;
         setStream(activeStream);
         setFacingMode(targetFacing);
         setStatus("STREAMING");
@@ -260,18 +264,18 @@ export function useCameraStream() {
           }
           previousLumaRef.current = meanLuma;
 
-          // Determine advice
+          // Compute guidance state
           let lightStatus: GuidanceFeedback["lighting"] = "OPTIMAL";
-          let lightText = "Lighting is balanced for OCR & Table-I font check";
+          let lightText = "Lighting is balanced";
           let isReady = true;
 
           if (meanLuma < 45) {
             lightStatus = "TOO_DARK";
-            lightText = "Scene is dark — move closer to ambient light";
+            lightText = "Packaging surface is too dark — improve room illumination or enable torch";
             isReady = false;
-          } else if (meanLuma > 225) {
+          } else if (meanLuma > 220) {
             lightStatus = "TOO_BRIGHT";
-            lightText = "Scene is overexposed — angle phone away from direct source";
+            lightText = "Scene is overexposed — reduce harsh lighting";
             isReady = false;
           } else if (glareFraction > 0.08) {
             lightStatus = "GLARE_WARNING";
@@ -294,13 +298,14 @@ export function useCameraStream() {
         setStatus("ERROR");
       }
     },
-    [stream, updateDeviceList]
+    [updateDeviceList]
   );
 
   // Toggle torch / flashlight
   const toggleTorch = useCallback(async () => {
-    if (!stream || !torchSupported) return;
-    const track = stream.getVideoTracks()[0];
+    const activeStream = streamRef.current;
+    if (!activeStream || !torchSupported) return;
+    const track = activeStream.getVideoTracks()[0];
     if (!track) return;
 
     try {
@@ -312,7 +317,7 @@ export function useCameraStream() {
     } catch (err) {
       console.warn("Could not toggle torch:", err);
     }
-  }, [stream, torchSupported, torchOn]);
+  }, [torchSupported, torchOn]);
 
   // Switch camera (Flip facingMode or cycle device ID)
   const switchCamera = useCallback(async () => {
@@ -331,11 +336,12 @@ export function useCameraStream() {
 
   // Capture still photograph
   const capturePhoto = useCallback(async (): Promise<CapturedPhoto> => {
-    if (!stream) {
+    const activeStream = streamRef.current;
+    if (!activeStream) {
       throw new Error("Cannot capture photo: No active camera stream.");
     }
 
-    const videoTrack = stream.getVideoTracks()[0];
+    const videoTrack = activeStream.getVideoTracks()[0];
     if (!videoTrack) {
       throw new Error("No video track found in stream.");
     }

@@ -82,8 +82,17 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
   const [copiedId, setCopiedId] = useState(false);
   const [selectedBoxId, setSelectedBoxId] = useState<string | undefined>(undefined);
   const [auditSubTab, setAuditSubTab] = useState<"PROVENANCE" | "DIAGNOSTICS">("PROVENANCE");
+  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
 
-  const activeAsset: EvidenceAsset | undefined = caseData.evidence_assets[caseData.evidence_assets.length - 1];
+  const activeAsset: EvidenceAsset | undefined = useMemo(() => {
+    if (!caseData.evidence_assets || caseData.evidence_assets.length === 0) return undefined;
+    if (selectedAssetId) {
+      const found = caseData.evidence_assets.find((a) => a.image_id === selectedAssetId);
+      if (found) return found;
+    }
+    const pdpFront = caseData.evidence_assets.find((a) => a.panel_type === "PDP_FRONT");
+    return pdpFront || caseData.evidence_assets[0];
+  }, [caseData.evidence_assets, selectedAssetId]);
 
   // Handle evidence upload
   const handleEvidenceSubmitted = async (
@@ -354,6 +363,9 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
     if (caseData.extracted_fields && caseData.extracted_fields.length > 0) {
       caseData.extracted_fields.forEach((fld, idx) => {
         if (fld.bounding_box && fld.bounding_box.length === 4) {
+          if ((fld as any).image_id && activeAsset && (fld as any).image_id !== activeAsset.image_id) {
+            return;
+          }
           const p = toPercentBox(fld.bounding_box as [number, number, number, number]);
 
           // Match any statutory compliance finding for this field
@@ -403,7 +415,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
             y: p.y,
             width: p.width,
             height: p.height,
-            confidence: tok.confidence || 0.95,
+            confidence: tok.confidence ?? 0.80,
             type: tok.language === "hi" ? "HINDI_DECLARATION" : "STATUTORY_FIELD",
           });
         }
@@ -782,6 +794,8 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                       referenceLengthMm: calibrationData.referenceLengthMm,
                       measuredPixels: calibrationData.measuredPixels,
                     }}
+                    activeImageId={activeAsset?.image_id}
+                    onSelectImage={(id) => setSelectedAssetId(id)}
                     selectedBoxId={selectedBoxId}
                     onSelectBox={(boxId) => setSelectedBoxId(boxId)}
                   />

@@ -147,7 +147,7 @@ export const NewInspection: React.FC = () => {
       });
 
       // 3. Upload evidence files if provided (all selected photographs)
-      let uploadedImageId: string | null = null;
+      const uploadedImageIds: string[] = [];
       if (files.length > 0) {
         for (let i = 0; i < files.length; i++) {
           const file = files[i];
@@ -156,7 +156,9 @@ export const NewInspection: React.FC = () => {
               ? "PDP_FRONT"
               : i === 1
               ? "SIDE_PANEL"
-              : "BACK_PANEL";
+              : i === 2
+              ? "BACK_PANEL"
+              : "SIDE_PANEL";
           const uploadResult = await ApiService.uploadEvidence(file, {
             inspection_id: newCase.id,
             panel_type: panelType,
@@ -167,8 +169,8 @@ export const NewInspection: React.FC = () => {
             image_height: 1080,
             preview_url: filePreviews[i] || URL.createObjectURL(file),
           });
-          if (i === 0 && uploadResult?.image_id) {
-            uploadedImageId = uploadResult.image_id;
+          if (uploadResult?.image_id) {
+            uploadedImageIds.push(uploadResult.image_id);
           }
         }
       }
@@ -182,10 +184,13 @@ export const NewInspection: React.FC = () => {
         await new Promise((r) => setTimeout(r, 220));
       }
 
-      // Final: Execute pipeline
-      const activeAssetId = uploadedImageId || newCase.evidence_assets[0]?.image_id;
-      if (activeAssetId) {
-        await ApiService.executePipeline(activeAssetId, newCase.id);
+      // Final: Execute pipeline across all evidence assets
+      if (uploadedImageIds.length > 0) {
+        for (const imgId of uploadedImageIds) {
+          await ApiService.executePipeline(imgId, newCase.id);
+        }
+      } else if (newCase.evidence_assets[0]?.image_id) {
+        await ApiService.executePipeline(newCase.evidence_assets[0].image_id, newCase.id);
       }
 
       // Navigate directly into the Adjudication Canvas for this case

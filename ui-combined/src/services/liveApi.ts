@@ -350,25 +350,30 @@ export class LiveApiService implements IInspectionApiService {
         ai_verdict: insp.ai_verdict || "PENDING",
         evidence_assets: (data.evidence_images || []).map((img: any) => {
           const rawPath = (img.file_path || "").trim();
-          let resolvedPath = "";
-
-          // Deterministic resolution for Golden Demonstration SKUs and Static Assets
-          const pLower = (insp.product_name || "").toLowerCase();
           const skuLower = (matchedSkuId || id || "").toLowerCase();
           const rawLower = rawPath.toLowerCase();
+          let resolvedPath = "";
 
-          if (skuLower.includes("demo-01") || pLower.includes("cookie") || pLower.includes("biscuit") || rawLower.includes("demo_01") || rawLower.includes("biscuit")) {
-            resolvedPath = "/storage/uploads/sku_demo_01_biscuit.jpg";
-          } else if (skuLower.includes("demo-02") || pLower.includes("dal makhani") || pLower.includes("curry") || rawLower.includes("demo_02") || rawLower.includes("curry")) {
-            resolvedPath = "/storage/uploads/sku_demo_02_curry.jpg";
-          } else if (skuLower.includes("demo-03") || pLower.includes("mineral water") || pLower.includes("himalayan") || rawLower.includes("demo_03") || rawLower.includes("water")) {
-            resolvedPath = "/storage/uploads/sku_demo_03_water.jpg";
-          } else if (skuLower.includes("demo-04") || pLower.includes("bathing bar") || pLower.includes("soap") || pLower.includes("herbal") || rawLower.includes("demo_04") || rawLower.includes("soap")) {
-            resolvedPath = "/storage/uploads/sku_demo_04_soap.jpg";
-          } else if (skuLower.includes("demo-05") || pLower.includes("potato chips") || pLower.includes("chips") || pLower.includes("crunchy") || rawLower.includes("demo_05") || rawLower.includes("chips")) {
-            resolvedPath = "/storage/uploads/sku_demo_05_chips.jpg";
-          } else if (skuLower.includes("demo-06") || pLower.includes("bluetooth") || pLower.includes("earbud") || pLower.includes("audiotech") || rawLower.includes("demo_06") || rawLower.includes("listing")) {
-            resolvedPath = "/storage/uploads/sku_demo_06_listing.png";
+          // 1. User uploaded image preview or blob URL always takes absolute precedence
+          if (cached?.preview_url) {
+            resolvedPath = cached.preview_url;
+          } else if (rawPath.startsWith("http://") || rawPath.startsWith("https://") || rawPath.startsWith("data:") || rawPath.startsWith("blob:")) {
+            resolvedPath = rawPath;
+          } else if (skuLower.startsWith("sku-demo-") || skuLower.startsWith("insp_demo_") || skuLower.startsWith("demo-")) {
+            // Deterministic resolution strictly for Golden Demonstration SKUs
+            if (skuLower.includes("demo-01") || rawLower.includes("demo_01")) {
+              resolvedPath = "/storage/uploads/sku_demo_01_biscuit.jpg";
+            } else if (skuLower.includes("demo-02") || rawLower.includes("demo_02")) {
+              resolvedPath = "/storage/uploads/sku_demo_02_curry.jpg";
+            } else if (skuLower.includes("demo-03") || rawLower.includes("demo_03")) {
+              resolvedPath = "/storage/uploads/sku_demo_03_water.jpg";
+            } else if (skuLower.includes("demo-04") || rawLower.includes("demo_04")) {
+              resolvedPath = "/storage/uploads/sku_demo_04_soap.jpg";
+            } else if (skuLower.includes("demo-05") || rawLower.includes("demo_05")) {
+              resolvedPath = "/storage/uploads/sku_demo_05_chips.jpg";
+            } else if (skuLower.includes("demo-06") || rawLower.includes("demo_06")) {
+              resolvedPath = "/storage/uploads/sku_demo_06_listing.png";
+            }
           } else if (rawLower.includes("real-pkg-01")) {
             resolvedPath = "/storage/uploads/REAL-PKG-01_8901719134845.jpg";
           } else if (rawLower.includes("real-pkg-02")) {
@@ -385,10 +390,6 @@ export class LiveApiService implements IInspectionApiService {
             resolvedPath = "/storage/uploads/REAL-PKG-07_7622202334009.jpg";
           } else if (rawLower.includes("real-pkg-08")) {
             resolvedPath = "/storage/uploads/REAL-PKG-08_9556001137722.jpg";
-          } else if (rawPath.startsWith("http://") || rawPath.startsWith("https://") || rawPath.startsWith("data:")) {
-            resolvedPath = rawPath;
-          } else if (cached?.preview_url) {
-            resolvedPath = cached.preview_url;
           } else if (rawPath.startsWith("uploads/2026/")) {
             resolvedPath = `${this.baseUrl}/evidence/image/${img.id}`;
           } else if (rawPath.startsWith("storage/")) {

@@ -98,7 +98,15 @@ export class ApiService {
   // ---------------------------------------------------------------------------
 
   public static async getDashboardSummary(circleId?: string): Promise<DashboardSummary> {
-    return this.getActiveService().getDashboardSummary(circleId);
+    try {
+      return await this.getActiveService().getDashboardSummary(circleId);
+    } catch (err: any) {
+      if (this.operatingMode === "LIVE") {
+        console.warn("Live server dashboard summary unreachable. Engaging Mode B Local Resilient failover.");
+        return await MockApiService.getInstance().getDashboardSummary(circleId);
+      }
+      throw err;
+    }
   }
 
   public static async listInspections(params?: {
@@ -171,6 +179,7 @@ export class ApiService {
         if (id.startsWith("SKU-DEMO-")) {
           return await DemoFixtureService.getInstance().getInspection(id);
         }
+        this.setOperatingMode("MOCK");
         return await MockApiService.getInstance().getInspection(id);
       }
     }
@@ -272,7 +281,24 @@ export class ApiService {
     inspectionId: string,
     request: AdjudicationRequest
   ): Promise<OfficerDecision> {
-    return this.getActiveService().submitAdjudication(inspectionId, request);
+    if (
+      this.operatingMode === "MOCK" ||
+      this.operatingMode === "DEMO_FIXTURE" ||
+      inspectionId.startsWith("INS-2026-") ||
+      inspectionId.startsWith("SKU-DEMO-") ||
+      inspectionId.startsWith("insp_demo_") ||
+      inspectionId.startsWith("demo-")
+    ) {
+      return MockApiService.getInstance().submitAdjudication(inspectionId, request);
+    }
+
+    try {
+      return await this.getActiveService().submitAdjudication(inspectionId, request);
+    } catch (err: any) {
+      console.warn("Live server adjudication failed. Engaging Mode B Local Resilient failover:", err);
+      this.setOperatingMode("MOCK");
+      return await MockApiService.getInstance().submitAdjudication(inspectionId, request);
+    }
   }
 
   public static async submitFindingAdjudication(
@@ -282,13 +308,42 @@ export class ApiService {
     remarks: string,
     actionOrder?: OfficerActionOrder
   ): Promise<FindingAdjudication> {
-    return this.getActiveService().submitFindingAdjudication(
-      inspectionId,
-      findingId,
-      decision,
-      remarks,
-      actionOrder
-    );
+    if (
+      this.operatingMode === "MOCK" ||
+      this.operatingMode === "DEMO_FIXTURE" ||
+      inspectionId.startsWith("INS-2026-") ||
+      inspectionId.startsWith("SKU-DEMO-") ||
+      inspectionId.startsWith("insp_demo_") ||
+      inspectionId.startsWith("demo-")
+    ) {
+      return MockApiService.getInstance().submitFindingAdjudication(
+        inspectionId,
+        findingId,
+        decision,
+        remarks,
+        actionOrder
+      );
+    }
+
+    try {
+      return await this.getActiveService().submitFindingAdjudication(
+        inspectionId,
+        findingId,
+        decision,
+        remarks,
+        actionOrder
+      );
+    } catch (err: any) {
+      console.warn("Live server finding adjudication failed. Engaging Mode B Local Resilient failover:", err);
+      this.setOperatingMode("MOCK");
+      return await MockApiService.getInstance().submitFindingAdjudication(
+        inspectionId,
+        findingId,
+        decision,
+        remarks,
+        actionOrder
+      );
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -296,18 +351,67 @@ export class ApiService {
   // ---------------------------------------------------------------------------
 
   public static async getAuditTrail(inspectionId: string): Promise<AuditEvent[]> {
-    return this.getActiveService().getAuditTrail(inspectionId);
+    if (
+      this.operatingMode === "MOCK" ||
+      this.operatingMode === "DEMO_FIXTURE" ||
+      inspectionId.startsWith("INS-2026-") ||
+      inspectionId.startsWith("SKU-DEMO-") ||
+      inspectionId.startsWith("insp_demo_") ||
+      inspectionId.startsWith("demo-")
+    ) {
+      return MockApiService.getInstance().getAuditTrail(inspectionId);
+    }
+
+    try {
+      return await this.getActiveService().getAuditTrail(inspectionId);
+    } catch (err: any) {
+      console.warn("Live server audit trail retrieval failed. Engaging Mode B Local Resilient failover:", err);
+      return await MockApiService.getInstance().getAuditTrail(inspectionId);
+    }
   }
 
   public static async getCaseReadiness(inspectionId: string): Promise<CaseReadinessChecklist> {
-    return this.getActiveService().getCaseReadiness(inspectionId);
+    if (
+      this.operatingMode === "MOCK" ||
+      this.operatingMode === "DEMO_FIXTURE" ||
+      inspectionId.startsWith("INS-2026-") ||
+      inspectionId.startsWith("SKU-DEMO-") ||
+      inspectionId.startsWith("insp_demo_") ||
+      inspectionId.startsWith("demo-")
+    ) {
+      return MockApiService.getInstance().getCaseReadiness(inspectionId);
+    }
+
+    try {
+      return await this.getActiveService().getCaseReadiness(inspectionId);
+    } catch (err: any) {
+      console.warn("Live server case readiness failed. Engaging Mode B Local Resilient failover:", err);
+      return await MockApiService.getInstance().getCaseReadiness(inspectionId);
+    }
   }
 
   public static async closeInspection(
     inspectionId: string,
     remarks?: string
   ): Promise<InspectionCase> {
-    return this.getActiveService().closeInspection(inspectionId, remarks);
+    if (
+      this.operatingMode === "MOCK" ||
+      this.operatingMode === "DEMO_FIXTURE" ||
+      inspectionId.startsWith("INS-2026-") ||
+      inspectionId.startsWith("SKU-DEMO-") ||
+      inspectionId.startsWith("insp_demo_") ||
+      inspectionId.startsWith("demo-")
+    ) {
+      return MockApiService.getInstance().closeInspection(inspectionId, remarks);
+    }
+
+    try {
+      return await this.getActiveService().closeInspection(inspectionId, remarks);
+    } catch (err: any) {
+      console.warn("Live server close inspection failed. Engaging Mode B Local Resilient failover:", err);
+      this.setOperatingMode("MOCK");
+      return await MockApiService.getInstance().closeInspection(inspectionId, remarks);
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -317,7 +421,24 @@ export class ApiService {
   public static async generateNotice(
     payload: GenerateNoticePayload
   ): Promise<LegalNoticeResult> {
-    return this.getActiveService().generateNotice(payload);
+    if (
+      this.operatingMode === "MOCK" ||
+      this.operatingMode === "DEMO_FIXTURE" ||
+      payload.inspection_id.startsWith("INS-2026-") ||
+      payload.inspection_id.startsWith("SKU-DEMO-") ||
+      payload.inspection_id.startsWith("insp_demo_") ||
+      payload.inspection_id.startsWith("demo-")
+    ) {
+      return MockApiService.getInstance().generateNotice(payload);
+    }
+
+    try {
+      return await this.getActiveService().generateNotice(payload);
+    } catch (err: any) {
+      console.warn("Live server generate notice failed. Engaging Mode B Local Resilient failover:", err);
+      this.setOperatingMode("MOCK");
+      return await MockApiService.getInstance().generateNotice(payload);
+    }
   }
 
   public static getNoticePdfUrl(noticeId: string): string {

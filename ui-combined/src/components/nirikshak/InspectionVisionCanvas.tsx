@@ -44,6 +44,8 @@ interface InspectionVisionCanvasProps {
     referenceLengthMm?: number;
     measuredPixels?: number;
   };
+  activeImageId?: string;
+  onSelectImage?: (imageId: string) => void;
   onSelectBox?: (boxId: string) => void;
   selectedBoxId?: string;
   className?: string;
@@ -53,17 +55,44 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
   images,
   boxes,
   calibration,
+  activeImageId,
+  onSelectImage,
   onSelectBox,
   selectedBoxId,
   className = "",
 }) => {
   const { language } = useLanguage();
-  const [selectedImageId, setSelectedImageId] = useState<string>(images[0]?.id || "");
+  const [selectedImageId, setSelectedImageId] = useState<string>(activeImageId || images[0]?.id || "");
+
+  React.useEffect(() => {
+    if (activeImageId && activeImageId !== selectedImageId) {
+      setSelectedImageId(activeImageId);
+    }
+  }, [activeImageId]);
+
+  const handleSelectImage = (id: string) => {
+    setSelectedImageId(id);
+    if (onSelectImage) {
+      onSelectImage(id);
+    }
+  };
+
   const [zoom, setZoom] = useState<number>(1);
   const [showBoxes, setShowBoxes] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<"image" | "annotations" | "calibration">("image");
+  const [naturalDimensions, setNaturalDimensions] = useState<{ width: number; height: number } | null>(null);
 
-  const activeImage = images.find((img) => img.id === selectedImageId) || images[0];
+  const activeImage = images.find((img) => img.id === (activeImageId || selectedImageId)) || images[0];
+
+  const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+      setNaturalDimensions({ width: img.naturalWidth, height: img.naturalHeight });
+    }
+  };
+
+  const effectiveWidth = naturalDimensions?.width || activeImage?.width || 1920;
+  const effectiveHeight = naturalDimensions?.height || activeImage?.height || 1080;
 
   const handleZoomIn = () => setZoom((v) => Math.min(2.5, Number((v + 0.15).toFixed(2))));
   const handleZoomOut = () => setZoom((v) => Math.max(0.5, Number((v - 0.15).toFixed(2))));
@@ -83,7 +112,7 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
             </h3>
             <p className="text-[10px] text-slate-400">
               {activeImage
-                ? `${activeImage.width} × ${activeImage.height}px · ${activeImage.type.replace(/_/g, " ")}`
+                ? `${effectiveWidth} × ${effectiveHeight}px · ${activeImage.type.replace(/_/g, " ")}`
                 : language === "hi"
                 ? "उच्च-रिज़ॉल्यूशन सेंसर साक्ष्य"
                 : "High-resolution sensor evidence"}
@@ -179,13 +208,14 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
           className="relative shrink-0 transition-transform duration-200 select-none shadow-2xl"
           style={{
             width: `${Math.min(640 * zoom, 1200)}px`,
-            aspectRatio: activeImage ? `${activeImage.width} / ${activeImage.height}` : "4 / 3",
+            aspectRatio: `${effectiveWidth} / ${effectiveHeight}`,
           }}
         >
           {activeImage ? (
             <img
               src={activeImage.url}
               alt={activeImage.filename}
+              onLoad={handleImageLoad}
               className="h-full w-full rounded-md object-contain pointer-events-none"
             />
           ) : (
@@ -344,7 +374,7 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
             <button
               key={img.id}
               type="button"
-              onClick={() => setSelectedImageId(img.id)}
+              onClick={() => handleSelectImage(img.id)}
               className={`group relative h-14 w-20 shrink-0 overflow-hidden rounded-lg border-2 transition-all cursor-pointer ${
                 img.id === activeImage?.id
                   ? "border-govNavy ring-2 ring-govNavy/30"
