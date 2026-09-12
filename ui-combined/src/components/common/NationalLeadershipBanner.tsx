@@ -1,5 +1,6 @@
 import React from "react";
 import { Scale, Award, ShieldCheck, Quote } from "lucide-react";
+import { StateEmblem } from "./StateEmblem";
 import { useLanguage } from "../../context/LanguageContext";
 
 export const NationalLeadershipBanner: React.FC = () => {
@@ -65,7 +66,7 @@ export const NationalLeadershipBanner: React.FC = () => {
           {/* Right Column (5 cols): Department of Consumer Affairs Legal Metrology Mission */}
           <div className="lg:col-span-5 lg:border-l lg:border-slate-200 lg:pl-6 space-y-3 bg-slate-50/70 p-4 rounded-xl border border-slate-200/60">
             <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-govNavy">
-              <Scale size={16} className="text-amber-600" />
+              <StateEmblem size={18} tone="navy" />
               <span>
                 {t(
                   "quote.mission_title",

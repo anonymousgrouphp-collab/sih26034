@@ -49,7 +49,8 @@ export const GOLDEN_SKU_CASES: Record<string, InspectionCase> = {
       {
         image_id: "img_demo_01_pdp",
         inspection_id: "insp_demo_01_biscuit",
-        file_path: "storage/uploads/sku_demo_01_biscuit.jpg",
+        file_path: "/storage/uploads/sku_demo_01_biscuit.jpg",
+        preview_url: "/storage/uploads/sku_demo_01_biscuit.jpg",
         raw_sha256: "a3f5e1b2c4d6879012345678abcdef0123456789abcdef0123456789abcdef01",
         panel_type: "PDP_FRONT",
         image_width: 1920,
@@ -271,7 +272,8 @@ export const GOLDEN_SKU_CASES: Record<string, InspectionCase> = {
       {
         image_id: "img_demo_02",
         inspection_id: "insp_demo_02_curry",
-        file_path: "storage/uploads/sku_demo_02_curry.jpg",
+        file_path: "/storage/uploads/sku_demo_02_curry.jpg",
+        preview_url: "/storage/uploads/sku_demo_02_curry.jpg",
         raw_sha256: "b4e6f2c3d5e7980123456789abcdef0123456789abcdef0123456789abcdef02",
         panel_type: "PDP_FRONT",
         image_width: 1920,
@@ -378,7 +380,8 @@ export const GOLDEN_SKU_CASES: Record<string, InspectionCase> = {
       {
         image_id: "img_demo_03",
         inspection_id: "insp_demo_03_water",
-        file_path: "storage/uploads/sku_demo_03_water.jpg",
+        file_path: "/storage/uploads/sku_demo_03_water.jpg",
+        preview_url: "/storage/uploads/sku_demo_03_water.jpg",
         raw_sha256: "c5f7a3d4e6f8091234567890abcdef0123456789abcdef0123456789abcdef03",
         panel_type: "PDP_FRONT",
         image_width: 1920,
@@ -485,7 +488,8 @@ export const GOLDEN_SKU_CASES: Record<string, InspectionCase> = {
       {
         image_id: "img_demo_04",
         inspection_id: "insp_demo_04_soap",
-        file_path: "storage/uploads/sku_demo_04_soap.jpg",
+        file_path: "/storage/uploads/sku_demo_04_soap.jpg",
+        preview_url: "/storage/uploads/sku_demo_04_soap.jpg",
         raw_sha256: "d6a8b4e5f7a9102345678901abcdef0123456789abcdef0123456789abcdef04",
         panel_type: "PDP_FRONT",
         image_width: 1920,
@@ -565,7 +569,8 @@ export const GOLDEN_SKU_CASES: Record<string, InspectionCase> = {
       {
         image_id: "img_demo_05",
         inspection_id: "insp_demo_05_chips",
-        file_path: "storage/uploads/sku_demo_05_chips.jpg",
+        file_path: "/storage/uploads/sku_demo_05_chips.jpg",
+        preview_url: "/storage/uploads/sku_demo_05_chips.jpg",
         raw_sha256: "e7b9c5f6a8b0213456789012abcdef0123456789abcdef0123456789abcdef05",
         panel_type: "PDP_FRONT",
         image_width: 1920,
@@ -620,7 +625,8 @@ export const GOLDEN_SKU_CASES: Record<string, InspectionCase> = {
       {
         image_id: "img_demo_06",
         inspection_id: "insp_demo_06_earbuds",
-        file_path: "storage/uploads/sku_demo_06_listing.png",
+        file_path: "/storage/uploads/sku_demo_06_listing.png",
+        preview_url: "/storage/uploads/sku_demo_06_listing.png",
         raw_sha256: "f8c0d6e7b1a2345678901234abcdef0123456789abcdef0123456789abcdef06",
         panel_type: "ECOMMERCE_SNAPSHOT",
         image_width: 1280,

@@ -113,10 +113,54 @@ export class DemoFixtureService implements IInspectionApiService {
   }
 
   public async getInspection(id: string): Promise<InspectionCase> {
+    const normalizedId = id.trim();
+    const lower = normalizedId.toLowerCase();
+
+    // Map common aliases
+    const aliasMap: Record<string, string> = {
+      "1": "SKU-DEMO-01",
+      "demo-1": "SKU-DEMO-01",
+      "sku-demo-1": "SKU-DEMO-01",
+      "sku-demo-01": "SKU-DEMO-01",
+      "2": "SKU-DEMO-02",
+      "demo-2": "SKU-DEMO-02",
+      "sku-demo-2": "SKU-DEMO-02",
+      "sku-demo-02": "SKU-DEMO-02",
+      "3": "SKU-DEMO-03",
+      "demo-3": "SKU-DEMO-03",
+      "sku-demo-3": "SKU-DEMO-03",
+      "sku-demo-03": "SKU-DEMO-03",
+      "4": "SKU-DEMO-04",
+      "demo-4": "SKU-DEMO-04",
+      "sku-demo-4": "SKU-DEMO-04",
+      "sku-demo-04": "SKU-DEMO-04",
+      "5": "SKU-DEMO-05",
+      "demo-5": "SKU-DEMO-05",
+      "sku-demo-5": "SKU-DEMO-05",
+      "sku-demo-05": "SKU-DEMO-05",
+      "6": "SKU-DEMO-06",
+      "demo-6": "SKU-DEMO-06",
+      "sku-demo-6": "SKU-DEMO-06",
+      "sku-demo-06": "SKU-DEMO-06",
+      "fortune": "demo-fortune-sunlite",
+      "sunlite": "demo-fortune-sunlite",
+      "oil": "demo-fortune-sunlite",
+    };
+
+    const targetKey = aliasMap[lower] || normalizedId;
+
     const found =
-      GOLDEN_SKU_CASES[id] ||
+      GOLDEN_SKU_CASES[targetKey] ||
+      GOLDEN_SKU_CASES[normalizedId] ||
       Object.values(GOLDEN_SKU_CASES).find(
-        (c) => c.id === id || c.sku_demo_id === id || c.inspection_number === id
+        (c) =>
+          c.id === normalizedId ||
+          c.sku_demo_id === normalizedId ||
+          c.inspection_number === normalizedId ||
+          c.id.toLowerCase() === lower ||
+          (c.sku_demo_id && c.sku_demo_id.toLowerCase() === lower) ||
+          c.inspection_number.toLowerCase() === lower ||
+          (c.sku_demo_id && aliasMap[lower] === c.sku_demo_id)
       );
 
     if (!found) {
@@ -124,7 +168,7 @@ export class DemoFixtureService implements IInspectionApiService {
         error_code: "DEMO_CASE_NOT_FOUND",
         status: 404,
         message: `Golden Demo SKU '${id}' not found in fixture catalog.`,
-        remediation: "Select one of SKU-DEMO-01 through SKU-DEMO-06.",
+        remediation: "Select one of SKU-DEMO-01 through SKU-DEMO-06 or demo-fortune-sunlite.",
       } as ApiError;
     }
 

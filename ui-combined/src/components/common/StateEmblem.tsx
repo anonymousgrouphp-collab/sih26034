@@ -36,8 +36,8 @@ export const StateEmblem: React.FC<StateEmblemProps> = ({
 
   const emblemSrc = getEmblemSrc();
 
-  // Exact aspect ratio of official high-definition engraving: 717 width x 1209 height (ratio ~ 1.686)
-  const height = Math.round(size * (1209 / 717));
+  // Exact aspect ratio of official high-definition engraving: 170.585 width x 289.598 height (ratio ~ 1.698)
+  const height = Math.round(size * (289.598 / 170.585));
 
   return (
     <div
@@ -51,7 +51,7 @@ export const StateEmblem: React.FC<StateEmblemProps> = ({
         alt="State Emblem of India — Satyameva Jayate"
         width={size}
         height={height}
-        className="object-contain pointer-events-none drop-shadow-2xs"
+        className="object-contain pointer-events-none"
         style={{ width: `${size}px`, height: `${height}px` }}
         loading="eager"
         decoding="sync"

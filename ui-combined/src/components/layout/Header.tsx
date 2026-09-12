@@ -5,7 +5,8 @@ import { OfficerRole } from "../../types/inspection";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { ApiService } from "../../services/api";
-import { LogOut, Scale, ShieldCheck } from "lucide-react";
+import { LogOut, Scale, ShieldCheck, Sparkles, ChevronDown } from "lucide-react";
+import { DEMO_SCENARIOS } from "../../features/demo/demoCatalog";
 
 interface HeaderProps {
   activeCircle: string;
@@ -65,6 +66,8 @@ export const Header: React.FC<HeaderProps> = ({
       return "ONLINE";
     }
   });
+
+  const [demoMenuOpen, setDemoMenuOpen] = useState(false);
 
   const handleRoleToggle = (newRole: OfficerRole) => {
     switchOfficerRole(newRole);
@@ -140,6 +143,91 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Controls: Circle Selector, Connectivity, RBAC Toggle, Officer Profile */}
           <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
+            {/* Quick Demo Cases Dropdown Launcher */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setDemoMenuOpen(!demoMenuOpen)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-black text-xs transition-all shadow-xs border border-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                title="Quick Access: Certified Statutory Demonstration Scenarios"
+                aria-haspopup="true"
+                aria-expanded={demoMenuOpen}
+              >
+                <Sparkles size={14} className="text-slate-950" />
+                <span>{language === "hi" ? "डेमो परिदृश्य" : "Demo Cases"}</span>
+                <span className="bg-slate-950 text-amber-300 text-[10px] font-mono font-black px-1.5 py-0.2 rounded-full">
+                  7
+                </span>
+                <ChevronDown size={13} className={`transition-transform duration-200 ${demoMenuOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              {demoMenuOpen && (
+                <div
+                  className="absolute right-0 mt-2 w-80 sm:w-88 rounded-xl bg-white text-slate-900 shadow-2xl border border-slate-200 p-2 z-50 animate-in fade-in zoom-in-95"
+                >
+                  <div className="px-3 py-2 border-b border-slate-100 flex items-center justify-between">
+                    <div>
+                      <p className="font-extrabold text-xs text-govNavy flex items-center gap-1.5">
+                        <Sparkles size={12} className="text-amber-500" />
+                        <span>{language === "hi" ? "सांविधिक प्रदर्शन परिदृश्य" : "Statutory Demo Suite"}</span>
+                      </p>
+                      <p className="text-[10px] text-slate-500">
+                        {language === "hi" ? "त्वरित सांविधिक जांच हेतु 1-क्लिक लोड" : "1-Click load for statutory audit"}
+                      </p>
+                    </div>
+                    <Link
+                      to="/dashboard#demo-showcase"
+                      onClick={() => setDemoMenuOpen(false)}
+                      className="text-[11px] font-bold text-amber-700 hover:underline"
+                    >
+                      {language === "hi" ? "सभी 7 देखें" : "View All"}
+                    </Link>
+                  </div>
+
+                  <div className="py-1 max-h-80 overflow-y-auto space-y-1">
+                    {DEMO_SCENARIOS.map((s) => (
+                      <button
+                        key={s.caseId}
+                        type="button"
+                        onClick={() => {
+                          setDemoMenuOpen(false);
+                          navigate(`/inspections/${s.caseId}`);
+                        }}
+                        className="w-full text-left p-2 rounded-lg hover:bg-slate-50 flex items-center justify-between gap-2 text-xs transition-colors group border border-transparent hover:border-slate-200"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-mono text-[9px] font-bold text-slate-500">
+                              #{s.scenarioNumber}
+                            </span>
+                            <span className="font-bold text-slate-900 group-hover:text-govNavy truncate">
+                              {language === "hi" && s.titleHi ? s.titleHi : s.title}
+                            </span>
+                          </div>
+                          <p className="text-[10.5px] text-slate-500 truncate mt-0.5">
+                            {language === "hi" && s.headlineViolationHi ? s.headlineViolationHi : s.headlineViolation}
+                          </p>
+                        </div>
+                        <span
+                          className={`text-[9.5px] font-black px-1.5 py-0.5 rounded border shrink-0 ${
+                            s.targetVerdict === "FAIL"
+                              ? "bg-rose-50 text-rose-700 border-rose-200"
+                              : s.targetVerdict === "PASS"
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                              : s.targetVerdict === "REVIEW"
+                              ? "bg-amber-50 text-amber-800 border-amber-200"
+                              : "bg-purple-50 text-purple-700 border-purple-200"
+                          }`}
+                        >
+                          {s.targetVerdict}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Jurisdiction Circle Selector */}
             <div className="hidden 2xl:flex items-center space-x-2 bg-govNavy-dark/70 px-3 py-1.5 rounded-lg border border-slate-700 shrink-0">
               <label htmlFor="circle-select" className="text-xs text-slate-300 whitespace-nowrap font-medium">

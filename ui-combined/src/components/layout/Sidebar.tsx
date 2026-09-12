@@ -12,9 +12,11 @@ import {
   ShieldCheck,
   Scale,
   X,
+  Sparkles,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
+import { StateEmblem } from "../common/StateEmblem";
 
 interface SidebarProps {
   pendingCasesCount?: number;
@@ -62,6 +64,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const navigation = [
     { label: t("nav.dashboard", "Executive Dashboard"), path: "/dashboard", icon: Home },
     { label: t("nav.register", "Inspection Register"), path: "/inspections", icon: SearchCheck },
+    {
+      label: language === "hi" ? "डेमो परिदृश्य (7)" : "Demo Scenarios (7)",
+      path: "/inspections/SKU-DEMO-01",
+      icon: Sparkles,
+      badge: "7 DEMOS",
+    },
     { label: t("nav.new", "New Inspection"), path: "/inspections/new", icon: ClipboardCheck },
     {
       label: t("nav.review", "Review Queue"),
@@ -91,9 +99,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
       >
         {/* Mobile Header */}
         <div className="flex h-16 items-center justify-between border-b border-slate-200 px-4 lg:hidden bg-govNavy text-white">
-          <div className="flex items-center gap-2">
-            <Scale size={20} className="text-amber-400" />
-            <span className="font-bold text-sm">NyayaDrishti-LM</span>
+          <div className="flex items-center gap-2.5">
+            <StateEmblem size={22} tone="white" showMotto={true} className="shrink-0" />
+            <span className="font-bold text-sm tracking-tight">NyayaDrishti-LM</span>
           </div>
           <button
             type="button"

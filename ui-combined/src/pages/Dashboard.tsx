@@ -28,6 +28,8 @@ import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import { StatutorySurveillanceTicker } from "../components/common/StatutorySurveillanceTicker";
 import { StatutoryOmnibox } from "../components/common/StatutoryOmnibox";
+import { StateEmblem } from "../components/common/StateEmblem";
+import { StatutoryDemoShowcase } from "../features/demo/StatutoryDemoShowcase";
 import { motion } from "framer-motion";
 
 export const Dashboard: React.FC = () => {
@@ -140,9 +142,9 @@ export const Dashboard: React.FC = () => {
           {/* Top Row: Authority & Badges */}
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-200/80 pb-4">
             <div className="flex items-start gap-4">
-              {/* Department of Consumer Affairs Legal Metrology Crest */}
-              <div className="p-3 bg-amber-50/80 border-2 border-amber-300 rounded-2xl shadow-xs shrink-0 flex items-center justify-center">
-                <Scale size={32} className="text-amber-700" />
+              {/* Sovereign State Emblem of India (Unboxed & Majestic) */}
+              <div className="shrink-0 flex items-center justify-center pt-0.5">
+                <StateEmblem size={44} tone="navy" showMotto={true} />
               </div>
 
               <div>
@@ -248,7 +250,7 @@ export const Dashboard: React.FC = () => {
           <div className="pt-2 border-t border-slate-200/80">
             <div className="mb-2 flex items-center justify-between">
               <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                <Search size={14} className="text-[#D32F2F]" />
+                <Search size={14} className="text-[#146337]" />
                 <span>{t("dash.search_statutory", "Quick Statutory & Precedent Lookup")}</span>
               </span>
               <span className="text-[11px] text-slate-500 font-medium hidden sm:inline">
@@ -262,6 +264,9 @@ export const Dashboard: React.FC = () => {
 
       {/* National Statutory Surveillance Directives Ticker (Inspired by india.gov.in) */}
       <StatutorySurveillanceTicker />
+
+      {/* Certified Statutory Demonstration & Evaluation Suite */}
+      <StatutoryDemoShowcase />
 
       {/* Quick Statutory Action Launchpad */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -664,51 +669,64 @@ export const Dashboard: React.FC = () => {
             <div className="space-y-2">
               {[
                 {
-                  id: "INS-2026-0001",
-                  name: language === "hi" ? "आशीर्वाद आटा 500g" : "Aashirvaad Atta 500g",
-                  tag: language === "hi" ? "उत्तीर्ण — 4.2mm फॉन्ट, ₹32.00 MRP, SI मात्रक" : "PASS — 4.2mm Font, ₹32.00 MRP, SI units",
-                  badge: "PASS",
-                },
-                {
-                  id: "INS-2026-0002",
-                  name: language === "hi" ? "फ़िज़अप लेमन 1L" : "FizzUp Lemon Drink 1L",
-                  tag: language === "hi" ? "समीक्षा — नियम 18(1) दोहरा मूल्य विवाद (₹48 vs ₹45)" : "REVIEW — Rule 18(1) Dual Price Conflict (₹48 vs ₹45)",
-                  badge: "REVIEW",
-                },
-                {
-                  id: "INS-2026-0003",
-                  name: language === "hi" ? "क्लीनहोम फ्लोर क्लीनर 250g" : "CleanHome Floor Cleaner 250g",
-                  tag: language === "hi" ? "असमर्थ — अरुको अंशांकन अनुपस्थित" : "UNABLE — Uncalibrated Sensor (ArUco Missing)",
-                  badge: "UNABLE_TO_VERIFY",
-                },
-                {
-                  id: "demo-fortune-sunlite",
-                  name: language === "hi" ? "फॉर्च्यून सनलाइट ऑयल 1L" : "Fortune Sunlite Oil 1L",
-                  tag: language === "hi" ? "अनुत्तीर्ण — प्रतिबंधित इकाई (1000 ML)" : "FAIL — Prohibited Unit (1000 ML)",
+                  id: "SKU-DEMO-01",
+                  name: language === "hi" ? "सनफीस्ट बटर कुकीज़ 200g" : "Sunfeast Butter Cookies 200g",
+                  tag: language === "hi" ? "उल्लंघन — फॉन्ट कमी (1.84mm) + 'gms' इकाई" : "FAIL — Font Deficit (1.84mm) + 'gms' unit",
                   badge: "FAIL",
                 },
                 {
-                  id: "demo-tata-salt",
-                  name: language === "hi" ? "टाटा नमक 1kg" : "Tata Salt 1kg",
-                  tag: language === "hi" ? "उत्तीर्ण — 100% विधिक अनुपालक" : "PASS — 100% Compliant",
+                  id: "SKU-DEMO-02",
+                  name: language === "hi" ? "रेडी करी पाउच 300g" : "Ready Curry Retort Pouch 300g",
+                  tag: language === "hi" ? "उल्लंघन — यूएसपी विसंगति (₹0.28 vs ₹0.23/g)" : "FAIL — Rule 6(1)(e) USP Mismatch",
+                  badge: "FAIL",
+                },
+                {
+                  id: "SKU-DEMO-03",
+                  name: language === "hi" ? "खनिज जल बोतल 1L" : "Natural Mineral Water 1L",
+                  tag: language === "hi" ? "उत्तीर्ण — 100% विधिक अनुपालक (बेलनाकार)" : "PASS — 100% Compliant (Cylindrical)",
                   badge: "PASS",
                 },
                 {
-                  id: "demo-dettol-handwash",
-                  name: language === "hi" ? "डेटॉल लिक्विड हैंडवॉश" : "Dettol Liquid Handwash",
-                  tag: language === "hi" ? "समीक्षा — सीमावर्ती अंक ऊंचाई" : "REVIEW — Borderline Font",
+                  id: "SKU-DEMO-04",
+                  name: language === "hi" ? "हर्बल साबुन 125g" : "Herbal Bathing Soap 125g",
+                  tag: language === "hi" ? "समीक्षा — सीमांत फॉन्ट (2.46mm, k=2 बैंड)" : "REVIEW — Borderline Font (k=2 band)",
                   badge: "REVIEW",
+                },
+                {
+                  id: "SKU-DEMO-05",
+                  name: language === "hi" ? "आलू चिप्स 75g" : "Crispy Potato Chips 75g",
+                  tag: language === "hi" ? "असमर्थ — चकाचौंध फैलाव (6.4% > 3.0%)" : "UNABLE — Specular Glare (6.4% > 3.0%)",
+                  badge: "UNABLE_TO_VERIFY",
+                },
+                {
+                  id: "SKU-DEMO-06",
+                  name: language === "hi" ? "ई-कॉमर्स ईयरबड्स" : "Wireless Earbuds (E-Commerce)",
+                  tag: language === "hi" ? "उल्लंघन — नियम 6(10) मूल देश अनुपस्थित" : "FAIL — Rule 6(10) Missing Country of Origin",
+                  badge: "FAIL",
+                },
+                {
+                  id: "demo-fortune-sunlite",
+                  name: language === "hi" ? "फॉर्च्यून सनलाइट तेल 1L" : "Fortune Sunlite Oil 1L",
+                  tag: language === "hi" ? "उत्तीर्ण — ArUco अंशांकन एवं धारा 63 प्रमाण" : "PASS — Calibrated ArUco Benchmark",
+                  badge: "PASS",
                 },
               ].map((sku) => (
                 <button
                   key={sku.id}
                   type="button"
                   onClick={() => navigate(`/inspections/${sku.id}`)}
-                  className="w-full flex items-center justify-between p-2.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-amber-50 hover:border-amber-300 text-left transition-colors text-xs"
+                  className="w-full flex items-center justify-between p-2.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-amber-50 hover:border-amber-300 text-left transition-colors text-xs group"
                 >
                   <div className="min-w-0 pr-2">
-                    <p className="font-bold text-govNavy truncate">{sku.name}</p>
-                    <p className="text-[11px] text-slate-500 mt-0.5">{sku.tag}</p>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-mono text-[9px] font-black px-1.5 py-0.2 rounded bg-slate-200 text-slate-700">
+                        DEMO
+                      </span>
+                      <p className="font-bold text-govNavy group-hover:text-amber-700 transition-colors truncate">
+                        {sku.name}
+                      </p>
+                    </div>
+                    <p className="text-[10.5px] text-slate-500 mt-0.5 truncate">{sku.tag}</p>
                   </div>
                   <VerdictBadge verdict={sku.badge as any} size="sm" />
                 </button>

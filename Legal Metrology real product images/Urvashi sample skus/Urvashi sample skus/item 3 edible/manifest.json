@@ -1,0 +1,227 @@
+{
+  "dataset_name": "Nirikshak Physical Validation Dataset - SIH 2026",
+  "item_folder": "item 3 edible",
+  "total_images": 8,
+  "product_details": {
+    "brand": "Haldiram's",
+    "commodity": "NAVRATTAN (Signature Mix of 9 Favourites)",
+    "category": "Food Products / Edible Savouries (Namkeen)",
+    "packaging_type": "Flexible multi-layer laminated plastic/foil pillow pouch",
+    "barcode_ean13": "8904063231796",
+    "mrp": "Rs. 100 (INCL. OF ALL TAXES)",
+    "unit_sale_price_usp": "Rs. 0.25/g",
+    "net_quantity": "400 g",
+    "servings_per_pack": 20,
+    "batch_no": "DAFH2461 (16:27)",
+    "mfg_date": "24/08/2026",
+    "expiry_date": "23/01/2027",
+    "shelf_life_months": 5,
+    "manufacturer": "HALDIRAM SNACKS FOOD PRIVATE LIMITED, C-3, Sector-67, Noida-201307, Gautam Budh Nagar, (UP), INDIA",
+    "marketed_by": "HALDIRAM SNACKS FOOD PRIVATE LIMITED, Village Kherki Daula, Delhi - Jaipur Highway, Gurugram - 122001, Haryana",
+    "fssai_lic_mfg": "10013051000541",
+    "fssai_lic_mkt": "10014011001919",
+    "consumer_care_helpline": "0120-2400286",
+    "consumer_care_email": "customercare@haldiram.com",
+    "website": "www.haldiram.com",
+    "country_of_origin": "India"
+  },
+  "physical_measurements": {
+    "pouch_height_mm": 275.0,
+    "pouch_width_mm": 205.0,
+    "pouch_thickness_mm": 45.0,
+    "net_weight_g": 400.0,
+    "device": "Digital Vernier Caliper (0.01 mm Least Count) & Metric Reference Standard"
+  },
+  "reference_object": {
+    "type": "Government of India ₹10 Commemorative Coin (Azadi Ka Amrit Mahotsav)",
+    "standard": "RBI Bimetallic Coinage Standard",
+    "outer_diameter_mm": 27.0,
+    "thickness_mm": 2.15,
+    "calibrated_spatial_scale_px_per_mm": 20.59
+  },
+  "legal_metrology_compliance_status": {
+    "generic_name": "COMPLIANT (NAVRATTAN / Namkeen)",
+    "net_quantity": "COMPLIANT (400 g)",
+    "mrp": "COMPLIANT (Rs. 100)",
+    "unit_sale_price": "COMPLIANT (Rs. 0.25/g)",
+    "mfg_date": "COMPLIANT (24/08/2026)",
+    "expiry_date": "COMPLIANT (23/01/2027)",
+    "batch_no": "COMPLIANT (DAFH2461)",
+    "manufacturer_name_address": "COMPLIANT (Haldiram Snacks Food Pvt. Ltd., Noida)",
+    "marketed_by_address": "COMPLIANT (Haldiram Snacks Food Pvt. Ltd., Gurugram)",
+    "consumer_care_details": "COMPLIANT (0120-2400286, customercare@haldiram.com)",
+    "fssai_licensing": "COMPLIANT (Dual FSSAI Lic. Nos. Declared)",
+    "country_of_origin": "COMPLIANT (India)",
+    "overall_status": "100% STATUTORILY COMPLIANT"
+  },
+  "file_mapping": [
+    {
+      "index": 1,
+      "original_filename": "IMG_20260912_142005.jpg.jpeg",
+      "new_filename": "front_01.jpg",
+      "nomenclature_class": "Standard Guide #1",
+      "angle_description": "Overhead Planar (0°)",
+      "packaging_face": "Front Principal Display Panel (PDP) with Coin",
+      "dimensions_px": {
+        "width": 3472,
+        "height": 4640
+      },
+      "sha256": "79a1148f49beae186b50c309115f707077f8264d29b8f501f19a49d2133e93cf",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 766,
+        "f_number": 1.89,
+        "exposure_time_s": 0.030002,
+        "datetime_original": "2026:09:12 14:20:05"
+      }
+    },
+    {
+      "index": 2,
+      "original_filename": "IMG_20260912_142007.jpg.jpeg",
+      "new_filename": "front_02.jpg",
+      "nomenclature_class": "Extension Guide (Variant)",
+      "angle_description": "Overhead Planar (0°)",
+      "packaging_face": "Front PDP Verification Framing with Coin",
+      "dimensions_px": {
+        "width": 3472,
+        "height": 4640
+      },
+      "sha256": "47d5c96a3e4c575d946cbcd96c7e563d142f53c4c14049eb012fcc2c0f7a9b44",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 744,
+        "f_number": 1.89,
+        "exposure_time_s": 0.030002,
+        "datetime_original": "2026:09:12 14:20:07"
+      }
+    },
+    {
+      "index": 3,
+      "original_filename": "IMG_20260912_142027.jpg.jpeg",
+      "new_filename": "back_01.jpg",
+      "nomenclature_class": "Standard Guide #2",
+      "angle_description": "Overhead Planar (0°)",
+      "packaging_face": "Back Information Panel (BIP) - Legal Metrology Ground Truth",
+      "dimensions_px": {
+        "width": 3472,
+        "height": 4640
+      },
+      "sha256": "31cee8a11e53361b068bbeae5ad2ad8ddb7eff3fe5ee2cf82ac62b11833e88b0",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 666,
+        "f_number": 1.89,
+        "exposure_time_s": 0.030002,
+        "datetime_original": "2026:09:12 14:20:27"
+      }
+    },
+    {
+      "index": 4,
+      "original_filename": "IMG_20260912_142030.jpg.jpeg",
+      "new_filename": "back_02.jpg",
+      "nomenclature_class": "Standard Guide (Sub-panel)",
+      "angle_description": "Overhead Planar (0°)",
+      "packaging_face": "Back Statutory Declaration & Nutrition Focus",
+      "dimensions_px": {
+        "width": 3472,
+        "height": 4640
+      },
+      "sha256": "14b6b327aa5481a95b96e558f48ed677a672e89400679666024b8f663d4beb0e",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 569,
+        "f_number": 1.89,
+        "exposure_time_s": 0.030002,
+        "datetime_original": "2026:09:12 14:20:30"
+      }
+    },
+    {
+      "index": 5,
+      "original_filename": "IMG_20260912_142032.jpg.jpeg",
+      "new_filename": "far_01.jpg",
+      "nomenclature_class": "Extension Guide (Distance)",
+      "angle_description": "Far Field Context (~60 cm)",
+      "packaging_face": "Wide Environmental Staging Context with Coin",
+      "dimensions_px": {
+        "width": 4640,
+        "height": 3472
+      },
+      "sha256": "1dd4c2d0966a84157e1ff36d04dec501eae3876e7b712f023c74f3cf439e17eb",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 647,
+        "f_number": 1.89,
+        "exposure_time_s": 0.030002,
+        "datetime_original": "2026:09:12 14:20:33"
+      }
+    },
+    {
+      "index": 6,
+      "original_filename": "IMG_20260912_142039.jpg.jpeg",
+      "new_filename": "close_01.jpg",
+      "nomenclature_class": "Extension Guide (Close-up/OCR)",
+      "angle_description": "Close Macro (~18 cm)",
+      "packaging_face": "Macro High-Resolution Batch & MRP/USP Imprint",
+      "dimensions_px": {
+        "width": 3472,
+        "height": 4640
+      },
+      "sha256": "79ba328b149217c4a689536a23eec1c08ecbdcaa6b53dc0cef5f055033386731",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 623,
+        "f_number": 1.89,
+        "exposure_time_s": 0.030002,
+        "datetime_original": "2026:09:12 14:20:39"
+      }
+    },
+    {
+      "index": 7,
+      "original_filename": "IMG_20260912_142042.jpg.jpeg",
+      "new_filename": "back_03.jpg",
+      "nomenclature_class": "Extension Guide (Variant)",
+      "angle_description": "Overhead Planar (0°)",
+      "packaging_face": "Full Back Pouch Verification Capture",
+      "dimensions_px": {
+        "width": 3472,
+        "height": 4640
+      },
+      "sha256": "1b4ab8738ca49a5be6ffdc10d9668b85ac52faa86a3f5b049f69dcb69802db8f",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 625,
+        "f_number": 1.89,
+        "exposure_time_s": 0.030002,
+        "datetime_original": "2026:09:12 14:20:42"
+      }
+    },
+    {
+      "index": 8,
+      "original_filename": "IMG_20260912_142050.jpg.jpeg",
+      "new_filename": "back_angle_01.jpg",
+      "nomenclature_class": "Custom Perspective Angle",
+      "angle_description": "30° Oblique Pitch Angle",
+      "packaging_face": "Oblique Back Pouch Perspective View",
+      "dimensions_px": {
+        "width": 3472,
+        "height": 4640
+      },
+      "sha256": "eab0a5ee2d9971cba3d23b5a8b55b31cd9162d8445e539c040a403f2aeb0fdcf",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 666,
+        "f_number": 1.89,
+        "exposure_time_s": 0.030002,
+        "datetime_original": "2026:09:12 14:20:50"
+      }
+    }
+  ]
+}

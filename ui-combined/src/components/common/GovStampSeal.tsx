@@ -68,9 +68,7 @@ export const GovStampSeal: React.FC<GovStampSealProps> = ({
 
       {/* Content Stack */}
       <div className="flex flex-col items-center justify-center text-center p-2 z-10">
-        <div className="w-7 h-7 rounded-full bg-govNavy flex items-center justify-center mb-0.5 shadow-2xs">
-          <StateEmblem size={15} tone="white" showMotto={false} />
-        </div>
+        <StateEmblem size={18} tone="navy" showMotto={true} className="mb-0.5" />
         
         <span className="text-[7.5px] font-black uppercase tracking-widest font-mono text-slate-800 leading-tight">
           {language === "hi" ? "उपभोक्ता मामले विभाग" : "DEPT OF CONSUMER AFFAIRS"}

@@ -97,9 +97,7 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
         {/* Official National Emblem & Gazette Formal Header */}
         <div className="border-b-2 border-slate-900 pb-5 text-center sm:text-left flex flex-col sm:flex-row items-center sm:items-start justify-between gap-5">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
-            <div className="p-2 bg-govNavy border border-govNavy-light rounded-lg shadow-2xs shrink-0 flex items-center justify-center">
-              <StateEmblem size={44} tone="white" showMotto={true} />
-            </div>
+            <StateEmblem size={46} tone="navy" showMotto={true} className="shrink-0" />
             <div>
               <div className="text-[11px] font-bold tracking-widest text-amber-700 uppercase">
                 {language === "hi"

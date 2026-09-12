@@ -1,0 +1,309 @@
+{
+  "dataset_name": "Nirikshak Physical Validation Dataset - SIH 2026",
+  "item_folder": "item 1 facewash",
+  "total_images": 12,
+  "product_details": {
+    "brand": "Dot & Key Skincare",
+    "commodity": "Cica Calming Blemish Clearing Gel Face Wash",
+    "category": "Personal Care / Cosmetic (Face Wash)",
+    "packaging_type": "Flexible HDPE squeeze tube with flip-top dispensing cap and heat-sealed crimp",
+    "barcode_ean13": "8906147700396",
+    "mrp": "₹ 249.00 (INCL. OF ALL TAXES)",
+    "unit_sale_price_usp": "₹ 2.49/ml",
+    "net_quantity": "100 ml",
+    "batch_no": "BANGF4005",
+    "mfg_date": "03/26",
+    "expiry_date": "02/29",
+    "manufacturer_unit_code": "W1",
+    "manufacturer": "RSH Wellness Private Limited, Plot No.- 2, HPSIDC, Industrial Area, Baddi- 173205, District- Solan (H.P.) M.L. No. HIM/COS/25/384",
+    "marketed_by": "Dot & Key Wellness Ltd., 2/7 Sarat Bose Road, 3rd Floor, Kolkata 700020, West Bengal, India",
+    "consumer_care_helpline": "+91 8447704734",
+    "consumer_care_email": "care@dotandkey.com",
+    "country_of_origin": "MADE IN INDIA",
+    "plastic_epr_registration": "DOT & KEY REGN. NO. BO-23-000-08-AAHCD7076K-23",
+    "plastic_thickness": "Minimum thickness of the packaging is 450 micron"
+  },
+  "physical_measurements": {
+    "total_length_mm": 148.0,
+    "crimp_width_mm": 55.0,
+    "cap_diameter_mm": 38.0,
+    "body_depth_mm": 35.0,
+    "volume_ml": 100,
+    "device": "Digital Vernier Caliper (0.01 mm Least Count) & Metric Reference Standard"
+  },
+  "reference_object": {
+    "type": "Government of India ₹10 Commemorative Coin (Azadi Ka Amrit Mahotsav)",
+    "standard": "RBI Bimetallic Coinage Standard",
+    "outer_diameter_mm": 27.0,
+    "thickness_mm": 2.15,
+    "calibrated_spatial_scale_px_per_mm": 20.59
+  },
+  "legal_metrology_compliance_status": {
+    "generic_name": "COMPLIANT (FACE WASH)",
+    "net_quantity": "COMPLIANT (100ml)",
+    "mrp": "COMPLIANT (₹ 249.00)",
+    "unit_sale_price": "COMPLIANT (₹ 2.49/ml)",
+    "mfg_date": "COMPLIANT (03/26)",
+    "expiry_date": "COMPLIANT (02/29)",
+    "batch_no": "COMPLIANT (BANGF4005)",
+    "manufacturer_name_address": "COMPLIANT (RSH Wellness Pvt. Ltd., Baddi)",
+    "marketed_by_address": "COMPLIANT (Dot & Key Wellness Ltd., Kolkata)",
+    "consumer_care_details": "COMPLIANT (+91 8447704734, care@dotandkey.com)",
+    "country_of_origin": "COMPLIANT (MADE IN INDIA)",
+    "overall_status": "100% STATUTORILY COMPLIANT"
+  },
+  "file_mapping": [
+    {
+      "index": 1,
+      "original_filename": "IMG_20260912_141649.jpg.jpeg",
+      "new_filename": "front_01.jpg",
+      "nomenclature_class": "Standard Guide #1",
+      "angle_description": "Overhead Planar (0°)",
+      "packaging_face": "Front Principal Display Panel (PDP)",
+      "dimensions_px": {
+        "width": 3472,
+        "height": 4640
+      },
+      "sha256": "6ab87ffabf866b87cc097d7e7caf73bd250eceb3fae07ec88a7c4a16890e452a",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 560,
+        "f_number": 1.89,
+        "exposure_time_s": 0.030002,
+        "datetime_original": "2026:09:12 14:16:50"
+      }
+    },
+    {
+      "index": 2,
+      "original_filename": "IMG_20260912_141653.jpg.jpeg",
+      "new_filename": "back_01.jpg",
+      "nomenclature_class": "Standard Guide #2",
+      "angle_description": "Overhead Planar (0°)",
+      "packaging_face": "Back Information Panel (BIP) - Legal Metrology Ground Truth",
+      "dimensions_px": {
+        "width": 3472,
+        "height": 4640
+      },
+      "sha256": "efb84dd824a784d857015309791ed461ca13fcf9f444411916c84a42163c5ceb",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 550,
+        "f_number": 1.89,
+        "exposure_time_s": 0.030002,
+        "datetime_original": "2026:09:12 14:16:53"
+      }
+    },
+    {
+      "index": 3,
+      "original_filename": "IMG_20260912_141702.jpg.jpeg",
+      "new_filename": "right_01.jpg",
+      "nomenclature_class": "Standard Guide #4",
+      "angle_description": "Horizontal Lateral (90°)",
+      "packaging_face": "Right Lateral Profile View",
+      "dimensions_px": {
+        "width": 4640,
+        "height": 3472
+      },
+      "sha256": "569c91608d72f496b0d69e14b0e5fabc5523b706a2a64440d5166e21cbf067e4",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 772,
+        "f_number": 1.89,
+        "exposure_time_s": 0.020006,
+        "datetime_original": "2026:09:12 14:17:02"
+      }
+    },
+    {
+      "index": 4,
+      "original_filename": "IMG_20260912_141709.jpg.jpeg",
+      "new_filename": "left_01.jpg",
+      "nomenclature_class": "Standard Guide #3",
+      "angle_description": "Horizontal Lateral (270°)",
+      "packaging_face": "Left Lateral Profile View",
+      "dimensions_px": {
+        "width": 4640,
+        "height": 3472
+      },
+      "sha256": "e92cf43899a07b8a55d04e18ff63d27ccb51c45f7d289e3d4c2aaede252e56e1",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 584,
+        "f_number": 1.89,
+        "exposure_time_s": 0.030002,
+        "datetime_original": "2026:09:12 14:17:09"
+      }
+    },
+    {
+      "index": 5,
+      "original_filename": "IMG_20260912_141718.jpg.jpeg",
+      "new_filename": "far_01.jpg",
+      "nomenclature_class": "Extension Guide (Distance)",
+      "angle_description": "Far Field Context (~65 cm)",
+      "packaging_face": "Wide Environmental Context with Dual References",
+      "dimensions_px": {
+        "width": 4640,
+        "height": 3472
+      },
+      "sha256": "bed6387a8b5877459070d33d5f65f2a3adc1bd385eb9b63a07042cb54c0b9dd3",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 600,
+        "f_number": 1.89,
+        "exposure_time_s": 0.030002,
+        "datetime_original": "2026:09:12 14:17:18"
+      }
+    },
+    {
+      "index": 6,
+      "original_filename": "IMG_20260912_141754.jpg.jpeg",
+      "new_filename": "close_01.jpg",
+      "nomenclature_class": "Extension Guide (Close-up/OCR)",
+      "angle_description": "Macro Close-up (~15 cm)",
+      "packaging_face": "Macro High-Resolution Back Declaration Text",
+      "dimensions_px": {
+        "width": 4640,
+        "height": 3472
+      },
+      "sha256": "53c2feb06605144943bdd96613ba2de658d332c550b88ecb3a54f042b753ec7d",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 778,
+        "f_number": 1.89,
+        "exposure_time_s": 0.020006,
+        "datetime_original": "2026:09:12 14:17:54"
+      }
+    },
+    {
+      "index": 7,
+      "original_filename": "IMG_20260912_141756.jpg.jpeg",
+      "new_filename": "back_02.jpg",
+      "nomenclature_class": "Extension Guide (Rotational Variant)",
+      "angle_description": "Horizontal Orthographic (0°)",
+      "packaging_face": "Horizontal Back Panel with Coin",
+      "dimensions_px": {
+        "width": 4640,
+        "height": 3472
+      },
+      "sha256": "5fc203dde6dd1541bc5d41bcd0bb49a3b503189b5e35cc1b224d07d1e1784a45",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 809,
+        "f_number": 1.89,
+        "exposure_time_s": 0.020006,
+        "datetime_original": "2026:09:12 14:17:56"
+      }
+    },
+    {
+      "index": 8,
+      "original_filename": "IMG_20260912_141803.jpg.jpeg",
+      "new_filename": "bottom_angle_01.jpg",
+      "nomenclature_class": "Custom Perspective Angle",
+      "angle_description": "30° Cap-End Oblique",
+      "packaging_face": "Oblique Dispenser Base / Cap Perspective",
+      "dimensions_px": {
+        "width": 3472,
+        "height": 4640
+      },
+      "sha256": "094c415d2310f1bba9e77074f099bf48b3e45b4d3bd4e0b0536990992b5f0cc2",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 807,
+        "f_number": 1.89,
+        "exposure_time_s": 0.020006,
+        "datetime_original": "2026:09:12 14:18:03"
+      }
+    },
+    {
+      "index": 9,
+      "original_filename": "IMG_20260912_141810.jpg.jpeg",
+      "new_filename": "top_angle_01.jpg",
+      "nomenclature_class": "Custom Perspective Angle",
+      "angle_description": "30° Crimp-End Oblique",
+      "packaging_face": "Oblique Crimp Perspective",
+      "dimensions_px": {
+        "width": 3472,
+        "height": 4640
+      },
+      "sha256": "c896b6ca022ad8d19769246bc11f99353e1bbfce875b791dab3b6f23dd56f14c",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 672,
+        "f_number": 1.89,
+        "exposure_time_s": 0.020006,
+        "datetime_original": "2026:09:12 14:18:10"
+      }
+    },
+    {
+      "index": 10,
+      "original_filename": "IMG_20260912_141826.jpg.jpeg",
+      "new_filename": "top_01.jpg",
+      "nomenclature_class": "Standard Guide #5",
+      "angle_description": "Orthogonal Crimp Plane (90°)",
+      "packaging_face": "Direct Top Crimp & Embossed Batch Code View",
+      "dimensions_px": {
+        "width": 3472,
+        "height": 4640
+      },
+      "sha256": "7e5bb314e87d1e653b48e79691bc165895c71a5a7902c8fcebcb7d41dc1a9aba",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 753,
+        "f_number": 1.89,
+        "exposure_time_s": 0.020006,
+        "datetime_original": "2026:09:12 14:18:27"
+      }
+    },
+    {
+      "index": 11,
+      "original_filename": "IMG_20260912_141832.jpg.jpeg",
+      "new_filename": "front_angle_01.jpg",
+      "nomenclature_class": "Standard Guide #7",
+      "angle_description": "45° Isometric Front",
+      "packaging_face": "Oblique 3D Front Perspective",
+      "dimensions_px": {
+        "width": 3472,
+        "height": 4640
+      },
+      "sha256": "6f8b1cde1c72d14782f8c4a9f3f992de17ad006c903346e6c79ad3bff710948a",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 781,
+        "f_number": 1.89,
+        "exposure_time_s": 0.020006,
+        "datetime_original": "2026:09:12 14:18:32"
+      }
+    },
+    {
+      "index": 12,
+      "original_filename": "IMG_20260912_141837.jpg.jpeg",
+      "new_filename": "front_02.jpg",
+      "nomenclature_class": "Extension Guide (Rotational Variant)",
+      "angle_description": "Horizontal Orthographic (0°)",
+      "packaging_face": "Horizontal Front Panel with Coin",
+      "dimensions_px": {
+        "width": 4640,
+        "height": 3472
+      },
+      "sha256": "65db8f67fa6ecc646c0e3832e80cab2ad49bb37e73c90b9b419d0937ffc26542",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 626,
+        "f_number": 1.89,
+        "exposure_time_s": 0.030002,
+        "datetime_original": "2026:09:12 14:18:37"
+      }
+    }
+  ]
+}

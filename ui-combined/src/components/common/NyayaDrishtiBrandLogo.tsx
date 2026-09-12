@@ -39,16 +39,13 @@ export const NyayaDrishtiBrandLogo: React.FC<NyayaDrishtiBrandLogoProps> = ({
       className={`inline-flex items-center gap-2.5 group select-none ${className}`}
       title="NyayaDrishti-LM — Legal Metrology Inspection Assistance Workstation"
     >
-      {/* Legal Metrology Verification Crest — Contained strictly within header boundaries */}
-      <div
-        className={`p-1 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-200 ${
-          isLight
-            ? "bg-white/10 backdrop-blur-xs border border-white/20 group-hover:bg-white/15 group-hover:border-white/40 shadow-2xs"
-            : "bg-govNavy border border-govNavy-light group-hover:border-slate-500 shadow-xs"
-        }`}
-      >
-        <StateEmblem size={emblemSizes[size]} tone="white" showMotto={true} />
-      </div>
+      {/* Sovereign State Emblem of India (Ashoka Lion Capital with Satyameva Jayate) — Unboxed & Independent */}
+      <StateEmblem
+        size={emblemSizes[size]}
+        tone={isLight ? "white" : "navy"}
+        showMotto={true}
+        className="transition-transform duration-200 group-hover:opacity-95"
+      />
 
       {/* Typography Hierarchy */}
       <div className="flex flex-col justify-center leading-tight shrink-0">

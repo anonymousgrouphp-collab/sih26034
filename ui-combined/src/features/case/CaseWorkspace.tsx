@@ -11,6 +11,7 @@ import { CaseHandoffState } from "../audit/CaseHandoffState";
 import { InspectionOutcome } from "./InspectionOutcome";
 import { InspectionReportView } from "./InspectionReportView";
 import { ApiService } from "../../services/api";
+import { DemoCaseTourBanner } from "../demo/DemoCaseTourBanner";
 import {
   CalibrationCard,
   MeasurementCard,
@@ -292,10 +293,16 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
   }, [caseData, activeAsset, calibrationData, language]);
 
   const canvasImages: CanvasImageItem[] = useMemo(() => {
+    const normalizeUrl = (u?: string) => {
+      if (!u) return "";
+      if (u.startsWith("http://") || u.startsWith("https://") || u.startsWith("/") || u.startsWith("data:")) return u;
+      return `/${u}`;
+    };
+
     if (caseData.evidence_assets && caseData.evidence_assets.length > 0) {
       return caseData.evidence_assets.map((asset) => ({
         id: asset.image_id,
-        url: asset.preview_url || asset.file_path || "/assets/images/sample-pdp.jpg",
+        url: normalizeUrl(asset.preview_url) || normalizeUrl(asset.file_path) || "/assets/images/sample-pdp.jpg",
         filename: `${asset.image_id}.jpg`,
         type: asset.panel_type || "PDP_FRONT",
         width: asset.image_width || 1280,
@@ -465,6 +472,16 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
 
   return (
     <div className="space-y-4">
+      {/* 0. Interactive Demonstration Case Tour Banner (when exploring pre-certified fixtures) */}
+      {(caseData.is_mock_fixture ||
+        ApiService.isDemoId(caseData.id) ||
+        ApiService.isDemoId(caseData.sku_demo_id || "")) && (
+        <DemoCaseTourBanner
+          currentCaseId={caseData.sku_demo_id || caseData.id}
+          onSelectCase={onSelectCase}
+        />
+      )}
+
       {/* 1. Compact Case Shell Header */}
       <CaseHeader
         caseData={caseData}
@@ -1039,7 +1056,12 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                   <div className="relative rounded-lg border border-slate-300 bg-slate-950 overflow-hidden min-h-64 flex items-center justify-center">
                     {activeAsset?.preview_url || activeAsset?.file_path ? (
                       <img
-                        src={activeAsset.preview_url || activeAsset.file_path}
+                        src={
+                          (activeAsset.preview_url || activeAsset.file_path || "").startsWith("/") ||
+                          (activeAsset.preview_url || activeAsset.file_path || "").startsWith("http")
+                            ? (activeAsset.preview_url || activeAsset.file_path)
+                            : `/${activeAsset.preview_url || activeAsset.file_path}`
+                        }
                         alt={`Packaging evidence for ${caseData.product_name}`}
                         className="max-h-96 w-auto object-contain rounded"
                       />

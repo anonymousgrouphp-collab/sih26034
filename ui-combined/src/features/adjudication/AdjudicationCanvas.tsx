@@ -275,9 +275,7 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
       {/* 1. Sub-Header: Adjudication Workspace Mode Bar */}
       <div className="bg-panelBg border border-slate-200 rounded-lg p-3 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div className="flex items-center gap-2.5 flex-wrap">
-          <div className="p-1 bg-govNavy border border-govNavy-light rounded shadow-2xs flex items-center justify-center">
-            <StateEmblem size={20} tone="white" showMotto={false} />
-          </div>
+          <StateEmblem size={22} tone="navy" showMotto={true} className="shrink-0" />
           <div>
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700">

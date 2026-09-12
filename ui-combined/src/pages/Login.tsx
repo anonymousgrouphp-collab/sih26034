@@ -111,10 +111,8 @@ export const Login: React.FC = () => {
           <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px]" />
 
           <div className="relative z-10">
-            <Link to="/" className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-xs border border-white/20 shadow-md flex items-center justify-center p-1.5 shrink-0">
-                <StateEmblem size={24} tone="white" showMotto={true} />
-              </div>
+            <Link to="/" className="flex items-center gap-3.5 group">
+              <StateEmblem size={32} tone="white" showMotto={true} className="transition-transform group-hover:scale-105" />
               <div>
                 <p className="text-[10.5px] font-bold uppercase tracking-widest text-amber-400">
                   भारत सरकार • Government of India
@@ -196,10 +194,8 @@ export const Login: React.FC = () => {
             </div>
 
             <div className="card p-6 sm:p-8 bg-white space-y-6 shadow-md border-slate-200">
-              <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
-                <div className="p-2 bg-govNavy border border-govNavy-light rounded-xl shrink-0 flex items-center justify-center shadow-xs">
-                  <StateEmblem size={24} tone="white" showMotto={true} />
-                </div>
+              <div className="flex items-center gap-3.5 border-b border-slate-200 pb-4">
+                <StateEmblem size={28} tone="navy" showMotto={true} className="shrink-0" />
                 <div>
                   <span className="text-[10px] font-bold uppercase tracking-widest text-amber-700 block">
                     Officer Authentication Gateway

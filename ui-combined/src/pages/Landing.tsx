@@ -23,6 +23,7 @@ import { motion } from "framer-motion";
 import { IndiaGateHeroBackdrop } from "../components/common/IndiaGateHeroBackdrop";
 import { NationalLeadershipBanner } from "../components/common/NationalLeadershipBanner";
 import { StatutoryOmnibox } from "../components/common/StatutoryOmnibox";
+import { StateEmblem } from "../components/common/StateEmblem";
 
 export const Landing: React.FC = () => {
   const { t, language } = useLanguage();
@@ -68,24 +69,26 @@ export const Landing: React.FC = () => {
       {/* Official GIGW 3.0 Top Utility Bar */}
       <GovTopBar />
 
-      {/* Official Portal Header */}
-      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-          <NyayaDrishtiBrandLogo tone="dark" size="md" />
+      {/* Official Portal Header — Sovereign Masthead */}
+      <header className="sticky top-0 z-40 border-b border-slate-800 bg-[#0B1727] text-white shadow-md">
+        {/* National Tricolor Top Accent Line */}
+        <div className="h-1 bg-gradient-to-r from-[#ff9933] via-white to-[#138808] w-full" />
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2.5 sm:px-6 lg:px-8">
+          <NyayaDrishtiBrandLogo tone="light" size="md" />
 
           <div className="flex items-center gap-2 sm:gap-4">
             <a
               href="https://emaap.gov.in/"
               target="_blank"
               rel="noreferrer"
-              className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-govNavy"
+              className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-slate-300 hover:text-amber-400 transition-colors"
             >
               <span>{language === "hi" ? "ई-माप पोर्टल" : "eMaap Portal"}</span>
               <ExternalLink size={13} />
             </a>
             <Link
               to="/login"
-              className="inline-flex items-center gap-2 rounded-lg bg-govNavy px-4 py-2 text-xs sm:text-sm font-bold text-white shadow-sm transition hover:bg-govNavy-light"
+              className="inline-flex items-center gap-2 rounded-lg bg-amber-500 hover:bg-amber-400 px-4 py-2 text-xs sm:text-sm font-bold text-slate-950 shadow-sm transition"
             >
               <span>{t("portal.officer_workstation", "Officer Workstation")}</span>
               <ArrowRight size={15} />
@@ -101,12 +104,29 @@ export const Landing: React.FC = () => {
           <IndiaGateHeroBackdrop />
 
           <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center space-y-7 z-10">
-            {/* Centered Sovereign State Emblem & Department Authority */}
-            <div className="flex flex-col items-center justify-center animate-fade-in">
-              <div className="p-3.5 rounded-2xl bg-amber-500/15 backdrop-blur-md border border-amber-400/40 shadow-2xl mb-3.5 inline-flex items-center justify-center hover:scale-105 transition-transform">
-                <Scale size={42} className="text-amber-400 drop-shadow-sm" />
+            {/* Centered Sovereign State Emblem & Department Authority (Exact india.gov.in Pattern) */}
+            <div className="flex flex-col items-center justify-center animate-fade-in space-y-3">
+              {/* Majestic Unboxed State Emblem of India */}
+              <div className="hover:scale-105 transition-transform duration-300">
+                <StateEmblem size={58} tone="white" showMotto={true} />
               </div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-1.5 text-xs font-semibold text-amber-300 backdrop-blur-xs shadow-xs">
+
+              {/* Sovereign Portal Brand (Exact india.gov.in Pattern) */}
+              <div className="space-y-1">
+                <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white font-serif">
+                  nyayadrishti<span className="text-amber-400">.gov.in</span>
+                </h1>
+                <p className="text-xs sm:text-sm font-extrabold uppercase tracking-[0.25em] text-slate-200">
+                  {language === "hi" ? "राष्ट्रीय विधिक मापविज्ञान पोर्टल" : "National Legal Metrology Portal"}
+                </p>
+                <p className="text-[11px] sm:text-xs font-semibold text-amber-300/90 tracking-widest uppercase">
+                  {language === "hi"
+                    ? "उपभोक्ता मामले विभाग • भारत सरकार"
+                    : "Department of Consumer Affairs • Government of India"}
+                </p>
+              </div>
+
+              <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-1.5 text-xs font-semibold text-amber-300 backdrop-blur-xs shadow-xs mt-1">
                 <ShieldCheck size={14} className="text-amber-400" />
                 <span>
                   {language === "hi"

@@ -124,17 +124,43 @@ export class ApiService {
   // 3. Single Inspection Case Retrieval
   // ---------------------------------------------------------------------------
 
+  public static isDemoId(id: string): boolean {
+    if (!id) return false;
+    const lower = id.toLowerCase().trim();
+    return (
+      lower.startsWith("sku-demo-") ||
+      lower.startsWith("demo-") ||
+      lower.startsWith("insp_demo_") ||
+      lower.startsWith("ins-2026-") ||
+      lower === "fortune" ||
+      lower === "sunlite"
+    );
+  }
+
   public static async getInspection(id: string): Promise<InspectionCase> {
-    // Check if ID is a Golden SKU request while in LIVE or MOCK mode:
-    // If explicitly querying a Golden SKU ID (e.g. SKU-DEMO-01), allow DemoFixtureService to resolve it
-    if (id.startsWith("SKU-DEMO-") && this.operatingMode !== "MOCK") {
+    // 1. If ID is a recognized demo identifier, resolve immediately through DemoFixtureService
+    if (this.isDemoId(id)) {
       try {
-        return await DemoFixtureService.getInstance().getInspection(id);
+        const demoCase = await DemoFixtureService.getInstance().getInspection(id);
+        if (demoCase) return demoCase;
       } catch {
-        // Fall back to active service
+        // Fall back to active service if fixture resolution misses
       }
     }
-    return this.getActiveService().getInspection(id);
+
+    // 2. Try the currently configured active service (Live backend or Mock)
+    try {
+      return await this.getActiveService().getInspection(id);
+    } catch (err) {
+      // 3. Fallback: If live API returns 404, 401, or network error, attempt demo fixture lookup
+      try {
+        const fallbackDemo = await DemoFixtureService.getInstance().getInspection(id);
+        if (fallbackDemo) return fallbackDemo;
+      } catch {
+        // rethrow original active service error
+      }
+      throw err;
+    }
   }
 
   // ---------------------------------------------------------------------------

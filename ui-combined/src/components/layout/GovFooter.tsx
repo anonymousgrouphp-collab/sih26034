@@ -17,10 +17,8 @@ export const GovFooter: React.FC = () => {
           {/* Column 1 (4 cols): State Emblem & Ministry Authority */}
           <div className="lg:col-span-4 space-y-4">
             <div className="flex items-start gap-3.5">
-              {/* Sole Sovereign National Emblem of India (Ashoka Lion Capital) */}
-              <div className="p-2 rounded-xl bg-white/10 border border-white/20 shadow-xs shrink-0">
-                <StateEmblem size={40} tone="white" showMotto={true} />
-              </div>
+              {/* Sole Sovereign National Emblem of India (Ashoka Lion Capital) — Unboxed & Independent */}
+              <StateEmblem size={38} tone="white" showMotto={true} className="shrink-0 mt-0.5" />
               <div>
                 <h3 className="text-xs uppercase font-extrabold tracking-wider text-amber-400">
                   {t("govt.india", "Government of India")}

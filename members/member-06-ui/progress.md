@@ -1658,6 +1658,166 @@ Publish comprehensive 16-discipline engineering audit report.
 ### Signing Note
 SIGNED OFF BY: Parmarth Kumar (parmarth.kumar@example.com) — 2026-09-12 05:40 IST [VERIFIED]
 
+## 2026-09-12 14:38 IST
+
+### Task / Chunk
+Milestone: Pure-Vector Unboxed Independent State Emblem of India Overhaul & Universal UI Harmonization (`ui-combined/`).
+
+### Status
+COMPLETE
+
+### Completed
+- **Elimination of Artificial "App-Icon" Boxed Tiles**:
+  - Removed all enclosing rounded tiles, frosted boxes (`bg-white/10`, `border border-white/20`), dark navy padding boxes (`bg-govNavy`), and background square containers wrapping the State Emblem of India.
+  - State Emblem of India (Ashoka Lion Capital with *Satyameva Jayate*) now stands majestic, unboxed, and independent directly on sovereign surfaces across all pages.
+- **True Vector SVG Extraction & Multi-Color Vector Asset Deployment**:
+  - Replaced legacy 1.4 MB raster-in-SVG with authentic 137-path mathematical pure-vector SVGs extracted directly from India's official National Portal (`npi_logo.svg`).
+  - Generated and deployed pure vectors for `emblem_india_white.svg` (pure white `#FFFFFF`), `emblem_india_navy.svg` (deep Ashoka Navy `#1B365D`), `emblem_india_gold.svg` (`#B45309`), `emblem_india_black.svg` (`#0F172A`), and `state_emblem_of_india.svg` (`fill="currentColor"`).
+  - Synchronized assets across `ui-combined/public/`, `ui-combined/dist/`, `dist/`, and `members/member-06-ui/dist/`.
+- **Portal-Wide Harmonization & Single-Color Consistency**:
+  - `NyayaDrishtiBrandLogo.tsx`: Removed the enclosing box container; emblem renders unboxed and independent beside typography hierarchy.
+  - `Landing.tsx`: Harmonized navbar to sovereign dark navy (`bg-[#0B1727]` / `bg-govNavy` with tricolor line) with `<NyayaDrishtiBrandLogo tone="light" />` for 100% portal-wide brand unity.
+  - `Login.tsx`: Removed boxed tiles from both left hero masthead (unboxed pure white emblem) and right officer gateway card (unboxed deep navy emblem).
+  - `GovFooter.tsx`: Removed enclosing box; unboxed white emblem anchored with Ministry and Department attribution.
+  - `InspectionReportView.tsx`: Form-1 statutory report notice header now displays unboxed deep navy emblem directly on white paper.
+  - `AdjudicationCanvas.tsx`: Unboxed deep navy emblem integrated into sub-header mode bar.
+  - `Unauthorized.tsx` & `NotFound.tsx`: Removed container wrappers, rendering unboxed pure white emblem on dark security headers.
+  - `GovStampSeal.tsx`: Clean unboxed emblem centered within statutory verification seal rings.
+  - `Sidebar.tsx`: Replaced generic `<Scale>` in mobile header with official unboxed `<StateEmblem size={22} tone="white" />`.
+- **Production Build & Visual Inspection**:
+  - Executed `npm run build` in `ui-combined/`: Clean build in 4.60s (0 TypeScript errors, 2060 modules transformed).
+  - Chrome DevTools MCP verification: Audited Landing (`/`), Dashboard (`/dashboard`), Login (`/login`), and mobile viewport (390×844) with mobile drawer inspection.
+
+### Tests
+- `npm run build` in `ui-combined/`: Built cleanly in 4.60s with 0 errors.
+- Chrome DevTools MCP visual inspection: Verified unboxed rendering across `/`, `/dashboard`, `/login`, and mobile drawer (390×844).
+
+### Problems
+None.
+
+### Decisions
+1. Harmonizing the Landing page navbar to the official `#0B1727` dark sovereign theme eliminates the previous boxed dark-tile visual anomaly and creates complete visual consistency across the entire portal.
+2. Unboxed deep navy (`#1B365D`) vector emblem is used on formal white printable reports and light cards, while pure white (`#FFFFFF`) is used on all dark navy sovereign headers.
+
+### Next Step
+Continue assisting Team Lead with live demonstration readiness and presentation workflows.
+
+### Signing Note
+SIGNED OFF BY: Kunal Raj (razzkunal7@gmail.com) — 2026-09-12 14:38 IST [VERIFIED]
+
+---
+
+## [12 September 2026] [14:46] IST
+
+### Task / Chunk
+National Portal (`india.gov.in`) Design Inspiration Overhaul on Dashboard and Landing Hero.
+
+### Status
+COMPLETE
+
+### Completed
+- **`StatutoryOmnibox.tsx` Upgraded to `india.gov.in` Signature Standard**:
+  - Implemented authentic deep emerald/forest green (`#146337`, hover `#0f4d2a`) "Search" CTA button with white typography and arrow icon, replacing legacy red button.
+  - Upgraded container to seamless pill geometry (`rounded-2xl sm:rounded-full`) with subtle 2px border, focus ring, and clean category selector divider.
+  - Refined `Trending Searches :` pill tags with bold amber/yellow title and rounded-full glass pills for Table-I (Row 5 = 6.0 mm), Prohibited Units (gms, ML), USP Math (±₹0.02), Rule 6(10) E-Commerce, and Section 63 BSA 2023 Merkle Proofs.
+- **`Landing.tsx` Sovereign Hero Overhaul**:
+  - Replaced generic boxed scale container with centered, majestic, unboxed State Emblem of India (`<StateEmblem size={58} tone="white" showMotto={true} />`).
+  - Implemented authentic sovereign portal brand typography directly below the emblem:
+    - `nyayadrishti.gov.in`
+    - `NATIONAL LEGAL METROLOGY PORTAL`
+    - `DEPARTMENT OF CONSUMER AFFAIRS • GOVERNMENT OF INDIA`
+- **`Dashboard.tsx` Executive Inspection Control Centre Elevation**:
+  - Replaced generic yellow boxed `<Scale>` icon with the unboxed State Emblem of India (`<StateEmblem size={44} tone="navy" showMotto={true} />`).
+  - Integrated the updated `StatutoryOmnibox` with emerald green search action and trending pills directly within the executive dashboard header.
+  - Updated quick search accent icon to `#146337`.
+- **`NationalLeadershipBanner.tsx` Refinement**:
+  - Integrated unboxed State Emblem into the Department of Consumer Affairs mission column.
+- **Production Build & Visual Inspection**:
+  - Executed `npm run build` in `ui-combined/`: Built cleanly in 5.37s with 0 errors.
+  - Chrome DevTools MCP: Captured screenshots of Landing Hero (`/`), Search Omnibox, Statutory Rule Modal popup, Dashboard (`/dashboard`), and mobile viewport (390×844) confirming seamless responsive parity.
+
+### Tests
+- `npm run build` in `ui-combined/`: Clean exit code 0 in 5.37s (2060 modules).
+- Interactive Omnibox verification: Tested trending search pill click (`Table-I Font Schedule`), verified rule dossier modal popup and action buttons.
+- Chrome DevTools visual screenshots captured for `/`, `/dashboard`, and mobile viewport (390×844).
+
+### Problems
+None.
+
+### Decisions
+1. Emerald green (`#146337`) search CTA button perfectly captures the sovereign National Portal of India palette, creating harmony with the national tricolor and avoiding alarming red tones.
+2. Centering the unboxed white Ashoka Lion Capital directly above `nyayadrishti.gov.in` gives the portal unquestioned official authority matching `india.gov.in`.
+
+### Next Step
+Prepare final live demo walkthrough and pitch presentation materials.
+
+### Signing Note
+SIGNED OFF BY: Kunal Raj (razzkunal7@gmail.com) — 2026-09-12 14:46 IST [VERIFIED]
+
+---
+
+## [12 September 2026] [15:38] IST
+
+### Task / Chunk
+Complete Statutory Demonstration Cases, Interactive Tour Navigation & Evidentiary Verification Hub.
+
+### Status
+COMPLETE
+
+### Completed
+- **Authoritative Statutory Demonstration Catalog (`demoCatalog.ts`)**:
+  - Implemented the full catalog of 7 golden statutory demonstration cases per `12_DEMO_PLAN.md` and `11_TESTING_AND_VALIDATION_PLAN.md`:
+    1. `SKU-DEMO-01`: Sunfeast Butter Cookies 200g (`FAIL` — Table-I Font Deficit 1.84 mm vs 2.50 mm + Banned 'gms' unit under Section 11).
+    2. `SKU-DEMO-02`: Ready Curry Retort Pouch 300g (`FAIL` — Rule 6(1)(e) USP Math Mismatch ₹0.28 vs ₹0.23/g + Missing consumer care email).
+    3. `SKU-DEMO-03`: Packaged Natural Mineral Water 1L (`PASS` — 100% Statutory Compliant, Cylindrical PDP 40% area, 3.10 mm font, matching ₹20.00/L USP).
+    4. `SKU-DEMO-04`: Herbal Bathing Soap Bar 125g (`REVIEW` — Borderline font 2.46 mm within sensor $k=2, 95\%$ confidence uncertainty band $\pm 0.08$ mm; HITL physical caliper retest recommended).
+    5. `SKU-DEMO-05`: Crispy Potato Chips 75g (`UNABLE_TO_VERIFY` — Specular glare bloom $6.4\% > 3.0\%$ threshold obscuring declarations; camera retake directive).
+    6. `SKU-DEMO-06`: Premium Wireless Earbuds (`FAIL` — Rule 6(10) / GSR 594(E) missing Country of Origin on digital marketplace listing; statutory exemption for Mfg Date applied).
+    7. `demo-fortune-sunlite`: Fortune Sunlite Refined Sunflower Oil 1L (`PASS` — End-to-end ArUco calibration, PDP area calculation, Section 63 BSA 2023 Merkle proof certificate, Form-1 compounding notice).
+- **Interactive Demonstration Showcase (`StatutoryDemoShowcase.tsx`)**:
+  - Integrated directly on `Dashboard.tsx` under the national directives ticker.
+  - Interactive filter pills: `All Demo Cases (7)`, `Violations / FAIL (3)`, `Compliant / PASS (2)`, `Borderline / REVIEW (1)`, `Retake / UNABLE (1)`.
+  - Rich card layout with packaging thumbnails, headline statutory findings, PDP area metrics, Table-I font schedules, rule citations, and 1-click `Inspect Demo →` actions.
+  - Quick `Start Demo Tour (Case 1) →` launch button.
+- **Sticky Demo Case Tour Banner (`DemoCaseTourBanner.tsx`)**:
+  - Automatically activates when viewing any demo fixture inside `CaseWorkspace.tsx`.
+  - Prominent flashing amber `[DEMO CASE FIXTURE]` badge and scenario counter (`Scenario X of 7`).
+  - Expected statutory verdict badge (`FAIL`, `PASS`, `REVIEW`, `UNABLE_TO_VERIFY`) and headline infraction.
+  - Seamless 1-click tour navigation: `< Prev`, quick dropdown selector, `Next Demo >`, and `Scenario Guide` modal.
+  - `Scenario Guide Modal`: Displays detailed statutory rationale, specific rules evaluated, subsystem capabilities demonstrated, and step-by-step evaluator instructions.
+- **Global Demo Launcher in Header & Sidebar**:
+  - Top navigation bar: High-contrast `⚡ Demo Cases [7] ▾` button opening an instant dropdown preview of all 7 cases with 1-click navigation.
+  - Sidebar: Integrated `Demo Scenarios (7)` with `7 DEMOS` badge.
+- **API & Asset Path Hardening**:
+  - Fixed relative image paths in `mockData.ts` and `CaseWorkspace.tsx` to ensure all packaging photographs load cleanly from `/storage/uploads/...`.
+  - Updated `api.ts` and `demoFixtures.ts` with `isDemoId` and case-insensitive alias matching to guarantee zero 401/404 failures during demonstrations.
+- **Multilingual Support**:
+  - Complete Hindi (`हिन्दी`) and English parity across all demo cards, badges, tour banners, and guide modals.
+
+### Tests
+- `npm run build` in `ui-combined/`: Clean exit code 0 in 6.53s (2063 modules transformed).
+- Chrome DevTools MCP visual inspection:
+  - Dashboard Demo Suite verified (`/dashboard`).
+  - Sequential tour verified across Scenarios 1 through 7 (`SKU-DEMO-01` through `demo-fortune-sunlite`).
+  - Scenario Guide modal tested and verified.
+  - Header `⚡ Demo Cases [7] ▾` dropdown verified.
+  - Hindi language toggle tested and verified.
+
+### Problems
+None. All demo assets, routing, and navigation operate with zero latency and 100% determinism.
+
+### Decisions
+1. All demonstration fixtures are explicitly badged with prominent amber `[DEMO CASE FIXTURE]` tags to eliminate any possible ambiguity between synthetic demonstration data and live seized enforcement records.
+2. The sticky tour bar allows evaluators to effortlessly cycle through all statutory verdict states (`FAIL`, `PASS`, `REVIEW`, `UNABLE_TO_VERIFY`) in a single click without returning to the dashboard.
+
+### Next Step
+Assist Team Lead with final pitch rehearsal and hackathon demonstration workflows.
+
+### Signing Note
+SIGNED OFF BY: Kunal Raj (razzkunal7@gmail.com) — 2026-09-12 15:38 IST [VERIFIED]
+
+
+
 
 
 
