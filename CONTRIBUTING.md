@@ -8,11 +8,11 @@ To maintain deterministic reproducibility, strict legal compliance, and zero arc
 
 ## 🏛️ Governance & Architecture Freeze
 
-1. **Master Single Source of Truth:** All contributions must comply with [01_MASTER_PROJECT_BLUEPRINT.md](01_MASTER_PROJECT_BLUEPRINT.md) and [03_FINAL_ARCHITECTURE.md](03_FINAL_ARCHITECTURE.md).
+1. **Master Single Source of Truth:** All contributions must comply with [01_MASTER_PROJECT_BLUEPRINT.md](docs/specifications/01_MASTER_PROJECT_BLUEPRINT.md) and [03_FINAL_ARCHITECTURE.md](docs/specifications/03_FINAL_ARCHITECTURE.md).
 2. **Permissive Open-Source Licensing Only:**
    - Permitted: `Apache-2.0`, `MIT`, `BSD-3-Clause`.
    - **Strictly Prohibited:** Any `GNU AGPL-3.0` packages (e.g., `ultralytics`). Pull requests introducing AGPL dependencies will be automatically rejected by CI.
-3. **No Uncalibrated Physical Measurements:** Physical font millimeter measurements must use the calibrated planar homography pipeline ([06_DATA_AND_MODEL_STRATEGY.md](06_DATA_AND_MODEL_STRATEGY.md)).
+3. **No Uncalibrated Physical Measurements:** Physical font millimeter measurements must use the calibrated planar homography pipeline ([06_DATA_AND_MODEL_STRATEGY.md](docs/specifications/06_DATA_AND_MODEL_STRATEGY.md)).
 
 ---
 
@@ -56,8 +56,8 @@ git commit -m "feat(homography): implement ArUco 4x4 planar rectification with s
 
 A pull request is considered **DONE** and eligible for merge if and only if:
 
-1. **Contract Conformance:** Strictly satisfies the API contracts and schemas defined in [07_API_AND_INTERFACE_CONTRACTS.md](07_API_AND_INTERFACE_CONTRACTS.md).
-2. **Test Coverage:** Achieves $> 85\%$ unit test coverage for mathematical, optical, and legal rule algorithms ([11_TESTING_AND_VALIDATION_PLAN.md](11_TESTING_AND_VALIDATION_PLAN.md)).
+1. **Contract Conformance:** Strictly satisfies the API contracts and schemas defined in [07_API_AND_INTERFACE_CONTRACTS.md](docs/specifications/07_API_AND_INTERFACE_CONTRACTS.md).
+2. **Test Coverage:** Achieves $> 85\%$ unit test coverage for mathematical, optical, and legal rule algorithms ([11_TESTING_AND_VALIDATION_PLAN.md](docs/specifications/11_TESTING_AND_VALIDATION_PLAN.md)).
 3. **Edge Performance:** Executes within the CPU latency budget ($\le 1200\text{ ms}$ on 8-core CPU) without requiring a discrete GPU.
 4. **Peer Review:** Reviewed and approved by at least **one other team member** whose module interfaces with the change.
 5. **No Broken Windows:** Zero linting errors, clean type hints (Pydantic v2 / TypeScript), and zero unhandled exceptions exposed to the user.
