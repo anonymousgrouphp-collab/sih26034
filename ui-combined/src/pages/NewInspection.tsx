@@ -23,6 +23,7 @@ import { ApiService } from "../services/api";
 import { GoldenSkuQuickSelector } from "../features/desk/GoldenSkuQuickSelector";
 import { PackagingType, InspectionType } from "../types/inspection";
 import { InspectionCameraModal } from "../components/camera";
+import { useCircle } from "../context/CircleContext";
 import { useLanguage } from "../context/LanguageContext";
 
 interface PipelineStepItem {
@@ -93,6 +94,7 @@ export const NewInspection: React.FC = () => {
 
   // Mode: Field Capture vs Benchmark Scenarios
   const [activeTab, setActiveTab] = useState<"FIELD_CAPTURE" | "BENCHMARK_SKUS">("FIELD_CAPTURE");
+  const { activeCircle } = useCircle();
 
   const [files, setFiles] = useState<File[]>([]);
   const [filePreviews, setFilePreviews] = useState<string[]>([]);
@@ -142,7 +144,7 @@ export const NewInspection: React.FC = () => {
         category,
         package_type: packageType,
         inspection_type: inspectionType,
-        jurisdiction_circle_id: "CIRCLE_DL_SOUTH_01",
+        jurisdiction_circle_id: activeCircle || "CIRCLE_DL_SOUTH_01",
         declared_net_quantity: declaredNetQty.trim() || undefined,
       });
 

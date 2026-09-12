@@ -9,6 +9,7 @@ import { NewInspectionModal } from "../../features/new-inspection/NewInspectionM
 import { CommandPalette } from "../common/CommandPalette";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext";
+import { useCircle } from "../../context/CircleContext";
 
 interface AppShellProps {
   children: ReactNode;
@@ -18,7 +19,7 @@ interface AppShellProps {
 
 export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   const { language } = useLanguage();
-  const [activeCircle, setActiveCircle] = useState("CIRCLE_DL_SOUTH_01");
+  const { activeCircle, setActiveCircle } = useCircle();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [isNewModalOpen, setIsNewModalOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);

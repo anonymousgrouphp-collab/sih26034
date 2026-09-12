@@ -1983,6 +1983,42 @@ Push all verified changes to `origin/main` to update the live Vercel deployment.
 ### Signing Note
 SIGNED OFF BY: Parmarth Kumar (parmarth.kumar@example.com) — 2026-09-12 18:35 IST [VERIFIED]
 
+---
+
+## [12 September 2026] [21:35] IST
+
+### Task / Chunk
+Post-Verification Hotfix: React Rules of Hooks in EvidenceDossier & Global CircleContext Synchronization.
+
+### Status
+COMPLETE
+
+### Completed
+- **Evidence Dossier Crash Fix (`EvidenceDossier.tsx`):**
+  - Resolved `Minified React error #310` caused by `useState` and `useMemo` hooks being executed after an early `if (isLoading || !caseData)` return.
+  - Reorganized all hook declarations to the unconditional top-level of the component function, ensuring stable hook counts across renders.
+- **Global Jurisdiction Circle Synchronization (`CircleContext.tsx`):**
+  - Created `CircleProvider` and `useCircle` hook in `ui-combined/src/context/CircleContext.tsx` with persistent local storage backing.
+  - Wrapped `CircleProvider` in `App.tsx` and connected `AppShell.tsx`, `Header.tsx`, `Inspections.tsx`, and `NewInspection.tsx`.
+  - Selecting any jurisdiction circle in the top header immediately filters cases on the Inspection Desk, updates desk badges, and sets the default circle for new registrations.
+
+### Tests
+- `npx tsc --noEmit --prefix ui-combined`: Clean exit code 0.
+- `npm run build --prefix ui-combined`: Built in 5.68s with zero warnings or errors.
+- `npm test --prefix ui-combined`: 113/113 tests passed in 1.71s (35 suites, 0 failures).
+
+### Problems
+None. Both defects identified during browser verification have been eliminated.
+
+### Decisions
+Global circle selection is backed by `localStorage.getItem("nyayadrishti_active_circle")`, preserving the officer's selected jurisdiction across navigation and page reloads.
+
+### Next Step
+Commit and push to `origin/main` to trigger Vercel deployment.
+
+### Signing Note
+SIGNED OFF BY: Parmarth Kumar (parmarth.kumar@example.com) — 2026-09-12 21:35 IST [VERIFIED]
+
 
 
 
