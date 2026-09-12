@@ -8,12 +8,21 @@ The development of **NyayaDrishti-LM (SIH26034)** is driven by a specialized six
 
 | Member | Workstream & Focus | Core Subsystems & Deliverables | GitHub Profile |
 | :--- | :--- | :--- | :---: |
-| **Kunal Raj** | **Member 1: CV & Metrology** | Optical quality gate (Laplacian blur variance, luminance glare bloom), ArUco 4×4 scale calibration, planar homography rectification, and Principal Display Panel (PDP) metric surface area schedule calculation. | [@kunal-raj-dev](https://github.com/kunal-raj-dev) |
-| **Parmarth Kumar** | **Member 2: Multilingual OCR** | Deep text detection with DBNet++, multilingual text recognition with PP-OCRv4 (English + Devanagari Hindi), INT8 CPU quantized inference via ONNX Runtime, coordinate normalization, and consensus Levenshtein matching. | [@parmarth-kumar](https://github.com/parmarth-kumar) |
-| **Harsh Patel** | **Member 3: Semantic Extraction** | Statutory entity extraction (MRP, Net Qty, Dates, Address, PIN, Consumer Care, Origin), Prohibited unit flagger (`gms`, `ML`, `gm`, `ltrs`), Indic numeral converter, and spatial label proximity analysis. | [@anonymousgrouphp-collab](https://github.com/anonymousgrouphp-collab) |
-| **Ambika Bansal** | **Member 4: Statutory Rule Engine** | Abstract Syntax Tree (AST) statutory compliance engine, Table-I font schedule enforcement, Unit Sale Price (USP) tolerance math, E-Commerce Rule 6(10) audit, and 4-state epistemic triage (`PASS`, `FAIL`, `REVIEW`, `UNABLE_TO_VERIFY`). | [@bansalambika12-ship-it](https://github.com/bansalambika12-ship-it) |
+| **Kunal Raj** | **Member 1: CV, Metrology & Frontend** | Optical quality gate (Laplacian blur variance, luminance glare bloom), ArUco 4×4 scale calibration, planar homography rectification, Principal Display Panel (PDP) metric schedule, and Frontend Adjudication canvas integration. | [@kunal-raj-dev](https://github.com/kunal-raj-dev) |
+| **Parmarth Kumar** | **Member 2: Multilingual OCR & Member 6: Lead Frontend** | Deep text detection with DBNet++, multilingual text recognition with PP-OCRv4 (English + Devanagari Hindi), INT8 CPU quantized inference via ONNX Runtime, React 18 + Vite SPA, Metrology workbench, split-view Canvas HUD, and local resilient mode. | [@parmarth-kumar](https://github.com/parmarth-kumar) |
+| **Harsh Patel** | **Member 3: Semantic Extraction & Frontend** | Statutory entity extraction (MRP, Net Qty, Dates, Address, PIN, Consumer Care, Origin), Prohibited unit flagger (`gms`, `ML`, `gm`, `ltrs`), Indic numeral converter, and Frontend E2E pipeline orchestration & UI integration. | [@anonymousgrouphp-collab](https://github.com/anonymousgrouphp-collab) |
+| **Ambika Bansal** | **Member 4: Statutory Rule Engine** | Abstract Syntax Tree (AST) statutory compliance engine, Table-I font schedule enforcement, Unit Sale Price (USP) tolerance math, Rule 6(1)(k) single-unit proviso, E-Commerce Rule 6(10) audit, and 4-state epistemic triage (`PASS`, `FAIL`, `REVIEW`, `UNABLE_TO_VERIFY`). | [@bansalambika12-ship-it](https://github.com/bansalambika12-ship-it) |
 | **Shailendra Pratap Singh** | **Member 5: Evidence & Cryptography** | FastAPI REST microservices, PostgreSQL 16 schema, SHA-256 Merkle chain-of-custody ledger, Section 63 BSA 2023 digital certificate generator, and ReportLab Form-1 Show Cause Notice PDF/A generation. | [@shailendrapratap1](https://github.com/shailendrapratap1) |
-| **Parmarth Kumar** | **Member 6: Frontend & HUD** | React 18 + Vite SPA, Legal Metrology Officer HUD, split-view Adjudication Canvas, Central Inspection Desk, zero-broken-image evidence viewer, and local resilient inspection flow. | [@parmarth-kumar](https://github.com/parmarth-kumar) |
+| **Urvashi Rajput** | **UI/UX Architecture & Design System** | Initial frontend architecture, Nirikshak Metrolens workstation framework, Quick Triage Filter Pills, elevation shadow tokens, initial inspection desk and conflict card ergonomics. | [@rajputurvashi2006-bit](https://github.com/rajputurvashi2006-bit) |
+
+---
+
+### 🎨 Frontend & Adjudication Workstation Collaborative Delivery
+The production web platform (`ui-combined/`) is a unified collaborative achievement:
+- **Lead Frontend Architecture & Inspection HUD:** Parmarth Kumar ([@parmarth-kumar](https://github.com/parmarth-kumar))
+- **Full-Pipeline Integration & Verification:** Harsh Patel ([@anonymousgrouphp-collab](https://github.com/anonymousgrouphp-collab))
+- **Metrology Canvas & Calibration Overlay:** Kunal Raj ([@kunal-raj-dev](https://github.com/kunal-raj-dev))
+- **Initial UI Foundation & Workstation Design:** Urvashi Rajput ([@rajputurvashi2006-bit](https://github.com/rajputurvashi2006-bit))
 
 ---
 
