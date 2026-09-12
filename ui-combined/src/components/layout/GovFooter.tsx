@@ -42,8 +42,8 @@ export const GovFooter: React.FC = () => {
 
             <p className="text-xs text-slate-400 leading-relaxed pt-1">
               {language === "hi"
-                ? "न्यायदृष्टि-एलएम, विधिक मापविज्ञान (पैकेज वस्तुएं) नियम, 2011 के अंतर्गत अधिकृत विधिक मापविज्ञान अधिकारियों (LMO) के लिए स्थापित आधिकारिक डिजिटल अनुपालन सत्यापन कार्यस्थान है।"
-                : "NyayaDrishti-LM is the authorized digital compliance verification workstation deployed for authorized Legal Metrology Officers (LMO) under the Legal Metrology (Packaged Commodities) Rules, 2011."}
+                ? "निरीक्षक (NIRIKSHAK), विधिक मापविज्ञान (पैकेज वस्तुएं) नियम, 2011 के अंतर्गत अधिकृत विधिक मापविज्ञान अधिकारियों (LMO) के लिए स्थापित आधिकारिक डिजिटल अनुपालन सत्यापन कार्यस्थान है।"
+                : "NIRIKSHAK is the authorized digital compliance verification workstation deployed for authorized Legal Metrology Officers (LMO) under the Legal Metrology (Packaged Commodities) Rules, 2011."}
             </p>
           </div>
 

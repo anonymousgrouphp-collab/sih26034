@@ -194,7 +194,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
         <div>
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-bold text-govNavy">
-              {language === "hi" ? "विधिक मापविज्ञान निरीक्षण पटल" : "Legal Metrology Inspection Desk"}
+              {language === "hi" ? "निरीक्षण पटल" : "Inspection Desk"}
             </h2>
             <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-700">
               {language === "hi" ? `सक्रिय मंडल: ${activeCircle}` : `Active Circle: ${activeCircle}`}
@@ -347,7 +347,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
         </div>
 
         {/* Filters */}
-        <div className="flex items-center gap-2.5 w-full md:w-auto overflow-x-auto">
+        <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
           {/* Workflow Status Filter */}
           <div className="flex items-center gap-1.5 shrink-0">
             <span className="text-xs font-medium text-slate-500">

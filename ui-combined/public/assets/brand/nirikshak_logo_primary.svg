@@ -11,13 +11,9 @@
     <path d="M18 36H30" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
   </g>
 
-  <!-- Typography: Product Name & Pill -->
-  <text x="64" y="27" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="900" fill="#071526" letter-spacing="-0.5">NyayaDrishti<tspan fill="#D97706">-LM</tspan></text>
-  
-  <!-- LMPC Statutory Rule Badge -->
-  <rect x="238" y="12" width="46" height="18" rx="5" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1"/>
-  <text x="261" y="24.5" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="800" fill="#92400E" text-anchor="middle">LMPC</text>
+  <!-- Typography: Product Name -->
+  <text x="64" y="27" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="900" fill="#071526" letter-spacing="-0.5">NIRIKSHAK</text>
 
   <!-- Subtitle Descriptor -->
-  <text x="64" y="42" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="600" fill="#64748B" letter-spacing="0.2">Legal Metrology Compliance Workstation</text>
+  <text x="64" y="42" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="600" fill="#64748B" letter-spacing="0.2">Inspection Workstation</text>
 </svg>

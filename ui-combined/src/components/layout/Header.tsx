@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { NyayaDrishtiBrandLogo } from "../common/NyayaDrishtiBrandLogo";
+import { NirikshakBrandLogo } from "../common/NirikshakBrandLogo";
 import { OfficerRole } from "../../types/inspection";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
@@ -124,7 +124,7 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
             )}
 
-            <NyayaDrishtiBrandLogo tone="light" size="md" />
+            <NirikshakBrandLogo tone="light" size="md" />
           </div>
 
           {/* Quick Command Palette Search Trigger */}
@@ -133,14 +133,14 @@ export const Header: React.FC<HeaderProps> = ({
               type="button"
               onClick={onOpenCommandPalette}
               aria-label="Open universal command search palette (Ctrl+K)"
-              className="hidden lg:flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-govNavy-dark/80 hover:bg-govNavy-light border border-slate-700 text-slate-300 hover:text-white text-xs transition-colors shadow-2xs whitespace-nowrap shrink-0"
+              className="hidden lg:flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-govNavy-dark/80 hover:bg-govNavy-light border border-slate-700 text-slate-300 hover:text-white text-xs transition-colors shadow-2xs whitespace-nowrap min-w-0 overflow-hidden"
             >
               <svg className="w-3.5 h-3.5 text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
-              <span className="hidden 2xl:inline">{t("portal.command_search", "Quick Search Cases & Rules...")}</span>
-              <span className="inline 2xl:hidden">{t("portal.command_search_short", "Search Cases...")}</span>
-              <kbd className="hidden xl:inline-block ml-1 font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-amber-300 border border-slate-600">
+              <span className="hidden 2xl:inline truncate min-w-0">{t("portal.command_search", "Quick Search Cases & Rules...")}</span>
+              <span className="inline 2xl:hidden truncate min-w-0">{t("portal.command_search_short", "Search Cases...")}</span>
+              <kbd className="hidden 2xl:inline-block ml-1 font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-amber-300 border border-slate-600 shrink-0">
                 Ctrl K
               </kbd>
             </button>
@@ -153,14 +153,14 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 type="button"
                 onClick={() => setDemoMenuOpen(!demoMenuOpen)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-black text-xs transition-all shadow-xs border border-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-black text-xs transition-all shadow-xs border border-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-300"
                 title="Quick Access: Certified Statutory Demonstration Scenarios"
                 aria-haspopup="true"
                 aria-expanded={demoMenuOpen}
               >
                 <Sparkles size={14} className="text-slate-950" />
-                <span>{language === "hi" ? "डेमो परिदृश्य" : "Demo Cases"}</span>
-                <span className="bg-slate-950 text-amber-300 text-[10px] font-mono font-black px-1.5 py-0.2 rounded-full">
+                <span className="hidden sm:inline">{language === "hi" ? "डेमो परिदृश्य" : "Demo Cases"}</span>
+                <span className="hidden sm:inline bg-slate-950 text-amber-300 text-[10px] font-mono font-black px-1.5 py-0.2 rounded-full">
                   7
                 </span>
                 <ChevronDown size={13} className={`transition-transform duration-200 ${demoMenuOpen ? "rotate-180" : ""}`} />
@@ -242,7 +242,7 @@ export const Header: React.FC<HeaderProps> = ({
                 id="circle-select"
                 value={activeCircle}
                 onChange={(e) => onCircleChange(e.target.value)}
-                className="bg-transparent text-xs text-amber-200 font-semibold focus:outline-none cursor-pointer pr-2 max-w-[200px] 2xl:max-w-[260px] truncate"
+                className="bg-transparent text-xs text-amber-200 font-semibold focus:outline-none cursor-pointer pr-2 max-w-[160px] 2xl:max-w-[220px] truncate"
               >
                 {JURISDICTION_CIRCLES.map((c) => (
                   <option key={c.id} value={c.id} className="bg-govNavy text-white">
@@ -333,7 +333,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             {/* Officer Profile Badge — Themed to Active Role (LMO Inspector vs Controller) */}
             <div
-              className={`flex items-center gap-2 px-2.5 py-1 rounded-lg border transition-all duration-200 shrink-0 ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-1.5 sm:px-2.5 py-1 rounded-lg border transition-all duration-200 shrink-0 ${
                 isController
                   ? "bg-govNavy-dark/90 border-purple-500/50 hover:border-purple-400/80 shadow-xs"
                   : "bg-govNavy-dark/90 border-amber-500/40 hover:border-amber-400/80 shadow-xs"

@@ -1,5 +1,5 @@
 /**
- * Client-Side Packaging Image Compression Service for NyayaDrishti-LM
+ * Client-Side Packaging Image Compression Service for NIRIKSHAK
  * 
  * Compresses high-resolution field photos (4 MB - 15 MB) to optimal statutory inspection
  * dimensions (max 1280px, JPEG quality 0.80) producing ~60 KB - 100 KB payloads.

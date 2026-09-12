@@ -332,17 +332,17 @@ export const NewInspection: React.FC = () => {
           >
             <ArrowLeft size={20} />
           </button>
-          <div>
-            <div className="flex items-center gap-2">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
               <span className="text-[10.5px] font-extrabold uppercase tracking-widest text-amber-700 font-mono">
-                {language === "hi" ? "विधिक मापविज्ञान प्रवर्तन" : "Legal Metrology Enforcement"}
+                {language === "hi" ? "वैधानिक प्रवर्तन" : "Statutory Enforcement"}
               </span>
               <span className="text-slate-300">•</span>
               <span className="text-[10.5px] font-bold text-slate-500">
                 {language === "hi" ? "नियम 6 एवं तालिका-I अधिग्रहण" : "Rule 6 & Table-I Intake"}
               </span>
             </div>
-            <h1 className="text-2xl font-black text-slate-900 leading-tight mt-0.5">
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight mt-0.5">
               {language === "hi" ? "नई वस्तु का विधिक निरीक्षण" : "New Commodity Inspection"}
             </h1>
           </div>
@@ -395,7 +395,7 @@ export const NewInspection: React.FC = () => {
           </span>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5">
           {steps.map((s, idx) => {
             const isCompleted = s.status === "completed";
             const isActive = s.status === "active";
@@ -838,8 +838,8 @@ export const NewInspection: React.FC = () => {
               </div>
               <p className="text-[11.5px] leading-relaxed text-emerald-900/90">
                 {language === "hi"
-                  ? "न्यायदृष्टि-एलएम कभी भी स्वायत्त रूप से विधिक नोटिस या जुर्माना जारी नहीं करता है। धारा 63 बीएसए 2023 के तहत सभी निष्कर्ष अधिकृत अधिकारी की समीक्षा हेतु हैं।"
-                  : "NyayaDrishti-LM never issues legal notices, compounding orders, or fines autonomously. All findings are recommendations for human officer review under Section 63 BSA 2023."}
+                  ? "निरीक्षक कभी भी स्वायत्त रूप से विधिक नोटिस या जुर्माना जारी नहीं करता है। धारा 63 बीएसए 2023 के तहत सभी निष्कर्ष अधिकृत अधिकारी की समीक्षा हेतु हैं।"
+                  : "NIRIKSHAK never issues legal notices, compounding orders, or fines autonomously. All findings are recommendations for human officer review under Section 63 BSA 2023."}
               </p>
             </div>
           </aside>

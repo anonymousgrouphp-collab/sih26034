@@ -106,7 +106,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="flex h-16 items-center justify-between border-b border-slate-200 px-4 lg:hidden bg-govNavy text-white">
           <div className="flex items-center gap-2.5">
             <StateEmblem size={22} tone="white" showMotto={true} className="shrink-0" />
-            <span className="font-bold text-sm tracking-tight">NyayaDrishti-LM</span>
+            <span className="font-bold text-sm tracking-tight">NIRIKSHAK</span>
           </div>
           <button
             type="button"
@@ -207,7 +207,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <span className="text-amber-700 font-bold">6.0 mm (ADL-01)</span>
             </div>
             <div className="pt-1.5 border-t border-slate-100 text-center text-[9.5px] text-slate-400">
-              NyayaDrishti-LM • v1.0.0-sih26034
+              NIRIKSHAK • v1.0.0-sih26034
             </div>
           </div>
         </div>

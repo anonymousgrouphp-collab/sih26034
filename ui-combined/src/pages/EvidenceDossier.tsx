@@ -457,7 +457,7 @@ export const EvidenceDossier: React.FC = () => {
                       <div>
                         {language === "hi" ? "आयाम:" : "Dimensions:"} {asset.image_width || 1920} × {asset.image_height || 1080} px
                       </div>
-                      <div className="truncate" title={asset.raw_sha256}>
+                      <div className="break-all" title={asset.raw_sha256}>
                         SHA-256: <span className="text-slate-800 font-bold">{asset.raw_sha256 || "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"}</span>
                       </div>
                       <div>
@@ -651,7 +651,7 @@ export const EvidenceDossier: React.FC = () => {
           <div>
             <span className="font-bold">{language === "hi" ? "प्रमाणपत्र आईडी:" : "Cert ID:"}</span> {certificateNumber}
           </div>
-          <div>
+          <div className="break-all">
             <span className="font-bold">{language === "hi" ? "मर्कल रूट हैश:" : "Merkle Root:"}</span> {merkleRoot}
           </div>
           <div>

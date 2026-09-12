@@ -123,8 +123,8 @@ export const NotFound: React.FC = () => {
             {/* Support / Helpdesk Disclaimer */}
             <div className="pt-2 text-[11px] text-slate-400 font-mono">
               {language === "hi"
-                ? "राष्ट्रीय उपभोक्ता हेल्पलाइन: 1915 • ई-माप प्रवर्तन डेस्क • न्यायदृष्टि-एलएम"
-                : "National Consumer Helpline: 1915 • eMaap Enforcement Desk • NyayaDrishti-LM"}
+                ? "राष्ट्रीय उपभोक्ता हेल्पलाइन: 1915 • ई-माप प्रवर्तन डेस्क • निरीक्षक"
+                : "National Consumer Helpline: 1915 • eMaap Enforcement Desk • NIRIKSHAK"}
             </div>
           </div>
         </div>

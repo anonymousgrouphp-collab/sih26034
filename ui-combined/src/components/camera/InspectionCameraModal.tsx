@@ -112,8 +112,8 @@ export const InspectionCameraModal: React.FC<InspectionCameraModalProps> = ({
             <ShieldCheck size={16} className="text-amber-400" />
             <span className="font-bold tracking-wide">
               {language === "hi"
-                ? "न्यायदृष्टि-एलएम • फील्ड कैमरा निरीक्षण"
-                : "NyayaDrishti-LM • Field Camera Inspection"}
+                ? "निरीक्षक • फील्ड कैमरा निरीक्षण"
+                : "NIRIKSHAK • Field Camera Inspection"}
             </span>
           </div>
           <button

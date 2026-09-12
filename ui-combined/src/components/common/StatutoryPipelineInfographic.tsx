@@ -374,8 +374,8 @@ export const StatutoryPipelineInfographic: React.FC = () => {
             src={language === "hi" ? "/assets/guidance/evidence_extraction_pipeline_hi.svg" : "/assets/guidance/evidence_extraction_pipeline.svg"}
             alt={
               language === "hi"
-                ? "न्यायदृष्टि-एलएम 5-चरणीय सांविधिक साक्ष्य निष्कर्षण पाइपलाइन वास्तुकला"
-                : "NyayaDrishti-LM 5-Stage Statutory Evidence Extraction Pipeline Architecture"
+                ? "निरीक्षक 5-चरणीय सांविधिक साक्ष्य निष्कर्षण पाइपलाइन वास्तुकला"
+                : "NIRIKSHAK 5-Stage Statutory Evidence Extraction Pipeline Architecture"
             }
             className="w-full max-w-4xl mx-auto h-auto object-contain min-w-[640px]"
           />

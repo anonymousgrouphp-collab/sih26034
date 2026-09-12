@@ -1,5 +1,5 @@
 /**
- * Canonical Typed Domain Models for NyayaDrishti-LM (SIH26034)
+ * Canonical Typed Domain Models for NIRIKSHAK (SIH26034)
  * Governed by:
  * - Legal Metrology (Packaged Commodities) Rules, 2011 (LMPC Rules, 2011)
  * - Section 63 Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)

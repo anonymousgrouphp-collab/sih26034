@@ -1,5 +1,5 @@
 /**
- * Authoritative Demonstration Scenario Catalog for NyayaDrishti-LM
+ * Authoritative Demonstration Scenario Catalog for NIRIKSHAK
  * Models the 7 Golden Statutory Demonstration Scenarios per 12_DEMO_PLAN.md
  * and 11_TESTING_AND_VALIDATION_PLAN.md.
  * 
@@ -416,9 +416,9 @@ export const DEMO_SCENARIOS: DemoScenarioItem[] = [
     detailedRationaleHi:
       "50 मिमी ArUco संदर्भ मानक सहित उच्च-सटीकता संदर्भ मामला। खाद्य तेल पैकेजिंग नियमों के अनुसार आयतन (1 L) और द्रव्यमान (910 ग्राम) दोनों विधिवत घोषित हैं। अंक ऊंचाई 3.80 मिमी तालिका-I के 2.50 मिमी से अधिक है। मर्कल डीएजी और धारा 63 प्रमाण पत्र सत्यापित।",
     evaluatorGuide:
-      "This is the comprehensive showcase for end-to-end adjudication. Click through the Canvas, HUD, Audit Timeline, and Evidence Dossier tabs to see all 12 stages of the NyayaDrishti-LM pipeline operating harmoniously.",
+      "This is the comprehensive showcase for end-to-end adjudication. Click through the Canvas, HUD, Audit Timeline, and Evidence Dossier tabs to see all 12 stages of the NIRIKSHAK pipeline operating harmoniously.",
     evaluatorGuideHi:
-      "यह एंड-टू-एंड न्यायनिर्णयन हेतु विस्तृत प्रदर्शन है। न्यायदृष्टि-एलएम पाइपलाइन के सभी 12 चरणों को सामंजस्य से कार्य करते हुए देखने के लिए कैनवास, एचयूडी, ऑडिट टाइमलाइन और साक्ष्य डोजियर टैब देखें।",
+      "यह एंड-टू-एंड न्यायनिर्णयन हेतु विस्तृत प्रदर्शन है। निरीक्षक पाइपलाइन के सभी 12 चरणों को सामंजस्य से कार्य करते हुए देखने के लिए कैनवास, एचयूडी, ऑडिट टाइमलाइन और साक्ष्य डोजियर टैब देखें।",
     imagePath: "/storage/uploads/REAL-PKG-01_8901719134845.jpg",
     pdpAreaCm2: 180.0,
     expectedFontMm: 2.5,

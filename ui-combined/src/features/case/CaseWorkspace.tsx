@@ -679,8 +679,8 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
         <div className="space-y-4">
           {/* Workspace Mode Switcher (available when case has evaluations) */}
           {caseData.rule_evaluations && caseData.rule_evaluations.length > 0 && (
-            <div className="workspace-switcher screen-only no-print flex items-center justify-between bg-slate-100 p-1.5 rounded-lg border border-slate-200 gap-2">
-              <div className="flex items-center gap-1.5 flex-nowrap overflow-x-auto no-scrollbar shrink-0">
+            <div className="workspace-switcher screen-only no-print flex items-center justify-between bg-slate-100 p-1.5 rounded-lg border border-slate-200 gap-2 min-w-0">
+              <div className="flex items-center gap-1.5 flex-nowrap overflow-x-auto no-scrollbar min-w-0 flex-1">
                 <button
                   type="button"
                   onClick={() => setActiveWorkspaceView("OVERVIEW")}
@@ -771,7 +771,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
             </div>
           )}
 
-          {/* View 0: Inspection Overview (Nirikshak + NyayaDrishti Synthesis) */}
+          {/* View 0: Inspection Overview (Nirikshak Vision Synthesis) */}
           {activeWorkspaceView === "OVERVIEW" ? (
             <div className="space-y-5">
               {/* 1. 5-Stage Statutory Pipeline Progress */}

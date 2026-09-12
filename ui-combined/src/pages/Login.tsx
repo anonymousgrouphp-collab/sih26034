@@ -23,7 +23,7 @@ export const Login: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [selectedRole, setSelectedRole] = useState<UserRole>("inspector");
-  const [email, setEmail] = useState("inspector@metrolens.gov.in");
+  const [email, setEmail] = useState("inspector@nirikshak.gov.in");
   const [password, setPassword] = useState("Demo@123");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,10 +54,10 @@ export const Login: React.FC = () => {
   const handleRoleSelect = (roleId: UserRole) => {
     setSelectedRole(roleId);
     const emails: Record<UserRole, string> = {
-      inspector: "inspector@metrolens.gov.in",
-      controller: "controller@metrolens.gov.in",
-      administrator: "admin@metrolens.gov.in",
-      auditor: "audit@metrolens.gov.in",
+      inspector: "inspector@nirikshak.gov.in",
+      controller: "controller@nirikshak.gov.in",
+      administrator: "admin@nirikshak.gov.in",
+      auditor: "audit@nirikshak.gov.in",
     };
     setEmail(emails[roleId]);
     setError(null);
@@ -118,7 +118,7 @@ export const Login: React.FC = () => {
                   भारत सरकार • Government of India
                 </p>
                 <h2 className="text-base font-black tracking-tight text-white">
-                  Department of Consumer Affairs • Legal Metrology
+                  Department of Consumer Affairs • Government of India
                 </h2>
               </div>
             </Link>
@@ -202,7 +202,7 @@ export const Login: React.FC = () => {
                   </span>
                   <h2 className="text-xl font-black text-govNavy">Official Workstation Sign In</h2>
                   <p className="text-[11px] text-slate-500 mt-0.5">
-                    Legal Metrology Department • Government of India
+                    Department of Consumer Affairs • Government of India
                   </p>
                 </div>
               </div>

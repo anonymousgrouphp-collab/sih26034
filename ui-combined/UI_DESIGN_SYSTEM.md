@@ -1,6 +1,6 @@
-# NyayaDrishti-LM UI Design System & Component Architecture Specification
+# NIRIKSHAK UI Design System & Component Architecture Specification
 
-**Product:** NyayaDrishti-LM (SIH26034)  
+**Product:** NIRIKSHAK (SIH26034)  
 **Classification:** Government-Service-Grade Legal Metrology Verification Platform  
 **Compliance Standards:** GIGW 3.0 (Guidelines for Indian Government Websites), WCAG 2.1 AA, ISO 9241-110 Ergonomics  
 **Framework Stack:** React 18, TypeScript, Tailwind CSS, Lucide Icons, Framer Motion  

@@ -107,8 +107,8 @@ export const StatutoryDemoShowcase: React.FC<StatutoryDemoShowcaseProps> = ({
 
             <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white">
               {language === "hi"
-                ? "विधिक मापविज्ञान सांविधिक प्रदर्शन एवं परीक्षण सुइट"
-                : "Legal Metrology Statutory Demonstration & Evaluation Hub"}
+                ? "सांविधिक प्रदर्शन एवं परीक्षण सुइट"
+                : "Statutory Demonstration & Evaluation Hub"}
             </h2>
 
             <p className="text-xs text-slate-300 leading-relaxed">

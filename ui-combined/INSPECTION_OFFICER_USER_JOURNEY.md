@@ -1,6 +1,6 @@
 # Legal Metrology Inspection Officer (LMO) User Journey & Operational Workflow
 
-**Product:** NyayaDrishti-LM  
+**Product:** NIRIKSHAK  
 **Target Role:** Legal Metrology Officer (LMO), Inspector, Assistant Controller, Controller  
 **Jurisdictional Context:** Field raids, wholesale mandis, retail superstores, packaging units, e-commerce fulfillment hubs  
 **Authoritative Statute:** Legal Metrology Act, 2009; Legal Metrology (Packaged Commodities) Rules, 2011; Section 63 Bharatiya Sakshya Adhiniyam, 2023  
@@ -42,7 +42,7 @@ The complete operational journey is structured into 6 sequential phases, ensurin
 
 ### Phase 1: Station Initiation & Jurisdictional Setup
 1. **Officer Login & Circle Selection:**
-   - The officer opens `NyayaDrishti-LM` on their browser or field device.
+   - The officer opens `NIRIKSHAK` on their browser or field device.
    - The top navigation bar automatically reflects their authenticated identity (`Rajesh Sharma • INSP-DL-0842`) and active circle (`DL-SOUTH-01 • South Delhi Circle`).
    - The connectivity pill displays `ONLINE (MODE A)` or automatically indicates `LOCAL RESILIENT (MODE B)` when operating offline with local SQLite datastore.
 2. **Accessibility Confirmation:**

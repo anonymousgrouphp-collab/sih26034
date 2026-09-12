@@ -1,5 +1,5 @@
 /**
- * Mock API Service for NyayaDrishti-LM
+ * Mock API Service for NIRIKSHAK
  * Provides interactive local state mutations against mockData.ts
  * for developer testing, offline demonstrations, and standalone execution.
  * 

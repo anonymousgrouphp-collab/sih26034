@@ -14,7 +14,7 @@ import {
   Sparkles,
   ExternalLink,
 } from "lucide-react";
-import { NyayaDrishtiBrandLogo } from "../components/common/NyayaDrishtiBrandLogo";
+import { NirikshakBrandLogo } from "../components/common/NirikshakBrandLogo";
 import { GovTopBar } from "../components/layout/GovTopBar";
 import { GovFooter } from "../components/layout/GovFooter";
 import { StatutoryPipelineInfographic } from "../components/common/StatutoryPipelineInfographic";
@@ -74,7 +74,7 @@ export const Landing: React.FC = () => {
         {/* National Tricolor Top Accent Line */}
         <div className="h-1 bg-gradient-to-r from-[#ff9933] via-white to-[#138808] w-full" />
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2.5 sm:px-6 lg:px-8">
-          <NyayaDrishtiBrandLogo tone="light" size="md" />
+          <NirikshakBrandLogo tone="light" size="md" />
 
           <div className="flex items-center gap-2 sm:gap-4">
             <a
@@ -114,10 +114,10 @@ export const Landing: React.FC = () => {
               {/* Sovereign Portal Brand (Exact india.gov.in Pattern) */}
               <div className="space-y-1">
                 <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white font-serif">
-                  nyayadrishti<span className="text-amber-400">.gov.in</span>
+                  nirikshak<span className="text-amber-400">.gov.in</span>
                 </h1>
                 <p className="text-xs sm:text-sm font-extrabold uppercase tracking-[0.25em] text-slate-200">
-                  {language === "hi" ? "राष्ट्रीय विधिक मापविज्ञान पोर्टल" : "National Legal Metrology Portal"}
+                  {language === "hi" ? "राष्ट्रीय निरीक्षण पोर्टल" : "National Inspection Portal"}
                 </p>
                 <p className="text-[11px] sm:text-xs font-semibold text-amber-300/90 tracking-widest uppercase">
                   {language === "hi"
@@ -130,8 +130,8 @@ export const Landing: React.FC = () => {
                 <ShieldCheck size={14} className="text-amber-400" />
                 <span>
                   {language === "hi"
-                    ? "शासकीय सेवा स्तर • विधिक मापविज्ञान (पैक वस्तु) अनुपालन सहायता"
-                    : "Government-Service-Grade • Legal Metrology (Packaged Commodities) Enforcement"}
+                    ? "शासकीय सेवा स्तर • पैक वस्तु वैधानिक प्रवर्तन"
+                    : "Government-Service-Grade • Packaged Commodities Statutory Enforcement"}
                 </span>
               </div>
             </div>

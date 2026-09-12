@@ -1,5 +1,5 @@
 /**
- * Client-Side Storage Service for NyayaDrishti-LM
+ * Client-Side Storage Service for NIRIKSHAK
  * Handles temporary offline draft state, UI preferences, and session indicators.
  * 
  * Rules:

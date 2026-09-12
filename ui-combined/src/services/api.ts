@@ -1,5 +1,5 @@
 /**
- * Canonical API Service & Unified Adapter for NyayaDrishti-LM
+ * Canonical API Service & Unified Adapter for NIRIKSHAK
  * Connects React UI to FastAPI Backend Catalog per 07_API_AND_INTERFACE_CONTRACTS.md.
  * 
  * Provides clean architectural separation into:

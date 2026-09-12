@@ -145,7 +145,7 @@ export function useCameraStream() {
           code: "NOT_FOUND",
           message: "Camera API is not supported by this browser.",
           userGuidance:
-            "Please open NyayaDrishti-LM in a modern browser (Google Chrome, Apple Safari, or Mozilla Firefox).",
+            "Please open NIRIKSHAK in a modern browser (Google Chrome, Apple Safari, or Mozilla Firefox).",
         });
         setStatus("ERROR");
         return;

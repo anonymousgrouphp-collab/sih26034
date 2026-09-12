@@ -1,5 +1,5 @@
 /**
- * Golden Demonstration SKU Mock Fixtures & Adapters for NyayaDrishti-LM
+ * Golden Demonstration SKU Mock Fixtures & Adapters for NIRIKSHAK
  * Maps 1:1 with integration/fixtures/sku_demo_01 to sku_demo_06.
  * Frozen per 12_DEMO_PLAN.md, 11_TESTING_AND_VALIDATION_PLAN.md, and 16_DECISION_LOG.md.
  * 
@@ -2217,7 +2217,7 @@ export function createDefaultAuditTrail(caseData: InspectionCase): AuditEvent[] 
       event_label: "Pipeline Analysis Completed",
       actor_type: "SYSTEM",
       actor_id: "SYSTEM_PIPELINE",
-      actor_name: "NyayaDrishti Automated Pipeline",
+      actor_name: "NIRIKSHAK Automated Pipeline",
       entity_type: "INSPECTION",
       entity_id: caseData.id,
       related_evidence_id: asset?.image_id,

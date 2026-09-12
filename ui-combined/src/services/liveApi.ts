@@ -1,5 +1,5 @@
 /**
- * Live API Service & Backend Adapter for NyayaDrishti-LM
+ * Live API Service & Backend Adapter for NIRIKSHAK
  * Connects React UI to FastAPI Backend Catalog per 07_API_AND_INTERFACE_CONTRACTS.md.
  * 
  * Strict boundary:

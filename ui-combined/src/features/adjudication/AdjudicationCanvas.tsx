@@ -300,7 +300,7 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
         <div className="flex items-center gap-2.5 flex-wrap">
           <StateEmblem size={22} tone="navy" showMotto={true} className="shrink-0" />
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 min-w-0 flex-wrap">
               <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700">
                 {language === "hi" ? "उपभोक्ता मामले विभाग • राजपत्रित अधिकारी कार्यक्षेत्र" : "DoCA • Gazetted Officer Workstation"}
               </span>
@@ -309,12 +309,12 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
                 {language === "hi" ? "धारा 15 विधिक मापविज्ञान अधिनियम 2009" : "Sec 15 LM Act 2009"}
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-black text-govNavy">
+            <div className="flex items-center gap-2 min-w-0 flex-wrap">
+              <span className="text-xs font-black text-govNavy whitespace-nowrap">
                 {language === "hi" ? "प्रमुख विधिक अधिनिर्णय कार्यक्षेत्र (कैनवास)" : "Flagship Adjudication Canvas"}
               </span>
               <span className="text-slate-300">|</span>
-              <span className="text-xs text-slate-600 font-mono truncate max-w-[280px]">
+              <span className="text-xs text-slate-600 font-mono truncate max-w-[150px] sm:max-w-[280px] min-w-0">
                 {caseData.product_name}
               </span>
             </div>

@@ -1,5 +1,5 @@
 /**
- * Demo Fixture Service for NyayaDrishti-LM
+ * Demo Fixture Service for NIRIKSHAK
  * Provides dedicated, read-only access to the 6 Golden Demonstration SKUs
  * (SKU-DEMO-01 to SKU-DEMO-06) per 12_DEMO_PLAN.md and 11_TESTING_AND_VALIDATION_PLAN.md.
  * 

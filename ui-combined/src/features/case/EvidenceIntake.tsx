@@ -137,7 +137,7 @@ export const EvidenceIntake: React.FC<EvidenceIntakeProps> = ({
       ctx.fillRect(0, 0, 1920, 1080);
       ctx.fillStyle = "#F8FAFC";
       ctx.font = "bold 42px sans-serif";
-      ctx.fillText(`NyayaDrishti-LM Demo Package Evidence (${scenario})`, 80, 200);
+      ctx.fillText(`NIRIKSHAK Demo Package Evidence (${scenario})`, 80, 200);
       ctx.font = "32px monospace";
       ctx.fillText(`ArUco 50mm Fiducial Scale • Principal Display Panel`, 80, 280);
       ctx.fillText(`Statute: Legal Metrology (Packaged Commodities) Rules, 2011`, 80, 340);

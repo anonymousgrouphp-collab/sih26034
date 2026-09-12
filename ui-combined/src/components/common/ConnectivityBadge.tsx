@@ -51,8 +51,8 @@ export const ConnectivityBadge: React.FC<ConnectivityBadgeProps> = ({
           label: language === "hi" ? "ऑनलाइन (मोड ए)" : "ONLINE (MODE A)",
           tooltip:
             language === "hi"
-              ? "केंद्रीय विधिक मापविज्ञान क्लाउड मोनोलिथ से कनेक्टेड"
-              : "Connected to Central Legal Metrology Cloud Monolith",
+              ? "केंद्रीय क्लाउड मोनोलिथ से कनेक्टेड"
+              : "Connected to Central Cloud Monolith",
         };
       case "LOCAL_RESILIENT":
         return {
