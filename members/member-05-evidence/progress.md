@@ -390,3 +390,48 @@ Sync frontend notice download workflows and commit to main.
 
 ### Signing Note
 SIGNED OFF BY: Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-13 00:35 IST [VERIFIED]
+
+---
+
+## [13 September 2026] [00:42] IST
+
+### Task / Chunk
+Sitewide Case Disposal (`DELETE /api/v1/inspections/{id}`) and Dual Date & Time Timestamp Enforcement across all Inspection Registers and Workspaces.
+
+### Status
+COMPLETE
+
+### Completed
+- **Cascading Case Disposal Backend (`members/member-05-evidence/src/server.py`, `storage.py`):**
+  - Implemented `DELETE /api/v1/inspections/{inspection_id}` in FastAPI backend.
+  - Recursively and cleanly disposes all associated child records: `LegalNotice`, `BSACertificate`, `ComplianceEvaluation`, `EvidenceImage`, and `BoundingBox`.
+  - Unlinks all physical evidentiary files (packaged commodity images, PDF notices) from filesystem storage via `DecoupledStorageManager.delete_file` with path traversal defense.
+  - Appends an immutable `CASE_DISPOSED` cryptographic event into `AuditLog` preserving Section 63 BSA 2023 Merkle hash chain integrity without breaking hash linkage.
+  - Added unit test `test_delete_inspection_case_cascade` in `test_server_api.py`.
+- **Sitewide Date & Time Representation (`ui-combined`):**
+  - Ensured all inspection records return and display both date and time (`created_at` in ISO format).
+  - Implemented `formatDateTime` rendering `DD MMM YYYY, hh:mm A` across `InspectionDesk`, `CaseWorkspace`, `ReviewQueue`, and `InspectionTable`.
+  - Updated desk table header to "Case ID / Date & Time" (`केस आईडी / दिनांक एवं समय` / `Case ID / Date & Time`).
+- **Sitewide Case Disposal UI & State Reconciliation (`ui-combined`):**
+  - Added delete buttons with accessible confirmation modals to `InspectionDesk` (desktop table & mobile cards), `CaseWorkspace` (Action Center panel), `ReviewQueue` (triage cards), and `InspectionTable`.
+  - Implemented persistent mock deletion tracker `DELETED_CASES_STORAGE_KEY` so deleted cases remain purged across page refreshes in both online and offline resilient modes.
+  - Synchronized `ApiService.deleteInspection` to evict pipeline caches and update local storage.
+
+### Tests
+- `pytest members/member-05-evidence/tests/ -v` (60 passed in 6.03s)
+- `npm test -- --run` in `ui-combined` (121 passed in 1.75s)
+- `npm run build` in `ui-combined` (TypeScript check & Vite bundle built in 5.55s)
+
+### Problems
+None. Deletion does not break Merkle DAG audit log validation because disposal is logged as an immutable chronological append event.
+
+### Decisions
+1. In statutory evidence systems, destroying inspection records must record a cryptographic `CASE_DISPOSED` event so an auditor can verify that the case was intentionally disposed by an authorized officer rather than tampered with or silently dropped.
+2. Case timestamps must always include hours and minutes to establish exact chain-of-custody timing during enforcement raids.
+
+### Next Step
+Push changes cleanly to `main`.
+
+### Signing Note
+SIGNED OFF BY: Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-13 00:42 IST [VERIFIED]
+
