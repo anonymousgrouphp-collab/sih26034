@@ -199,16 +199,23 @@ python local_runner.py
 
 ## 👥 Core Engineering Team & Contributors
 
-NyayaDrishti-LM is developed by a six-member parallel engineering workstream under Smart India Hackathon 2026:
+NyayaDrishti-LM is developed under Smart India Hackathon 2026 for the **Department of Consumer Affairs (DoCA)**:
 
 | Member | Workstream & Focus | Subsystem Scope | GitHub Profile |
 |:---|:---|:---|:---:|
-| **Kunal Raj** | **Member 1: CV & Metrology** | Optical quality gate, ArUco 4×4 calibration, planar homography, PDP metric surface area | [@kunal-raj-dev](https://github.com/kunal-raj-dev) |
-| **Parmarth Kumar** | **Member 2: Multilingual OCR** | DBNet++ text detection, PP-OCRv4 Indic recognition, ONNX INT8 CPU inference | [@parmarth-kumar](https://github.com/parmarth-kumar) |
-| **Harsh Patel** | **Member 3: Semantic Extraction** | Statutory field parsing (MRP, Net Qty, Dates, Address, PIN), banned unit flagger | [@anonymousgrouphp-collab](https://github.com/anonymousgrouphp-collab) |
-| **Ambika Bansal** | **Member 4: Statutory Rule Engine** | AST statutory engine, Table-I font schedule (Row 5 = 6.0 mm), USP math, 4-state triage | [@bansalambika12-ship-it](https://github.com/bansalambika12-ship-it) |
-| **Shailendra Pratap Singh** | **Member 5: Evidence & Cryptography** | FastAPI REST services, PostgreSQL 16 schema, Merkle DAG, Section 63 BSA 2023 certificate, Form-1 PDF | [@shailendrapratap1](https://github.com/shailendrapratap1) |
-| **Parmarth Kumar** | **Member 6: Frontend & HUD** | React 18 + Vite SPA, Metrology workbench, split-view Adjudication Canvas, zero-broken-image HUD | [@parmarth-kumar](https://github.com/parmarth-kumar) |
+| **Kunal Raj** | **Member 1: CV, Metrology & Frontend** | Optical quality gate, ArUco 4×4 calibration, planar homography, PDP metric schedule, Frontend Adjudication canvas | [@kunal-raj-dev](https://github.com/kunal-raj-dev) |
+| **Parmarth Kumar** | **Member 2: Multilingual OCR & Member 6: Lead Frontend** | DBNet++ text detection, PP-OCRv4 Indic recognition, ONNX INT8 inference, React 18 + Vite SPA, Metrology workbench, split-view Canvas HUD | [@parmarth-kumar](https://github.com/parmarth-kumar) |
+| **Harsh Patel** | **Member 3: Semantic Extraction & Frontend** | Statutory field parsing (MRP, Net Qty, Dates, Address, PIN), banned unit flagger, Frontend E2E pipeline orchestration & UI integration | [@anonymousgrouphp-collab](https://github.com/anonymousgrouphp-collab) |
+| **Ambika Bansal** | **Member 4: Statutory Rule Engine** | AST statutory engine, Table-I font schedule (Row 5 = 6.0 mm), USP math, Rule 6(1)(k) single-unit proviso, 4-state triage | [@bansalambika12-ship-it](https://github.com/bansalambika12-ship-it) |
+| **Shailendra Pratap Singh** | **Member 5: Evidence & Cryptography** | FastAPI REST services, PostgreSQL 16 schema, Merkle DAG, Section 63 BSA 2023 certificate, Form-1 PDF engine | [@shailendrapratap1](https://github.com/shailendrapratap1) |
+| **Urvashi Rajput** | **UI/UX Architecture & Design System** | Initial frontend architecture, Nirikshak Metrolens workstation framework, Quick Triage Filter Pills, elevation shadow design tokens & UI styling | [@rajputurvashi2006-bit](https://github.com/rajputurvashi2006-bit) |
+
+### 🎨 Frontend & Adjudication Workstation Collaboration
+The production web platform (`ui-combined/`) is a collaborative achievement across the team:
+- **Lead Frontend Architecture & Inspection HUD:** Parmarth Kumar ([@parmarth-kumar](https://github.com/parmarth-kumar))
+- **Full-Pipeline Integration & Verification:** Harsh Patel ([@anonymousgrouphp-collab](https://github.com/anonymousgrouphp-collab))
+- **Metrology Canvas & Calibration Overlay:** Kunal Raj ([@kunal-raj-dev](https://github.com/kunal-raj-dev))
+- **Initial UI Foundation & Workstation Design:** Urvashi Rajput ([@rajputurvashi2006-bit](https://github.com/rajputurvashi2006-bit))
 
 See **[CONTRIBUTORS.md](CONTRIBUTORS.md)** for full details and attribution policies.
 
