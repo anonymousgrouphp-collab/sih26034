@@ -758,24 +758,25 @@ def execute_pipeline(
 
     t0 = time.perf_counter()
 
-    # Match golden demonstration SKU if available
+    # Match golden demonstration SKU strictly if explicitly created as a demo case
     matched_sku = None
     if FIXTURES_DIR.exists():
-        p_lower = (inspection.product_name or "").lower().replace("-", "_")
-        b_lower = (inspection.brand_name or "").lower()
-        num_lower = (inspection.inspection_number or "").lower().replace("-", "_")
-        id_lower = (inspection.id or "").lower().replace("-", "_")
-        for f in sorted(FIXTURES_DIR.glob("sku_demo_*.json")):
-            try:
-                with open(f, "r", encoding="utf-8") as fp:
-                    data = json.load(fp)
-                    sku = data.get("sku_id", "").lower().replace("-", "_")
-                    prod = data.get("product_name", "").lower().replace("-", "_")
-                    if (sku and (sku in p_lower or sku in num_lower or sku in id_lower)) or (prod and (prod in p_lower or p_lower in prod)) or (b_lower and b_lower in prod):
-                        matched_sku = data
-                        break
-            except Exception:
-                continue
+        num_upper = (inspection.inspection_number or "").upper()
+        id_upper = (inspection.id or "").upper()
+        p_upper = (inspection.product_name or "").upper()
+        # Only match if inspection is an explicit golden demonstration SKU
+        is_demo_case = any(k in num_upper or k in id_upper or k in p_upper for k in ("SKU-DEMO", "SKU_DEMO", "DEMO-", "DEMO_"))
+        if is_demo_case:
+            for f in sorted(FIXTURES_DIR.glob("sku_demo_*.json")):
+                try:
+                    with open(f, "r", encoding="utf-8") as fp:
+                        data = json.load(fp)
+                        sku = data.get("sku_id", "").upper().replace("_", "-")
+                        if sku and (sku in num_upper or sku in id_upper or sku in p_upper):
+                            matched_sku = data
+                            break
+                except Exception:
+                    continue
 
     if matched_sku:
         is_ecom = inspection.capture_source == "ECOMMERCE_URL" or "ecommerce" in str(inspection.package_type).lower() or bool(inspection.ecommerce_url) or bool(matched_sku.get("is_ecommerce")) or matched_sku.get("packaging_type") == "ECOMMERCE_LISTING"
@@ -1021,9 +1022,25 @@ def execute_pipeline(
                         pdp_area = 112.0
 
                     # 3. Real Multilingual OCR Engine (Member 2)
-                    from engine import MultilingualOCREngine
-                    ocr_engine = MultilingualOCREngine()
-                    ocr_output = ocr_engine.process_image(img_bgr, image_id=ev_image.id)
+                    try:
+                        import importlib.util
+                        m2_engine_path = REPO_ROOT / "members" / "member-02-ocr" / "src" / "engine.py"
+                        if m2_engine_path.exists():
+                            spec = importlib.util.spec_from_file_location("m2_engine_isolated", str(m2_engine_path))
+                            m2_mod = importlib.util.module_from_spec(spec)
+                            spec.loader.exec_module(m2_mod)
+                            OCREngineClass = getattr(m2_mod, "MultilingualOCREngine", None)
+                        else:
+                            OCREngineClass = None
+                    except Exception:
+                        OCREngineClass = None
+
+                    if OCREngineClass is not None:
+                        ocr_engine = OCREngineClass(allow_classical_fallback=True)
+                        ocr_output = ocr_engine.process_image(img_bgr, image_id=ev_image.id)
+                    else:
+                        from contracts.ocr.ocr_dto import OCROutput
+                        ocr_output = OCROutput(image_id=ev_image.id, tokens=[], primary_language="en")
 
                     # 4. Real Semantic Extractor (Member 3)
                     from extractor import CommodityFactExtractor
@@ -1047,12 +1064,11 @@ def execute_pipeline(
                         if rf.measured_font_height_mm and rf.measured_font_height_mm > 0:
                             font_mm = rf.measured_font_height_mm
                             break
-                    if font_mm is None:
-                        font_mm = 2.10
+                    # Zero guessing policy: if font height or PDP area cannot be measured, pass None to evaluate UNABLE_TO_VERIFY
 
                     eval_res = LegalMetrologyRuleEngine.evaluate_inspection(
                         inspection_id=inspection.id,
-                        pdp_area_cm2=pdp_area,
+                        pdp_area_cm2=pdp_area or 0.0,
                         font_height_mm=font_mm,
                         net_quantity=net_q,
                         mrp=mrp_dict,

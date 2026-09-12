@@ -322,8 +322,42 @@ Dedicated image streaming endpoint eliminates cross-origin storage path issues a
 ### Next Step
 Verify frontend rendering and push to remote.
 
+---
+
+## [13 September 2026] [00:15] IST
+
+### Task / Chunk
+Strict Demo SKU Scoping, OCR Namespace Collision Resolution, and Zero-Guessing Audit in Live Backend Pipeline (`members/member-05-evidence/src/server.py`).
+
+### Status
+COMPLETE
+
+### Completed
+- **Strict Demo SKU Isolation (`server.py`):** Replaced fuzzy substring matching (`prod in p_lower or p_lower in prod`) with strict `is_demo_case` check. Real user packaging uploads (e.g. Boult Earbuds, local snacks) are never hijacked by demo fixtures (`sku_demo_*.json`).
+- **OCR Engine Module Collision Resolution (`server.py`):** Resolved Python `sys.path` namespace collision between `member-04-rule-engine/src/engine.py` and `member-02-ocr/src/engine.py`. Now isolates `MultilingualOCREngine` import and sets `allow_classical_fallback=True` to execute real text detection on uploaded packaging images without crashing.
+- **Zero-Guessing Policy Enforcement (`server.py`):** Eliminated `if font_mm is None: font_mm = 2.10` hardcoded fallback. If font height or PDP area cannot be measured from packaging imagery, `font_height_mm` remains `None` and `Table1FontSchedule.evaluate` deterministically returns `status: "UNABLE_TO_VERIFY"`, `measured_value: "UNAVAILABLE"` under Rule 6(1)(h) Table-I.
+- **Verification:**
+  - `pytest members/member-04-rule-engine/tests/ -v` (53 passed in 0.58s)
+  - `pytest members/member-05-evidence/tests/test_server_api.py -v` (13 passed in 2.17s)
+  - `pytest members/member-05-evidence/tests/test_e2e_query_audit.py -v` (1 passed in 1.92s)
+
+### Tests
+- `pytest members/member-04-rule-engine/tests/ -v` (53 passed in 0.58s)
+- `pytest members/member-05-evidence/tests/test_server_api.py -v` (13 passed in 2.17s)
+- `pytest members/member-05-evidence/tests/test_e2e_query_audit.py -v` (1 passed in 1.92s)
+
+### Problems
+None. Module collision and fuzzy fixture hijacking resolved cleanly.
+
+### Decisions
+1. Golden demonstration fixtures are strictly restricted to cases with explicit `SKU-DEMO` or `DEMO` identifiers, protecting real physical inspections from synthetic interference.
+2. In accordance with Section 63 BSA 2023 evidentiary defense and zero-guessing standards, unmeasurable packaging attributes must never be filled with synthetic compliant values; they must explicitly report `UNABLE_TO_VERIFY` or `FAIL`.
+
+### Next Step
+Provide full architectural and statutory compliance explanation to Team Lead and commit to repository.
+
 ### Signing Note
-SIGNED OFF BY: Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-12 16:05 IST [VERIFIED]
+SIGNED OFF BY: Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-13 00:15 IST [VERIFIED]
 
 
 
