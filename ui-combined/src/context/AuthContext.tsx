@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { OfficerRole } from "../types/inspection";
+import { LiveApiService } from "../services/liveApi";
+import { StorageService } from "../services/storage";
 
 export type UserRole = "inspector" | "controller" | "administrator" | "auditor";
 
@@ -111,8 +113,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   useEffect(() => {
     if (user) {
       localStorage.setItem("nyayadrishti_session", JSON.stringify(user));
+      // Pre-warm Bearer JWT authentication for live Render backend in the background
+      const targetRole = user.officerRole === "CONTROLLER" ? "controller" : "inspector";
+      LiveApiService.getInstance().ensureAuthenticated(targetRole).catch(() => {});
     } else {
       localStorage.removeItem("nyayadrishti_session");
+      StorageService.clearAuthToken();
     }
   }, [user]);
 
@@ -123,9 +129,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       login: (role, email, _password) => {
         const expected = demoUsers[role];
         setUser(expected);
+        const targetRole = expected.officerRole === "CONTROLLER" ? "controller" : "inspector";
+        LiveApiService.getInstance().ensureAuthenticated(targetRole).catch(() => {});
         return { ok: true };
       },
-      logout: () => setUser(null),
+      logout: () => {
+        setUser(null);
+        StorageService.clearAuthToken();
+      },
       switchOfficerRole: (newOfficerRole: OfficerRole) => {
         if (newOfficerRole === "CONTROLLER") {
           setUser(demoUsers.controller);

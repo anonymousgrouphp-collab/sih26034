@@ -46,10 +46,24 @@ if DIST_DIR.is_dir():
     # Catch-all route to serve index.html for client-side routing (SPA)
     @app.get("/{full_path:path}", include_in_schema=False)
     async def serve_spa(full_path: str):
-        # Allow API, docs, test-ui, and storage endpoints to pass through to FastAPI handlers
-        if full_path.startswith(("api/", "docs", "redoc", "openapi.json", "test-ui", "storage/")):
+        # Allow API, docs, redoc, openapi.json, and test-ui to pass through to FastAPI handlers
+        if full_path.startswith(("api/", "docs", "redoc", "openapi.json", "test-ui")):
             from fastapi import HTTPException
             raise HTTPException(status_code=404, detail="API endpoint not found.")
+
+        # Check if requested path is a storage asset
+        if full_path.startswith("storage/"):
+            rel = full_path.replace("storage/", "", 1)
+            storage_file = (STORAGE_DIR / rel).resolve()
+            if storage_file.is_file():
+                return FileResponse(storage_file)
+            # Check public storage directory
+            pub_storage = (REPO_ROOT / "ui-combined" / "public" / full_path).resolve()
+            if pub_storage.is_file():
+                return FileResponse(pub_storage)
+            from fastapi import HTTPException
+            raise HTTPException(status_code=404, detail="Storage asset not found.")
+
         file_path = DIST_DIR / full_path
         if file_path.is_file():
             return FileResponse(file_path)

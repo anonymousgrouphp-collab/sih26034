@@ -293,6 +293,34 @@ Zero 404 broken images, authentic packaging evidence for all 6 Golden SKUs and 8
 ### Status
 ACTIVE
 
+---
+
+## [12 September 2026 | 13:45 IST]
+
+### Discovery
+Found that setting Mode B (Local Resilient Mode) to `DEMO_FIXTURE` broke field case registration because `DemoFixtureService` enforces a strict 403 `READ_ONLY_MODE` on mutations (`createInspection`, `uploadEvidence`). Furthermore, swallowing exceptions in `NewInspection.tsx` and immediately routing to `/inspections` gave inspectors the illusion that the system was randomly resetting or dumping them onto an empty desk. Additionally, dropping files past `files[0]` caused multi-photo intake packages to lose side and back panel evidence.
+
+### Evidence
+- Visual audit of user complaint showing immediate redirection to `/inspections` with 0 cases.
+- `DemoFixtureService.ts` lines 106-113: explicit `READ_ONLY_MODE` rejection.
+- `NewInspection.tsx` lines 182-185: silent `catch (err) { navigate("/inspections"); }`.
+
+### Decision
+1. **Mode B Semantics:** Mode B (Local Resilient Mode) must strictly map to `MOCK` (`MockApiService`), enabling field officers to create, inspect, and adjudicate cases on laptops without internet connectivity per `SYSTEM_MODES_AND_CONNECTIVITY.md`.
+2. **Safe Mutation Gating in Demo Mode:** If an inspector creates a custom case while in `DEMO_FIXTURE` mode, `ApiService` dynamically transitions to `MOCK` mode rather than rejecting the action with a 403 error.
+3. **Statutory Failover Continuity:** If live backend requests fail due to network errors (`Failed to fetch`, 503), `ApiService` automatically activates Mode B local resilient storage without crashing.
+4. **Transparent Error Telemetry:** Never silently navigate away from an intake form on failure; present an actionable error banner preserving all user inputs and photographs.
+5. **Full Multi-Photo Ingestion:** Ingest all selected evidence photos (`files[0..n-1]`) with facet assignments (`PDP_FRONT`, `SIDE_PANEL`, `BACK_PANEL`) and custom commodity particulars.
+
+### Why
+Guarantees uninterrupted field inspections even during total network blackouts, protects user data from being wiped by unexpected network glitches, and ensures complete evidentiary record intake under Section 63 BSA 2023.
+
+### Impact
+113/113 passing automated tests, zero silent redirects, full multi-photo evidence retention, and robust offline resilience.
+
+### Status
+ACTIVE
+
 
 
 

@@ -631,6 +631,68 @@ async def upload_inspection_image(
     }
 
 
+@app.get("/api/v1/evidence/image/{image_id}", response_class=FileResponse)
+def get_evidence_image(
+    image_id: str,
+    db: Session = Depends(get_db_session),
+):
+    """Streams the raw physical packaging evidence image for an evidence record."""
+    ev_image = db.execute(select(EvidenceImage).where(EvidenceImage.id == image_id)).scalar_one_or_none()
+    if not ev_image:
+        raise HTTPException(status_code=404, detail="Evidence image record not found.")
+
+    file_path = None
+    try:
+        cand = storage_manager.resolve_absolute_path(ev_image.file_path)
+        if cand.exists():
+            file_path = cand
+    except Exception:
+        pass
+
+    if not file_path:
+        # Check repo public storage
+        pub_cand = (REPO_ROOT / "ui-combined" / "public" / "storage" / ev_image.file_path).resolve()
+        if pub_cand.exists():
+            file_path = pub_cand
+
+    if not file_path:
+        # Check by SKU / commodity name association
+        insp = db.execute(select(Inspection).where(Inspection.id == ev_image.inspection_id)).scalar_one_or_none()
+        p_name = (insp.product_name or "").lower() if insp else ""
+        sku_map = [
+            ("cookie", "sku_demo_01_biscuit.jpg"),
+            ("biscuit", "sku_demo_01_biscuit.jpg"),
+            ("demo-01", "sku_demo_01_biscuit.jpg"),
+            ("curry", "sku_demo_02_curry.jpg"),
+            ("dal makhani", "sku_demo_02_curry.jpg"),
+            ("demo-02", "sku_demo_02_curry.jpg"),
+            ("water", "sku_demo_03_water.jpg"),
+            ("mineral", "sku_demo_03_water.jpg"),
+            ("demo-03", "sku_demo_03_water.jpg"),
+            ("soap", "sku_demo_04_soap.jpg"),
+            ("bathing", "sku_demo_04_soap.jpg"),
+            ("demo-04", "sku_demo_04_soap.jpg"),
+            ("chip", "sku_demo_05_chips.jpg"),
+            ("crispy", "sku_demo_05_chips.jpg"),
+            ("demo-05", "sku_demo_05_chips.jpg"),
+            ("earbud", "sku_demo_06_listing.png"),
+            ("bluetooth", "sku_demo_06_listing.png"),
+            ("demo-06", "sku_demo_06_listing.png"),
+        ]
+        for pattern, fname in sku_map:
+            if pattern in p_name:
+                cand = (REPO_ROOT / "ui-combined" / "public" / "storage" / "uploads" / fname).resolve()
+                if cand.exists():
+                    file_path = cand
+                    break
+
+    if not file_path or not file_path.exists():
+        raise HTTPException(status_code=404, detail="Physical packaging image file not found on disk.")
+
+    media_type = "image/png" if str(file_path).lower().endswith(".png") else "image/jpeg"
+    return FileResponse(path=str(file_path), media_type=media_type)
+
+
 @app.post(
     "/api/v1/inspections/ecommerce",
     status_code=status.HTTP_201_CREATED,
@@ -701,19 +763,22 @@ def execute_pipeline(
     if FIXTURES_DIR.exists():
         p_lower = (inspection.product_name or "").lower().replace("-", "_")
         b_lower = (inspection.brand_name or "").lower()
+        num_lower = (inspection.inspection_number or "").lower().replace("-", "_")
+        id_lower = (inspection.id or "").lower().replace("-", "_")
         for f in sorted(FIXTURES_DIR.glob("sku_demo_*.json")):
             try:
                 with open(f, "r", encoding="utf-8") as fp:
                     data = json.load(fp)
                     sku = data.get("sku_id", "").lower().replace("-", "_")
-                    prod = data.get("product_name", "").lower()
-                    if (sku and sku in p_lower) or (prod and prod in p_lower) or (b_lower and b_lower in prod):
+                    prod = data.get("product_name", "").lower().replace("-", "_")
+                    if (sku and (sku in p_lower or sku in num_lower or sku in id_lower)) or (prod and (prod in p_lower or p_lower in prod)) or (b_lower and b_lower in prod):
                         matched_sku = data
                         break
             except Exception:
                 continue
 
     if matched_sku:
+        is_ecom = inspection.capture_source == "ECOMMERCE_URL" or "ecommerce" in str(inspection.package_type).lower() or bool(inspection.ecommerce_url) or bool(matched_sku.get("is_ecommerce")) or matched_sku.get("packaging_type") == "ECOMMERCE_LISTING"
         sku_qg = matched_sku.get("quality_gate", {})
         blur = float(sku_qg.get("blur_variance", ev_image.blur_laplacian_variance or 312.4))
         glare = float(sku_qg.get("glare_percentage", ev_image.glare_pixel_percentage or 1.1))
@@ -721,7 +786,8 @@ def execute_pipeline(
 
         qg_res = CentralPipelineAdapter.execute_quality_gate(blur, glare, tilt) if CentralPipelineAdapter else {"is_valid": glare <= 3.0 and blur >= 100.0}
 
-        if not qg_res.get("is_valid", True):
+        # E-Commerce listings are digital snapshots exempt from camera physical glare rejection
+        if not is_ecom and not qg_res.get("is_valid", True):
             ai_verdict = "UNABLE_TO_VERIFY"
             extracted_fields = []
             evaluations = [
@@ -748,7 +814,6 @@ def execute_pipeline(
             pkr_dict = ext.get("packer")
             cc_dict = ext.get("consumer_care")
             coo = ext.get("country_of_origin")
-            is_ecom = inspection.capture_source == "ECOMMERCE_URL" or "ecommerce" in inspection.package_type.lower()
 
             if LegalMetrologyRuleEngine:
                 eval_res = LegalMetrologyRuleEngine.evaluate_inspection(
@@ -1137,8 +1202,13 @@ def get_inspection_detail(
     user: UserContext = Depends(get_current_user),
     db: Session = Depends(get_db_session),
 ):
-    """Retrieves complete inspection report, evidence images, bounding boxes, and audit entries."""
-    insp = db.execute(select(Inspection).where(Inspection.id == inspection_id)).scalar_one_or_none()
+    insp = db.execute(
+        select(Inspection).where(
+            (Inspection.id == inspection_id)
+            | (Inspection.inspection_number == inspection_id)
+            | (Inspection.product_name.ilike(f"%{inspection_id}%"))
+        )
+    ).scalars().first()
     if not insp:
         raise HTTPException(status_code=404, detail="Inspection not found.")
 

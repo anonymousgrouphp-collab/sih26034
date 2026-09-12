@@ -122,4 +122,74 @@ describe("API Adapter & Service Layer Architecture", () => {
     assert.strictEqual(cached.extracted_fields.length, 1);
     assert.strictEqual(cached.extracted_fields[0].raw_ocr_text, "MRP Rs 75.00");
   });
+
+  it("6. ApiService creates inspection without throwing READ_ONLY_MODE when in DEMO_FIXTURE mode", async () => {
+    ApiService.setOperatingMode("DEMO_FIXTURE");
+    assert.strictEqual(ApiService.getOperatingMode(), "DEMO_FIXTURE");
+
+    const customCase = await ApiService.createInspection({
+      product_name: "GOPI BABA HAIR OIL Hair Oil",
+      brand_name: "GOPI BABA",
+      category: "COSMETICS_PERSONAL_CARE",
+      package_type: "CYLINDRICAL",
+      inspection_type: "CONSUMER_COMPLAINT",
+      jurisdiction_circle_id: "CIRCLE_DL_SOUTH_01",
+      declared_net_quantity: "400 ml",
+    });
+
+    assert.ok(customCase.id);
+    assert.strictEqual(customCase.product_name, "GOPI BABA HAIR OIL Hair Oil");
+    assert.strictEqual(ApiService.getOperatingMode(), "MOCK");
+  });
+
+  it("7. Dynamic commodity inspection preserves custom particulars and multiple evidence photos", async () => {
+    ApiService.setOperatingMode("MOCK");
+
+    const newCase = await ApiService.createInspection({
+      product_name: "GOPI BABA HAIR OIL Hair Oil",
+      brand_name: "GOPI BABA",
+      category: "COSMETICS_PERSONAL_CARE",
+      package_type: "CYLINDRICAL",
+      inspection_type: "CONSUMER_COMPLAINT",
+      jurisdiction_circle_id: "CIRCLE_DL_SOUTH_01",
+      declared_net_quantity: "400 ml",
+    });
+
+    // Ingest photo 1 (PDP)
+    const up1 = await ApiService.uploadEvidence(new Blob(["mock-pdp-bytes"], { type: "image/jpeg" }), {
+      inspection_id: newCase.id,
+      panel_type: "PDP_FRONT",
+      original_filename: "image-1.jpeg",
+      file_size_bytes: 196608,
+      mime_type: "image/jpeg",
+    });
+
+    // Ingest photo 2 (Side panel)
+    const up2 = await ApiService.uploadEvidence(new Blob(["mock-side-bytes"], { type: "image/jpeg" }), {
+      inspection_id: newCase.id,
+      panel_type: "SIDE_PANEL",
+      original_filename: "image-2.jpeg",
+      file_size_bytes: 172032,
+      mime_type: "image/jpeg",
+    });
+
+    assert.ok(up1.image_id);
+    assert.ok(up2.image_id);
+
+    // Execute pipeline
+    const executedCase = await ApiService.executePipeline(up1.image_id, newCase.id);
+    assert.strictEqual(executedCase.id, newCase.id);
+    assert.strictEqual(executedCase.evidence_assets.length, 2);
+    assert.strictEqual(executedCase.evidence_assets[0].panel_type, "PDP_FRONT");
+    assert.strictEqual(executedCase.evidence_assets[1].panel_type, "SIDE_PANEL");
+
+    // Extracted fields reflect user commodity particulars
+    const prodField = executedCase.extracted_fields.find((f) => f.field_type === "GENERIC_NAME");
+    assert.ok(prodField);
+    assert.strictEqual(prodField.raw_ocr_text, "GOPI BABA HAIR OIL Hair Oil");
+
+    const netQtyField = executedCase.extracted_fields.find((f) => f.field_type === "NET_QUANTITY");
+    assert.ok(netQtyField);
+    assert.strictEqual(netQtyField.raw_ocr_text, "Net Qty: 400 ml");
+  });
 });
