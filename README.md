@@ -205,10 +205,15 @@ NyayaDrishti-LM is developed under Smart India Hackathon 2026 for the **Departme
 |:---|:---|:---|:---:|
 | **Kunal Raj** | **Member 1: CV, Metrology & Frontend** | Optical quality gate, ArUco 4×4 calibration, planar homography, PDP metric schedule, Frontend Adjudication canvas | [@kunal-raj-dev](https://github.com/kunal-raj-dev) |
 | **Parmarth Kumar** | **Member 2: Multilingual OCR & Member 6: Lead Frontend** | DBNet++ text detection, PP-OCRv4 Indic recognition, ONNX INT8 inference, React 18 + Vite SPA, Metrology workbench, split-view Canvas HUD | [@parmarth-kumar](https://github.com/parmarth-kumar) |
-| **Harsh Patel** | **Member 3: Semantic Extraction & Frontend** | Statutory field parsing (MRP, Net Qty, Dates, Address, PIN), banned unit flagger, Frontend E2E pipeline orchestration & UI integration | [@anonymousgrouphp-collab](https://github.com/anonymousgrouphp-collab) |
-| **Ambika Bansal** | **Member 4: Statutory Rule Engine** | AST statutory engine, Table-I font schedule (Row 5 = 6.0 mm), USP math, Rule 6(1)(k) single-unit proviso, 4-state triage | [@bansalambika12-ship-it](https://github.com/bansalambika12-ship-it) |
+| **Harsh Patel** | **Member 3: Semantic Extraction, Rule Engine & Frontend** | Statutory field parsing (MRP, Net Qty, Dates, Address, PIN), banned unit flagger, AST rule engine hardening, Frontend E2E pipeline orchestration | [@anonymousgrouphp-collab](https://github.com/anonymousgrouphp-collab) |
+| **Ambika Bansal** | **Member 4: Statutory Rule Engine** *(Co-engineered with Harsh Patel)* | AST statutory engine, Table-I font schedule (Row 5 = 6.0 mm), USP math, IEEE 754 precision guard, Rule 6(1)(k) single-unit proviso, 4-state triage | [@bansalambika12-ship-it](https://github.com/bansalambika12-ship-it) |
 | **Shailendra Pratap Singh** | **Member 5: Evidence & Cryptography** | FastAPI REST services, PostgreSQL 16 schema, Merkle DAG, Section 63 BSA 2023 certificate, Form-1 PDF engine | [@shailendrapratap1](https://github.com/shailendrapratap1) |
 | **Urvashi Rajput** | **UI/UX Architecture & Design System** | Initial frontend architecture, Nirikshak Metrolens workstation framework, Quick Triage Filter Pills, elevation shadow design tokens & UI styling | [@rajputurvashi2006-bit](https://github.com/rajputurvashi2006-bit) |
+
+### ⚖️ Statutory Rule Engine Collaboration
+The deterministic compliance engine (`members/member-04-rule-engine/`) was co-engineered for 100% legal reproducibility:
+- **Lead Statutory Rule Architecture & Font Schedules:** Ambika Bansal ([@bansalambika12-ship-it](https://github.com/bansalambika12-ship-it))
+- **AST Compliance Hardening, IEEE 754 Precision Guard & Statutory Provisos:** Harsh Patel ([@anonymousgrouphp-collab](https://github.com/anonymousgrouphp-collab))
 
 ### 🎨 Frontend & Adjudication Workstation Collaboration
 The production web platform (`ui-combined/`) is a collaborative achievement across the team:
