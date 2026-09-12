@@ -98,6 +98,7 @@ export const NewInspection: React.FC = () => {
   const [filePreviews, setFilePreviews] = useState<string[]>([]);
   const [steps, setSteps] = useState<PipelineStepItem[]>(INITIAL_STEPS);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showGuidanceModal, setShowGuidanceModal] = useState(false);
   const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -124,6 +125,7 @@ export const NewInspection: React.FC = () => {
   };
 
   const handleStartAnalysis = async () => {
+    setErrorMessage(null);
     setIsProcessing(true);
 
     try {
@@ -144,22 +146,30 @@ export const NewInspection: React.FC = () => {
         declared_net_quantity: declaredNetQty.trim() || undefined,
       });
 
-      // 3. Upload evidence file if provided
+      // 3. Upload evidence files if provided (all selected photographs)
       let uploadedImageId: string | null = null;
       if (files.length > 0) {
-        const file = files[0];
-        const uploadResult = await ApiService.uploadEvidence(file, {
-          inspection_id: newCase.id,
-          panel_type: "PDP_FRONT",
-          original_filename: file.name,
-          file_size_bytes: file.size,
-          mime_type: file.type || "image/jpeg",
-          image_width: 1920,
-          image_height: 1080,
-          preview_url: filePreviews[0] || URL.createObjectURL(file),
-        });
-        if (uploadResult?.image_id) {
-          uploadedImageId = uploadResult.image_id;
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const panelType =
+            i === 0
+              ? "PDP_FRONT"
+              : i === 1
+              ? "SIDE_PANEL"
+              : "BACK_PANEL";
+          const uploadResult = await ApiService.uploadEvidence(file, {
+            inspection_id: newCase.id,
+            panel_type: panelType,
+            original_filename: file.name,
+            file_size_bytes: file.size,
+            mime_type: file.type || "image/jpeg",
+            image_width: 1920,
+            image_height: 1080,
+            preview_url: filePreviews[i] || URL.createObjectURL(file),
+          });
+          if (i === 0 && uploadResult?.image_id) {
+            uploadedImageId = uploadResult.image_id;
+          }
         }
       }
 
@@ -178,10 +188,18 @@ export const NewInspection: React.FC = () => {
         await ApiService.executePipeline(activeAssetId, newCase.id);
       }
 
+      // Navigate directly into the Adjudication Canvas for this case
       navigate(`/inspections/${newCase.id}`);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to execute inspection:", err);
-      navigate("/inspections");
+      const msg =
+        err?.message ||
+        err?.remediation ||
+        (language === "hi"
+          ? "निरीक्षण प्रारंभ करने में असमर्थ। कृपया विवरण जांचें और पुनः प्रयास करें।"
+          : "Unable to start statutory analysis. Please check packaging particulars and retry.");
+      setErrorMessage(msg);
+      setSteps(INITIAL_STEPS);
     } finally {
       setIsProcessing(false);
     }
@@ -577,6 +595,41 @@ export const NewInspection: React.FC = () => {
                   </select>
                 </div>
               </div>
+
+              {/* Error Alert Banner */}
+              {errorMessage && (
+                <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2.5 shadow-2xs">
+                  <AlertCircle size={18} className="text-rose-600 shrink-0 mt-0.5" />
+                  <div className="flex-1 space-y-1">
+                    <div className="font-bold">
+                      {language === "hi" ? "निरीक्षण विश्लेषण प्रारंभ करने में समस्या" : "Inspection Pipeline Issue"}
+                    </div>
+                    <p className="text-[11px] leading-relaxed text-rose-700">{errorMessage}</p>
+                    {ApiService.getOperatingMode() === "LIVE" && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          ApiService.setOperatingMode("MOCK");
+                          setErrorMessage(null);
+                          handleStartAnalysis();
+                        }}
+                        className="mt-1 text-[11px] font-bold text-govNavy underline hover:text-blue-900 flex items-center gap-1"
+                      >
+                        <span>{language === "hi" ? "मोड बी (स्थानीय लचीला मोड) में पुनः प्रयास करें" : "Switch to Mode B (Local Resilient) & Retry Analysis"}</span>
+                        <ArrowRight size={12} />
+                      </button>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setErrorMessage(null)}
+                    className="text-rose-400 hover:text-rose-700 p-1"
+                    aria-label="Dismiss error"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
 
               {/* Action Button */}
               <div className="pt-3 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">

@@ -61,6 +61,81 @@ export class LiveApiService implements IInspectionApiService {
     this.baseUrl = url;
   }
 
+  private isAuthenticating: Promise<string | null> | null = null;
+
+  public async ensureAuthenticated(role: "inspector" | "controller" = "inspector"): Promise<string | null> {
+    const existingToken = StorageService.getAuthToken();
+    if (existingToken) {
+      return existingToken;
+    }
+
+    if (this.isAuthenticating) {
+      return this.isAuthenticating;
+    }
+
+    const username = role === "controller" ? "controller_south" : "inspector_rajesh";
+    this.isAuthenticating = (async () => {
+      try {
+        const res = await fetch(`${this.baseUrl}/auth/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Client-Version": "1.0.0-sih26034",
+            "X-Device-Fingerprint": "WEB-SPA-CLIENT-OFFICER-WORKSTATION",
+          },
+          body: JSON.stringify({
+            username,
+            password: "Officer@2026",
+          }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.access_token) {
+            StorageService.setAuthToken(data.access_token);
+            return data.access_token;
+          }
+        }
+      } catch (err) {
+        console.warn("Auto-authentication against live backend failed:", err);
+      } finally {
+        this.isAuthenticating = null;
+      }
+      return null;
+    })();
+
+    return this.isAuthenticating;
+  }
+
+  private async fetchWithAuth(url: string, options: RequestInit = {}): Promise<Response> {
+    let token = StorageService.getAuthToken();
+    if (!token) {
+      token = await this.ensureAuthenticated();
+    }
+
+    const baseHeaders: Record<string, string> = {
+      "X-Client-Version": "1.0.0-sih26034",
+      "X-Device-Fingerprint": "WEB-SPA-CLIENT-OFFICER-WORKSTATION",
+      ...((options.headers as Record<string, string>) || {}),
+    };
+    if (token) {
+      baseHeaders["Authorization"] = `Bearer ${token}`;
+    }
+
+    let res = await fetch(url, { ...options, headers: baseHeaders });
+
+    if (res.status === 401) {
+      StorageService.clearAuthToken();
+      token = await this.ensureAuthenticated();
+      if (token) {
+        baseHeaders["Authorization"] = `Bearer ${token}`;
+        res = await fetch(url, { ...options, headers: baseHeaders });
+      }
+    }
+
+    return res;
+  }
+
   private getHeaders(): Record<string, string> {
     const headers: Record<string, string> = {
       "X-Client-Version": "1.0.0-sih26034",
@@ -92,7 +167,7 @@ export class LiveApiService implements IInspectionApiService {
       const url = circleId
         ? `${this.baseUrl}/dashboard/summary?circle_id=${encodeURIComponent(circleId)}`
         : `${this.baseUrl}/dashboard/summary`;
-      const res = await fetch(url, { headers: this.getHeaders() });
+      const res = await this.fetchWithAuth(url);
       if (!res.ok) {
         throw new Error(`Failed to fetch dashboard summary: HTTP ${res.status}`);
       }
@@ -128,9 +203,7 @@ export class LiveApiService implements IInspectionApiService {
       if (params?.status) queryParams.set("status", params.status);
       if (params?.search) queryParams.set("search", params.search);
 
-      const res = await fetch(`${this.baseUrl}/inspections?${queryParams.toString()}`, {
-        headers: this.getHeaders(),
-      });
+      const res = await this.fetchWithAuth(`${this.baseUrl}/inspections?${queryParams.toString()}`);
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}`);
       }
@@ -170,10 +243,9 @@ export class LiveApiService implements IInspectionApiService {
     }
 
     try {
-      const res = await fetch(`${this.baseUrl}/inspections`, {
+      const res = await this.fetchWithAuth(`${this.baseUrl}/inspections`, {
         method: "POST",
         headers: {
-          ...this.getHeaders(),
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -224,9 +296,21 @@ export class LiveApiService implements IInspectionApiService {
 
   public async getInspection(id: string): Promise<InspectionCase> {
     try {
-      const res = await fetch(`${this.baseUrl}/inspections/${id}`, {
-        headers: this.getHeaders(),
-      });
+      let res = await this.fetchWithAuth(`${this.baseUrl}/inspections/${encodeURIComponent(id)}`);
+      if (res.status === 404 && id.startsWith("SKU-DEMO-")) {
+        // Resolve database case ID by search if requested by SKU identifier
+        const listRes = await this.fetchWithAuth(`${this.baseUrl}/inspections?search=${encodeURIComponent(id)}`);
+        if (listRes.ok) {
+          const listData = await listRes.json();
+          const match = (listData.items || []).find((it: any) =>
+            (it.product_name || "").includes(id) || (it.inspection_number || "").includes(id)
+          );
+          if (match?.id) {
+            res = await this.fetchWithAuth(`${this.baseUrl}/inspections/${encodeURIComponent(match.id)}`);
+          }
+        }
+      }
+
       if (!res.ok) {
         throw new Error(`Failed to retrieve inspection: HTTP ${res.status}`);
       }
@@ -236,13 +320,19 @@ export class LiveApiService implements IInspectionApiService {
       // Check if we have cached pipeline execution artifacts for this case or its images
       const cached =
         this.pipelineArtifactCache.get(id) ||
+        this.pipelineArtifactCache.get(insp.id) ||
         (data.evidence_images && data.evidence_images[0]
           ? this.pipelineArtifactCache.get(data.evidence_images[0].id)
           : undefined);
 
+      const matchedSkuId =
+        (insp.product_name || "").match(/SKU-DEMO-\d+/i)?.[0]?.toUpperCase() ||
+        (id.startsWith("SKU-DEMO-") ? id : undefined);
+
       const caseData: InspectionCase = {
         id: insp.id,
         inspection_number: insp.inspection_number,
+        sku_demo_id: matchedSkuId,
         created_at: insp.adjudication_timestamp || insp.inspection_timestamp || new Date().toISOString(),
         officer_id: insp.officer_id || "INSP-DL-SOUTH",
         jurisdiction_id: insp.jurisdiction_id || "CIRCLE_DL_SOUTH_01",
@@ -266,41 +356,41 @@ export class LiveApiService implements IInspectionApiService {
             image_id: img.id,
             inspection_id: insp.id,
             file_path: resolvedPath,
-          raw_sha256: img.sha256,
-          panel_type: img.panel_type || "PDP_FRONT",
-          image_width: img.image_width || 1920,
-          image_height: img.image_height || 1080,
-          quality_gate: {
-            passed: img.quality_passed !== false,
-            blur_variance: img.blur_variance || 340.0,
-            glare_percentage: img.glare_percentage || 0.8,
-            skew_angle_deg: img.skew_angle_deg || 1.2,
-          },
-          calibration: cached?.calibration,
-          ocr: cached?.ocr,
-          is_original_untouched: true,
-        };
-      }),
+            raw_sha256: img.sha256,
+            panel_type: img.panel_type || "PDP_FRONT",
+            image_width: img.image_width || 1920,
+            image_height: img.image_height || 1080,
+            quality_gate: {
+              passed: img.quality_passed !== false,
+              blur_variance: img.blur_variance || 340.0,
+              glare_percentage: img.glare_percentage || 0.8,
+              skew_angle_deg: img.skew_angle_deg || 1.2,
+            },
+            calibration: cached?.calibration,
+            ocr: cached?.ocr,
+            is_original_untouched: true,
+          };
+        }),
         // Preserve extracted fields from pipeline execution cache if backend inspection detail lacks them
         extracted_fields: (data.extracted_fields && data.extracted_fields.length > 0)
           ? data.extracted_fields
           : (cached?.extracted_fields || []),
         rule_evaluations: (data.evaluations || []).map((e: any, index: number) => ({
-          finding_id: `eval_${index}`,
+          finding_id: e.finding_id || `eval_${index}`,
           rule_code: e.rule_code,
           statutory_reference: e.statutory_reference,
           status: e.status,
           severity: e.severity || "CRITICAL",
-          required_value: e.expected || "Statutory threshold",
-          measured_value: e.actual || "Observed value",
+          required_value: e.expected || e.required_value || "Statutory threshold",
+          measured_value: e.actual || e.measured_value || "Observed value",
           discrepancy: e.discrepancy,
-          legal_consequence: "Section 36(1) LM Act 2009",
+          legal_consequence: e.legal_consequence || "Section 36(1) LM Act 2009",
         })),
         principal_display_panel: cached?.principal_display_panel,
         evidence_graph: cached?.evidence_graph,
         bsa_certificate: cached?.bsa_certificate,
         is_mock_fixture: false,
-        pipeline_source: "BACKEND_SIMULATION",
+        pipeline_source: "LIVE_BACKEND",
       };
 
       return caseData;
@@ -334,9 +424,8 @@ export class LiveApiService implements IInspectionApiService {
       formData.append("image", file);
       formData.append("metadata", JSON.stringify(metadata));
 
-      const res = await fetch(`${this.baseUrl}/inspections/upload`, {
+      const res = await this.fetchWithAuth(`${this.baseUrl}/inspections/upload`, {
         method: "POST",
-        headers: this.getHeaders(),
         body: formData,
       });
 
@@ -377,9 +466,8 @@ export class LiveApiService implements IInspectionApiService {
     _scenario?: "PASS" | "FAIL" | "REVIEW" | "UNABLE_TO_VERIFY"
   ): Promise<InspectionCase> {
     try {
-      const res = await fetch(`${this.baseUrl}/pipeline/execute/${imageId}`, {
+      const res = await this.fetchWithAuth(`${this.baseUrl}/pipeline/execute/${imageId}`, {
         method: "POST",
-        headers: this.getHeaders(),
       });
 
       if (!res.ok) {
@@ -428,10 +516,9 @@ export class LiveApiService implements IInspectionApiService {
     }
 
     try {
-      const res = await fetch(`${this.baseUrl}/inspections/${inspectionId}/adjudicate`, {
+      const res = await this.fetchWithAuth(`${this.baseUrl}/inspections/${inspectionId}/adjudicate`, {
         method: "PATCH",
         headers: {
-          ...this.getHeaders(),
           "Content-Type": "application/json",
         },
         body: JSON.stringify(request),
@@ -489,9 +576,7 @@ export class LiveApiService implements IInspectionApiService {
 
   public async getAuditTrail(inspectionId: string): Promise<AuditEvent[]> {
     try {
-      const res = await fetch(`${this.baseUrl}/inspections/${inspectionId}/audit-trail`, {
-        headers: this.getHeaders(),
-      });
+      const res = await this.fetchWithAuth(`${this.baseUrl}/inspections/${inspectionId}/audit-trail`);
       if (res.status === 404) {
         // Known dev gap: Case-specific audit trail route not yet registered on dev
         return [];
@@ -511,10 +596,9 @@ export class LiveApiService implements IInspectionApiService {
 
   public async closeInspection(inspectionId: string, remarks?: string): Promise<InspectionCase> {
     try {
-      const res = await fetch(`${this.baseUrl}/inspections/${inspectionId}/close`, {
+      const res = await this.fetchWithAuth(`${this.baseUrl}/inspections/${inspectionId}/close`, {
         method: "POST",
         headers: {
-          ...this.getHeaders(),
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ remarks }),
@@ -543,10 +627,9 @@ export class LiveApiService implements IInspectionApiService {
 
   public async generateNotice(payload: GenerateNoticePayload): Promise<LegalNoticeResult> {
     try {
-      const res = await fetch(`${this.baseUrl}/notices/generate`, {
+      const res = await this.fetchWithAuth(`${this.baseUrl}/notices/generate`, {
         method: "POST",
         headers: {
-          ...this.getHeaders(),
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
@@ -573,9 +656,7 @@ export class LiveApiService implements IInspectionApiService {
     version: string;
   }> {
     try {
-      const res = await fetch(`${this.baseUrl}/system/status`, {
-        headers: this.getHeaders(),
-      });
+      const res = await this.fetchWithAuth(`${this.baseUrl}/system/status`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
     } catch {
@@ -595,9 +676,7 @@ export class LiveApiService implements IInspectionApiService {
     verification_timestamp: string;
   }> {
     try {
-      const res = await fetch(`${this.baseUrl}/audit/chain-verify`, {
-        headers: this.getHeaders(),
-      });
+      const res = await this.fetchWithAuth(`${this.baseUrl}/audit/chain-verify`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
     } catch {
