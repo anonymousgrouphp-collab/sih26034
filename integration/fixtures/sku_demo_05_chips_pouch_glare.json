@@ -17,7 +17,17 @@
     "skew_angle_deg": 2.5,
     "rejection_reason": "SPECULAR_GLARE: Glare coverage 6.40% exceeds acceptable maximum 3.00%. Tilt camera slightly to avoid direct light reflection."
   },
-  "calibration": null,
-  "extracted_entities": null,
+  "calibration": {
+    "method": "ARUCO_4X4_50",
+    "px_to_mm": 12.0,
+    "confidence": 0.98,
+    "reference_bounding_box": [78, 78, 242, 242]
+  },
+  "extracted_entities": {
+    "glare_zone": {
+      "name": "Specular Reflection Bloom",
+      "bounding_box": [450, 920, 620, 1180]
+    }
+  },
   "expected_violations": []
 }

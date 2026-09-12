@@ -199,8 +199,42 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
             <div className="absolute inset-0 pointer-events-none">
               {boxes.map((b) => {
                 const isSelected = selectedBoxId === b.id;
-                const isMrp = b.type === "MRP" || b.label.toLowerCase().includes("mrp");
+                const isFiducial = b.type === "FIDUCIAL_STANDARD" || b.label.toLowerCase().includes("aruco");
+                const isFail = b.type === "FAIL" || b.label.toLowerCase().includes("deficit") || b.label.toLowerCase().includes("missing");
+                const isReview = b.type === "REVIEW" || b.label.toLowerCase().includes("review") || b.label.toLowerCase().includes("borderline");
+                const isMrp = b.type === "MRP" || b.label.toLowerCase().includes("mrp") || b.label.toLowerCase().includes("usp");
                 const isNetQty = b.type === "NET_QUANTITY" || b.label.toLowerCase().includes("net");
+                const isPass = b.type === "PASS";
+
+                const borderClass = isSelected
+                  ? "border-amber-400 bg-amber-400/25 ring-4 ring-amber-400/40 z-30"
+                  : isFiducial
+                  ? "border-amber-400 border-dashed bg-amber-400/10 hover:bg-amber-400/20 z-10"
+                  : isFail
+                  ? "border-rose-500 bg-rose-500/20 hover:bg-rose-500/30 z-20"
+                  : isReview
+                  ? "border-amber-400 bg-amber-400/20 hover:bg-amber-400/30 z-20"
+                  : isMrp
+                  ? "border-sky-400 bg-sky-400/15 hover:bg-sky-400/30 z-10"
+                  : isNetQty || isPass
+                  ? "border-emerald-400 bg-emerald-400/15 hover:bg-emerald-400/30 z-10"
+                  : "border-indigo-400 bg-indigo-400/15 hover:bg-indigo-400/30 z-10";
+
+                const badgeClass = isSelected
+                  ? "bg-amber-500 text-slate-950 font-black"
+                  : isFiducial
+                  ? "bg-amber-900/90 text-amber-300 border border-amber-400/50"
+                  : isFail
+                  ? "bg-rose-700 text-white"
+                  : isReview
+                  ? "bg-amber-600 text-white"
+                  : isMrp
+                  ? "bg-sky-700 text-white"
+                  : isNetQty || isPass
+                  ? "bg-emerald-700 text-white"
+                  : "bg-indigo-700 text-white";
+
+                const displayLabel = b.label.length > 38 ? `${b.label.slice(0, 36)}…` : b.label;
 
                 return (
                   <button
@@ -208,15 +242,7 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
                     type="button"
                     onClick={() => onSelectBox?.(b.id)}
                     title={`${b.label} (${Math.round(b.confidence * 100)}% ${language === "hi" ? "विश्वसनीयता" : "confidence"})`}
-                    className={`absolute border-2 pointer-events-auto transition-all cursor-pointer ${
-                      isSelected
-                        ? "border-amber-400 bg-amber-400/25 ring-4 ring-amber-400/40 z-20"
-                        : isMrp
-                        ? "border-sky-400 bg-sky-400/15 hover:bg-sky-400/30"
-                        : isNetQty
-                        ? "border-emerald-400 bg-emerald-400/15 hover:bg-emerald-400/30"
-                        : "border-indigo-400 bg-indigo-400/15 hover:bg-indigo-400/30"
-                    }`}
+                    className={`absolute border-2 pointer-events-auto transition-all cursor-pointer ${borderClass}`}
                     style={{
                       left: `${b.x}%`,
                       top: `${b.y}%`,
@@ -225,17 +251,9 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
                     }}
                   >
                     <span
-                      className={`absolute -top-6 left-0 whitespace-nowrap rounded px-1.5 py-0.5 text-[9px] font-black shadow-md ${
-                        isSelected
-                          ? "bg-amber-500 text-slate-950"
-                          : isMrp
-                          ? "bg-sky-700 text-white"
-                          : isNetQty
-                          ? "bg-emerald-700 text-white"
-                          : "bg-indigo-700 text-white"
-                      }`}
+                      className={`absolute -top-6 left-0 whitespace-nowrap rounded px-1.5 py-0.5 text-[9px] font-black shadow-md ${badgeClass}`}
                     >
-                      {b.label} · {Math.round(b.confidence * 100)}%
+                      {displayLabel} · {Math.round(b.confidence * 100)}%
                     </span>
                   </button>
                 );
@@ -260,18 +278,31 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
               <div className="mt-3 rounded-lg bg-black/60 p-3 border border-white/10 font-mono text-[11px] text-amber-300 space-y-1">
                 <div>
                   {language === "hi" ? "संदर्भ मानक:" : "Reference Standard:"}{" "}
-                  {calibration?.referenceObject || "ArUco 4x4 (50.0mm)"}
+                  {calibration?.available
+                    ? calibration?.referenceObject || "ArUco 4x4 (50.0mm)"
+                    : language === "hi"
+                    ? "कोई वैध संदर्भ नहीं"
+                    : "No Valid Fiducial"}
                 </div>
                 <div>
                   {language === "hi" ? "समाधानित पैमाना:" : "Resolved Scale:"}{" "}
-                  {calibration?.scaleMmPerPixel
+                  {calibration?.available && calibration?.scaleMmPerPixel
                     ? `${calibration.scaleMmPerPixel.toFixed(4)} mm/px`
-                    : "0.2604 mm/px"}
+                    : calibration?.available
+                    ? "Calibrated via fiducial standard"
+                    : language === "hi"
+                    ? "अंशांकित नहीं (निरस्त/अनुपलब्ध)"
+                    : "Not Calibrated (Aborted/Unavailable)"}
                 </div>
                 <div>
-                  {language === "hi"
-                    ? "समतलीय होमोग्राफी: सत्यापित (झुकाव < 15°)"
-                    : "Planar Homography: Verified (Tilt < 15°)"}
+                  {language === "hi" ? "समतलीय होमोग्राफी:" : "Planar Homography:"}{" "}
+                  {calibration?.available
+                    ? language === "hi"
+                      ? "सत्यापित (झुकाव < 15°)"
+                      : "Verified (Tilt < 15°)"
+                    : language === "hi"
+                    ? "अस्वीकृत / अप्रयुक्त"
+                    : "Rejected / Inactive"}
                 </div>
               </div>
             </div>

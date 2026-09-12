@@ -50,13 +50,14 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
   const imgRef = useRef<HTMLImageElement>(null);
 
   const tokens: OCRToken[] = asset.ocr?.tokens || [];
-  // Natural dimensions mapped from loaded image, prioritizing asset metadata for calibrated vector packaging
   const imgWidth =
-    asset.image_width ||
-    (naturalDimensions?.width && naturalDimensions.width >= 400 ? naturalDimensions.width : 900);
+    naturalDimensions?.width && naturalDimensions.width >= 400
+      ? naturalDimensions.width
+      : (asset.image_width || 1920);
   const imgHeight =
-    asset.image_height ||
-    (naturalDimensions?.height && naturalDimensions.height >= 400 ? naturalDimensions.height : 1100);
+    naturalDimensions?.height && naturalDimensions.height >= 400
+      ? naturalDimensions.height
+      : (asset.image_height || 1080);
 
   const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const img = e.currentTarget;

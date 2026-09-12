@@ -219,18 +219,22 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
         method: caseData.calibration_summary.method || "ArUco 4x4 Planar Homography",
         referenceObject: caseData.calibration_summary.referenceObject || `ArUco #${caseData.calibration_summary.aruco_marker_id ?? 0} (50mm)`,
         referenceLengthMm: caseData.calibration_summary.referenceLengthMm || 50.0,
-        scaleMmPerPixel: caseData.calibration_summary.scale_mm_per_px ?? caseData.calibration_summary.scaleMmPerPixel ?? 0.26,
-        uncertaintyMm: caseData.calibration_summary.sensor_uncertainty_mm ?? caseData.calibration_summary.uncertaintyMm ?? 0.8,
+        scaleMmPerPixel: caseData.calibration_summary.scale_mm_per_px ?? caseData.calibration_summary.scaleMmPerPixel,
+        uncertaintyMm: caseData.calibration_summary.sensor_uncertainty_mm ?? caseData.calibration_summary.uncertaintyMm,
         timestamp: caseData.created_at,
         operator: caseData.officer_id || "Officer LMO-DL-2024",
       };
     }
+    const isCalibrated = Boolean(activeAsset?.calibration?.is_calibrated);
+    const rawPxToMm = activeAsset?.calibration?.px_to_mm;
+    // If px_to_mm > 1.0 (e.g. 12 px/mm), convert to mm/px (0.0833 mm/px); if <= 1.0, use as mm/px
+    const computedScale = rawPxToMm ? (rawPxToMm > 1.0 ? 1.0 / rawPxToMm : rawPxToMm) : undefined;
     return {
-      available: Boolean(activeAsset?.calibration?.is_calibrated),
+      available: isCalibrated,
       method: activeAsset?.calibration?.method || "ArUco 4x4",
       referenceLengthMm: 50.0,
-      scaleMmPerPixel: activeAsset?.calibration?.px_to_mm,
-      uncertaintyMm: activeAsset?.calibration?.margin_of_error_pct || 0.8,
+      scaleMmPerPixel: isCalibrated ? computedScale : undefined,
+      uncertaintyMm: isCalibrated ? (activeAsset?.calibration?.margin_of_error_pct ?? 1.2) : undefined,
       timestamp: caseData.created_at,
       operator: caseData.officer_id,
     };
@@ -295,74 +299,139 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
     if (caseData.evidence_assets && caseData.evidence_assets.length > 0) {
       return caseData.evidence_assets.map((asset) => ({
         id: asset.image_id,
-        url: asset.preview_url || asset.file_path || "/assets/images/sample-pdp.jpg",
-        filename: `${asset.image_id}.jpg`,
+        url: asset.preview_url || asset.file_path || "",
+        filename: asset.original_filename || `${asset.image_id}.jpg`,
         type: asset.panel_type || "PDP_FRONT",
-        width: asset.image_width || 1280,
-        height: asset.image_height || 960,
+        width: asset.image_width || 1920,
+        height: asset.image_height || 1080,
       }));
     }
-    return [
-      {
-        id: "IMG-FALLBACK",
-        url: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&q=80&w=800",
-        filename: `${caseData.id}-evidence.jpg`,
-        type: "PDP_FRONT",
-        width: 1280,
-        height: 960,
-      },
-    ];
-  }, [caseData.evidence_assets, caseData.id]);
+    return [];
+  }, [caseData.evidence_assets]);
 
   const canvasBoxes: CanvasBoundingBox[] = useMemo(() => {
-    if (activeAsset?.ocr?.tokens && activeAsset.ocr.tokens.length > 0) {
-      const w = activeAsset.image_width || 1000;
-      const h = activeAsset.image_height || 1000;
-      return activeAsset.ocr.tokens.slice(0, 15).map((tok, idx) => {
-        const [ymin, xmin, ymax, xmax] = tok.bounding_box || [0, 0, 0, 0];
-        const boxW = Math.max(8, ((xmax - xmin) / w) * 100);
-        const boxH = Math.max(4, ((ymax - ymin) / h) * 100);
-        const x = Math.max(2, Math.min(90, (xmin / w) * 100));
-        const y = Math.max(2, Math.min(90, (ymin / h) * 100));
-        return {
-          id: tok.token_id || `tok-${idx}`,
-          label: tok.text,
-          x: Math.round(x),
-          y: Math.round(y),
-          width: Math.round(boxW),
-          height: Math.round(boxH),
-          confidence: tok.confidence || 0.95,
-          type: tok.language === "hi" ? "HINDI_DECLARATION" : "STATUTORY_FIELD",
-        };
+    const boxes: CanvasBoundingBox[] = [];
+    const w = activeAsset?.image_width || 1920;
+    const h = activeAsset?.image_height || 1080;
+
+    // Safely transform pixel bounding box [ymin, xmin, ymax, xmax] to viewport percentage [0 - 100]
+    const toPercentBox = (box: [number, number, number, number]) => {
+      const [ymin, xmin, ymax, xmax] = box;
+      const bw = ((xmax - xmin) / w) * 100;
+      const bh = ((ymax - ymin) / h) * 100;
+      const bx = (xmin / w) * 100;
+      const by = (ymin / h) * 100;
+      return {
+        x: Number(Math.max(0, Math.min(100, bx)).toFixed(2)),
+        y: Number(Math.max(0, Math.min(100, by)).toFixed(2)),
+        width: Number(Math.max(2, Math.min(100 - bx, bw)).toFixed(2)),
+        height: Number(Math.max(2, Math.min(100 - by, bh)).toFixed(2)),
+      };
+    };
+
+    // 1. Detected ArUco 4x4 (50mm) Scale Calibration Reference Standard
+    const refBox =
+      activeAsset?.calibration?.reference_bounding_box ||
+      (activeAsset?.calibration?.is_calibrated && activeAsset?.panel_type !== "ECOMMERCE_SNAPSHOT"
+        ? ([78, 78, 242, 242] as [number, number, number, number])
+        : null);
+
+    if (refBox && refBox.length === 4) {
+      const p = toPercentBox(refBox as [number, number, number, number]);
+      boxes.push({
+        id: "box-aruco-fiducial",
+        label: "ARUCO 4X4 (50mm Scale Standard)",
+        x: p.x,
+        y: p.y,
+        width: p.width,
+        height: p.height,
+        confidence: activeAsset?.calibration?.confidence || 0.99,
+        type: "FIDUCIAL_STANDARD",
       });
     }
 
+    // 2. Calibrated Extracted Fields with Linked Rule Evaluation Findings
+    if (caseData.extracted_fields && caseData.extracted_fields.length > 0) {
+      caseData.extracted_fields.forEach((fld, idx) => {
+        if (fld.bounding_box && fld.bounding_box.length === 4) {
+          const p = toPercentBox(fld.bounding_box as [number, number, number, number]);
+
+          // Match any statutory compliance finding for this field
+          const linkedFinding = (caseData.rule_evaluations || []).find((r) => {
+            const rc = r.rule_code?.toUpperCase() || "";
+            const ft = fld.field_type?.toUpperCase() || "";
+            if (ft === "NET_QUANTITY" && (rc.includes("NET_QTY") || rc.includes("UNIT") || rc.includes("QUANTITY"))) return true;
+            if (ft === "MRP" && rc.includes("MRP")) return true;
+            if (ft === "UNIT_SALE_PRICE" && rc.includes("USP")) return true;
+            if (ft === "CONSUMER_CARE" && rc.includes("CONSUMER_CARE")) return true;
+            if (ft === "COUNTRY_OF_ORIGIN" && rc.includes("ORIGIN")) return true;
+            if (ft === "QUALITY_GATE_GLARE" && rc.includes("QUALITY_GATE")) return true;
+            return false;
+          });
+
+          const label = linkedFinding
+            ? `${linkedFinding.rule_code}: ${fld.raw_ocr_text || linkedFinding.measured_value}`
+            : `${fld.field_type}: ${fld.raw_ocr_text}`;
+
+          boxes.push({
+            id: fld.field_id || `fld-box-${idx}`,
+            label,
+            x: p.x,
+            y: p.y,
+            width: p.width,
+            height: p.height,
+            confidence: fld.ocr_confidence || fld.detection_confidence || 0.98,
+            type: linkedFinding?.status || fld.field_type,
+          });
+        }
+      });
+    }
+
+    // 3. Fallback to OCR Tokens if extracted_fields is empty
+    if (
+      boxes.filter((b) => b.type !== "FIDUCIAL_STANDARD").length === 0 &&
+      activeAsset?.ocr?.tokens &&
+      activeAsset.ocr.tokens.length > 0
+    ) {
+      activeAsset.ocr.tokens.slice(0, 20).forEach((tok, idx) => {
+        if (tok.bounding_box && tok.bounding_box.length === 4) {
+          const p = toPercentBox(tok.bounding_box as [number, number, number, number]);
+          boxes.push({
+            id: tok.token_id || `tok-${idx}`,
+            label: tok.text,
+            x: p.x,
+            y: p.y,
+            width: p.width,
+            height: p.height,
+            confidence: tok.confidence || 0.95,
+            type: tok.language === "hi" ? "HINDI_DECLARATION" : "STATUTORY_FIELD",
+          });
+        }
+      });
+    }
+
+    // 4. If any rule_evaluations have explicit evidence_box and were not mapped above, add them
     if (caseData.rule_evaluations && caseData.rule_evaluations.length > 0) {
-      const positions = [
-        { x: 15, y: 14, w: 45, h: 10 },
-        { x: 15, y: 28, w: 35, h: 9 },
-        { x: 15, y: 42, w: 50, h: 12 },
-        { x: 15, y: 58, w: 40, h: 10 },
-        { x: 15, y: 72, w: 55, h: 12 },
-        { x: 65, y: 18, w: 30, h: 14 },
-      ];
-      return caseData.rule_evaluations.slice(0, 6).map((rule, idx) => {
-        const pos = positions[idx % positions.length];
-        return {
-          id: rule.finding_id,
-          label: `${rule.rule_code}: ${rule.measured_value || rule.status}`,
-          x: pos.x,
-          y: pos.y,
-          width: pos.w,
-          height: pos.h,
-          confidence: 0.96,
-          type: rule.status,
-        };
+      caseData.rule_evaluations.forEach((rule) => {
+        const evBox = (rule as any).evidence_box;
+        if (evBox && evBox.length === 4 && !boxes.some((b) => b.id === rule.finding_id)) {
+          const p = toPercentBox(evBox as [number, number, number, number]);
+          boxes.push({
+            id: rule.finding_id,
+            label: `${rule.rule_code}: ${rule.measured_value || rule.status}`,
+            x: p.x,
+            y: p.y,
+            width: p.width,
+            height: p.height,
+            confidence: 0.98,
+            type: rule.status,
+          });
+        }
       });
     }
 
-    return [];
-  }, [activeAsset, caseData.rule_evaluations]);
+    return boxes;
+  }, [activeAsset, caseData.extracted_fields, caseData.rule_evaluations]);
 
   const measurementsList: CalibratedMeasurementItem[] = useMemo(() => {
     if (caseData.measurements && caseData.measurements.length > 0) {
