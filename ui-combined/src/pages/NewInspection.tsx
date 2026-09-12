@@ -25,7 +25,6 @@ import { PackagingType, InspectionType } from "../types/inspection";
 import { InspectionCameraModal } from "../components/camera";
 import { useCircle } from "../context/CircleContext";
 import { useLanguage } from "../context/LanguageContext";
-import { compressPackagingImage } from "../services/imageCompression";
 
 interface PipelineStepItem {
   id: string;
@@ -170,42 +169,23 @@ export const NewInspection: React.FC = () => {
     if (!newFiles || newFiles.length === 0) return;
     const fileList = Array.from(newFiles);
     const startIdx = files.length;
+    // Preserve original, uncompressed File objects in state for statutory analysis
     setFiles((prev) => [...prev, ...fileList]);
     const previews = fileList.map((f) => URL.createObjectURL(f));
     setFilePreviews((prev) => [...prev, ...previews]);
 
+    // Generate lightweight thumbnail previews for UI display without altering original File objects
     fileList.forEach((f, idx) => {
-      compressPackagingImage(f, { maxDimension: 1280, quality: 0.8 })
-        .then((comp) => {
-          setFilePreviews((prev) => {
-            const next = [...prev];
-            const pos = startIdx + idx;
-            if (pos < next.length) {
-              next[pos] = comp.dataUrl;
-            }
-            return next;
-          });
-          setFiles((prev) => {
-            const next = [...prev];
-            const pos = startIdx + idx;
-            if (pos < next.length) {
-              next[pos] = comp.file;
-            }
-            return next;
-          });
-        })
-        .catch(() => {
-          getPersistentPreview(f).then((persistentUrl) => {
-            setFilePreviews((prev) => {
-              const next = [...prev];
-              const pos = startIdx + idx;
-              if (pos < next.length) {
-                next[pos] = persistentUrl;
-              }
-              return next;
-            });
-          });
+      getPersistentPreview(f).then((persistentUrl) => {
+        setFilePreviews((prev) => {
+          const next = [...prev];
+          const pos = startIdx + idx;
+          if (pos < next.length) {
+            next[pos] = persistentUrl;
+          }
+          return next;
         });
+      });
     });
   };
 
@@ -237,25 +217,39 @@ export const NewInspection: React.FC = () => {
       });
 
       // 3. Upload evidence files if provided (all selected photographs)
+      // STATUTORY REQUIREMENT: 1st time upload and analysis MUST run on original, non-compressed
+      // images at native sensor resolution to prevent ArUco scale and OCR token discrepancy.
       const uploadedImageIds: string[] = [];
       if (files.length > 0) {
         for (let i = 0; i < files.length; i++) {
           const rawFile = files[i];
-          let fileToUpload = rawFile;
           let previewUrl = filePreviews[i];
           let imgWidth = 1920;
           let imgHeight = 1080;
 
           try {
-            const compressed = await compressPackagingImage(rawFile, { maxDimension: 1280, quality: 0.8 });
-            fileToUpload = compressed.file;
-            imgWidth = compressed.width;
-            imgHeight = compressed.height;
-            if (compressed.dataUrl) {
-              previewUrl = compressed.dataUrl;
-            }
-          } catch (compErr) {
-            console.warn("Pre-upload compression fallback:", compErr);
+            const dims = await new Promise<{ width: number; height: number }>((resolve) => {
+              const img = new Image();
+              const tempUrl = URL.createObjectURL(rawFile);
+              img.onload = () => {
+                const w = img.naturalWidth || 1920;
+                const h = img.naturalHeight || 1080;
+                URL.revokeObjectURL(tempUrl);
+                resolve({ width: w, height: h });
+              };
+              img.onerror = () => {
+                URL.revokeObjectURL(tempUrl);
+                resolve({ width: 1920, height: 1080 });
+              };
+              img.src = tempUrl;
+            });
+            imgWidth = dims.width;
+            imgHeight = dims.height;
+          } catch {
+            // Default fallback dimensions
+          }
+
+          if (!previewUrl) {
             previewUrl = await getPersistentPreview(rawFile, filePreviews[i]);
           }
 
@@ -267,12 +261,14 @@ export const NewInspection: React.FC = () => {
               : i === 2
               ? "BACK_PANEL"
               : "SIDE_PANEL";
-          const uploadResult = await ApiService.uploadEvidence(fileToUpload, {
+
+          // Transmit untouched original image to uploadEvidence for pristine statutory analysis
+          const uploadResult = await ApiService.uploadEvidence(rawFile, {
             inspection_id: newCase.id,
             panel_type: panelType,
-            original_filename: fileToUpload.name,
-            file_size_bytes: fileToUpload.size,
-            mime_type: fileToUpload.type || "image/jpeg",
+            original_filename: rawFile.name,
+            file_size_bytes: rawFile.size,
+            mime_type: rawFile.type || "image/jpeg",
             image_width: imgWidth,
             image_height: imgHeight,
             preview_url: previewUrl,
@@ -515,13 +511,23 @@ export const NewInspection: React.FC = () => {
                         ? "मोबाइल गैलरी अथवा स्कैनर से JPEG, PNG, WEBP समर्थित"
                         : "Supports JPEG, PNG, WEBP from mobile gallery or external scanners"}
                     </p>
-                    <div className="mt-2 flex items-center gap-1.5 text-[10px] text-emerald-800 font-medium bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                      <ShieldCheck size={12} className="text-emerald-600" />
-                      <span>
-                        {language === "hi"
-                          ? "अधिग्रहण पर SHA-256 मर्कल साक्ष्य अखंडता सुरक्षित"
-                          : "SHA-256 Merkle Provenance Captured on Intake"}
-                      </span>
+                    <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
+                      <div className="flex items-center gap-1.5 text-[10px] text-emerald-800 font-medium bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                        <ShieldCheck size={12} className="text-emerald-600" />
+                        <span>
+                          {language === "hi"
+                            ? "अधिग्रहण पर SHA-256 मर्कल साक्ष्य अखंडता सुरक्षित"
+                            : "SHA-256 Merkle Provenance Captured on Intake"}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-[10px] text-blue-800 font-medium bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
+                        <Sparkles size={12} className="text-blue-600" />
+                        <span>
+                          {language === "hi"
+                            ? "विश्लेषण हेतु 100% मूल गैर-संपीड़ित छवि • शून्य डेटा हानि"
+                            : "Full-Fidelity Original Intake • Zero Precision Loss"}
+                        </span>
+                      </div>
                     </div>
                     <input
                       ref={fileInputRef}
@@ -560,8 +566,10 @@ export const NewInspection: React.FC = () => {
                             )}
                             <div className="min-w-0">
                               <p className="font-bold text-slate-800 truncate">{file.name}</p>
-                              <p className="text-[10px] font-mono text-slate-500">
-                                {(file.size / 1024).toFixed(0)} KB • High-Res PDP
+                              <p className="text-[10px] font-mono text-emerald-700 font-semibold">
+                                {file.size >= 1024 * 1024
+                                  ? `${(file.size / (1024 * 1024)).toFixed(1)} MB`
+                                  : `${(file.size / 1024).toFixed(0)} KB`} • {language === "hi" ? "मूल गैर-संपीड़ित PDP" : "Original Uncompressed PDP"}
                               </p>
                             </div>
                           </div>

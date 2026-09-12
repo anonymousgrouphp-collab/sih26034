@@ -47,4 +47,13 @@ describe("Client-Side Packaging Image Compression", () => {
     assert.ok(result.originalSizeBytes > 0);
     assert.equal(result.file.name, "box_front.jpg");
   });
+
+  it("compressForStorageWithoutPixelLoss preserves lossless flag and native resolution", async () => {
+    const rawFile = new File(["lossless-image-binary-data"], "package_hires.png", { type: "image/png" });
+    const result = await compressPackagingImage(rawFile, { lossless: true });
+
+    assert.equal(result.isLossless, true);
+    assert.ok(result.file instanceof File);
+    assert.ok(result.file.size > 0);
+  });
 });

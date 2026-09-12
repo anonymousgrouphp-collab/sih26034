@@ -551,26 +551,21 @@ class FieldInspectorCLI:
             }
 
         # Stage 2: Metric Calibration
-        scale_mm_per_px = 0.0625
-        scale_px_per_mm = 16.0
-        calib_target = "ArUco DICT_4X4_50 #0 (50.0 mm)" if calib_mode == "aruco" else "ISO Standard Card (85.6 mm)"
-        uncertainty = 0.04
+        from calibration import CalibrationEngine
+        calib_res = CalibrationEngine.calibrate(img)
+        if calib_res and calib_res.is_calibrated and calib_res.calibration:
+            scale_px_per_mm = float(calib_res.calibration.px_to_mm)
+            scale_mm_per_px = round(1.0 / max(0.001, scale_px_per_mm), 4)
+            calib_target = str(calib_res.calibration.method)
+            uncertainty = float(calib_res.calibration.margin_of_error_pct or 0.04)
+            pdp_cm2 = pdp_cm2_override or (calib_res.principal_display_panel.pdp_area_cm2 if calib_res.principal_display_panel else 120.0)
+        else:
+            scale_mm_per_px = 0.0625
+            scale_px_per_mm = 16.0
+            calib_target = "UNRESOLVED"
+            uncertainty = 0.04
+            pdp_cm2 = pdp_cm2_override or (known_meta["pdp_area_cm2"] if known_meta else 120.0)
 
-        try:
-            from cv2 import aruco
-            aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_4X4_50)
-            parameters = aruco.DetectorParameters()
-            detector = aruco.ArucoDetector(aruco_dict, parameters)
-            corners, ids, _ = detector.detectMarkers(img)
-            if ids is not None and len(ids) > 0:
-                edge_px = float(np.linalg.norm(corners[0][0][0] - corners[0][0][1]))
-                scale_mm_per_px = round(50.0 / max(1.0, edge_px), 4)
-                scale_px_per_mm = round(1.0 / scale_mm_per_px, 2)
-                calib_target = f"ArUco DICT_4X4_50 (Marker ID #{ids[0][0]})"
-        except Exception:
-            pass
-
-        pdp_cm2 = pdp_cm2_override or (known_meta["pdp_area_cm2"] if known_meta else 120.0)
         font_mm = known_meta["measured_font_mm"] if known_meta else 1.84
 
         # Stage 3: Semantic Extraction
@@ -593,10 +588,10 @@ class FieldInspectorCLI:
         else:
             from engine import MultilingualOCREngine
             from extractor import CommodityFactExtractor
-            ocr_engine = MultilingualOCREngine()
+            ocr_engine = MultilingualOCREngine(allow_classical_fallback=True)
             ocr_output = ocr_engine.process_image(img, image_id=inspection_id)
             extractor = CommodityFactExtractor()
-            facts = extractor.extract(ocr_output, calibration=None)
+            facts = extractor.extract(ocr_output, calibration=calib_res)
             
             product_name = path_obj.stem.replace("_", " ").title()
             parsed_qty = facts.net_quantity.model_dump() if facts.net_quantity else None

@@ -589,7 +589,7 @@ async def upload_inspection_image(
     ev_image = EvidenceImage(
         id=f"img_{uuid.uuid4()}",
         inspection_id=inspection.id,
-        panel_type=meta.get("image_facet", "PDP_FRONT"),
+        panel_type=meta.get("panel_type") or meta.get("image_facet") or "PDP_FRONT",
         file_path=rel_path,
         raw_sha256=file_hash,
         image_width=img_w,

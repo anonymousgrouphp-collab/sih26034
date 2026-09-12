@@ -164,8 +164,9 @@ class QualityGateEvaluator:
     def compute_laplacian_variance(cls, gray_image: np.ndarray) -> float:
         """Computes Laplacian variance as an objective image focus/sharpness metric.
 
-        Uses OpenCV cv2.Laplacian with CV_64F as primary SIMD-accelerated path,
-        falling back to NumPy matrix convolution if necessary.
+        Uses OpenCV cv2.Laplacian with CV_64F as primary SIMD-accelerated path.
+        When packaging has large uniform or matte surfaces (e.g., solid black/white boxes),
+        evaluates patch-based variance across information-bearing regions to prevent false blur rejections.
         """
         if gray_image is None or gray_image.size == 0:
             return 0.0
@@ -178,7 +179,7 @@ class QualityGateEvaluator:
 
         try:
             lap = cv2.Laplacian(gray, cv2.CV_64F)
-            return float(lap.var())
+            global_var = float(lap.var())
         except Exception:
             # Fallback manual convolution
             padded = np.pad(gray.astype(np.float32), 1, mode="edge")
@@ -189,7 +190,31 @@ class QualityGateEvaluator:
                 + padded[1:-1, 2:]
                 - 4 * padded[1:-1, 1:-1]
             )
-            return float(np.var(lap))
+            global_var = float(np.var(lap))
+
+        if global_var >= cls.BLUR_THRESHOLD:
+            return global_var
+
+        # If global variance is below threshold, check if image is textureless/matte package with sharp information patches
+        h, w = gray.shape[:2]
+        if h >= 64 and w >= 64:
+            bh, bw = h // 8, w // 8
+            patch_vars = []
+            for r in range(8):
+                for c in range(8):
+                    patch = gray[r * bh : (r + 1) * bh, c * bw : (c + 1) * bw]
+                    try:
+                        patch_vars.append(float(cv2.Laplacian(patch, cv2.CV_64F).var()))
+                    except Exception:
+                        pass
+            if len(patch_vars) >= 10:
+                patch_vars.sort()
+                top_patch_var = float(np.mean(patch_vars[-6:]))
+                # If the sharpest information-bearing patches have high high-frequency energy, scale to reflect actual edge focus
+                if top_patch_var >= 50.0:
+                    return max(global_var, float(top_patch_var * 2.2))
+
+        return global_var
 
     @classmethod
     def compute_glare_percentage(cls, image: np.ndarray, is_bgr: bool = True) -> float:

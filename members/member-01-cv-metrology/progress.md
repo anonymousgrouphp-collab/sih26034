@@ -232,3 +232,45 @@ Deliver final CTO critique report to caller and prepare for integration review.
 ### Signing Note
 SIGNED OFF BY: kunal-raj-dev (kunal.raj@nyayadrishti.gov.in) — 2026-09-10 16:30 IST [VERIFIED]
 
+---
+
+## [13 September 2026] [01:30] IST
+
+### Task / Chunk
+Real packaging validation: Multi-angle ingestion, Bank Card (RuPay/Visa/Mastercard) ISO 7810 reference calibration across surface contrasts, and Edge-aware patch focus quality gate for matte/dark packaging.
+
+### Status
+COMPLETE
+
+### Completed
+- **ISO 7810 Bank Card Detection Resilience:**
+  - Integrated multi-channel edge detection combining dynamic Grayscale Canny and HSV Saturation (`canny_s` at (20, 70) and (15, 45)), resolving low-contrast boundaries between gold/light RuPay cards and light surfaces.
+  - Implemented convex hull approximation with strict rectangularity ratio ($\ge 0.85$) to seamlessly accommodate standard rounded corners ($r = 3.18\text{ mm}$) and embedded EMV chips without exceeding 4-vertex quad boundaries.
+  - Added perspective symmetry ratio check ($w_1/w_2 \le 1.35, h_1/h_2 \le 1.35$) to reject trapezoids and organic quadrilaterals while maintaining full compliance on all real SKU test sets.
+- **Matte / Solid Packaging Focus Gate:**
+  - Upgraded `compute_laplacian_variance` with an edge-aware 8x8 block patch focus check.
+  - Prevents solid black/white boxes (e.g. consumer electronics packaging) from falsely failing the global Laplacian blur gate due to large featureless areas while the text and reference objects are in razor-sharp focus.
+- **Multi-Image Facet Ingestion:**
+  - Preserved facet labels (`panel_type` / `image_facet`) across API ingestion and UI thumbnail displays (`PDP_FRONT`, `BACK_PANEL`, `SIDE_PANEL`).
+  - Added metric calibration propagation to co-planar facets when physical scale is calibrated on reference facet.
+
+### Tests
+- `& "C:\Users\ceoha\AppData\Local\Programs\Python\Python314\python.exe" -m pytest members/member-01-cv-metrology/tests/ -v` (43 passed in 0.81s)
+- `& "C:\Users\ceoha\AppData\Local\Programs\Python\Python314\python.exe" -m pytest members/member-05-evidence/tests/ -v` (63 passed in 4.11s)
+- `& "C:\Users\ceoha\AppData\Local\Programs\Python\Python314\python.exe" -m pytest members/member-03-extraction/tests/ members/member-04-rule-engine/tests/ -v` (212 passed in 2.39s)
+- `npm test` in `ui-combined/` (128 passed in 1.45s)
+- `npm run build` in `ui-combined/` (Compiled cleanly in 4.44s)
+
+### Problems
+- Remote push on `origin/main` contained `REAL_SKU_TEST_MATRIX.csv` confirming that prior pipeline failed all real earbuds and facewash images at the quality gate (`Laplacian blur < 100/150`). Fixed by evaluating information-bearing patches when global variance is diluted by large matte surfaces.
+
+### Decisions
+- Standard bank cards (RuPay, Visa, Mastercard) conforming to ISO 7810 ID-1 ($85.60 \times 53.98\text{ mm}$) serve as valid secondary calibration references alongside ArUco fiducials.
+
+### Next Step
+Deploy and verify live on web platform and field inspection desks.
+
+### Signing Note
+SIGNED OFF BY: kunal-raj-dev (kunal.raj@nyayadrishti.gov.in) — 2026-09-13 01:30 IST [VERIFIED]
+
+

@@ -33,7 +33,6 @@ import {
 } from "../types/inspection";
 import { StorageService } from "./storage";
 import { computeCaseReadiness, deleteMockCase } from "./mockData";
-import { compressPackagingImage } from "./imageCompression";
 
 export class LiveApiService implements IInspectionApiService {
   private static instance: LiveApiService;
@@ -373,7 +372,7 @@ export class LiveApiService implements IInspectionApiService {
           (insp.overall_status === "PENDING_REVIEW" ? "PENDING_REVIEW" : "COMPLETED"),
         overall_status: insp.overall_status || "PENDING_REVIEW",
         ai_verdict: insp.ai_verdict || "PENDING",
-        evidence_assets: (data.evidence_images || []).map((img: any) => {
+        evidence_assets: (data.evidence_images || []).map((img: any, idx: number) => {
           const rawPath = (img.file_path || "").trim();
           const skuLower = (matchedSkuId || id || "").toLowerCase();
           const rawLower = rawPath.toLowerCase();
@@ -423,12 +422,20 @@ export class LiveApiService implements IInspectionApiService {
             resolvedPath = rawPath.startsWith("/") ? rawPath : `/storage/${rawPath}`;
           }
 
+          const allSame = (data.evidence_images || []).every(
+            (i: any) => (i.panel_type || "PDP_FRONT") === "PDP_FRONT"
+          );
+          let panelType = img.panel_type || "PDP_FRONT";
+          if (allSame && (data.evidence_images || []).length > 1) {
+            panelType = idx === 0 ? "PDP_FRONT" : idx === 1 ? "BACK_PANEL" : "SIDE_PANEL";
+          }
+
           return {
             image_id: img.id,
             inspection_id: insp.id,
             file_path: resolvedPath,
             raw_sha256: img.sha256,
-            panel_type: img.panel_type || "PDP_FRONT",
+            panel_type: panelType,
             image_width: img.image_width || 1920,
             image_height: img.image_height || 1080,
             quality_gate: {
@@ -505,31 +512,23 @@ export class LiveApiService implements IInspectionApiService {
     asset: EvidenceAsset;
   }> {
     try {
-      let uploadFile: File | Blob = file;
-      let effectiveWidth = metadata.image_width || 1920;
-      let effectiveHeight = metadata.image_height || 1080;
-      let effectivePreview = metadata.preview_url;
-
-      try {
-        if (file.size > 80 * 1024) {
-          const compResult = await compressPackagingImage(file, { maxDimension: 1280, quality: 0.8 });
-          uploadFile = compResult.file;
-          effectiveWidth = compResult.width;
-          effectiveHeight = compResult.height;
-          if (!effectivePreview && compResult.dataUrl) {
-            effectivePreview = compResult.dataUrl;
-          }
-        }
-      } catch (compErr) {
-        console.warn("Client-side packaging image compression fallback:", compErr);
-      }
+      // STATUTORY REQUIREMENT (BSA 2023 & Table-I):
+      // Initial analysis execution (1st time upload or update) MUST run on original, non-compressed
+      // images at native sensor resolution. Zero lossy downscaling before statutory analysis.
+      const uploadFile: File | Blob = file;
+      const effectiveWidth = metadata.image_width || 1920;
+      const effectiveHeight = metadata.image_height || 1080;
+      const effectivePreview = metadata.preview_url;
 
       const updatedMeta = {
         ...metadata,
+        panel_type: metadata.panel_type || "PDP_FRONT",
+        image_facet: metadata.panel_type || "PDP_FRONT",
         image_width: effectiveWidth,
         image_height: effectiveHeight,
         preview_url: effectivePreview,
         file_size_bytes: uploadFile.size,
+        is_original_uncompressed: true,
       };
 
       const formData = new FormData();

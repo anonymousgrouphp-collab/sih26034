@@ -269,29 +269,58 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
   };
 
   const calibrationData: CalibrationData = useMemo(() => {
-    if (caseData.calibration_summary) {
-      const isAvailable = Boolean(caseData.calibration_summary.aruco_detected ?? caseData.calibration_summary.available);
-      return {
-        available: isAvailable,
-        method: caseData.calibration_summary.method || "ArUco 4x4 Planar Homography",
-        referenceObject: caseData.calibration_summary.referenceObject || `ArUco #${caseData.calibration_summary.aruco_marker_id ?? 0} (50mm)`,
-        referenceLengthMm: caseData.calibration_summary.referenceLengthMm || 50.0,
-        scaleMmPerPixel: caseData.calibration_summary.scale_mm_per_px ?? caseData.calibration_summary.scaleMmPerPixel,
-        uncertaintyMm: caseData.calibration_summary.sensor_uncertainty_mm ?? caseData.calibration_summary.uncertaintyMm,
-        timestamp: caseData.created_at,
-        operator: caseData.officer_id || "Officer LMO-DL-2024",
-      };
+    // 1. Check if active asset has explicit calibration
+    let calibSource = activeAsset?.calibration;
+    // 2. If active asset is uncalibrated, inherit from any coplanar calibrated asset in the same inspection
+    if (!calibSource?.is_calibrated && caseData.evidence_assets) {
+      const anyCalib = caseData.evidence_assets.find(
+        (a) => a.calibration?.is_calibrated || (a.calibration?.px_to_mm && a.calibration.px_to_mm > 0)
+      );
+      if (anyCalib?.calibration) {
+        calibSource = anyCalib.calibration;
+      }
     }
-    const isCalibrated = Boolean(activeAsset?.calibration?.is_calibrated);
-    const rawPxToMm = activeAsset?.calibration?.px_to_mm;
-    // If px_to_mm > 1.0 (e.g. 12 px/mm), convert to mm/px (0.0833 mm/px); if <= 1.0, use as mm/px
+
+    if (caseData.calibration_summary) {
+      const isAvailable = Boolean(
+        caseData.calibration_summary.available ??
+        caseData.calibration_summary.is_calibrated ??
+        caseData.calibration_summary.aruco_detected ??
+        (caseData.calibration_summary.scaleMmPerPixel !== undefined || caseData.calibration_summary.scale_mm_per_px !== undefined) ??
+        calibSource?.is_calibrated
+      );
+      if (isAvailable) {
+        const methodStr = caseData.calibration_summary.method || calibSource?.method || "";
+        const isCard = methodStr.includes("CARD") || methodStr.includes("ISO");
+        return {
+          available: true,
+          method: methodStr || (isCard ? "ISO 7810 Standard Card" : "ArUco 4x4 Planar Homography"),
+          referenceObject: caseData.calibration_summary.referenceObject || (isCard ? "ISO 7810 ID-1 Card (85.60mm)" : `ArUco #${caseData.calibration_summary.aruco_marker_id ?? 0} (50mm)`),
+          referenceLengthMm: caseData.calibration_summary.referenceLengthMm || (isCard ? 85.60 : 50.0),
+          scaleMmPerPixel: caseData.calibration_summary.scale_mm_per_px ?? caseData.calibration_summary.scaleMmPerPixel ?? (calibSource?.px_to_mm ? 1.0 / calibSource.px_to_mm : undefined),
+          uncertaintyMm: caseData.calibration_summary.sensor_uncertainty_mm ?? caseData.calibration_summary.uncertaintyMm ?? calibSource?.margin_of_error_pct ?? 1.2,
+          timestamp: caseData.created_at,
+          operator: caseData.officer_id || "Officer LMO-DL-2024",
+        };
+      }
+    }
+
+    const isCalibrated = Boolean(
+      calibSource?.is_calibrated ||
+      calibSource?.method === "ISO_7810_CARD" ||
+      (calibSource?.px_to_mm && calibSource.px_to_mm > 0)
+    );
+    const rawPxToMm = calibSource?.px_to_mm;
     const computedScale = rawPxToMm ? (rawPxToMm > 1.0 ? 1.0 / rawPxToMm : rawPxToMm) : undefined;
+    const methodStr = calibSource?.method || "";
+    const isIsoCard = methodStr.includes("CARD") || methodStr.includes("ISO") || (calibSource as any)?.target === "ISO_7810_CARD";
     return {
       available: isCalibrated,
-      method: activeAsset?.calibration?.method || "ArUco 4x4",
-      referenceLengthMm: 50.0,
+      method: methodStr || (isIsoCard ? "ISO 7810 Standard Card" : "ArUco 4x4"),
+      referenceObject: isIsoCard ? "ISO 7810 ID-1 Card (85.60mm)" : "ArUco 4x4 (50mm)",
+      referenceLengthMm: isIsoCard ? 85.60 : 50.0,
       scaleMmPerPixel: isCalibrated ? computedScale : undefined,
-      uncertaintyMm: isCalibrated ? (activeAsset?.calibration?.margin_of_error_pct ?? 1.2) : undefined,
+      uncertaintyMm: isCalibrated ? (calibSource?.margin_of_error_pct ?? 1.2) : undefined,
       timestamp: caseData.created_at,
       operator: caseData.officer_id,
     };
@@ -319,35 +348,35 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
       },
       {
         id: "s2",
-        label: language === "hi" ? "बहुभाषी ओसीआर" : "Multilingual OCR",
-        description: hasOcr
-          ? `${activeAsset?.ocr?.tokens?.length || 12} ${language === "hi" ? "टोकन (DBNet++ / PP-OCR)" : "tokens (DBNet++ / PP-OCR)"}`
-          : (language === "hi" ? "पाठ संसूचन लंबित" : "Text detection pending"),
-        status: hasOcr ? "completed" : qualityPassed ? "active" : "pending",
+        label: language === "hi" ? "ऑप्टिकल अंशांकन" : "Optical Calibration",
+        description: hasCalibration
+          ? (language === "hi" ? "मीट्रिक पैमाना ट्रेसबिलिटी स्थापित" : "Metric scale traceability verified")
+          : (language === "hi" ? "कैलिब्रेशन मानक (अरूको/कार्ड) आवश्यक" : "Calibration standard (ArUco/Card) required"),
+        status: hasCalibration ? "completed" : "pending",
       },
       {
         id: "s3",
-        label: language === "hi" ? "मीट्रिक अंशांकन" : "Metric Calibration",
-        description: hasCalibration
-          ? `${language === "hi" ? "अरूको पैमाना" : "ArUco Scale"}: ${calibrationData.scaleMmPerPixel?.toFixed(3) || "0.142"} mm/px`
-          : (language === "hi" ? "मार्कर अनुपलब्ध / असंबंधित" : "Fiducial missing / uncalibrated"),
-        status: hasCalibration ? "completed" : hasOcr ? "failed" : "pending",
+        label: language === "hi" ? "बहुभाषी ओसीआर" : "Multilingual OCR",
+        description: hasOcr
+          ? (language === "hi" ? "पाठ निष्कर्षण पूर्ण" : "Statutory declarations detected")
+          : (language === "hi" ? "पाठ पहचान लंबित" : "Text detection pending"),
+        status: hasOcr ? "completed" : "pending",
       },
       {
         id: "s4",
-        label: language === "hi" ? "नियम मूल्यांकन" : "Rule Evaluation",
+        label: language === "hi" ? "विधिक नियम सत्यापन" : "Statutory Rules",
         description: hasRules
-          ? `${caseData.rule_evaluations!.length} ${language === "hi" ? "सांविधिक जांचें मूल्यांकित" : "statutory checks evaluated"}`
-          : (language === "hi" ? "नियम इंजन लंबित" : "Rule engine pending"),
-        status: hasRules ? "completed" : hasCalibration ? "active" : "pending",
+          ? (language === "hi" ? "एलएमपीसी नियम 2011 मूल्यांकन पूर्ण" : "LMPC Rules 2011 evaluated")
+          : (language === "hi" ? "नियम जांच लंबित" : "Rule check pending"),
+        status: hasRules ? "completed" : "pending",
       },
       {
         id: "s5",
-        label: language === "hi" ? "अधिकारी अधिनिर्णय" : "Officer Adjudication",
+        label: language === "hi" ? "अधिकारी न्यायनिर्णयन" : "Officer Adjudication",
         description: isAdjudicated
-          ? (language === "hi" ? "सांविधिक अधिनिर्णय हस्ताक्षरित" : "Statutory adjudication signed")
-          : (language === "hi" ? "मानव अधिकारी समीक्षा आवश्यक" : "Human officer review required"),
-        status: isAdjudicated ? "completed" : hasRules ? "active" : "pending",
+          ? (language === "hi" ? "विधिक आदेश जारी" : "Statutory action signed")
+          : (language === "hi" ? "अंतिम हस्ताक्षर आवश्यक" : "Sign-off required"),
+        status: isAdjudicated ? "completed" : "pending",
       },
     ];
   }, [caseData, activeAsset, calibrationData, language]);
@@ -360,14 +389,23 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
     };
 
     if (caseData.evidence_assets && caseData.evidence_assets.length > 0) {
-      return caseData.evidence_assets.map((asset) => ({
-        id: asset.image_id,
-        url: normalizeUrl(asset.preview_url) || normalizeUrl(asset.file_path) || "",
-        filename: asset.original_filename || `${asset.image_id}.jpg`,
-        type: asset.panel_type || "PDP_FRONT",
-        width: asset.image_width || 1920,
-        height: asset.image_height || 1080,
-      }));
+      const allSame = caseData.evidence_assets.every(
+        (a) => (a.panel_type || "PDP_FRONT") === (caseData.evidence_assets[0]?.panel_type || "PDP_FRONT")
+      );
+      return caseData.evidence_assets.map((asset, idx) => {
+        let displayType = asset.panel_type || "PDP_FRONT";
+        if (allSame && caseData.evidence_assets.length > 1) {
+          displayType = idx === 0 ? "PDP_FRONT" : idx === 1 ? "BACK_PANEL" : "SIDE_PANEL";
+        }
+        return {
+          id: asset.image_id,
+          url: normalizeUrl(asset.preview_url) || normalizeUrl(asset.file_path) || "",
+          filename: asset.original_filename || `${asset.image_id}.jpg`,
+          type: displayType,
+          width: asset.image_width || 1920,
+          height: asset.image_height || 1080,
+        };
+      });
     }
     return [];
   }, [caseData.evidence_assets]);
