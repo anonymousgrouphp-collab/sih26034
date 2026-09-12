@@ -19,19 +19,26 @@
   "calibration": {
     "method": "ARUCO_4X4_50",
     "px_to_mm": 11.85,
-    "confidence": 0.99
+    "confidence": 0.99,
+    "reference_bounding_box": [78, 78, 242, 242]
   },
   "extracted_entities": {
+    "brand_name": {
+      "text": "Sunfeast Premium Butter Cookies",
+      "bounding_box": [475, 840, 520, 1300]
+    },
     "net_quantity": {
       "magnitude": 200.0,
       "unit": "gms",
       "has_banned_unit": true,
-      "banned_unit_found": "gms"
+      "banned_unit_found": "gms",
+      "bounding_box": [530, 840, 565, 1050]
     },
     "mrp": {
       "amount": 75.0,
       "currency": "INR",
-      "tax_inclusive": true
+      "tax_inclusive": true,
+      "bounding_box": [570, 840, 605, 1150]
     },
     "measured_font_height_mm": 1.84
   },

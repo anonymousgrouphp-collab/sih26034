@@ -28,6 +28,11 @@ import {
   CreateInspectionPayload,
   EvidenceAsset,
   ApiError,
+  ExtractedField,
+  RuleFinding,
+  CalibrationMethod,
+  PDPGeometry,
+  OCRToken,
 } from "../types/inspection";
 import {
   GOLDEN_SKU_CASES,
@@ -194,8 +199,8 @@ export class MockApiService implements IInspectionApiService {
     quality_gate: QualityGateResult;
     asset: EvidenceAsset;
   }> {
-    const imageId = `img_mock_${Date.now()}`;
-    let rawSha256 = "a3f5e1b2c4d6879012345678abcdef0123456789abcdef0123456789abcdef01";
+    const imageId = `img_mock_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    let rawSha256 = `sha256_${Date.now()}_${Math.random().toString(16).substring(2, 10)}`;
     let qualityGate: QualityGateResult = {
       passed: true,
       blur_variance: 342.18,
@@ -321,44 +326,386 @@ export class MockApiService implements IInspectionApiService {
       };
     }
 
-    let sourceTemplate = GOLDEN_SKU_CASES["SKU-DEMO-01"];
-    if (scenario === "PASS" || targetCase.product_name.toLowerCase().includes("water")) {
-      sourceTemplate = GOLDEN_SKU_CASES["SKU-DEMO-03"];
-    } else if (scenario === "REVIEW" || targetCase.product_name.toLowerCase().includes("soap")) {
-      sourceTemplate = GOLDEN_SKU_CASES["SKU-DEMO-04"];
-    } else if (scenario === "FAIL") {
-      sourceTemplate = GOLDEN_SKU_CASES["SKU-DEMO-01"];
-    }
+    const isEarbuds =
+      targetCase.product_name.toLowerCase().includes("earbud") ||
+      targetCase.product_name.toLowerCase().includes("goboult") ||
+      targetCase.product_name.toLowerCase().includes("w45") ||
+      targetCase.product_name.toLowerCase().includes("headphone") ||
+      targetCase.product_name.toLowerCase().includes("boult") ||
+      targetCase.product_name.toLowerCase().includes("wireless") ||
+      targetCase.product_name.toLowerCase().includes("audio") ||
+      targetCase.product_name.toLowerCase().includes("tws") ||
+      (targetCase.brand_name && targetCase.brand_name.toLowerCase().includes("goboult")) ||
+      (targetCase.brand_name && targetCase.brand_name.toLowerCase().includes("boult")) ||
+      targetCase.evidence_assets.some(
+        (a) =>
+          a.original_filename?.toLowerCase().includes("img (") ||
+          a.original_filename?.toLowerCase().includes("earbud") ||
+          a.original_filename?.toLowerCase().includes("w45") ||
+          a.original_filename?.toLowerCase().includes("boult")
+      );
 
-    const updatedAssets = targetCase.evidence_assets.map((a, idx) => {
-      const isPrimary = a.image_id === (activeAsset?.image_id || imageId) || idx === 0;
-      return {
-        ...a,
-        calibration: a.calibration || (isPrimary ? sourceTemplate.evidence_assets[0]?.calibration : undefined),
-        ocr: a.ocr || (isPrimary ? {
-          ...sourceTemplate.evidence_assets[0]?.ocr,
-          full_text: `${targetCase.product_name || "Statutory Commodity"}\nDeclared Net Qty: ${targetCase.declared_net_quantity || "400 ml"}\nMRP Rs. 140.00 (incl. of all taxes)\nMfg Date: 08/2026\nBrand: ${targetCase.brand_name || "Trade Brand"}`,
-        } : undefined),
-      };
-    });
+    let updatedAssets: EvidenceAsset[] = [];
+    let adaptedExtractedFields: ExtractedField[] = [];
+    let ruleEvaluations: RuleFinding[] = [];
+    let overallVerdict: "PASS" | "FAIL" | "REVIEW" | "UNABLE_TO_VERIFY" = "PASS";
 
-    // For custom dynamic cases created in the field, reflect declared commodity particulars
-    let adaptedExtractedFields = sourceTemplate.extracted_fields;
-    if (targetCase.id && !targetCase.id.startsWith("insp_demo_")) {
+    if (isEarbuds) {
+      targetCase.product_name = targetCase.product_name || "GOBOULT W45 Wireless Earbuds";
+      targetCase.brand_name = targetCase.brand_name || "GOBOULT";
+      targetCase.manufacturer_name = targetCase.manufacturer_name || "Exotic Mile Pvt Ltd";
+      targetCase.declared_net_quantity = targetCase.declared_net_quantity || "1 U";
+
+      const makeToken = (
+        token_id: string,
+        text: string,
+        confidence: number,
+        box: [number, number, number, number]
+      ): OCRToken => ({
+        token_id,
+        text,
+        confidence,
+        bounding_box: box,
+        polygon: [
+          [box[1], box[0]],
+          [box[3], box[0]],
+          [box[3], box[2]],
+          [box[1], box[2]],
+        ],
+        language: "en",
+        model_source: "PP-OCRv4_Latin",
+      });
+
+      // Map each of the multi-angle uploads to its true package face and evidence properties
+      updatedAssets = targetCase.evidence_assets.map((a, idx) => {
+        const fname = (a.original_filename || "").toLowerCase();
+        let panelType: EvidenceAsset["panel_type"] = a.panel_type || "PDP_FRONT";
+        if (fname.includes("img (1)") || fname.includes("img (8)") || fname.includes("back")) {
+          panelType = "BACK_PANEL";
+        } else if (fname.includes("img (2)") || fname.includes("front")) {
+          panelType = "PDP_FRONT";
+        } else if (fname.includes("img (3)") || fname.includes("top")) {
+          panelType = "TOP_LID" as any;
+        } else if (fname.includes("img (4)") || fname.includes("img (5)") || fname.includes("side")) {
+          panelType = "SIDE_PANEL";
+        } else if (!a.panel_type) {
+          panelType = idx === 0 ? "PDP_FRONT" : idx === 1 ? "BACK_PANEL" : "SIDE_PANEL";
+        }
+
+        const isBackPanel = panelType === "BACK_PANEL";
+        const isFrontPanel = panelType === "PDP_FRONT";
+        const isTopPanel = (panelType as string) === "TOP_LID";
+        const isSidePanel = panelType === "SIDE_PANEL";
+
+        return {
+          ...a,
+          panel_type: panelType,
+          quality_gate: {
+            passed: true,
+            blur_variance: isTopPanel ? 165.4 : 312.8,
+            glare_percentage: 0.65,
+            skew_angle_deg: 1.1,
+            advice: "FRAME_OPTIMAL: Good illumination and sharpness",
+          },
+          calibration: {
+            is_calibrated: true,
+            method: "ISO_7810_CARD",
+            px_to_mm: 0.142,
+            confidence: 0.99,
+            margin_of_error_pct: 0.8,
+            reference_bounding_box: [180, 20, 720, 260],
+          },
+          ocr: {
+            image_id: a.image_id,
+            total_tokens: isBackPanel ? 12 : isFrontPanel ? 5 : 2,
+            mean_confidence: 0.98,
+            execution_time_ms: 110,
+            full_text: isBackPanel
+              ? "GOBOULT\nManufactured & Marketed By: Exotic Mile Pvt Ltd\nB-67, Wazirpur Industrial Area, Delhi - 110052\nMRP: ₹1,999.00 (Inclusive of all taxes)\nNet Quantity: 1U\nMonth & Year of Manufacturing: April 2026\nContains: TWS 1N, Extra Eartips 2N, Warranty Card 1N\nContact Customer Care: Exotic Mile Pvt Ltd B-67, Wazirpur Industrial Area, Delhi - 110052\nCountry of origin: India\nEmail: support@goboult.co.in\nContact: +91 9667 879 464\nProduct Name: W45\nColour: White"
+              : isFrontPanel
+              ? "GOBOULT\nWireless Earbuds\nAdaptive Low Latency • High Battery Life\nMade in India"
+              : "GOBOULT W45",
+            tokens: isBackPanel
+              ? [
+                  makeToken(`tok_${a.image_id}_01`, "GOBOULT", 0.99, [340, 290, 370, 470]),
+                  makeToken(`tok_${a.image_id}_02`, "Manufactured & Marketed By: Exotic Mile Pvt Ltd", 0.98, [520, 290, 545, 620]),
+                  makeToken(`tok_${a.image_id}_03`, "B-67, Wazirpur Industrial Area, Delhi - 110052", 0.98, [540, 290, 560, 600]),
+                  makeToken(`tok_${a.image_id}_04`, "MRP: ₹1,999.00 (Inclusive of all taxes)", 0.99, [555, 290, 575, 550]),
+                  makeToken(`tok_${a.image_id}_05`, "Net Quantity: 1U", 0.99, [565, 290, 585, 415]),
+                  makeToken(`tok_${a.image_id}_06`, "Month & Year of Manufacturing: April 2026", 0.97, [580, 290, 600, 585]),
+                  makeToken(`tok_${a.image_id}_07`, "Contact Customer Care: Exotic Mile Pvt Ltd B-67, Delhi - 110052", 0.98, [620, 290, 640, 615]),
+                  makeToken(`tok_${a.image_id}_08`, "Country of origin: India", 0.99, [650, 290, 670, 445]),
+                  makeToken(`tok_${a.image_id}_09`, "Email: support@goboult.co.in", 0.98, [710, 665, 730, 845]),
+                  makeToken(`tok_${a.image_id}_10`, "Contact: +91 9667 879 464", 0.98, [725, 665, 745, 825]),
+                ]
+              : [
+                  makeToken(`tok_${a.image_id}_01`, "GOBOULT", 0.99, [230, 290, 260, 430]),
+                  makeToken(`tok_${a.image_id}_02`, "Wireless Earbuds", 0.99, [620, 300, 645, 500]),
+                  makeToken(`tok_${a.image_id}_03`, "Made in India", 0.98, [605, 855, 625, 960]),
+                ],
+          },
+        };
+      });
+
+      // Statutory Declarations extracted from the physical Goboult package
+      adaptedExtractedFields = [
+        {
+          field_id: "fld_earbuds_brand",
+          field_type: "BRAND_NAME",
+          raw_ocr_text: "GOBOULT",
+          normalized_value: { brand: "GOBOULT" },
+          detection_confidence: 0.99,
+          ocr_confidence: 0.99,
+          bounding_box: [340, 290, 370, 470],
+          measured_font_height_mm: 5.0,
+          measurement_confidence: 0.98,
+        },
+        {
+          field_id: "fld_earbuds_name",
+          field_type: "GENERIC_NAME",
+          raw_ocr_text: "GOBOULT W45 Wireless Earbuds",
+          normalized_value: { text: "W45 Wireless Earbuds" },
+          detection_confidence: 0.99,
+          ocr_confidence: 0.99,
+          bounding_box: [620, 300, 645, 500],
+          measured_font_height_mm: 4.2,
+          measurement_confidence: 0.97,
+        },
+        {
+          field_id: "fld_earbuds_net_qty",
+          field_type: "NET_QUANTITY",
+          raw_ocr_text: "Net Quantity: 1U",
+          normalized_value: { magnitude: 1.0, unit: "U", standard_symbol: "U" },
+          detection_confidence: 0.99,
+          ocr_confidence: 0.99,
+          bounding_box: [565, 290, 585, 415],
+          measured_font_height_mm: 2.5,
+          measurement_confidence: 0.98,
+        },
+        {
+          field_id: "fld_earbuds_mrp",
+          field_type: "MRP",
+          raw_ocr_text: "MRP: ₹1,999.00 (Inclusive of all taxes)",
+          normalized_value: { amount_inr: 1999.0, is_tax_inclusive: true },
+          detection_confidence: 0.99,
+          ocr_confidence: 0.99,
+          bounding_box: [555, 290, 575, 550],
+          measured_font_height_mm: 2.8,
+          measurement_confidence: 0.98,
+        },
+        {
+          field_id: "fld_earbuds_usp",
+          field_type: "UNIT_SALE_PRICE",
+          raw_ocr_text: "Unit Sale Price: ₹ 1,999.00 / U",
+          normalized_value: { price_per_unit_inr: 1999.0, denominator_unit: "U" },
+          detection_confidence: 0.98,
+          ocr_confidence: 0.98,
+          bounding_box: [555, 290, 575, 550],
+          measured_font_height_mm: 2.2,
+          measurement_confidence: 0.97,
+        },
+        {
+          field_id: "fld_earbuds_mfg_date",
+          field_type: "DATE_OF_MANUFACTURE",
+          raw_ocr_text: "Month & Year of Manufacturing: April 2026",
+          normalized_value: { month: 4, year: 2026, date_iso: "2026-04-01" },
+          detection_confidence: 0.98,
+          ocr_confidence: 0.97,
+          bounding_box: [580, 290, 600, 585],
+          measured_font_height_mm: 2.2,
+          measurement_confidence: 0.96,
+        },
+        {
+          field_id: "fld_earbuds_mfg_addr",
+          field_type: "MANUFACTURER_ADDRESS",
+          raw_ocr_text: "Manufactured & Marketed By: Exotic Mile Pvt Ltd, B-67, Wazirpur Industrial Area, Delhi - 110052",
+          normalized_value: { name: "Exotic Mile Pvt Ltd", street: "B-67, Wazirpur Industrial Area", city: "Delhi", pincode: "110052" },
+          detection_confidence: 0.98,
+          ocr_confidence: 0.98,
+          bounding_box: [520, 290, 560, 620],
+          measured_font_height_mm: 2.1,
+          measurement_confidence: 0.96,
+        },
+        {
+          field_id: "fld_earbuds_cc",
+          field_type: "CONSUMER_CARE_CONTACT",
+          raw_ocr_text: "Contact Customer Care: Exotic Mile Pvt Ltd, Delhi - 110052 • support@goboult.co.in • +91 9667 879 464",
+          normalized_value: { phone: "+91 9667 879 464", email: "support@goboult.co.in" },
+          detection_confidence: 0.98,
+          ocr_confidence: 0.98,
+          bounding_box: [620, 290, 640, 615],
+          measured_font_height_mm: 2.0,
+          measurement_confidence: 0.95,
+        },
+        {
+          field_id: "fld_earbuds_origin",
+          field_type: "COUNTRY_OF_ORIGIN",
+          raw_ocr_text: "Country of origin: India",
+          normalized_value: { country: "India" },
+          detection_confidence: 0.99,
+          ocr_confidence: 0.99,
+          bounding_box: [650, 290, 670, 445],
+          measured_font_height_mm: 2.3,
+          measurement_confidence: 0.97,
+        },
+      ];
+
+      ruleEvaluations = [
+        {
+          finding_id: "eval_earbuds_01",
+          rule_code: "RULE_6_1_A_NAME",
+          statutory_reference: "Rule 6(1)(a) Legal Metrology (Packaged Commodities) Rules, 2011",
+          status: "PASS",
+          severity: "CRITICAL",
+          required_value: "Generic product name declaration present on PDP",
+          measured_value: "GOBOULT W45 Wireless Earbuds",
+          discrepancy: "Full generic name clearly declared",
+          legal_consequence: "Compliant with Rule 6(1)(a).",
+        },
+        {
+          finding_id: "eval_earbuds_02",
+          rule_code: "RULE_6_1_B_NET_QTY",
+          statutory_reference: "Rule 6(1)(b) & Rule 12 LMPC Rules 2011",
+          status: "PASS",
+          severity: "CRITICAL",
+          required_value: "Standard statutory unit (U or N for discrete items)",
+          measured_value: "1 U (Contains: TWS 1N, Extra Eartips 2N, Warranty Card 1N)",
+          discrepancy: "Valid statutory unit 'U' used with complete itemization",
+          legal_consequence: "Compliant with Rule 6(1)(b).",
+        },
+        {
+          finding_id: "eval_earbuds_03",
+          rule_code: "RULE_6_1_C_MRP",
+          statutory_reference: "Rule 6(1)(c) & Rule 6(1)(e) LMPC Rules 2011",
+          status: "PASS",
+          severity: "CRITICAL",
+          required_value: "MRP in Indian Rupees with 'inclusive of all taxes'",
+          measured_value: "₹1,999.00 (Inclusive of all taxes)",
+          discrepancy: "Tax-inclusive clause prominently declared",
+          legal_consequence: "Compliant with Rule 6(1)(c).",
+        },
+        {
+          finding_id: "eval_earbuds_04",
+          rule_code: "RULE_6_1_K_USP",
+          statutory_reference: "Rule 6(1)(k) LMPC Amendment 2021 (Mandatory)",
+          status: "PASS",
+          severity: "CRITICAL",
+          required_value: "Unit Sale Price matching MRP / Net Quantity (|Δ| <= 0.02 INR)",
+          measured_value: "₹ 1,999.00 / U",
+          discrepancy: "USP math perfectly consistent with single-unit retail price",
+          legal_consequence: "Compliant with Rule 6(1)(k).",
+        },
+        {
+          finding_id: "eval_earbuds_05",
+          rule_code: "RULE_6_1_D_DATE",
+          statutory_reference: "Rule 6(1)(d) LMPC Rules 2011",
+          status: "PASS",
+          severity: "CRITICAL",
+          required_value: "Month and year of manufacture or pre-packing",
+          measured_value: "April 2026 (04/2026)",
+          discrepancy: "Clear month & year declaration present",
+          legal_consequence: "Compliant with Rule 6(1)(d).",
+        },
+        {
+          finding_id: "eval_earbuds_06",
+          rule_code: "RULE_6_1_E_MFG",
+          statutory_reference: "Rule 6(1)(e) LMPC Rules 2011",
+          status: "PASS",
+          severity: "CRITICAL",
+          required_value: "Complete postal address of manufacturer / marketer with PIN code",
+          measured_value: "Exotic Mile Pvt Ltd, B-67, Wazirpur Industrial Area, Delhi - 110052",
+          discrepancy: "Valid Indian enterprise with standard 6-digit postal PIN code",
+          legal_consequence: "Compliant with Rule 6(1)(e).",
+        },
+        {
+          finding_id: "eval_earbuds_07",
+          rule_code: "RULE_6_1_F_CONSUMER_CARE",
+          statutory_reference: "Rule 6(1)(f) LMPC Rules 2011",
+          status: "PASS",
+          severity: "CRITICAL",
+          required_value: "Consumer helpline telephone number and email address",
+          measured_value: "+91 9667 879 464, support@goboult.co.in",
+          discrepancy: "Both telephone contact and email address visible and valid",
+          legal_consequence: "Compliant with Rule 6(1)(f).",
+        },
+        {
+          finding_id: "eval_earbuds_08",
+          rule_code: "RULE_6_1_G_ORIGIN",
+          statutory_reference: "Rule 6(1)(g) & Gazette GSR 858(E)",
+          status: "PASS",
+          severity: "CRITICAL",
+          required_value: "Explicit Country of Origin declaration",
+          measured_value: "India (Country of origin: India)",
+          discrepancy: "Prominent Country of Origin declaration verified",
+          legal_consequence: "Compliant with Rule 6(1)(g).",
+        },
+        {
+          finding_id: "eval_earbuds_09",
+          rule_code: "TABLE_1_FONT_HEIGHT",
+          statutory_reference: "Rule 7 & Table-I Schedule LMPC Rules 2011",
+          status: "PASS",
+          severity: "CRITICAL",
+          required_value: "Minimum numeral height >= 1.0 mm (Area <= 50 cm²)",
+          measured_value: "2.40 mm (Calibrated via RuPay Standard Reference Card)",
+          discrepancy: "Numeral font height exceeds statutory minimum by +1.40 mm",
+          legal_consequence: "Compliant with Table-I font schedule.",
+        },
+      ];
+      overallVerdict = "PASS";
+    } else {
+      let sourceTemplate = GOLDEN_SKU_CASES["SKU-DEMO-03"]; // Clean FMCG product template
+      if (scenario === "REVIEW" || targetCase.product_name.toLowerCase().includes("soap")) {
+        sourceTemplate = GOLDEN_SKU_CASES["SKU-DEMO-04"];
+      } else if (scenario === "FAIL") {
+        sourceTemplate = GOLDEN_SKU_CASES["SKU-DEMO-01"];
+      }
+
+      updatedAssets = targetCase.evidence_assets.map((a, idx) => {
+        const isPrimary = a.image_id === (activeAsset?.image_id || imageId) || idx === 0;
+        const panelType = a.panel_type || (idx === 0 ? "PDP_FRONT" : idx === 1 ? "BACK_PANEL" : "SIDE_PANEL");
+        return {
+          ...a,
+          panel_type: panelType,
+          calibration: a.calibration || sourceTemplate.evidence_assets[0]?.calibration || {
+            is_calibrated: true,
+            method: "ISO_7810_CARD",
+            px_to_mm: 0.15,
+            confidence: 0.98,
+            margin_of_error_pct: 1.0,
+            reference_bounding_box: [100, 100, 300, 400],
+          },
+          ocr: a.ocr || {
+            ...sourceTemplate.evidence_assets[0]?.ocr,
+            image_id: a.image_id,
+            full_text: isPrimary
+              ? `${targetCase.product_name || "Statutory Commodity"}\nDeclared Net Qty: ${targetCase.declared_net_quantity || "100 g"}\nMRP Rs. 140.00 (incl. of all taxes)\nMfg Date: 08/2026\nBrand: ${targetCase.brand_name || "Trade Brand"}`
+              : `${targetCase.product_name || "Statutory Commodity"}\nManufactured by: Certified Enterprise\nCustomer Care: support@statutory.gov.in\nCountry of Origin: India`,
+            tokens: (sourceTemplate.evidence_assets[0]?.ocr?.tokens || []).map((t, tIdx) => ({
+              ...t,
+              token_id: `tok_${a.image_id}_${tIdx}`,
+            })),
+          },
+        };
+      });
+
+      // Adapt fields to whatever commodity the officer registered
       adaptedExtractedFields = sourceTemplate.extracted_fields.map((f) => {
         if (f.field_type === "NET_QUANTITY" && targetCase.declared_net_quantity) {
           const qtyStr = targetCase.declared_net_quantity.trim();
           const numMatch = qtyStr.match(/^([\d.]+)\s*([a-zA-Z]+)?/);
-          const mag = numMatch ? parseFloat(numMatch[1]) : 400.0;
-          const unit = numMatch && numMatch[2] ? numMatch[2] : "ml";
+          const mag = numMatch ? parseFloat(numMatch[1]) : 100.0;
+          const unit = numMatch && numMatch[2] ? numMatch[2] : "g";
           return {
             ...f,
             raw_ocr_text: `Net Qty: ${qtyStr}`,
-            normalized_value: {
-              ...f.normalized_value,
-              magnitude: mag,
-              unit: unit,
-            },
+            normalized_value: { magnitude: mag, unit: unit },
+          };
+        }
+        if (f.field_type === "BRAND_NAME" && targetCase.brand_name) {
+          return {
+            ...f,
+            raw_ocr_text: targetCase.brand_name,
+            normalized_value: { brand: targetCase.brand_name },
           };
         }
         return f;
@@ -378,21 +725,30 @@ export class MockApiService implements IInspectionApiService {
             measurement_confidence: 0.96,
             token_ids: ["tok_prod_01"],
           },
-          ...adaptedExtractedFields,
+          ...adaptedExtractedFields.filter((f) => f.field_type !== "GENERIC_NAME"),
         ];
       }
+      ruleEvaluations = sourceTemplate.rule_evaluations;
+      overallVerdict = (sourceTemplate.ai_verdict === "PENDING" ? "REVIEW" : sourceTemplate.ai_verdict) as any;
     }
 
     const updated = updateMockCase(targetCase.id, {
-      evidence_assets: updatedAssets.length > 0 ? updatedAssets : sourceTemplate.evidence_assets,
-      principal_display_panel: sourceTemplate.principal_display_panel,
+      product_name: targetCase.product_name,
+      brand_name: targetCase.brand_name,
+      manufacturer_name: targetCase.manufacturer_name,
+      declared_net_quantity: targetCase.declared_net_quantity,
+      evidence_assets: updatedAssets.length > 0 ? updatedAssets : targetCase.evidence_assets,
+      principal_display_panel: targetCase.principal_display_panel || {
+        package_type: "RECTANGULAR",
+        package_area_cm2: 120.0,
+        pdp_area_cm2: 48.0,
+        pdp_area_percentage: 40.0,
+      },
       extracted_fields: adaptedExtractedFields,
-      rule_evaluations: sourceTemplate.rule_evaluations,
-      evidence_graph: sourceTemplate.evidence_graph,
-      bsa_certificate: sourceTemplate.bsa_certificate,
+      rule_evaluations: ruleEvaluations,
       workflow_status: "PENDING_REVIEW",
-      overall_status: sourceTemplate.overall_status,
-      ai_verdict: sourceTemplate.ai_verdict,
+      overall_status: "PENDING_REVIEW",
+      ai_verdict: overallVerdict,
     });
 
     return {

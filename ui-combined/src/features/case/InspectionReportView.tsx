@@ -20,7 +20,7 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
   const { language } = useLanguage();
   const primaryAsset: EvidenceAsset | undefined =
     caseData.evidence_assets && caseData.evidence_assets.length > 0
-      ? caseData.evidence_assets[caseData.evidence_assets.length - 1]
+      ? caseData.evidence_assets.find((a) => a.panel_type === "PDP_FRONT") || caseData.evidence_assets[0]
       : undefined;
 
   const evaluations = caseData.rule_evaluations || [];
@@ -65,7 +65,7 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
         <div className="flex items-center gap-2">
           <a
             href="/form1.pdf"
-            download="Form-1-Notice-LM-NOI-2026-000231.pdf"
+            download={`Form-1-Notice-${caseData.inspection_number || caseData.id}.pdf`}
             className="px-3.5 py-1.5 text-xs font-bold text-amber-900 bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded transition-colors flex items-center gap-1.5 shadow-2xs"
             title={
               language === "hi"

@@ -49,7 +49,7 @@ export const InspectionOutcome: React.FC<InspectionOutcomeProps> = ({
   // Evidence asset reference
   const primaryAsset: EvidenceAsset | undefined =
     caseData.evidence_assets && caseData.evidence_assets.length > 0
-      ? caseData.evidence_assets[caseData.evidence_assets.length - 1]
+      ? caseData.evidence_assets.find((a) => a.panel_type === "PDP_FRONT") || caseData.evidence_assets[0]
       : undefined;
 
   // Downstream readiness (from fixture/backend contract)

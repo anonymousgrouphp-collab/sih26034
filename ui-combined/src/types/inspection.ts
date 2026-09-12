@@ -95,7 +95,9 @@ export type OCRModelSource =
   | "PP-OCRv4_Latin"
   | "PP-OCRv3_Devanagari"
   | "Tesseract_v5"
-  | "PADDLE_DEV";
+  | "PADDLE_DEV"
+  | "DOM_PARSER"
+  | "RULE_6_10_EVALUATOR";
 
 export interface OCRToken {
   token_id: string;
@@ -126,13 +128,19 @@ export type ExtractedFieldType =
   | "MRP"
   | "UNIT_SALE_PRICE"
   | "MANUFACTURER_ADDRESS"
+  | "MANUFACTURER"
   | "PACKER_ADDRESS"
   | "IMPORTER_ADDRESS"
+  | "IMPORTER"
   | "COUNTRY_OF_ORIGIN"
   | "DATE_OF_MANUFACTURE"
   | "DATE_OF_EXPIRY"
   | "CONSUMER_CARE_CONTACT"
+  | "CONSUMER_CARE"
   | "GENERIC_NAME"
+  | "BRAND_NAME"
+  | "PRODUCT_NAME"
+  | "QUALITY_GATE_GLARE"
   | "UNKNOWN";
 
 export interface ExtractedField {

@@ -43,8 +43,23 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
   conflicts: propsConflicts,
 }) => {
   const { language } = useLanguage();
-  const activeAsset: EvidenceAsset | undefined =
-    caseData.evidence_assets[caseData.evidence_assets.length - 1];
+  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
+
+  const activeAsset: EvidenceAsset | undefined = useMemo(() => {
+    if (!caseData.evidence_assets || caseData.evidence_assets.length === 0) return undefined;
+    if (selectedAssetId) {
+      const found = caseData.evidence_assets.find((a) => a.image_id === selectedAssetId);
+      if (found) return found;
+    }
+    const sortedByTokens = [...caseData.evidence_assets].sort(
+      (a, b) => (b.ocr?.tokens?.length || 0) - (a.ocr?.tokens?.length || 0)
+    );
+    if (sortedByTokens[0]?.ocr?.tokens?.length) {
+      return sortedByTokens[0];
+    }
+    const pdpFront = caseData.evidence_assets.find((a) => a.panel_type === "PDP_FRONT");
+    return pdpFront || caseData.evidence_assets[0];
+  }, [caseData.evidence_assets, selectedAssetId]);
 
   const findings: RuleFinding[] = caseData.rule_evaluations || [];
   const fields: ExtractedField[] = caseData.extracted_fields || [];
@@ -362,7 +377,74 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
       {/* 2. Flagship Split-View Canvas */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
         {/* Left Column (6 cols): Calibrated Evidence Viewer with SVG Polygon Overlays */}
-        <div className="lg:col-span-6 h-full">
+        <div className="lg:col-span-6 h-full space-y-3">
+          {/* Multi-Angle Evidence Facet Switcher (Rule 6 Multi-Panel Coverage) */}
+          {caseData.evidence_assets && caseData.evidence_assets.length > 1 && (
+            <div className="bg-white border border-slate-200 rounded-lg p-2.5 shadow-xs">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-govNavy" />
+                  <span className="text-xs font-bold text-govNavy">
+                    {language === "hi" ? "बहु-कोणीय पैकेजिंग साक्ष्य" : "Multi-Angle Packaging Facets"}
+                  </span>
+                  <span className="text-[11px] font-mono text-slate-500 font-semibold">
+                    ({caseData.evidence_assets.length} {language === "hi" ? "फलक" : "facets"})
+                  </span>
+                </div>
+                <span className="text-[10px] text-slate-500 font-medium hidden sm:inline">
+                  {language === "hi" ? "सांविधिक चिह्नों का निरीक्षण करने हेतु किसी भी फलक का चयन करें" : "Select facet to inspect panel-specific markings"}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+                {caseData.evidence_assets.map((asset, index) => {
+                  const isSelected = activeAsset?.image_id === asset.image_id;
+                  const tokenCount = asset.ocr?.tokens?.length || 0;
+                  return (
+                    <button
+                      key={asset.image_id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedAssetId(asset.image_id);
+                        setSelectedTokenId(undefined);
+                      }}
+                      className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md border text-xs transition-all shrink-0 ${
+                        isSelected
+                          ? "bg-govNavy text-white border-govNavy shadow-xs font-bold"
+                          : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 font-medium"
+                      }`}
+                    >
+                      <div className="w-7 h-7 rounded bg-slate-200 overflow-hidden shrink-0 flex items-center justify-center border border-slate-300">
+                        {asset.preview_url || asset.file_path ? (
+                          <img
+                            src={asset.preview_url || asset.file_path}
+                            alt={`Facet ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-[10px] font-bold text-slate-500">#{index + 1}</span>
+                        )}
+                      </div>
+                      <div className="text-left">
+                        <div className="text-[11px] font-bold leading-tight">
+                          {asset.panel_type === "BACK_PANEL"
+                            ? (language === "hi" ? "पृष्ठ फलक" : "Back Panel")
+                            : asset.panel_type === "PDP_FRONT"
+                            ? (language === "hi" ? "मुख्य फलक (PDP)" : "Front PDP")
+                            : asset.panel_type === "SIDE_PANEL"
+                            ? (language === "hi" ? "पार्श्व फलक" : "Side Panel")
+                            : (language === "hi" ? `कोण #${index + 1}` : `Angle #${index + 1}`)}
+                        </div>
+                        <div className={`text-[10px] font-mono ${isSelected ? "text-slate-200" : "text-slate-500"}`}>
+                          {tokenCount} {language === "hi" ? "चिह्न" : "tokens"}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {activeAsset ? (
             <EvidenceViewer
               asset={activeAsset}

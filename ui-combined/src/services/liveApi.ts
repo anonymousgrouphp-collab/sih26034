@@ -48,6 +48,7 @@ export class LiveApiService implements IInspectionApiService {
     evidence_graph?: any;
     bsa_certificate?: any;
     ocr?: any;
+    preview_url?: string;
   }>();
 
   public static getInstance(): LiveApiService {
@@ -348,10 +349,55 @@ export class LiveApiService implements IInspectionApiService {
         overall_status: insp.overall_status || "PENDING_REVIEW",
         ai_verdict: insp.ai_verdict || "PENDING",
         evidence_assets: (data.evidence_images || []).map((img: any) => {
-          const rawPath = img.file_path || "";
-          const resolvedPath = rawPath.startsWith("/") || rawPath.startsWith("http")
-            ? rawPath
-            : (rawPath.startsWith("storage/") ? `/${rawPath}` : `/storage/${rawPath}`);
+          const rawPath = (img.file_path || "").trim();
+          const skuLower = (matchedSkuId || id || "").toLowerCase();
+          const rawLower = rawPath.toLowerCase();
+          let resolvedPath = "";
+
+          // 1. User uploaded image preview or blob URL always takes absolute precedence
+          if (cached?.preview_url) {
+            resolvedPath = cached.preview_url;
+          } else if (rawPath.startsWith("http://") || rawPath.startsWith("https://") || rawPath.startsWith("data:") || rawPath.startsWith("blob:")) {
+            resolvedPath = rawPath;
+          } else if (skuLower.startsWith("sku-demo-") || skuLower.startsWith("insp_demo_") || skuLower.startsWith("demo-")) {
+            // Deterministic resolution strictly for Golden Demonstration SKUs
+            if (skuLower.includes("demo-01") || rawLower.includes("demo_01")) {
+              resolvedPath = "/storage/uploads/sku_demo_01_biscuit.jpg";
+            } else if (skuLower.includes("demo-02") || rawLower.includes("demo_02")) {
+              resolvedPath = "/storage/uploads/sku_demo_02_curry.jpg";
+            } else if (skuLower.includes("demo-03") || rawLower.includes("demo_03")) {
+              resolvedPath = "/storage/uploads/sku_demo_03_water.jpg";
+            } else if (skuLower.includes("demo-04") || rawLower.includes("demo_04")) {
+              resolvedPath = "/storage/uploads/sku_demo_04_soap.jpg";
+            } else if (skuLower.includes("demo-05") || rawLower.includes("demo_05")) {
+              resolvedPath = "/storage/uploads/sku_demo_05_chips.jpg";
+            } else if (skuLower.includes("demo-06") || rawLower.includes("demo_06")) {
+              resolvedPath = "/storage/uploads/sku_demo_06_listing.png";
+            }
+          } else if (rawLower.includes("real-pkg-01")) {
+            resolvedPath = "/storage/uploads/REAL-PKG-01_8901719134845.jpg";
+          } else if (rawLower.includes("real-pkg-02")) {
+            resolvedPath = "/storage/uploads/REAL-PKG-02_8901063093522.jpg";
+          } else if (rawLower.includes("real-pkg-03")) {
+            resolvedPath = "/storage/uploads/REAL-PKG-03_8901063139329.jpg";
+          } else if (rawLower.includes("real-pkg-04")) {
+            resolvedPath = "/storage/uploads/REAL-PKG-04_8904043901015.jpg";
+          } else if (rawLower.includes("real-pkg-05")) {
+            resolvedPath = "/storage/uploads/REAL-PKG-05_8904004400731.jpg";
+          } else if (rawLower.includes("real-pkg-06")) {
+            resolvedPath = "/storage/uploads/REAL-PKG-06_8901262010016.jpg";
+          } else if (rawLower.includes("real-pkg-07")) {
+            resolvedPath = "/storage/uploads/REAL-PKG-07_7622202334009.jpg";
+          } else if (rawLower.includes("real-pkg-08")) {
+            resolvedPath = "/storage/uploads/REAL-PKG-08_9556001137722.jpg";
+          } else if (rawPath.startsWith("uploads/2026/")) {
+            resolvedPath = `${this.baseUrl}/evidence/image/${img.id}`;
+          } else if (rawPath.startsWith("storage/")) {
+            resolvedPath = `/${rawPath}`;
+          } else {
+            resolvedPath = rawPath.startsWith("/") ? rawPath : `/storage/${rawPath}`;
+          }
+
           return {
             image_id: img.id,
             inspection_id: insp.id,
@@ -437,7 +483,7 @@ export class LiveApiService implements IInspectionApiService {
       const asset: EvidenceAsset = {
         image_id: data.image_id,
         inspection_id: data.inspection_id,
-        file_path: metadata.preview_url || `storage/uploads/${metadata.original_filename || "field_evidence.jpg"}`,
+        file_path: metadata.preview_url || `${this.baseUrl}/evidence/image/${data.image_id}`,
         raw_sha256: data.raw_sha256,
         panel_type: metadata.panel_type || "PDP_FRONT",
         image_width: metadata.image_width || 1920,
@@ -450,6 +496,17 @@ export class LiveApiService implements IInspectionApiService {
         uploaded_at: new Date().toISOString(),
         is_original_untouched: true,
       };
+
+      if (metadata.preview_url) {
+        this.pipelineArtifactCache.set(data.image_id, {
+          preview_url: metadata.preview_url,
+        } as any);
+        if (data.inspection_id) {
+          this.pipelineArtifactCache.set(data.inspection_id, {
+            preview_url: metadata.preview_url,
+          } as any);
+        }
+      }
 
       return {
         ...data,
@@ -479,7 +536,9 @@ export class LiveApiService implements IInspectionApiService {
       // Cache returned pipeline outputs to bridge session persistence
       if (inspectionId || imageId) {
         const cacheKey = inspectionId || imageId;
+        const prevCache = this.pipelineArtifactCache.get(cacheKey) || {};
         this.pipelineArtifactCache.set(cacheKey, {
+          ...prevCache,
           extracted_fields: pipelineData.extracted_fields,
           rule_evaluations: pipelineData.rule_evaluations,
           calibration: pipelineData.calibration,

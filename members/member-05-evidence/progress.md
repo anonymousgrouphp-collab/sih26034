@@ -290,6 +290,42 @@ Deploy updated backend to Render and frontend to Vercel.
 ### Signing Note
 SIGNED OFF BY: Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-12 14:20 IST [VERIFIED]
 
+---
+
+## [12 September 2026] [16:05] IST
+
+### Task / Chunk
+Physical Evidence Image Streaming Endpoint & Static Storage Pass-Through Fix (`members/member-05-evidence/`, `main.py`).
+
+### Status
+COMPLETE
+
+### Completed
+- **Evidence Image Streaming API (`server.py`):**
+  - Implemented `GET /api/v1/evidence/image/{image_id}` using `FileResponse`.
+  - Resolves physical files from decoupled filesystem storage via `storage_manager.resolve_absolute_path`, with automatic fallback to public packaging repository and SKU association.
+- **Storage Mount Catch-All Resolution (`main.py`):**
+  - Fixed `serve_spa` catch-all route which was previously intercepting `/storage/...` requests and raising HTTP 404 instead of letting static storage files pass through.
+  - Added direct filesystem resolution for `storage/` paths in `main.py`, returning authentic image files.
+- **Verification:**
+  - `pytest members/member-05-evidence/tests/ -q`: 59 passed in 8.66s.
+
+### Tests
+- `pytest members/member-05-evidence/tests/ -q` (59 passed in 8.66s)
+
+### Problems
+None. All 59 tests pass cleanly.
+
+### Decisions
+Dedicated image streaming endpoint eliminates cross-origin storage path issues and enables browser `<img>` tags to render physical packaging evidence directly.
+
+### Next Step
+Verify frontend rendering and push to remote.
+
+### Signing Note
+SIGNED OFF BY: Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-12 16:05 IST [VERIFIED]
+
+
 
 
 

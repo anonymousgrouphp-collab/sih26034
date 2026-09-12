@@ -86,8 +86,8 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
   const filteredCases = useMemo(() => {
     return cases.filter((c) => {
       // Circle filter
-      if (activeCircle && c.jurisdiction_id && c.jurisdiction_id !== activeCircle) {
-        // Only filter if not "ALL" and matching circle exists
+      if (activeCircle && activeCircle !== "ALL" && c.jurisdiction_id && c.jurisdiction_id !== activeCircle) {
+        return false;
       }
 
       // Quick Triage Filter

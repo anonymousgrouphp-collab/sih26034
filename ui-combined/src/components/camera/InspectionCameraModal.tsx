@@ -59,7 +59,7 @@ export const InspectionCameraModal: React.FC<InspectionCameraModalProps> = ({
       stopCamera();
       setCurrentPhoto(null);
     }
-  }, [isOpen, requestCamera, stopCamera]);
+  }, [isOpen]);
 
   // Handle capture trigger
   const handleCapture = async () => {
