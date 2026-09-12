@@ -1,9 +1,10 @@
-import React from "react";
-import { ArrowRight, CalendarDays, MapPin, AlertTriangle, CheckCircle2, XCircle } from "lucide-react";
+import React, { useState } from "react";
+import { ArrowRight, CalendarDays, MapPin, AlertTriangle, CheckCircle2, XCircle, Trash2, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext";
 import { VerdictBadge } from "../common/StatusBadge";
 import { EpistemicVerdict } from "../../types/inspection";
+import { ApiService } from "../../services/api";
 
 export interface InspectionTableItem {
   id: string;
@@ -24,24 +25,32 @@ export interface InspectionTableItem {
 interface InspectionTableProps {
   inspections: InspectionTableItem[];
   className?: string;
+  onDelete?: (id: string) => void | Promise<void>;
 }
 
-export const InspectionTable: React.FC<InspectionTableProps> = ({ inspections, className = "" }) => {
+export const InspectionTable: React.FC<InspectionTableProps> = ({ inspections, className = "", onDelete }) => {
   const navigate = useNavigate();
   const { language } = useLanguage();
+  const [caseToDelete, setCaseToDelete] = useState<InspectionTableItem | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const formatDate = (dateStr: string) => {
+  const formatDateTime = (dateStr: string) => {
     try {
       const d = new Date(dateStr);
       return d.toLocaleDateString("en-IN", {
         day: "2-digit",
         month: "short",
         year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
       });
     } catch {
       return dateStr;
     }
   };
+
+  const formatDate = formatDateTime;
 
   return (
     <div className={`overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs ${className}`}>
@@ -56,7 +65,7 @@ export const InspectionTable: React.FC<InspectionTableProps> = ({ inspections, c
                 {language === "hi" ? "निरीक्षण स्थल" : "Inspection Location"}
               </th>
               <th className="px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                {language === "hi" ? "तिथि" : "Date"}
+                {language === "hi" ? "तिथि एवं समय" : "Date & Time"}
               </th>
               <th className="px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">
                 {language === "hi" ? "विश्वसनीयता" : "Confidence"}
@@ -153,18 +162,32 @@ export const InspectionTable: React.FC<InspectionTableProps> = ({ inspections, c
                   <td className="px-5 py-3.5">
                     <VerdictBadge verdict={verdict} size="sm" />
                   </td>
-                  <td className="px-5 py-3.5 text-right">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/inspections/${item.id}`);
-                      }}
-                      className="rounded-lg p-1.5 text-slate-400 hover:bg-govNavy/10 hover:text-govNavy transition-colors"
-                      title={language === "hi" ? "निरीक्षण प्रकरण खोलें" : "Open Inspection Case"}
-                    >
-                      <ArrowRight size={16} />
-                    </button>
+                  <td className="px-5 py-3.5 text-right whitespace-nowrap">
+                    <div className="flex items-center justify-end gap-1.5">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCaseToDelete(item);
+                        }}
+                        className="rounded-lg p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-colors"
+                        title={language === "hi" ? "मामला डेटाबेस से हटाएं" : "Dispose & Delete Case from Database"}
+                        aria-label={`Delete case ${item.caseNumber}`}
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/inspections/${item.id}`);
+                        }}
+                        className="rounded-lg p-1.5 text-slate-400 hover:bg-govNavy/10 hover:text-govNavy transition-colors"
+                        title={language === "hi" ? "निरीक्षण प्रकरण खोलें" : "Open Inspection Case"}
+                      >
+                        <ArrowRight size={16} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               );
@@ -172,6 +195,95 @@ export const InspectionTable: React.FC<InspectionTableProps> = ({ inspections, c
           </tbody>
         </table>
       </div>
+
+      {/* Deletion Confirmation Modal */}
+      {caseToDelete && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
+          <div className="bg-white rounded-2xl border border-rose-200 shadow-2xl max-w-md w-full p-6 space-y-4 text-left">
+            <div className="flex items-start gap-3">
+              <div className="p-2.5 bg-rose-100 text-rose-700 rounded-full shrink-0">
+                <Trash2 size={22} />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900">
+                  {language === "hi" ? "मामला निरस्त एवं स्थायी निष्कासन" : "Dispose & Permanently Delete Case"}
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  {language === "hi"
+                    ? "डेटाबेस से यह मामला एवं सभी संबंधित विधिक विवरण पूरी तरह हटा दिए जाएंगे।"
+                    : "This inspection case and all related statutory details will be permanently removed from the database sitewide."}
+                </p>
+              </div>
+            </div>
+
+            <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs space-y-1.5">
+              <div className="flex justify-between">
+                <span className="text-slate-500">{language === "hi" ? "केस संख्या:" : "Case Number:"}</span>
+                <span className="font-mono font-bold text-slate-800">{caseToDelete.caseNumber}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">{language === "hi" ? "उत्पाद / वस्तु:" : "Product / Commodity:"}</span>
+                <span className="font-semibold text-slate-800 truncate max-w-[220px]">{caseToDelete.productName}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">{language === "hi" ? "दिनांक एवं समय:" : "Date & Time:"}</span>
+                <span className="font-mono text-slate-700">{formatDateTime(caseToDelete.createdAt)}</span>
+              </div>
+            </div>
+
+            <p className="text-[11px] text-rose-700 bg-rose-50 p-2.5 rounded border border-rose-200">
+              <b>{language === "hi" ? "सांविधिक चेतावनी: " : "Statutory Warning: "}</b>
+              {language === "hi"
+                ? "यह कार्रवाई पूर्ववत नहीं की जा सकती। सभी साक्ष्य छवियां, नियम निष्कर्ष एवं नोटिस स्थायी रूप से नष्ट हो जाएंगे। धारा 63 बीएसए 2023 के तहत ऑडिट बहीखाते में एक 'CASE_DISPOSED' इवेंट दर्ज किया जाएगा।"
+                : "This action cannot be undone. All evidence photographs, rule evaluations, and notice records will be purged. A 'CASE_DISPOSED' audit event will be recorded under Section 63 BSA 2023."}
+            </p>
+
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={() => setCaseToDelete(null)}
+                className="btn-secondary text-xs px-4 py-2"
+              >
+                {language === "hi" ? "रद्द करें" : "Cancel"}
+              </button>
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={async () => {
+                  const id = caseToDelete.id;
+                  setIsDeleting(true);
+                  try {
+                    if (onDelete) {
+                      await onDelete(id);
+                    } else {
+                      await ApiService.deleteInspection(id);
+                    }
+                    setCaseToDelete(null);
+                  } catch (err: any) {
+                    alert(err?.message || "Failed to delete case from database");
+                  } finally {
+                    setIsDeleting(false);
+                  }
+                }}
+                className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 disabled:opacity-50 rounded-lg flex items-center gap-1.5 transition-colors shadow-xs"
+              >
+                {isDeleting ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    <span>{language === "hi" ? "हटाया जा रहा है..." : "Disposing..."}</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 size={14} />
+                    <span>{language === "hi" ? "स्थायी रूप से हटाएं" : "Permanently Delete"}</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

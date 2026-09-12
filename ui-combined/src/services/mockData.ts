@@ -2043,6 +2043,29 @@ export const MOCK_DASHBOARD_SUMMARY: DashboardSummary = {
 };
 
 export const USER_CASES_STORAGE_KEY = "nyayadrishti_persisted_cases_v2";
+export const DELETED_CASES_STORAGE_KEY = "nyayadrishti_deleted_case_ids_v1";
+
+export function getDeletedCaseIds(): Set<string> {
+  try {
+    const storage = getStorage();
+    if (!storage) return new Set();
+    const raw = storage.getItem(DELETED_CASES_STORAGE_KEY);
+    if (!raw) return new Set();
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return new Set(parsed);
+  } catch {}
+  return new Set();
+}
+
+export function saveDeletedCaseId(id: string): void {
+  try {
+    const storage = getStorage();
+    if (!storage) return;
+    const ids = getDeletedCaseIds();
+    ids.add(id);
+    storage.setItem(DELETED_CASES_STORAGE_KEY, JSON.stringify(Array.from(ids)));
+  } catch {}
+}
 
 function getStorage(): Storage | null {
   try {
@@ -2111,12 +2134,20 @@ export function savePersistedCases(casesMap: Map<string, InspectionCase>): void 
 }
 
 function initDynamicCases(): Map<string, InspectionCase> {
-  const map = new Map<string, InspectionCase>(Object.entries(GOLDEN_SKU_CASES));
+  const deletedIds = getDeletedCaseIds();
+  const map = new Map<string, InspectionCase>();
+  Object.entries(GOLDEN_SKU_CASES).forEach(([k, v]) => {
+    if (!deletedIds.has(k) && !deletedIds.has(v.id) && !deletedIds.has(v.inspection_number)) {
+      map.set(k, v);
+    }
+  });
   const persisted = loadPersistedCases();
   Object.entries(persisted).forEach(([k, v]) => {
-    map.set(k, v);
-    if (v.id && !map.has(v.id)) {
-      map.set(v.id, v);
+    if (!deletedIds.has(k) && !deletedIds.has(v.id) && !deletedIds.has(v.inspection_number)) {
+      map.set(k, v);
+      if (v.id && !map.has(v.id)) {
+        map.set(v.id, v);
+      }
     }
   });
   return map;
@@ -2354,8 +2385,12 @@ export function computeCaseReadiness(caseData: InspectionCase): CaseReadinessChe
 }
 
 export function getMockCases(): Record<string, InspectionCase> {
+  const deletedIds = getDeletedCaseIds();
   const persisted = loadPersistedCases();
   Object.entries(persisted).forEach(([k, v]) => {
+    if (deletedIds.has(k) || (v.id && deletedIds.has(v.id)) || (v.inspection_number && deletedIds.has(v.inspection_number))) {
+      return;
+    }
     if (!dynamicCases.has(k) || JSON.stringify(dynamicCases.get(k)?.adjudication) !== JSON.stringify(v.adjudication)) {
       dynamicCases.set(k, v);
       if (v.id && !dynamicCases.has(v.id)) {
@@ -2366,6 +2401,9 @@ export function getMockCases(): Record<string, InspectionCase> {
 
   const res: Record<string, InspectionCase> = {};
   dynamicCases.forEach((val, key) => {
+    if (deletedIds.has(key) || (val.id && deletedIds.has(val.id)) || (val.inspection_number && deletedIds.has(val.inspection_number))) {
+      return;
+    }
     if (!val.audit_trail || val.audit_trail.length === 0) {
       val.audit_trail = createDefaultAuditTrail(val);
     }
@@ -2385,21 +2423,53 @@ export function addMockCase(c: InspectionCase): void {
   savePersistedCases(dynamicCases);
 }
 
+export function deleteMockCase(id: string): boolean {
+  if (!id) return false;
+  let found = false;
+  const deletedIdentifiers: string[] = [id];
+
+  // Find all keys associated with this case
+  for (const [key, val] of dynamicCases.entries()) {
+    if (key === id || val.id === id || val.inspection_number === id || val.sku_demo_id === id) {
+      found = true;
+      if (val.id) deletedIdentifiers.push(val.id);
+      if (val.inspection_number) deletedIdentifiers.push(val.inspection_number);
+      if (val.sku_demo_id) deletedIdentifiers.push(val.sku_demo_id);
+      dynamicCases.delete(key);
+    }
+  }
+
+  // Remove directly
+  if (dynamicCases.has(id)) {
+    dynamicCases.delete(id);
+    found = true;
+  }
+
+  // Record into persistent deleted set
+  deletedIdentifiers.forEach(saveDeletedCaseId);
+
+  // Update persisted storage
+  savePersistedCases(dynamicCases);
+
+  return found;
+}
+
 export function resetMockCases(): void {
   dynamicCases.clear();
+  try {
+    const storage = getStorage();
+    if (storage) {
+      storage.removeItem(USER_CASES_STORAGE_KEY);
+      storage.removeItem(DELETED_CASES_STORAGE_KEY);
+    }
+  } catch {
+    // Ignore cleanup error
+  }
   Object.entries(GOLDEN_SKU_CASES).forEach(([k, v]) => {
     const cloned: InspectionCase = JSON.parse(JSON.stringify(v));
     cloned.audit_trail = createDefaultAuditTrail(cloned);
     dynamicCases.set(k, cloned);
   });
-  try {
-    const storage = getStorage();
-    if (storage) {
-      storage.removeItem(USER_CASES_STORAGE_KEY);
-    }
-  } catch {
-    // Ignore cleanup error
-  }
 }
 
 export function updateMockCase(id: string, updates: Partial<InspectionCase>): InspectionCase | undefined {

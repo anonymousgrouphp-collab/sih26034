@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { InspectionCase, EvidenceAsset } from "../../types/inspection";
 import { computeCaseReadiness } from "../../services/mockData";
 import { findFieldForFinding } from "../adjudication/AdjudicationTraceability";
 import { StateEmblem } from "../../components/common/StateEmblem";
 import { GovStampSeal } from "../../components/common/GovStampSeal";
 import { useLanguage } from "../../context/LanguageContext";
+import { ApiService } from "../../services/api";
 
 interface InspectionReportViewProps {
   caseData: InspectionCase;
@@ -29,6 +30,43 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
   const auditTrail = caseData.audit_trail || [];
 
   const handlePrint = () => {
+    window.print();
+  };
+
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const handleDownloadPdf = async () => {
+    setIsDownloading(true);
+    try {
+      const res = await ApiService.generateNotice({
+        inspection_id: caseData.id,
+        recipient: {
+          type: "MANUFACTURER",
+          name: caseData.manufacturer_name || caseData.establishment_name || "Responsible Enterprise / Manufacturer",
+          address: caseData.premises_address || "Premises recorded during statutory inspection",
+        },
+        compounding_fee_amount: 5000,
+        reply_window_days: 15,
+      });
+
+      if (res && res.pdf_download_url && res.pdf_download_url.startsWith("http") && res.pdf_download_url !== "/form1.pdf") {
+        const filename = `Form-1-Notice-${caseData.inspection_number || caseData.id}.pdf`;
+        const dlLink = document.createElement("a");
+        dlLink.href = res.pdf_download_url;
+        dlLink.download = filename;
+        dlLink.target = "_blank";
+        document.body.appendChild(dlLink);
+        dlLink.click();
+        document.body.removeChild(dlLink);
+        return;
+      }
+    } catch (err) {
+      console.warn("Backend notice download unavailable, engaging high-fidelity Gazette Print/PDF view:", err);
+    } finally {
+      setIsDownloading(false);
+    }
+
+    // High-fidelity fallback: Browser native Print-to-PDF rendering the exact on-screen Gazette Form-1 Notice
     window.print();
   };
 
@@ -63,10 +101,11 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
         </div>
 
         <div className="flex items-center gap-2">
-          <a
-            href="/form1.pdf"
-            download={`Form-1-Notice-${caseData.inspection_number || caseData.id}.pdf`}
-            className="px-3.5 py-1.5 text-xs font-bold text-amber-900 bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded transition-colors flex items-center gap-1.5 shadow-2xs"
+          <button
+            type="button"
+            onClick={handleDownloadPdf}
+            disabled={isDownloading}
+            className="px-3.5 py-1.5 text-xs font-bold text-amber-900 bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer disabled:opacity-50"
             title={
               language === "hi"
                 ? "धारा 63 बीएसए 2023 प्रमाण पत्र युक्त राजपत्र मानक प्रपत्र-1 पीडीएफ डाउनलोड करें"
@@ -76,8 +115,12 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
             <svg className="w-4 h-4 text-amber-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
-            <span>{language === "hi" ? "आधिकारिक प्रपत्र-1 (PDF/A) डाउनलोड करें" : "Download Official Form-1 (PDF/A)"}</span>
-          </a>
+            <span>
+              {isDownloading
+                ? (language === "hi" ? "नोटिस तैयार हो रहा है..." : "Generating Notice...")
+                : (language === "hi" ? "आधिकारिक प्रपत्र-1 (PDF/A) डाउनलोड करें" : "Download Official Form-1 (PDF/A)")}
+            </span>
+          </button>
 
           <button
             type="button"

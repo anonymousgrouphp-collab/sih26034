@@ -322,8 +322,42 @@ Dedicated image streaming endpoint eliminates cross-origin storage path issues a
 ### Next Step
 Verify frontend rendering and push to remote.
 
+---
+
+## [13 September 2026] [00:15] IST
+
+### Task / Chunk
+Strict Demo SKU Scoping, OCR Namespace Collision Resolution, and Zero-Guessing Audit in Live Backend Pipeline (`members/member-05-evidence/src/server.py`).
+
+### Status
+COMPLETE
+
+### Completed
+- **Strict Demo SKU Isolation (`server.py`):** Replaced fuzzy substring matching (`prod in p_lower or p_lower in prod`) with strict `is_demo_case` check. Real user packaging uploads (e.g. Boult Earbuds, local snacks) are never hijacked by demo fixtures (`sku_demo_*.json`).
+- **OCR Engine Module Collision Resolution (`server.py`):** Resolved Python `sys.path` namespace collision between `member-04-rule-engine/src/engine.py` and `member-02-ocr/src/engine.py`. Now isolates `MultilingualOCREngine` import and sets `allow_classical_fallback=True` to execute real text detection on uploaded packaging images without crashing.
+- **Zero-Guessing Policy Enforcement (`server.py`):** Eliminated `if font_mm is None: font_mm = 2.10` hardcoded fallback. If font height or PDP area cannot be measured from packaging imagery, `font_height_mm` remains `None` and `Table1FontSchedule.evaluate` deterministically returns `status: "UNABLE_TO_VERIFY"`, `measured_value: "UNAVAILABLE"` under Rule 6(1)(h) Table-I.
+- **Verification:**
+  - `pytest members/member-04-rule-engine/tests/ -v` (53 passed in 0.58s)
+  - `pytest members/member-05-evidence/tests/test_server_api.py -v` (13 passed in 2.17s)
+  - `pytest members/member-05-evidence/tests/test_e2e_query_audit.py -v` (1 passed in 1.92s)
+
+### Tests
+- `pytest members/member-04-rule-engine/tests/ -v` (53 passed in 0.58s)
+- `pytest members/member-05-evidence/tests/test_server_api.py -v` (13 passed in 2.17s)
+- `pytest members/member-05-evidence/tests/test_e2e_query_audit.py -v` (1 passed in 1.92s)
+
+### Problems
+None. Module collision and fuzzy fixture hijacking resolved cleanly.
+
+### Decisions
+1. Golden demonstration fixtures are strictly restricted to cases with explicit `SKU-DEMO` or `DEMO` identifiers, protecting real physical inspections from synthetic interference.
+2. In accordance with Section 63 BSA 2023 evidentiary defense and zero-guessing standards, unmeasurable packaging attributes must never be filled with synthetic compliant values; they must explicitly report `UNABLE_TO_VERIFY` or `FAIL`.
+
+### Next Step
+Provide full architectural and statutory compliance explanation to Team Lead and commit to repository.
+
 ### Signing Note
-SIGNED OFF BY: Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-12 16:05 IST [VERIFIED]
+SIGNED OFF BY: Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-13 00:15 IST [VERIFIED]
 
 ---
 
@@ -363,8 +397,81 @@ Final regression sign-off and deployment sync.
 ### Signing Note
 SIGNED OFF BY: Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-12 21:50 IST [VERIFIED]
 
+---
 
+## [13 September 2026] [00:35] IST
 
+### Task / Chunk
+Statutory Form-1 Notice Dynamic Commodity Schedule & Evidentiary Unique Certificate Fix (`members/member-05-evidence/src/notice_generator.py`, `server.py`).
+
+### Status
+COMPLETE
+
+### Completed
+- **Dynamic Commodity Particulars (Schedule A) in Form-1 Notice (`notice_generator.py`):** Added Schedule A to `Form1NoticePDFGenerator.generate_form1_pdf` rendering the exact inspected commodity name, brand name, batch/lot number, declared net quantity, retail sale price (MRP), packaging format, and measured PDP area. Renamed violations schedule to Schedule B.
+- **Backend Inspection Details Wiring (`server.py`):** Updated `POST /api/v1/notices/generate` to pass actual `commodity_name`, `brand_name`, `batch_number`, `declared_net_quantity`, `declared_mrp`, and `package_type` from the inspection database record.
+- **BSACertificate Duplicate Fix (`server.py`):** Resolved HTTP 500 `IntegrityError: UNIQUE constraint failed: bsa_certificates.inspection_id` by checking for existing certificates on `inspection_id` and updating/reusing instead of blind duplicate inserts.
+- **Ephemeral Storage Resilience (`server.py`):** Added on-the-fly PDF regeneration in `GET /api/v1/notices/{id}/pdf` so that container restarts on Render never throw HTTP 404 for generated notices.
+
+### Tests
+- `python -m pytest members/member-05-evidence/tests/` (60 passed in 5.28s)
+
+### Problems
+None. All 60 tests pass cleanly.
+
+### Decisions
+1. Every Form-1 Statutory Notice must explicitly state the inspected commodity's exact identity and deficits in Schedule A & B; generic or mismatched notices violate Section 63 BSA 2023.
+2. Regenerating PDFs on-the-fly ensures zero lost dossiers on cloud platforms with ephemeral local filesystems.
+
+### Next Step
+Sync frontend notice download workflows and commit to main.
+
+### Signing Note
+SIGNED OFF BY: Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-13 00:35 IST [VERIFIED]
+
+---
+
+## [13 September 2026] [00:42] IST
+
+### Task / Chunk
+Sitewide Case Disposal (`DELETE /api/v1/inspections/{id}`) and Dual Date & Time Timestamp Enforcement across all Inspection Registers and Workspaces.
+
+### Status
+COMPLETE
+
+### Completed
+- **Cascading Case Disposal Backend (`members/member-05-evidence/src/server.py`, `storage.py`):**
+  - Implemented `DELETE /api/v1/inspections/{inspection_id}` in FastAPI backend.
+  - Recursively and cleanly disposes all associated child records: `LegalNotice`, `BSACertificate`, `ComplianceEvaluation`, `EvidenceImage`, and `BoundingBox`.
+  - Unlinks all physical evidentiary files (packaged commodity images, PDF notices) from filesystem storage via `DecoupledStorageManager.delete_file` with path traversal defense.
+  - Appends an immutable `CASE_DISPOSED` cryptographic event into `AuditLog` preserving Section 63 BSA 2023 Merkle hash chain integrity without breaking hash linkage.
+  - Added unit test `test_delete_inspection_case_cascade` in `test_server_api.py`.
+- **Sitewide Date & Time Representation (`ui-combined`):**
+  - Ensured all inspection records return and display both date and time (`created_at` in ISO format).
+  - Implemented `formatDateTime` rendering `DD MMM YYYY, hh:mm A` across `InspectionDesk`, `CaseWorkspace`, `ReviewQueue`, and `InspectionTable`.
+  - Updated desk table header to "Case ID / Date & Time" (`केस आईडी / दिनांक एवं समय` / `Case ID / Date & Time`).
+- **Sitewide Case Disposal UI & State Reconciliation (`ui-combined`):**
+  - Added delete buttons with accessible confirmation modals to `InspectionDesk` (desktop table & mobile cards), `CaseWorkspace` (Action Center panel), `ReviewQueue` (triage cards), and `InspectionTable`.
+  - Implemented persistent mock deletion tracker `DELETED_CASES_STORAGE_KEY` so deleted cases remain purged across page refreshes in both online and offline resilient modes.
+  - Synchronized `ApiService.deleteInspection` to evict pipeline caches and update local storage.
+
+### Tests
+- `pytest members/member-05-evidence/tests/ -v` (60 passed in 6.03s)
+- `npm test -- --run` in `ui-combined` (121 passed in 1.75s)
+- `npm run build` in `ui-combined` (TypeScript check & Vite bundle built in 5.55s)
+
+### Problems
+None. Deletion does not break Merkle DAG audit log validation because disposal is logged as an immutable chronological append event.
+
+### Decisions
+1. In statutory evidence systems, destroying inspection records must record a cryptographic `CASE_DISPOSED` event so an auditor can verify that the case was intentionally disposed by an authorized officer rather than tampered with or silently dropped.
+2. Case timestamps must always include hours and minutes to establish exact chain-of-custody timing during enforcement raids.
+
+### Next Step
+Push changes cleanly to `main`.
+
+### Signing Note
+SIGNED OFF BY: Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-13 00:42 IST [VERIFIED]
 
 
 

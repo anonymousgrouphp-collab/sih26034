@@ -43,6 +43,7 @@ import {
   appendAuditEvent,
   computeCaseReadiness,
   loadPersistedCases,
+  deleteMockCase,
 } from "./mockData";
 
 export class MockApiService implements IInspectionApiService {
@@ -167,6 +168,10 @@ export class MockApiService implements IInspectionApiService {
 
     addMockCase(newCase);
     return newCase;
+  }
+
+  public addLocalCase(c: InspectionCase): void {
+    addMockCase(c);
   }
 
   public async getInspection(id: string): Promise<InspectionCase> {
@@ -995,6 +1000,15 @@ export class MockApiService implements IInspectionApiService {
       statutory_mandate: "Section 36(1) of Legal Metrology Act, 2009 read with Section 63 BSA 2023",
       pdf_download_url: "/form1.pdf",
       merkle_entry_hash: "8c42b9101adfa9280194bc0281efca891048bca120938a1ef908123bcdef0123",
+    };
+  }
+
+  public async deleteInspection(inspectionId: string): Promise<{ success: boolean; message: string; deleted_id: string }> {
+    deleteMockCase(inspectionId);
+    return {
+      success: true,
+      message: `Inspection case ${inspectionId} and all related records have been permanently disposed and deleted.`,
+      deleted_id: inspectionId,
     };
   }
 

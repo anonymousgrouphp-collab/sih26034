@@ -17,7 +17,9 @@ export const Inspections: React.FC = () => {
   const loadCases = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await ApiService.listInspections({ circleId: activeCircle });
+      const res = await ApiService.listInspections({
+        circleId: activeCircle && activeCircle !== "ALL" ? activeCircle : undefined,
+      });
       setCases(res.items);
     } catch (err) {
       console.error("Failed to load cases:", err);

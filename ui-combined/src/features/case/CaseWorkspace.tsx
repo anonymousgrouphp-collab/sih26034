@@ -53,8 +53,9 @@ import {
   ArrowRight,
   RefreshCw,
   Scale,
-  Activity,
   Lock,
+  Trash2,
+  Activity,
 } from "lucide-react";
 
 interface CaseWorkspaceProps {
@@ -87,6 +88,21 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
   const [selectedBoxId, setSelectedBoxId] = useState<string | undefined>(undefined);
   const [auditSubTab, setAuditSubTab] = useState<"PROVENANCE" | "DIAGNOSTICS">("PROVENANCE");
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeletingCase, setIsDeletingCase] = useState(false);
+
+  const handleDeleteCase = async () => {
+    setIsDeletingCase(true);
+    try {
+      await ApiService.deleteInspection(caseData.id);
+      onBack();
+    } catch (err) {
+      console.error("Failed to delete case:", err);
+    } finally {
+      setIsDeletingCase(false);
+      setIsDeleteDialogOpen(false);
+    }
+  };
 
   useEffect(() => {
     if (caseData?.id) {
@@ -217,19 +233,24 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
         compounding_fee_amount: 5000,
         reply_window_days: 15,
       });
-      const targetUrl = res.pdf_download_url || "/form1.pdf";
-      const filename = `Form-1-Notice-${caseData.inspection_number || caseData.id}.pdf`;
-      const dlLink = document.createElement("a");
-      dlLink.href = targetUrl;
-      dlLink.download = filename;
-      dlLink.target = "_blank";
-      document.body.appendChild(dlLink);
-      dlLink.click();
-      document.body.removeChild(dlLink);
+      if (res && res.pdf_download_url && res.pdf_download_url.startsWith("http") && res.pdf_download_url !== "/form1.pdf") {
+        const filename = `Form-1-Notice-${caseData.inspection_number || caseData.id}.pdf`;
+        const dlLink = document.createElement("a");
+        dlLink.href = res.pdf_download_url;
+        dlLink.download = filename;
+        dlLink.target = "_blank";
+        document.body.appendChild(dlLink);
+        dlLink.click();
+        document.body.removeChild(dlLink);
+      } else {
+        // Direct officer to authentic on-screen Form-1 Report View
+        setActiveWorkspaceView("REPORT");
+      }
 
       setQuickDecisionSaved(true);
       setTimeout(() => setQuickDecisionSaved(false), 5000);
     } catch (err: any) {
+      setActiveWorkspaceView("REPORT");
       setActionError(err.message || (language === "hi" ? "प्रपत्र-1 नोटिस तैयार करने में विफल।" : "Failed to generate Form-1 notice."));
     } finally {
       setIsGeneratingNotice(false);
@@ -1070,6 +1091,19 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                         </span>
                         <ArrowRight size={13} />
                       </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setIsDeleteDialogOpen(true)}
+                        className="w-full py-2 px-3 rounded-lg border border-rose-200 bg-rose-50/50 hover:bg-rose-100 font-semibold text-rose-700 text-xs flex items-center justify-center gap-1.5 transition-colors"
+                      >
+                        <Trash2 size={13} className="text-rose-600" />
+                        <span>
+                          {language === "hi"
+                            ? "मामला निरस्त एवं डेटाबेस से हटाएं"
+                            : "Dispose & Delete Case from Database"}
+                        </span>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -1333,6 +1367,89 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Deletion Confirmation Modal */}
+      {isDeleteDialogOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="p-2.5 bg-rose-100 text-rose-700 rounded-full shrink-0">
+                <Trash2 size={22} />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900">
+                  {language === "hi" ? "मामला निरस्त एवं स्थायी निष्कासन" : "Dispose & Permanently Delete Case"}
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  {language === "hi"
+                    ? "डेटाबेस से यह मामला एवं सभी संबंधित विधिक विवरण पूरी तरह हटा दिए जाएंगे।"
+                    : "This inspection case and all related statutory details will be permanently removed from the database sitewide."}
+                </p>
+              </div>
+            </div>
+
+            <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs space-y-1.5">
+              <div className="flex justify-between">
+                <span className="text-slate-500">{language === "hi" ? "केस संख्या:" : "Case Number:"}</span>
+                <span className="font-mono font-bold text-slate-800">{caseData.inspection_number}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">{language === "hi" ? "उत्पाद / वस्तु:" : "Product / Commodity:"}</span>
+                <span className="font-semibold text-slate-800 truncate max-w-[220px]">{caseData.product_name}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">{language === "hi" ? "दिनांक एवं समय:" : "Date & Time:"}</span>
+                <span className="font-mono text-slate-700">
+                  {new Date(caseData.created_at).toLocaleDateString("en-IN", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: true,
+                  })}
+                </span>
+              </div>
+            </div>
+
+            <p className="text-[11px] text-rose-700 bg-rose-50 p-2.5 rounded border border-rose-200">
+              <b>{language === "hi" ? "सांविधिक चेतावनी: " : "Statutory Warning: "}</b>
+              {language === "hi"
+                ? "यह कार्रवाई पूर्ववत नहीं की जा सकती। सभी साक्ष्य छवियां, बीओयू निर्देशांक, नियम निष्कर्ष एवं नोटिस स्थायी रूप से नष्ट हो जाएंगे।"
+                : "This action cannot be undone. All evidence photographs, bounding boxes, rule evaluations, and notice records will be purged."}
+            </p>
+
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                type="button"
+                disabled={isDeletingCase}
+                onClick={() => setIsDeleteDialogOpen(false)}
+                className="btn-secondary text-xs px-4 py-2"
+              >
+                {language === "hi" ? "रद्द करें" : "Cancel"}
+              </button>
+              <button
+                type="button"
+                disabled={isDeletingCase}
+                onClick={handleDeleteCase}
+                className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 disabled:opacity-50 rounded-lg flex items-center gap-1.5 transition-colors shadow-xs"
+              >
+                {isDeletingCase ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    <span>{language === "hi" ? "हटाया जा रहा है..." : "Deleting..."}</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 size={14} />
+                    <span>{language === "hi" ? "स्थायी रूप से हटाएं" : "Permanently Delete"}</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

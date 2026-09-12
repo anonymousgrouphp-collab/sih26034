@@ -25,6 +25,7 @@ import { PackagingType, InspectionType } from "../types/inspection";
 import { InspectionCameraModal } from "../components/camera";
 import { useCircle } from "../context/CircleContext";
 import { useLanguage } from "../context/LanguageContext";
+import { compressPackagingImage } from "../services/imageCompression";
 
 interface PipelineStepItem {
   id: string;
@@ -174,16 +175,37 @@ export const NewInspection: React.FC = () => {
     setFilePreviews((prev) => [...prev, ...previews]);
 
     fileList.forEach((f, idx) => {
-      getPersistentPreview(f).then((persistentUrl) => {
-        setFilePreviews((prev) => {
-          const next = [...prev];
-          const pos = startIdx + idx;
-          if (pos < next.length) {
-            next[pos] = persistentUrl;
-          }
-          return next;
+      compressPackagingImage(f, { maxDimension: 1280, quality: 0.8 })
+        .then((comp) => {
+          setFilePreviews((prev) => {
+            const next = [...prev];
+            const pos = startIdx + idx;
+            if (pos < next.length) {
+              next[pos] = comp.dataUrl;
+            }
+            return next;
+          });
+          setFiles((prev) => {
+            const next = [...prev];
+            const pos = startIdx + idx;
+            if (pos < next.length) {
+              next[pos] = comp.file;
+            }
+            return next;
+          });
+        })
+        .catch(() => {
+          getPersistentPreview(f).then((persistentUrl) => {
+            setFilePreviews((prev) => {
+              const next = [...prev];
+              const pos = startIdx + idx;
+              if (pos < next.length) {
+                next[pos] = persistentUrl;
+              }
+              return next;
+            });
+          });
         });
-      });
     });
   };
 
@@ -218,8 +240,25 @@ export const NewInspection: React.FC = () => {
       const uploadedImageIds: string[] = [];
       if (files.length > 0) {
         for (let i = 0; i < files.length; i++) {
-          const file = files[i];
-          const persistentPreview = await getPersistentPreview(file, filePreviews[i]);
+          const rawFile = files[i];
+          let fileToUpload = rawFile;
+          let previewUrl = filePreviews[i];
+          let imgWidth = 1920;
+          let imgHeight = 1080;
+
+          try {
+            const compressed = await compressPackagingImage(rawFile, { maxDimension: 1280, quality: 0.8 });
+            fileToUpload = compressed.file;
+            imgWidth = compressed.width;
+            imgHeight = compressed.height;
+            if (compressed.dataUrl) {
+              previewUrl = compressed.dataUrl;
+            }
+          } catch (compErr) {
+            console.warn("Pre-upload compression fallback:", compErr);
+            previewUrl = await getPersistentPreview(rawFile, filePreviews[i]);
+          }
+
           const panelType =
             i === 0
               ? "PDP_FRONT"
@@ -228,15 +267,15 @@ export const NewInspection: React.FC = () => {
               : i === 2
               ? "BACK_PANEL"
               : "SIDE_PANEL";
-          const uploadResult = await ApiService.uploadEvidence(file, {
+          const uploadResult = await ApiService.uploadEvidence(fileToUpload, {
             inspection_id: newCase.id,
             panel_type: panelType,
-            original_filename: file.name,
-            file_size_bytes: file.size,
-            mime_type: file.type || "image/jpeg",
-            image_width: 1920,
-            image_height: 1080,
-            preview_url: persistentPreview,
+            original_filename: fileToUpload.name,
+            file_size_bytes: fileToUpload.size,
+            mime_type: fileToUpload.type || "image/jpeg",
+            image_width: imgWidth,
+            image_height: imgHeight,
+            preview_url: previewUrl,
           });
           if (uploadResult?.image_id) {
             uploadedImageIds.push(uploadResult.image_id);

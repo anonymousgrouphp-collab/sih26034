@@ -32,6 +32,8 @@ import {
   GOLDEN_SKU_CASES,
   MOCK_DASHBOARD_SUMMARY,
   computeCaseReadiness,
+  deleteMockCase,
+  getDeletedCaseIds,
 } from "./mockData";
 
 export class DemoFixtureService implements IInspectionApiService {
@@ -59,7 +61,10 @@ export class DemoFixtureService implements IInspectionApiService {
     limit?: number;
     offset?: number;
   }): Promise<{ total: number; items: InspectionSummary[] }> {
-    const allCases = Object.values(GOLDEN_SKU_CASES).map((c) => ({
+    const deletedIds = getDeletedCaseIds();
+    const allCases = Object.values(GOLDEN_SKU_CASES)
+      .filter((c) => !deletedIds.has(c.id) && !deletedIds.has(c.inspection_number) && (!c.sku_demo_id || !deletedIds.has(c.sku_demo_id)))
+      .map((c) => ({
       id: c.id,
       inspection_number: c.inspection_number,
       product_name: c.product_name,
@@ -280,6 +285,15 @@ export class DemoFixtureService implements IInspectionApiService {
       statutory_mandate: "Section 36(1) of Legal Metrology Act, 2009 read with Section 63 BSA 2023",
       pdf_download_url: "/form1.pdf",
       merkle_entry_hash: "8c42b9101adfa9280194bc0281efca891048bca120938a1ef908123bcdef0123",
+    };
+  }
+
+  public async deleteInspection(inspectionId: string): Promise<{ success: boolean; message: string; deleted_id: string }> {
+    deleteMockCase(inspectionId);
+    return {
+      success: true,
+      message: `Inspection case ${inspectionId} has been disposed and removed from workspace.`,
+      deleted_id: inspectionId,
     };
   }
 

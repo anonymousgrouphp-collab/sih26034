@@ -139,15 +139,18 @@ export const EvidenceDossier: React.FC = () => {
         reply_window_days: 15,
       });
 
-      const targetUrl = res.pdf_download_url || "/form1.pdf";
-      const filename = `Form-1-Notice-${caseData.inspection_number || caseData.id}.pdf`;
-      const dlLink = document.createElement("a");
-      dlLink.href = targetUrl;
-      dlLink.download = filename;
-      dlLink.target = "_blank";
-      document.body.appendChild(dlLink);
-      dlLink.click();
-      document.body.removeChild(dlLink);
+      if (res && res.pdf_download_url && res.pdf_download_url.startsWith("http") && res.pdf_download_url !== "/form1.pdf") {
+        const filename = `Form-1-Notice-${caseData.inspection_number || caseData.id}.pdf`;
+        const dlLink = document.createElement("a");
+        dlLink.href = res.pdf_download_url;
+        dlLink.download = filename;
+        dlLink.target = "_blank";
+        document.body.appendChild(dlLink);
+        dlLink.click();
+        document.body.removeChild(dlLink);
+      } else {
+        window.print();
+      }
 
       setExportNotice(
         language === "hi"

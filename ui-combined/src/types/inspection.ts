@@ -578,6 +578,7 @@ export interface IInspectionApiService {
   getCaseReadiness(inspectionId: string): Promise<CaseReadinessChecklist>;
   closeInspection(inspectionId: string, remarks?: string): Promise<InspectionCase>;
   getEvidenceDossier?(inspectionId: string): Promise<any>;
+  deleteInspection?(inspectionId: string): Promise<{ success: boolean; message: string; deleted_id: string }>;
   generateNotice(payload: GenerateNoticePayload): Promise<LegalNoticeResult>;
   getNoticePdfUrl(noticeId: string): string;
   getSystemHealth(): Promise<{
