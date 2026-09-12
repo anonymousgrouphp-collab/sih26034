@@ -65,8 +65,8 @@ export const ReviewQueue: React.FC = () => {
         c.overall_status === "REVIEW" ||
         c.overall_status === "UNABLE_TO_VERIFY" ||
         c.workflow_status === "PENDING_REVIEW" ||
-        c.inspection_number.includes("DEMO-02") ||
-        c.inspection_number.includes("DEMO-04")
+        (Boolean(c.is_mock_fixture) &&
+          (c.inspection_number.includes("DEMO-02") || c.inspection_number.includes("DEMO-04")))
     );
   }, [cases]);
 

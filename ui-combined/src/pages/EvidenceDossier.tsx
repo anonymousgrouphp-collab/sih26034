@@ -21,11 +21,11 @@ import {
 
 export const EvidenceDossier: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const targetId = id || "demo-fortune-sunlite";
   const navigate = useNavigate();
   const { language } = useLanguage();
 
   const [caseData, setCaseData] = useState<InspectionCase | null>(null);
+  const [targetCaseId, setTargetCaseId] = useState<string | null>(id || null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isExporting, setIsExporting] = useState(false);
@@ -38,8 +38,34 @@ export const EvidenceDossier: React.FC = () => {
     setIsLoading(true);
     setLoadError(null);
 
-    ApiService.getInspection(targetId)
-      .then(async (data) => {
+    const resolveAndFetch = async () => {
+      let resolvedId = id;
+      if (!resolvedId) {
+        try {
+          const listRes = await ApiService.listInspections();
+          if (listRes.items && listRes.items.length > 0) {
+            resolvedId = listRes.items[0].id;
+          }
+        } catch {
+          // Ignore listing lookup error
+        }
+      }
+
+      if (!resolvedId) {
+        if (isMounted) {
+          setTargetCaseId(null);
+          setCaseData(null);
+          setIsLoading(false);
+        }
+        return;
+      }
+
+      if (isMounted) {
+        setTargetCaseId(resolvedId);
+      }
+
+      try {
+        const data = await ApiService.getInspection(resolvedId);
         if (isMounted) {
           setCaseData(data);
           setIsLoading(false);
@@ -53,8 +79,7 @@ export const EvidenceDossier: React.FC = () => {
             // Non-critical fallback
           }
         }
-      })
-      .catch((err) => {
+      } catch (err: any) {
         if (isMounted) {
           console.error("Failed to load dossier case:", err);
           setLoadError(
@@ -65,7 +90,10 @@ export const EvidenceDossier: React.FC = () => {
           );
           setIsLoading(false);
         }
-      });
+      }
+    };
+
+    resolveAndFetch();
 
     return () => {
       isMounted = false;
@@ -74,7 +102,7 @@ export const EvidenceDossier: React.FC = () => {
 
   useEffect(() => {
     return loadCase();
-  }, [targetId, language]);
+  }, [id, language]);
 
   const activeAsset = useMemo(() => {
     const assets = caseData?.evidence_assets || [];
@@ -222,7 +250,7 @@ export const EvidenceDossier: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
-  if (isLoading || !caseData) {
+  if (isLoading) {
     return (
       <div className="card p-12 text-center bg-white space-y-3">
         <div className="w-8 h-8 border-4 border-govNavy border-t-transparent rounded-full animate-spin mx-auto" />
@@ -235,7 +263,33 @@ export const EvidenceDossier: React.FC = () => {
     );
   }
 
-  if (loadError || !caseData) {
+  if (!caseData) {
+    if (!loadError && !targetCaseId) {
+      return (
+        <div className="card p-10 text-center bg-white space-y-4 max-w-xl mx-auto border border-slate-200 shadow-workstation">
+          <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center mx-auto">
+            <FileArchive size={24} />
+          </div>
+          <h2 className="text-base font-bold text-slate-800">
+            {language === "hi" ? "कोई साक्ष्य संचिका उपलब्ध नहीं है" : "No Evidence Dossier Available"}
+          </h2>
+          <p className="text-xs text-slate-500 max-w-sm mx-auto">
+            {language === "hi"
+              ? "रजिस्टर में कोई सक्रिय निरीक्षण मामला नहीं मिला। कृपया केस पंजी से एक मामला चुनें या नया निरीक्षण पंजीकृत करें।"
+              : "No active inspection cases found in the register. Please select a case from the Inspection Desk or register a new commodity inspection."}
+          </p>
+          <div className="pt-3 flex flex-wrap justify-center gap-3">
+            <Link to="/inspections" className="btn-secondary text-xs">
+              {language === "hi" ? "केस पंजी देखें" : "View Inspection Register"}
+            </Link>
+            <Link to="/inspections/new" className="btn-primary text-xs">
+              {language === "hi" ? "नया निरीक्षण पंजीकृत करें" : "Register New Inspection"}
+            </Link>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="card p-10 text-center bg-white space-y-4 max-w-xl mx-auto border border-rose-200">
         <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto">
@@ -247,8 +301,8 @@ export const EvidenceDossier: React.FC = () => {
         <p className="text-xs text-slate-500">
           {loadError ||
             (language === "hi"
-              ? `केस आईडी "${targetId}" के लिए साक्ष्य रिकॉर्ड उपलब्ध नहीं है।`
-              : `Evidence records for case ID "${targetId}" could not be retrieved.`)}
+              ? `केस आईडी "${targetCaseId || id || "—"}" के लिए साक्ष्य रिकॉर्ड उपलब्ध नहीं है।`
+              : `Evidence records for case ID "${targetCaseId || id || "—"}" could not be retrieved.`)}
         </p>
         <div className="pt-3 flex flex-wrap justify-center gap-3">
           <button type="button" onClick={loadCase} className="btn-secondary text-xs">
@@ -256,9 +310,6 @@ export const EvidenceDossier: React.FC = () => {
           </button>
           <Link to="/inspections" className="btn-secondary text-xs">
             {language === "hi" ? "केस पंजी पर वापस जाएं" : "Back to Case Register"}
-          </Link>
-          <Link to="/inspections/demo-fortune-sunlite/evidence" className="btn-primary text-xs">
-            {language === "hi" ? "फॉर्च्यून सनलाइट डोज़ियर लोड करें" : "Load Certified Fortune Dossier"}
           </Link>
         </div>
       </div>

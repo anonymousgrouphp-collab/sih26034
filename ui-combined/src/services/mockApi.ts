@@ -201,11 +201,12 @@ export class MockApiService implements IInspectionApiService {
       };
     }
 
-    // Default fallback to first case
-    return {
-      ...(mockCases["SKU-DEMO-01"] || Object.values(mockCases)[0]),
-      pipeline_source: "BACKEND_SIMULATION",
-    };
+    throw {
+      error_code: "INSPECTION_NOT_FOUND",
+      status: 404,
+      message: `Inspection case '${id}' was not found in the local or remote registry.`,
+      remediation: "Verify the case ID or return to the Inspection Desk.",
+    } as ApiError;
   }
 
   public async uploadEvidence(

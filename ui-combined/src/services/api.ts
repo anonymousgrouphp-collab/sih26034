@@ -145,12 +145,13 @@ export class ApiService {
 
     try {
       const liveResult = await LiveApiService.getInstance().listInspections(params);
-      // Retrieve any unsynced locally staged custom cases to guarantee zero data loss
+      // Retrieve any unsynced locally staged genuine custom cases to guarantee zero data loss.
+      // Strictly ignore all mock/demo fixtures so a cleared live database reflects 0 cases.
       try {
         const mockResult = await MockApiService.getInstance().listInspections(params);
         const localCustom = mockResult.items.filter(
           (c) =>
-            !c.id.startsWith("SKU-DEMO-") &&
+            !ApiService.isDemoOrFixtureCase(c) &&
             !liveResult.items.some((lr) => lr.id === c.id || lr.inspection_number === c.inspection_number)
         );
         if (localCustom.length > 0) {
@@ -216,6 +217,28 @@ export class ApiService {
     );
   }
 
+  public static isDemoOrFixtureCase(c: {
+    id: string;
+    inspection_number?: string;
+    is_mock_fixture?: boolean;
+    sku_demo_id?: string;
+  }): boolean {
+    if (c.is_mock_fixture) return true;
+    if (c.sku_demo_id) return true;
+    if (this.isDemoId(c.id)) return true;
+    if (c.inspection_number && this.isDemoId(c.inspection_number)) return true;
+    const lowerId = (c.id || "").toLowerCase().trim();
+    if (
+      lowerId.startsWith("sku-demo-") ||
+      lowerId.startsWith("insp_demo_") ||
+      lowerId.startsWith("ins-2026-") ||
+      lowerId.startsWith("demo-")
+    ) {
+      return true;
+    }
+    return false;
+  }
+
   public static async getInspection(id: string): Promise<InspectionCase> {
     if (this.operatingMode === "DEMO_FIXTURE") {
       try {
@@ -237,6 +260,12 @@ export class ApiService {
         try {
           return await DemoFixtureService.getInstance().getInspection(id);
         } catch {}
+      }
+      // If live server explicitly responded with 404 (Not Found), the case does not exist or was deleted.
+      // Do not resurrect or fall back to mock cases when a real case is not found.
+      const isNotFound = liveErr?.status === 404 || String(liveErr?.message || "").includes("404");
+      if (isNotFound && !this.isDemoId(id)) {
+        throw liveErr;
       }
       console.warn(`Live database retrieval for '${id}' failed. Engaging Mode B local fallback:`, liveErr);
       return await MockApiService.getInstance().getInspection(id);
