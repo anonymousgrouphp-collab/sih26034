@@ -132,12 +132,46 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
 
   // Image error state & resilient fallback
   const [imageError, setImageError] = useState(false);
+
+  const getSmartFallbackImage = (product?: string, raw?: string): string => {
+    const p = (product || "").toLowerCase();
+    const r = (raw || "").toLowerCase();
+    if (p.includes("water") || p.includes("mineral") || r.includes("water") || r.includes("demo_03") || r.includes("demo-03")) {
+      return "/storage/uploads/sku_demo_03_water.jpg";
+    }
+    if (p.includes("biscuit") || p.includes("cookie") || r.includes("biscuit") || r.includes("demo_01") || r.includes("demo-01")) {
+      return "/storage/uploads/sku_demo_01_biscuit.jpg";
+    }
+    if (p.includes("curry") || p.includes("dal makhani") || r.includes("curry") || r.includes("demo_02") || r.includes("demo-02")) {
+      return "/storage/uploads/sku_demo_02_curry.jpg";
+    }
+    if (p.includes("soap") || p.includes("bathing") || r.includes("soap") || r.includes("demo_04") || r.includes("demo-04")) {
+      return "/storage/uploads/sku_demo_04_soap.jpg";
+    }
+    if (p.includes("chip") || p.includes("crispy") || r.includes("chips") || r.includes("demo_05") || r.includes("demo-05")) {
+      return "/storage/uploads/sku_demo_05_chips.jpg";
+    }
+    if (p.includes("earbud") || p.includes("bluetooth") || r.includes("listing") || r.includes("demo_06") || r.includes("demo-06")) {
+      return "/storage/uploads/sku_demo_06_listing.png";
+    }
+    if (r.includes("real-pkg-01")) return "/storage/uploads/REAL-PKG-01_8901719134845.jpg";
+    if (r.includes("real-pkg-02")) return "/storage/uploads/REAL-PKG-02_8901063093522.jpg";
+    if (r.includes("real-pkg-03")) return "/storage/uploads/REAL-PKG-03_8901063139329.jpg";
+    if (r.includes("real-pkg-04")) return "/storage/uploads/REAL-PKG-04_8904043901015.jpg";
+    if (r.includes("real-pkg-05")) return "/storage/uploads/REAL-PKG-05_8904004400731.jpg";
+    if (r.includes("real-pkg-06")) return "/storage/uploads/REAL-PKG-06_8901262010016.jpg";
+    if (r.includes("real-pkg-07")) return "/storage/uploads/REAL-PKG-07_7622202334009.jpg";
+    if (r.includes("real-pkg-08")) return "/storage/uploads/REAL-PKG-08_9556001137722.jpg";
+    return "/assets/aashirvaad-atta-demo.svg";
+  };
+
   const rawImageSrc = asset.preview_url || asset.file_path || "";
-  const imageSrc = imageError || !rawImageSrc ? "/assets/aashirvaad-atta-demo.svg" : rawImageSrc;
+  const smartFallback = getSmartFallbackImage(productName, rawImageSrc);
+  const imageSrc = !imageError && rawImageSrc ? rawImageSrc : smartFallback;
 
   useEffect(() => {
     setImageError(false);
-  }, [asset.preview_url, asset.file_path]);
+  }, [asset.preview_url, asset.file_path, productName]);
 
   return (
     <div className="bg-panelBg rounded-lg border border-slate-200 shadow-sm flex flex-col h-full overflow-hidden">

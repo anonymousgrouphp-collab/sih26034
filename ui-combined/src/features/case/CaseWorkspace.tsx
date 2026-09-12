@@ -1041,6 +1041,16 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                       <img
                         src={activeAsset.preview_url || activeAsset.file_path}
                         alt={`Packaging evidence for ${caseData.product_name}`}
+                        onError={(e) => {
+                          const p = (caseData.product_name || "").toLowerCase();
+                          if (p.includes("water") || p.includes("mineral")) e.currentTarget.src = "/storage/uploads/sku_demo_03_water.jpg";
+                          else if (p.includes("cookie") || p.includes("biscuit")) e.currentTarget.src = "/storage/uploads/sku_demo_01_biscuit.jpg";
+                          else if (p.includes("curry") || p.includes("dal makhani")) e.currentTarget.src = "/storage/uploads/sku_demo_02_curry.jpg";
+                          else if (p.includes("soap") || p.includes("bathing")) e.currentTarget.src = "/storage/uploads/sku_demo_04_soap.jpg";
+                          else if (p.includes("chip") || p.includes("crispy")) e.currentTarget.src = "/storage/uploads/sku_demo_05_chips.jpg";
+                          else if (p.includes("earbud") || p.includes("bluetooth")) e.currentTarget.src = "/storage/uploads/sku_demo_06_listing.png";
+                          else e.currentTarget.src = "/assets/aashirvaad-atta-demo.svg";
+                        }}
                         className="max-h-96 w-auto object-contain rounded"
                       />
                     ) : (

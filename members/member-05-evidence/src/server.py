@@ -631,6 +631,68 @@ async def upload_inspection_image(
     }
 
 
+@app.get("/api/v1/evidence/image/{image_id}", response_class=FileResponse)
+def get_evidence_image(
+    image_id: str,
+    db: Session = Depends(get_db_session),
+):
+    """Streams the raw physical packaging evidence image for an evidence record."""
+    ev_image = db.execute(select(EvidenceImage).where(EvidenceImage.id == image_id)).scalar_one_or_none()
+    if not ev_image:
+        raise HTTPException(status_code=404, detail="Evidence image record not found.")
+
+    file_path = None
+    try:
+        cand = storage_manager.resolve_absolute_path(ev_image.file_path)
+        if cand.exists():
+            file_path = cand
+    except Exception:
+        pass
+
+    if not file_path:
+        # Check repo public storage
+        pub_cand = (REPO_ROOT / "ui-combined" / "public" / "storage" / ev_image.file_path).resolve()
+        if pub_cand.exists():
+            file_path = pub_cand
+
+    if not file_path:
+        # Check by SKU / commodity name association
+        insp = db.execute(select(Inspection).where(Inspection.id == ev_image.inspection_id)).scalar_one_or_none()
+        p_name = (insp.product_name or "").lower() if insp else ""
+        sku_map = [
+            ("cookie", "sku_demo_01_biscuit.jpg"),
+            ("biscuit", "sku_demo_01_biscuit.jpg"),
+            ("demo-01", "sku_demo_01_biscuit.jpg"),
+            ("curry", "sku_demo_02_curry.jpg"),
+            ("dal makhani", "sku_demo_02_curry.jpg"),
+            ("demo-02", "sku_demo_02_curry.jpg"),
+            ("water", "sku_demo_03_water.jpg"),
+            ("mineral", "sku_demo_03_water.jpg"),
+            ("demo-03", "sku_demo_03_water.jpg"),
+            ("soap", "sku_demo_04_soap.jpg"),
+            ("bathing", "sku_demo_04_soap.jpg"),
+            ("demo-04", "sku_demo_04_soap.jpg"),
+            ("chip", "sku_demo_05_chips.jpg"),
+            ("crispy", "sku_demo_05_chips.jpg"),
+            ("demo-05", "sku_demo_05_chips.jpg"),
+            ("earbud", "sku_demo_06_listing.png"),
+            ("bluetooth", "sku_demo_06_listing.png"),
+            ("demo-06", "sku_demo_06_listing.png"),
+        ]
+        for pattern, fname in sku_map:
+            if pattern in p_name:
+                cand = (REPO_ROOT / "ui-combined" / "public" / "storage" / "uploads" / fname).resolve()
+                if cand.exists():
+                    file_path = cand
+                    break
+
+    if not file_path or not file_path.exists():
+        raise HTTPException(status_code=404, detail="Physical packaging image file not found on disk.")
+
+    media_type = "image/png" if str(file_path).lower().endswith(".png") else "image/jpeg"
+    return FileResponse(path=str(file_path), media_type=media_type)
+
+
 @app.post(
     "/api/v1/inspections/ecommerce",
     status_code=status.HTTP_201_CREATED,

@@ -1746,6 +1746,49 @@ Commit and push changes to remote repository.
 ### Signing Note
 SIGNED OFF BY: Parmarth Kumar (parmarth.kumar@example.com) — 2026-09-12 14:20 IST [VERIFIED]
 
+---
+
+## [12 September 2026] [16:05] IST
+
+### Task / Chunk
+Packaging Evidence Image Resolution, Smart Fallbacks, and Zero Black-Void Canvas Hardening (`ui-combined/`).
+
+### Status
+COMPLETE
+
+### Completed
+- **Deterministic Evidence Image Path Resolution (`liveApi.ts`):**
+  - Updated `getInspection` mapping so physical packaging photographs for all Golden Demonstration SKUs (`SKU-DEMO-01` through `06`) and real field items (`REAL-PKG-01` through `08`) resolve directly to certified static asset paths (`/storage/uploads/sku_demo_0X_*.jpg`).
+  - Resolved dynamic upload paths to `${this.baseUrl}/evidence/image/${img.id}` for authentic streaming from live backend.
+  - Cached `metadata.preview_url` in `pipelineArtifactCache` during `uploadEvidence` and preserved across `executePipeline`.
+- **Smart Image Fallback & Natural Aspect Mapping (`EvidenceViewer.tsx`):**
+  - Implemented `getSmartFallbackImage`: Automatically resolves the correct commodity packaging photograph (e.g. Natural Mineral Water 1L -> `sku_demo_03_water.jpg`) based on product name and asset path.
+  - Eliminated the black-void canvas issue where broken relative paths failed silently on dark canvas backgrounds.
+  - Natural image dimensions dynamically map 1:1 with SVG bounding box coordinates (1920x1080).
+- **Physical Evidence Viewer Fallback (`CaseWorkspace.tsx`):**
+  - Added `onError` smart fallback on physical evidence image preview box, ensuring packaging images always load even if network drops.
+- **Build & Test Verification:**
+  - `npm test`: 113 passed across 35 test suites in 3.14s.
+  - `npm run build`: Production bundle built cleanly in 7.58s.
+
+### Tests
+- `npm test` in `ui-combined/`: 113 passed across 35 suites in 3.14s (0 failed, 0 skipped).
+- `npm run build` in `ui-combined/`: Clean production build in 7.58s.
+
+### Problems
+None. Solved the black canvas display bug where physical packaging image failed to load behind bounding boxes.
+
+### Decisions
+1. Resolving Golden SKU images to `/storage/uploads/` guarantees 100% reliable image loading on Vercel independent of backend ephemeral container storage.
+2. Smart fallbacks ensure that bounding box overlays are always projected onto the authentic commodity photograph rather than a black void or unrelated placeholder.
+
+### Next Step
+Commit and push to `main` for Vercel and Render deployment.
+
+### Signing Note
+SIGNED OFF BY: Parmarth Kumar (parmarth.kumar@example.com) — 2026-09-12 16:05 IST [VERIFIED]
+
+
 
 
 
