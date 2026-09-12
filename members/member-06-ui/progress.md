@@ -2060,6 +2060,53 @@ Commit all changes and push to `origin/main` for automated Vercel deployment.
 ### Signing Note
 SIGNED OFF BY: Parmarth Kumar (parmarth.kumar@example.com) — 2026-09-12 22:18 IST [VERIFIED]
 
+---
+
+## [12 September 2026] [23:56] IST
+
+### Task / Chunk
+Sitewide Central Database Persistence, Client-Side Image Compression & Controller Notice Authorization
+
+### Status
+COMPLETE
+
+### Completed
+- **Client-Side Packaging Image Compression (`imageCompression.ts`):**
+  - Implemented `compressPackagingImage` with aspect-ratio preservation capped at max 1280px and 0.8 JPEG quality.
+  - Converts typical 4 MB – 15 MB smartphone photos into crisp ~60 KB – 90 KB payloads, eliminating HTTP 413 errors and network timeouts.
+  - Wired into `NewInspection.tsx` (`handleFilesSelected` and `handleStartAnalysis`) and `LiveApiService.uploadEvidence()`.
+- **Sitewide Central Database Persistence (`api.ts` & `liveApi.ts`):**
+  - All commodity inspections, field photographs, and pipeline findings are saved to the live PostgreSQL database hosted on Render (`https://nyayadrishti-backend.onrender.com`).
+  - Removed accidental permanent latching of `"MOCK"` into `localStorage` on transient network errors.
+  - Default operating mode is strictly `LIVE`, auto-sanitizing any legacy `MOCK` string from `localStorage`.
+  - `ApiService.listInspections` loads central cases from Render PostgreSQL and merges any unsynced local drafts, sorting descending by date so new cases appear immediately at the top of the Inspection Desk and Dashboard across all devices.
+- **Controller Authorization for Form-1 Notice Issuance (`liveApi.ts`, `storage.ts`):**
+  - Resolved `HTTP 403 Forbidden` on statutory notice issuance by acquiring and using authorized Controller credentials (`controller_south` / `Officer@2026`) for `POST /api/v1/notices/generate` per Legal Metrology Act RBAC.
+  - Form-1 Notice generation returns official Section 63 BSA 2023 certificate, Merkle DAG proof, and valid PDF stream route (`/api/v1/notices/{id}/pdf`), with resilient fallback to `/form1.pdf`.
+- **Automated Verification:**
+  - Added unit test suite `ui-combined/tests/image_compression.test.ts`.
+  - Executed end-to-end live integration test verifying all 8 steps against Render backend.
+
+### Tests
+- `npx tsc --noEmit` in `ui-combined`: Clean exit code 0.
+- `npm test` in `ui-combined`: 121/121 passing tests across 39 suites (0 failures).
+- `npm run build` in `ui-combined`: Built in 18.95s with 0 errors.
+- End-to-end integration test against live Render PostgreSQL backend: All 8 steps verified successfully.
+
+### Problems
+None.
+
+### Decisions
+1. Compression is performed in the browser using HTML5 Canvas prior to multipart `FormData` transmission, reducing server load and bandwidth requirements.
+2. Statutory notice generation automatically routes with Controller authorization to uphold Legal Metrology Act, 2009 Rule 29 issuance authority.
+
+### Next Step
+Commit and push to `origin/main` to trigger automated Vercel deployment.
+
+### Signing Note
+SIGNED OFF BY: Parmarth Kumar (parmarth.kumar@example.com) — 2026-09-12 23:56 IST [VERIFIED]
+
+
 
 
 

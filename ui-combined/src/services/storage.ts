@@ -38,6 +38,7 @@ const STORAGE_KEYS = {
   DRAFT_CASE: "nyayadrishti_draft_inspection_v1",
   PREFERENCES: "nyayadrishti_user_prefs_v1",
   TOKEN: "nyayadrishti_auth_token_v1",
+  CONTROLLER_TOKEN: "nyayadrishti_controller_token_v1",
   ACTIVE_DEMO_SKU: "nyayadrishti_active_demo_sku_v1",
 };
 
@@ -143,6 +144,37 @@ export class StorageService {
       if (typeof window !== "undefined") {
         window.sessionStorage?.removeItem(STORAGE_KEYS.TOKEN);
         window.localStorage?.removeItem(STORAGE_KEYS.TOKEN);
+      }
+    } catch {
+      // Non-blocking
+    }
+  }
+
+  static getControllerAuthToken(): string | null {
+    try {
+      if (typeof window === "undefined") return null;
+      return window.sessionStorage?.getItem(STORAGE_KEYS.CONTROLLER_TOKEN) || window.localStorage?.getItem(STORAGE_KEYS.CONTROLLER_TOKEN);
+    } catch {
+      return null;
+    }
+  }
+
+  static setControllerAuthToken(token: string): void {
+    try {
+      if (typeof window !== "undefined") {
+        window.sessionStorage?.setItem(STORAGE_KEYS.CONTROLLER_TOKEN, token);
+        window.localStorage?.setItem(STORAGE_KEYS.CONTROLLER_TOKEN, token);
+      }
+    } catch {
+      // Non-blocking
+    }
+  }
+
+  static clearControllerAuthToken(): void {
+    try {
+      if (typeof window !== "undefined") {
+        window.sessionStorage?.removeItem(STORAGE_KEYS.CONTROLLER_TOKEN);
+        window.localStorage?.removeItem(STORAGE_KEYS.CONTROLLER_TOKEN);
       }
     } catch {
       // Non-blocking

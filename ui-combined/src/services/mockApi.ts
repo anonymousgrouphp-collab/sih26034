@@ -169,6 +169,10 @@ export class MockApiService implements IInspectionApiService {
     return newCase;
   }
 
+  public addLocalCase(c: InspectionCase): void {
+    addMockCase(c);
+  }
+
   public async getInspection(id: string): Promise<InspectionCase> {
     const mockCases = getMockCases();
     let found =

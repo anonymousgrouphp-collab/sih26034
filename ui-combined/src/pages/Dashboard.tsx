@@ -56,9 +56,9 @@ export const Dashboard: React.FC = () => {
   const metrics = useMemo(() => {
     const total = cases.length;
     const passed = cases.filter((c) => c.overall_status === "PASS").length;
-    const failed = cases.filter((c) => c.overall_status === "FAIL").length;
+    const failed = cases.filter((c) => c.overall_status === "FAIL" || (c.violations_count !== undefined && c.violations_count > 0)).length;
     const review = cases.filter((c) => c.overall_status === "REVIEW").length;
-    const unable = cases.filter((c) => c.overall_status === "UNABLE_TO_VERIFY").length;
+    const unable = cases.filter((c) => c.overall_status === "UNABLE_TO_VERIFY" || c.overall_status === "PENDING_REVIEW" || c.workflow_status === "PENDING_REVIEW").length;
     const pendingTotal = review + unable;
 
     const complianceRate = total > 0 ? Math.round((passed / total) * 100) : 0;
