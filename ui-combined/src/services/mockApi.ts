@@ -332,11 +332,17 @@ export class MockApiService implements IInspectionApiService {
       targetCase.product_name.toLowerCase().includes("w45") ||
       targetCase.product_name.toLowerCase().includes("headphone") ||
       targetCase.product_name.toLowerCase().includes("boult") ||
+      targetCase.product_name.toLowerCase().includes("wireless") ||
+      targetCase.product_name.toLowerCase().includes("audio") ||
+      targetCase.product_name.toLowerCase().includes("tws") ||
       (targetCase.brand_name && targetCase.brand_name.toLowerCase().includes("goboult")) ||
+      (targetCase.brand_name && targetCase.brand_name.toLowerCase().includes("boult")) ||
       targetCase.evidence_assets.some(
         (a) =>
           a.original_filename?.toLowerCase().includes("img (") ||
-          a.original_filename?.toLowerCase().includes("earbud")
+          a.original_filename?.toLowerCase().includes("earbud") ||
+          a.original_filename?.toLowerCase().includes("w45") ||
+          a.original_filename?.toLowerCase().includes("boult")
       );
 
     let updatedAssets: EvidenceAsset[] = [];
@@ -373,16 +379,23 @@ export class MockApiService implements IInspectionApiService {
       // Map each of the multi-angle uploads to its true package face and evidence properties
       updatedAssets = targetCase.evidence_assets.map((a, idx) => {
         const fname = (a.original_filename || "").toLowerCase();
-        const isBackPanel = fname.includes("img (1)") || fname.includes("img (8)") || idx === 0 || idx === 5;
-        const isFrontPanel = fname.includes("img (2)") || idx === 1;
-        const isTopPanel = fname.includes("img (3)") || idx === 2;
-        const isSidePanel = fname.includes("img (4)") || fname.includes("img (5)") || idx === 3 || idx === 4;
+        let panelType: EvidenceAsset["panel_type"] = a.panel_type || "PDP_FRONT";
+        if (fname.includes("img (1)") || fname.includes("img (8)") || fname.includes("back")) {
+          panelType = "BACK_PANEL";
+        } else if (fname.includes("img (2)") || fname.includes("front")) {
+          panelType = "PDP_FRONT";
+        } else if (fname.includes("img (3)") || fname.includes("top")) {
+          panelType = "TOP_LID" as any;
+        } else if (fname.includes("img (4)") || fname.includes("img (5)") || fname.includes("side")) {
+          panelType = "SIDE_PANEL";
+        } else if (!a.panel_type) {
+          panelType = idx === 0 ? "PDP_FRONT" : idx === 1 ? "BACK_PANEL" : "SIDE_PANEL";
+        }
 
-        let panelType: EvidenceAsset["panel_type"] = "PDP_FRONT";
-        if (isBackPanel) panelType = "BACK_PANEL";
-        else if (isFrontPanel) panelType = "PDP_FRONT";
-        else if (isTopPanel) panelType = "TOP_LID" as any;
-        else if (isSidePanel) panelType = "SIDE_PANEL";
+        const isBackPanel = panelType === "BACK_PANEL";
+        const isFrontPanel = panelType === "PDP_FRONT";
+        const isTopPanel = (panelType as string) === "TOP_LID";
+        const isSidePanel = panelType === "SIDE_PANEL";
 
         return {
           ...a,
@@ -649,13 +662,29 @@ export class MockApiService implements IInspectionApiService {
 
       updatedAssets = targetCase.evidence_assets.map((a, idx) => {
         const isPrimary = a.image_id === (activeAsset?.image_id || imageId) || idx === 0;
+        const panelType = a.panel_type || (idx === 0 ? "PDP_FRONT" : idx === 1 ? "BACK_PANEL" : "SIDE_PANEL");
         return {
           ...a,
-          calibration: a.calibration || (isPrimary ? sourceTemplate.evidence_assets[0]?.calibration : undefined),
-          ocr: a.ocr || (isPrimary ? {
+          panel_type: panelType,
+          calibration: a.calibration || sourceTemplate.evidence_assets[0]?.calibration || {
+            is_calibrated: true,
+            method: "ISO_7810_CARD",
+            px_to_mm: 0.15,
+            confidence: 0.98,
+            margin_of_error_pct: 1.0,
+            reference_bounding_box: [100, 100, 300, 400],
+          },
+          ocr: a.ocr || {
             ...sourceTemplate.evidence_assets[0]?.ocr,
-            full_text: `${targetCase.product_name || "Statutory Commodity"}\nDeclared Net Qty: ${targetCase.declared_net_quantity || "100 g"}\nMRP Rs. 140.00 (incl. of all taxes)\nMfg Date: 08/2026\nBrand: ${targetCase.brand_name || "Trade Brand"}`,
-          } : undefined),
+            image_id: a.image_id,
+            full_text: isPrimary
+              ? `${targetCase.product_name || "Statutory Commodity"}\nDeclared Net Qty: ${targetCase.declared_net_quantity || "100 g"}\nMRP Rs. 140.00 (incl. of all taxes)\nMfg Date: 08/2026\nBrand: ${targetCase.brand_name || "Trade Brand"}`
+              : `${targetCase.product_name || "Statutory Commodity"}\nManufactured by: Certified Enterprise\nCustomer Care: support@statutory.gov.in\nCountry of Origin: India`,
+            tokens: (sourceTemplate.evidence_assets[0]?.ocr?.tokens || []).map((t, tIdx) => ({
+              ...t,
+              token_id: `tok_${a.image_id}_${tIdx}`,
+            })),
+          },
         };
       });
 

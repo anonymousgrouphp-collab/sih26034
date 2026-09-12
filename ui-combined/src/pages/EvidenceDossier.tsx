@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { ApiService } from "../services/api";
 import { InspectionCase } from "../types/inspection";
@@ -103,8 +103,29 @@ export const EvidenceDossier: React.FC = () => {
     );
   }
 
-  const activeAsset = caseData.evidence_assets[0];
-  const ocrTokens = activeAsset?.ocr?.tokens || [];
+  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
+  const activeAsset = useMemo(() => {
+    if (!caseData.evidence_assets || caseData.evidence_assets.length === 0) return undefined;
+    if (selectedAssetId) {
+      const found = caseData.evidence_assets.find((a) => a.image_id === selectedAssetId);
+      if (found) return found;
+    }
+    const sorted = [...caseData.evidence_assets].sort(
+      (a, b) => (b.ocr?.tokens?.length || 0) - (a.ocr?.tokens?.length || 0)
+    );
+    return sorted[0] || caseData.evidence_assets[0];
+  }, [caseData.evidence_assets, selectedAssetId]);
+
+  const allTokens = useMemo(() => {
+    const collected: any[] = [];
+    caseData.evidence_assets.forEach((a) => {
+      if (a.ocr?.tokens) {
+        collected.push(...a.ocr.tokens);
+      }
+    });
+    return collected;
+  }, [caseData.evidence_assets]);
+  const ocrTokens = allTokens.length > 0 ? allTokens : activeAsset?.ocr?.tokens || [];
   const rules = caseData.rule_evaluations || [];
   const auditEvents = caseData.audit_trail || [];
 

@@ -59,6 +59,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
     return current === path || current.startsWith(path + "/");
   };
 
+  const lastCaseId =
+    typeof window !== "undefined"
+      ? window.localStorage?.getItem("nyayadrishti_last_case_id") || "demo-fortune-sunlite"
+      : "demo-fortune-sunlite";
+
   const navigation = [
     { label: t("nav.dashboard", "Executive Dashboard"), path: "/dashboard", icon: Home },
     { label: t("nav.register", "Inspection Register"), path: "/inspections", icon: SearchCheck },
@@ -70,7 +75,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       badge: pendingCasesCount > 0 ? pendingCasesCount : undefined,
     },
     { label: t("nav.rules", "Rules & Schedules"), path: "/rules", icon: GitBranch },
-    { label: t("nav.evidence", "Evidence Dossier"), path: "/inspections/demo-fortune-sunlite/evidence", icon: FileArchive },
+    { label: t("nav.evidence", "Evidence Dossier"), path: `/inspections/${lastCaseId}/evidence`, icon: FileArchive },
     { label: t("nav.reports", "Reports & Notices"), path: "/reports", icon: BarChart3 },
   ];
 

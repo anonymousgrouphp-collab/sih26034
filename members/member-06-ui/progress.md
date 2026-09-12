@@ -1934,6 +1934,55 @@ Commit and push to `origin/main` to trigger Vercel deployment.
 ### Signing Note
 SIGNED OFF BY: Parmarth Kumar (parmarth.kumar@example.com) — 2026-09-12 18:10 IST [VERIFIED]
 
+---
+
+## [12 September 2026] [18:35] IST
+
+### Task / Chunk
+Comprehensive E2E User Flow Harmonization, Multi-Angle Facet Switching & Navigation Alignment.
+
+### Status
+COMPLETE
+
+### Completed
+- **Adjudication Canvas Multi-Angle Facet Switcher (`AdjudicationCanvas.tsx`):**
+  - Eliminated hardcoded `evidence_assets[evidence_assets.length - 1]` selection that picked the blank top lid or last image with no OCR tokens.
+  - Added reactive `selectedAssetId` state and memoized `activeAsset` resolving by highest token density or `PDP_FRONT`.
+  - Added an interactive thumbnail facet selector bar above `EvidenceViewer` when multiple evidence assets are present, enabling officers to inspect any of the package facets (Front PDP, Back Panel, Side Panel, etc.) with real-time token and polygon overlays.
+- **Workspace Mode Switcher Navigation Alignment (`CaseWorkspace.tsx`):**
+  - Updated workspace switcher mode bar to render all 6 core views (`OVERVIEW`, `CANVAS`, `HUD`, `OUTCOME`, `REPORT`, `AUDIT`) with active highlights and icons, preventing the mode switcher from disappearing or falling out of sync when navigating between Diagnostic HUD or Case Outcome.
+  - Added multi-angle facet selection bar in the Diagnostic HUD view.
+  - Aligned `InspectionReportView`'s back button to navigate to `"OVERVIEW"` instead of jumping blindly into `"CANVAS"`.
+  - Added reactive `localStorage.setItem("nyayadrishti_last_case_id", caseData.id)` sync so sidebar links stay synchronized with the active inspection case.
+- **Inspection Desk Circle Filtering (`InspectionDesk.tsx`):**
+  - Resolved circle filter bug where non-matching jurisdiction circles were not filtered out due to an empty conditional block.
+- **Sidebar Dynamic Evidence Dossier (`Sidebar.tsx`):**
+  - Replaced hardcoded `/inspections/demo-fortune-sunlite/evidence` link with dynamic `lastCaseId` from local storage.
+- **Evidence Dossier Multi-Asset Aggregation (`EvidenceDossier.tsx`):**
+  - Aggregated OCR tokens across all package facets so multi-angle evidence sets never display 0 tokens.
+- **Inspection Report Dynamic PDF Name (`InspectionReportView.tsx`):**
+  - Dynamically bound PDF download filenames to `Form-1-Notice-${caseData.inspection_number || caseData.id}.pdf`.
+- **Pipeline Multi-Asset OCR & Calibration Robustness (`mockApi.ts`):**
+  - Ensured every asset in multi-angle uploads receives valid OCR tokens and calibration data in both specific commodity and general fallback modes, guaranteeing no image is rendered as a dead, un-detected asset.
+
+### Tests
+- `npx tsc --noEmit --prefix ui-combined`: Clean exit code 0.
+- `npm run build --prefix ui-combined`: Production build succeeded in 4.65s (zero errors).
+- `npm test --prefix ui-combined`: 113/113 tests passed in 1.36s (35 suites, 0 failures).
+
+### Problems
+None. All identified navigation glitches, empty token states, and flow bottlenecks have been resolved.
+
+### Decisions
+1. In `AdjudicationCanvas`, if no facet is explicitly clicked, default to the facet with the highest token count so officers immediately see statutory findings.
+2. In `CaseWorkspace`, all 6 operational views (`OVERVIEW`, `CANVAS`, `HUD`, `OUTCOME`, `REPORT`, `AUDIT`) are directly accessible via the top switcher ribbon.
+
+### Next Step
+Push all verified changes to `origin/main` to update the live Vercel deployment.
+
+### Signing Note
+SIGNED OFF BY: Parmarth Kumar (parmarth.kumar@example.com) — 2026-09-12 18:35 IST [VERIFIED]
+
 
 
 

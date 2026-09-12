@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useLanguage } from "../../context/LanguageContext";
 import { InspectionCase, EvidenceAsset, AdjudicationRequest, OfficerRole } from "../../types/inspection";
 import { CaseHeader } from "./CaseHeader";
@@ -51,6 +51,7 @@ import {
   ArrowRight,
   RefreshCw,
   Scale,
+  Activity,
 } from "lucide-react";
 
 interface CaseWorkspaceProps {
@@ -84,11 +85,27 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
   const [auditSubTab, setAuditSubTab] = useState<"PROVENANCE" | "DIAGNOSTICS">("PROVENANCE");
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (caseData?.id) {
+      try {
+        localStorage.setItem("nyayadrishti_last_case_id", caseData.id);
+      } catch {
+        // ignore
+      }
+    }
+  }, [caseData?.id]);
+
   const activeAsset: EvidenceAsset | undefined = useMemo(() => {
     if (!caseData.evidence_assets || caseData.evidence_assets.length === 0) return undefined;
     if (selectedAssetId) {
       const found = caseData.evidence_assets.find((a) => a.image_id === selectedAssetId);
       if (found) return found;
+    }
+    const sortedByTokens = [...caseData.evidence_assets].sort(
+      (a, b) => (b.ocr?.tokens?.length || 0) - (a.ocr?.tokens?.length || 0)
+    );
+    if (sortedByTokens[0]?.ocr?.tokens?.length) {
+      return sortedByTokens[0];
     }
     const pdpFront = caseData.evidence_assets.find((a) => a.panel_type === "PDP_FRONT");
     return pdpFront || caseData.evidence_assets[0];
@@ -645,6 +662,30 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                 </button>
                 <button
                   type="button"
+                  onClick={() => setActiveWorkspaceView("HUD")}
+                  className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                    activeWorkspaceView === "HUD"
+                      ? "bg-govNavy text-white shadow-sm"
+                      : "text-slate-600 hover:text-slate-900 bg-white border border-slate-200"
+                  }`}
+                >
+                  <Activity className="w-3.5 h-3.5 shrink-0" />
+                  <span>{language === "hi" ? "नैदानिक HUD" : "Diagnostic HUD"}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveWorkspaceView("OUTCOME")}
+                  className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                    activeWorkspaceView === "OUTCOME"
+                      ? "bg-govNavy text-white shadow-sm"
+                      : "text-slate-600 hover:text-slate-900 bg-white border border-slate-200"
+                  }`}
+                >
+                  <Scale className="w-3.5 h-3.5 shrink-0" />
+                  <span>{language === "hi" ? "अधिनिर्णय व परिणाम" : "Adjudication & Outcome"}</span>
+                </button>
+                <button
+                  type="button"
                   onClick={() => setActiveWorkspaceView("REPORT")}
                   className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                     activeWorkspaceView === "REPORT"
@@ -1021,7 +1062,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
             /* View 5: Read-Only Formal Inspection Report */
             <InspectionReportView
               caseData={caseData}
-              onBackToWorkspace={() => setActiveWorkspaceView("CANVAS")}
+              onBackToWorkspace={() => setActiveWorkspaceView("OVERVIEW")}
               onBackToOutcome={() => setActiveWorkspaceView("OUTCOME")}
             />
           ) : activeWorkspaceView === "AUDIT" ? (
@@ -1105,6 +1146,51 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
               {/* Left Column (5 cols): Physical Evidence Viewer */}
               <div className="lg:col-span-5 space-y-3">
+                {/* Multi-Angle Evidence Facet Switcher */}
+                {caseData.evidence_assets && caseData.evidence_assets.length > 1 && (
+                  <div className="bg-white border border-slate-200 rounded-lg p-2.5 shadow-xs">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-bold text-govNavy flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-govNavy" />
+                        {language === "hi" ? "पैकेजिंग फलक चयन" : "Select Packaging Facet"}
+                      </span>
+                      <span className="text-[10px] font-mono text-slate-500">
+                        {caseData.evidence_assets.length} {language === "hi" ? "कोण" : "angles"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+                      {caseData.evidence_assets.map((asset, index) => {
+                        const isSelected = activeAsset?.image_id === asset.image_id;
+                        return (
+                          <button
+                            key={asset.image_id}
+                            type="button"
+                            onClick={() => setSelectedAssetId(asset.image_id)}
+                            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border text-xs transition-all shrink-0 ${
+                              isSelected
+                                ? "bg-govNavy text-white border-govNavy shadow-xs font-bold"
+                                : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 font-medium"
+                            }`}
+                          >
+                            <span className="w-5 h-5 rounded bg-slate-200 overflow-hidden shrink-0 flex items-center justify-center text-[10px] font-bold">
+                              #{index + 1}
+                            </span>
+                            <span>
+                              {asset.panel_type === "BACK_PANEL"
+                                ? (language === "hi" ? "पृष्ठ फलक" : "Back Panel")
+                                : asset.panel_type === "PDP_FRONT"
+                                ? (language === "hi" ? "मुख्य फलक" : "Front PDP")
+                                : asset.panel_type === "SIDE_PANEL"
+                                ? (language === "hi" ? "पार्श्व फलक" : "Side Panel")
+                                : `Angle #${index + 1}`}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 <div className="bg-panelBg rounded-lg border border-slate-200 shadow-sm p-4 space-y-3">
                   <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
                     <div className="flex items-center gap-1.5">
