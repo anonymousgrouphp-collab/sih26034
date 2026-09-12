@@ -378,9 +378,11 @@ export class LiveApiService implements IInspectionApiService {
           const rawLower = rawPath.toLowerCase();
           let resolvedPath = "";
 
-          // 1. User uploaded image preview or blob URL always takes absolute precedence
-          if (cached?.preview_url) {
-            resolvedPath = cached.preview_url;
+          const imgCache = this.pipelineArtifactCache.get(img.id);
+
+          // 1. User uploaded image preview or blob URL for this specific image takes precedence
+          if (imgCache?.preview_url) {
+            resolvedPath = imgCache.preview_url;
           } else if (rawPath.startsWith("http://") || rawPath.startsWith("https://") || rawPath.startsWith("data:") || rawPath.startsWith("blob:")) {
             resolvedPath = rawPath;
           } else if (skuLower.startsWith("sku-demo-") || skuLower.startsWith("insp_demo_") || skuLower.startsWith("demo-")) {
@@ -414,12 +416,14 @@ export class LiveApiService implements IInspectionApiService {
             resolvedPath = "/storage/uploads/REAL-PKG-07_7622202334009.jpg";
           } else if (rawLower.includes("real-pkg-08")) {
             resolvedPath = "/storage/uploads/REAL-PKG-08_9556001137722.jpg";
-          } else if (rawPath.startsWith("uploads/2026/")) {
+          } else if (rawPath.startsWith("uploads/") || rawPath.startsWith("storage/uploads/") || rawPath.startsWith("/uploads/")) {
             resolvedPath = `${this.baseUrl}/evidence/image/${img.id}`;
           } else if (rawPath.startsWith("storage/")) {
             resolvedPath = `/${rawPath}`;
-          } else {
+          } else if (rawPath.length > 0) {
             resolvedPath = rawPath.startsWith("/") ? rawPath : `/storage/${rawPath}`;
+          } else {
+            resolvedPath = `${this.baseUrl}/evidence/image/${img.id}`;
           }
 
           const allSame = (data.evidence_images || []).every(
@@ -434,6 +438,7 @@ export class LiveApiService implements IInspectionApiService {
             image_id: img.id,
             inspection_id: insp.id,
             file_path: resolvedPath,
+            preview_url: imgCache?.preview_url || (resolvedPath.startsWith("http") || resolvedPath.startsWith("blob:") ? resolvedPath : undefined),
             raw_sha256: img.sha256,
             panel_type: panelType,
             image_width: img.image_width || 1920,
@@ -444,8 +449,8 @@ export class LiveApiService implements IInspectionApiService {
               glare_percentage: img.glare_percentage || 0.8,
               skew_angle_deg: img.skew_angle_deg || 1.2,
             },
-            calibration: img.calibration || cached?.calibration,
-            ocr: img.ocr || cached?.ocr,
+            calibration: img.calibration || imgCache?.calibration || (idx === 0 ? cached?.calibration : undefined),
+            ocr: img.ocr || imgCache?.ocr || (idx === 0 ? cached?.ocr : undefined),
             is_original_untouched: true,
           };
         }),
@@ -568,11 +573,6 @@ export class LiveApiService implements IInspectionApiService {
         this.pipelineArtifactCache.set(data.image_id, {
           preview_url: metadata.preview_url,
         } as any);
-        if (data.inspection_id) {
-          this.pipelineArtifactCache.set(data.inspection_id, {
-            preview_url: metadata.preview_url,
-          } as any);
-        }
       }
 
       return {
@@ -615,7 +615,12 @@ export class LiveApiService implements IInspectionApiService {
           ocr: pipelineData.ocr,
         });
         if (imageId) {
-          this.pipelineArtifactCache.set(imageId, this.pipelineArtifactCache.get(cacheKey)!);
+          const prevImg = this.pipelineArtifactCache.get(imageId) || {};
+          this.pipelineArtifactCache.set(imageId, {
+            ...prevImg,
+            calibration: pipelineData.calibration,
+            ocr: pipelineData.ocr,
+          });
         }
       }
 

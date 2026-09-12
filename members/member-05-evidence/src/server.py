@@ -1435,6 +1435,8 @@ def get_inspection_detail(
             except Exception:
                 norm_val = b.normalized_text
         extracted_fields.append({
+            "field_id": b.id,
+            "image_id": b.image_id,
             "field_type": b.field_type,
             "raw_ocr_text": b.raw_ocr_text,
             "normalized_value": norm_val,

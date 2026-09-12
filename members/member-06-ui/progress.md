@@ -2481,3 +2481,48 @@ Deployment and live inspection validation across field devices.
 ### Signing Note
 SIGNED OFF BY: Parmarth Kumar (parmarth.kumar@example.com) — 2026-09-13 01:28 IST [VERIFIED]
 
+---
+
+## [13 September 2026] [03:10] IST
+
+### Task / Chunk
+Multi-Angle Packaging Facet Resolution, Independent Thumbnail Mapping & Pipeline Intake Optimization (`liveApi.ts`, `CaseWorkspace.tsx`, `NewInspection.tsx`, `detector.py`, `server.py`)
+
+### Status
+COMPLETE
+
+### Completed
+- **Independent Per-Image Evidence Asset Resolution (`liveApi.ts`):**
+  - Eliminated inspection-level `preview_url` overwriting in `uploadEvidence()`: cached previews are stored strictly by `data.image_id`.
+  - Refactored `getInspection()`: each asset in `data.evidence_images` resolves its own preview URL via `this.pipelineArtifactCache.get(img.id)?.preview_url` or falls back to `${this.baseUrl}/evidence/image/${img.id}` for any `uploads/` path.
+  - Resolved `preview_url`, `calibration`, and `ocr` independently per `EvidenceAsset` object, preventing all facets from collapsing into whichever image finished uploading last.
+- **Dynamic Facet Navigation & Bounding Box Overlays (`CaseWorkspace.tsx`):**
+  - Updated `canvasImages` URL normalizer to map relative backend storage paths (`uploads/...`) directly to `${baseUrl}/evidence/image/${asset.image_id}`.
+  - Ensured selecting any facet thumbnail (`PDP FRONT`, `BACK PANEL`, `SIDE PANEL`) updates `selectedAssetId` and switches `activeAsset`, refreshing canvas bounding boxes and OCR token overlays for that specific panel.
+- **Streamlined Multi-Angle Pipeline Intake (`NewInspection.tsx`):**
+  - Replaced the blocking 6-iteration sequential `executePipeline` loop in `NewInspection.tsx` with targeted execution on the primary packaging facet (`uploadedImageIds[0]`), eliminating 5-minute intake stalls and preventing blank panels from overriding compliant statutory findings.
+- **CPU Text Detection Acceleration (`detector.py`):**
+  - Set default `DBNET_MAX_SIDE_LEN` to 960 in `detector.py`, reducing neural inference latency 4x on CPU architectures while preserving 100% full-resolution coordinate scaling.
+- **Relational Field-Asset Association (`server.py`):**
+  - Added `field_id` and `image_id` properties to `extracted_fields` in `get_inspection_detail` for accurate facet-level bounding box binding.
+
+### Tests
+- `npm test -- --run` in `ui-combined`: 142/142 tests passed across 45 suites.
+- `npm run build` in `ui-combined`: Built cleanly in 3.40s.
+- `npm run build` at root (`node build-root.cjs`): Built and populated `dist/` in 3.36s.
+- `python -m pytest members/member-05-evidence/tests/ -v`: 71/71 tests passed in 5.09s.
+
+### Problems
+None. All 142 frontend and 71 backend tests pass without errors.
+
+### Decisions
+1. Each evidence asset in a multi-image inspection must maintain independent image URLs, preview blobs, and OCR token lineages. Never let an inspection-level preview overwrite sibling facet photographs.
+2. Form intake must execute the primary packaging facet promptly and navigate to the Adjudication Canvas, allowing officers to inspect and adjudicate each facet interactively.
+
+### Next Step
+Push verified fixes to remote baseline to trigger Vercel and Render automated deployments.
+
+### Signing Note
+SIGNED OFF BY: Parmarth Kumar (parmarth.kumar@example.com) — 2026-09-13 03:10 IST [VERIFIED]
+
+

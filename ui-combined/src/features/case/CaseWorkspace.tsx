@@ -382,9 +382,13 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
   }, [caseData, activeAsset, calibrationData, language]);
 
   const canvasImages: CanvasImageItem[] = useMemo(() => {
-    const normalizeUrl = (u?: string) => {
-      if (!u) return "";
-      if (u.startsWith("http://") || u.startsWith("https://") || u.startsWith("/") || u.startsWith("data:")) return u;
+    const normalizeUrl = (u?: string, imgId?: string) => {
+      if (!u) return imgId ? `https://nyayadrishti-backend.onrender.com/api/v1/evidence/image/${imgId}` : "";
+      if (u.startsWith("http://") || u.startsWith("https://") || u.startsWith("data:") || u.startsWith("blob:")) return u;
+      if (u.startsWith("uploads/") || u.startsWith("/uploads/")) {
+        return imgId ? `https://nyayadrishti-backend.onrender.com/api/v1/evidence/image/${imgId}` : u;
+      }
+      if (u.startsWith("/")) return u;
       return `/${u}`;
     };
 
@@ -397,9 +401,10 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
         if (allSame && caseData.evidence_assets.length > 1) {
           displayType = idx === 0 ? "PDP_FRONT" : idx === 1 ? "BACK_PANEL" : "SIDE_PANEL";
         }
+        const candidateUrl = asset.preview_url || asset.file_path || "";
         return {
           id: asset.image_id,
-          url: normalizeUrl(asset.preview_url) || normalizeUrl(asset.file_path) || "",
+          url: normalizeUrl(candidateUrl, asset.image_id),
           filename: asset.original_filename || `${asset.image_id}.jpg`,
           type: displayType,
           width: asset.image_width || 1920,

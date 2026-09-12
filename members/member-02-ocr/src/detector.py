@@ -70,7 +70,7 @@ class DBNetTextDetector:
         execution_mode: str = "FP32"
     ):
         if max_side_len is None:
-            max_side_len = int(os.environ.get("DBNET_MAX_SIDE_LEN", "1920"))
+            max_side_len = int(os.environ.get("DBNET_MAX_SIDE_LEN", "960"))
         self.execution_mode = execution_mode.upper()
         models_dir = os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),

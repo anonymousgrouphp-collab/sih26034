@@ -286,11 +286,9 @@ export const NewInspection: React.FC = () => {
         await new Promise((r) => setTimeout(r, 220));
       }
 
-      // Final: Execute pipeline across all evidence assets
+      // Final: Execute pipeline on the primary packaging evidence asset
       if (uploadedImageIds.length > 0) {
-        for (const imgId of uploadedImageIds) {
-          await ApiService.executePipeline(imgId, newCase.id);
-        }
+        await ApiService.executePipeline(uploadedImageIds[0], newCase.id);
       } else if (newCase.evidence_assets[0]?.image_id) {
         await ApiService.executePipeline(newCase.evidence_assets[0].image_id, newCase.id);
       }
