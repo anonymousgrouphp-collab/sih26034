@@ -1,7 +1,7 @@
 # 01 — EXECUTIVE SUMMARY: METROLENS (NYAYADRISHTI-LM)
 
 **Project Identifier:** SIH26034 (Recorded as SIH26304 in initial prompt query)  
-**Product Name:** NyayaDrishti-LM / MetroLens  
+**Product Name:** NyayaDrishti-LM / Nirikshak
 **Ministry:** Ministry of Consumer Affairs, Food & Public Distribution  
 **Governing Department:** Department of Consumer Affairs (DoCA), Government of India  
 **Target Competition:** Smart India Hackathon (SIH) 2026  
@@ -13,7 +13,7 @@
 
 ## 1. Executive Verdict & Bottom-Line Status
 
-MetroLens (NyayaDrishti-LM) is an advanced, production-grade legal metrology compliance verification web platform built to automate packaged commodity inspections under the **Legal Metrology Act, 2009** and the **Legal Metrology (Packaged Commodities) Rules, 2011 (LMPC Rules, 2011)**.
+Nirikshak (NyayaDrishti-LM) is an advanced, production-grade legal metrology compliance verification web platform built to automate packaged commodity inspections under the **Legal Metrology Act, 2009** and the **Legal Metrology (Packaged Commodities) Rules, 2011 (LMPC Rules, 2011)**.
 
 Following an exhaustive, autonomous, adversarial audit spanning all source code, live browser interfaces, deep neural network checkpoints, database schemas, REST APIs, and 570 automated tests, our verdict is:
 
@@ -40,7 +40,7 @@ Following an exhaustive, autonomous, adversarial audit spanning all source code,
 ## 3. The 5 Biggest Strengths of the Project
 
 1. **Genuine Local Deep Learning Models (Zero LLM Hallucination):**
-   Unlike competitor projects that rely on OpenAI API wrappers or generic cloud OCR, MetroLens includes real, physically present **DBNet++ ONNX** (text detection) and **PaddleOCR PP-OCRv4 Latin + PP-OCRv3 Devanagari Hindi ONNX** models with static INT8 quantization executing sub-second inference entirely on standard CPU hardware.
+   Unlike competitor projects that rely on OpenAI API wrappers or generic cloud OCR, Nirikshak includes real, physically present **DBNet++ ONNX** (text detection) and **PaddleOCR PP-OCRv4 Latin + PP-OCRv3 Devanagari Hindi ONNX** models with static INT8 quantization executing sub-second inference entirely on standard CPU hardware.
 2. **Mathematically Defensible Metric Calibration:**
    Implements true sub-millimeter scale resolution via **ArUco 4x4 DICT 50.0 mm** fiducial markers with secondary fallback to **ISO 7810 ID-1 standard payment cards (85.60 × 53.98 mm)**, computing planar homography matrix rectification and calculating exact numeral font x-heights in millimeters.
 3. **Statutory Table-I Schedule & Jan Vishwas Act 2023 Decriminalization:**

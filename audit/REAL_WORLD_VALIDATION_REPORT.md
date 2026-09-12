@@ -13,7 +13,7 @@
 This report documents the rigorous, end-to-end empirical testing of NyayaDrishti-LM on genuine consumer packaging photographs captured across multiple angles, illumination regimes, and material finishes (corrugated cardboard, metallized foil, soft plastic tubes, glass and plastic bottles).
 
 The testing was conducted directly against the real dataset stored in:
-`C:\Users\kunal\Desktop\updated SIH26034 - 10th sep\Legal Metrology real product images`
+`Legal Metrology real product images`
 
 ---
 

@@ -8,7 +8,7 @@
 ---
 
 ## 1. What is my job?
-Your job is to build the computer vision and optical measurement foundation for NyayaDrishti-LM.
+Your job is to build the computer vision and optical measurement foundation for Nirikshak.
 You ensure that incoming images are sharp, free of severe glare bloom, and properly aligned.
 You detect reference calibration markers (ArUco 4x4_50 or ISO 7810 card), compute the planar homography matrix to remove perspective tilt, derive the physical metric scale ($S = \text{pixels per mm}$), and calculate the Principal Display Panel (PDP) surface area in cm².
 

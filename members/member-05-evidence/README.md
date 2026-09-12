@@ -15,7 +15,7 @@ You build:
 - File storage decoupling: large images and PDFs are stored in `/storage/uploads/` and `/storage/evidence/`—never as binary BLOBs in SQL tables.
 - SHA-256 Merkle Directed Acyclic Graph (DAG) chaining every stage of the inspection for unbroken chain of custody.
 - Section 63 Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023) Electronic Evidence Certificate.
-- ReportLab PDF/A generator producing court-ready statutory Inspection Notices (Form-1).
+- ReportLab PDF generator producing tamper-evident statutory Inspection Notices (Form-1).
 - Mode B offline bundle ingestion endpoint (`POST /api/v1/inspections/sync-bundle`).
 
 ---
@@ -52,7 +52,7 @@ You must NOT edit other member directories or root specification files.
 ## 5. What outputs do I produce?
 - REST API responses matching `contracts/ui/ui_contract_schema.json`.
 - `BSAEvidenceBundleDTO` and `Section63CertificateDTO` matching `contracts/evidence/evidence_dto.py`.
-- Court-ready archival `InspectionNotice_Form1.pdf`.
+- Tamper-evident archival `InspectionNotice_Form1.pdf`.
 
 ---
 
@@ -79,7 +79,7 @@ pytest members/member-05-evidence/tests/ -v
 Your module is complete when:
 1. Merkle DAG hashes every stage and flags 100% of single-character payload tampering.
 2. Section 63 BSA 2023 certificate generates with device telemetry and officer signature.
-3. ReportLab renders court-ready Form-1 notice in $< 1.5\text{ seconds}$.
+3. ReportLab renders tamper-evident Form-1 notice in $< 1.5\text{ seconds}$.
 4. FastAPI endpoints validate headers (`X-Request-ID`, `X-Device-Fingerprint`) and return OpenAPI 3.1 schemas.
 5. All unit tests pass with $> 85\%$ coverage.
 6. `progress.md` is marked `COMPLETE — YYYY-MM-DD HH:MM IST`.

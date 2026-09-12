@@ -101,6 +101,6 @@ Measures competitiveness against top national finalists in the SIH Grand Finale.
 ### Category H: Deployment, Documentation & Demo Readiness
 - **Score:** 4.5 / 5.0 (90.0%)
 - **Reasoning:** Dockerfile, docker-compose, Render backend keepalive, Vercel frontend proxy, comprehensive documentation guides, and a dedicated field inspector CLI demo harness (`inspect_cli.py`).
-- **Evidence:** `main.py`, `Dockerfile`, `inspect_cli.py --demo`, `COMPLETE_PROJECT_END_TO_END_GUIDE.md`.
+- **Evidence:** `main.py`, `Dockerfile`, `inspect_cli.py --demo`, `docs/COMPLETE_PROJECT_END_TO_END_GUIDE.md`.
 - **Weakness:** Render free tier cold starts can take ~50 seconds if the keepalive script is not running.
 - **Confidence:** High (E5).

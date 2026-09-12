@@ -41,7 +41,7 @@ The Member 3 automated test suite expanded from 106 to **139 deterministic tests
 
 ### Member 3 Subsystem Suite (Across All 4 Passes)
 ```powershell
-& "C:\Users\ceoha\AppData\Local\Programs\Python\Python313\python.exe" -m pytest members/member-03-extraction/tests/ -v
+python -m pytest members/member-03-extraction/tests/ -v
 ```
 **Output:**
 ```text

@@ -234,7 +234,7 @@ TOTAL COMPOSITE PROGRESS SCORE               |  100.0%    |     87.5 / 100|   87
 
 ### The 30-Second Elevator Pitch
 > *"Over 50 crore packaged commodities are sold daily across India. Today, enforcement officers inspect packaging with plastic rulers and paper gazettes—taking 15 minutes per product.  
-> We present **MetroLens (NyayaDrishti-LM)**: an AI-augmented compliance workstation that verifies packaging in under 2 seconds, measures font heights to sub-millimeter precision using ArUco and ISO card homography, and produces court-admissible show cause notices under Section 63 of the new Bharatiya Sakshya Adhiniyam, 2023."*
+> We present **Nirikshak (NyayaDrishti-LM)**: an AI-augmented compliance workstation that verifies packaging in under 2 seconds, measures font heights to sub-millimeter precision using ArUco and ISO card homography, and produces tamper-evident show cause notices under Section 63 of the new Bharatiya Sakshya Adhiniyam, 2023."*
 
 ### Key Hostile Attack Defenses
 1. *"Are you just wrapping ChatGPT?"* -> **No.** DBNet++ and PP-OCRv4 INT8 models run 100% locally on CPU with zero internet traffic; all legal rules are deterministic AST code.

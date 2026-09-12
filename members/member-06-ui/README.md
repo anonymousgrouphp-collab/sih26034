@@ -5,7 +5,7 @@
 > The Member 6 frontend application has been permanently consolidated into **`ui-combined/`** as the single canonical production frontend for the entire repository and deployment targets (Vercel, Render, and Docker Compose).
 > 
 > All active development, components, assets, localizations, and unit tests reside in:
-> **[`ui-combined/`](file:///c:/Users/kunal/Desktop/updated%20SIH26034%20-%2010th%20sep/ui-combined/)**
+> **[`ui-combined/`](ui-combined/)**
 > 
 > The markdown records in this folder (`progress.md`, `memory.md`, `TASKS.md`, `RESEARCH.md`, and `BACKEND_INTEGRATION_HANDOFF.md`) are preserved for Section 63 BSA 2023 evidentiary audit and architectural continuity.
 

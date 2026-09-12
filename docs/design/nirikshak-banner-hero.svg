@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" fill="none" role="img" aria-labelledby="rmTitle rmDesc">
+  <title id="rmTitle">NIRIKSHAK README Header Banner</title>
+  <desc id="rmDesc">Metrology emblem centered above NIRIKSHAK wordmark and Indian Department of Consumer Affairs attribution with status dots.</desc>
+
+  <defs>
+    <!-- Background Pastels Glow -->
+    <filter id="rmGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="60"/>
+    </filter>
+
+    <!-- Pupil glow -->
+    <filter id="rmCoreGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="3.5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+
+    <!-- Gradients -->
+    <linearGradient id="rmGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFB347"/>
+      <stop offset="50%" stop-color="#D4AF37"/>
+      <stop offset="100%" stop-color="#AA771C"/>
+    </linearGradient>
+
+    <linearGradient id="rmNavy" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E3A8A"/>
+      <stop offset="100%" stop-color="#0A192F"/>
+    </linearGradient>
+
+    <linearGradient id="rmPan" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1E3A8A" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#1E3A8A" stop-opacity="0.30"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="1200" height="420" rx="16" fill="#FDFCF8"/>
+  <rect width="1200" height="420" rx="16" stroke="#E2E8F0" stroke-width="1.5"/>
+
+  <!-- Ambient Pastels -->
+  <g filter="url(#rmGlow)" opacity="0.5">
+    <ellipse cx="220" cy="120" rx="220" ry="140" fill="#FFE1B3"/>
+    <ellipse cx="400" cy="320" rx="180" ry="120" fill="#F7C9DE"/>
+    <ellipse cx="880" cy="110" rx="210" ry="130" fill="#DCCEF8"/>
+    <ellipse cx="1000" cy="310" rx="190" ry="120" fill="#BFE8DE"/>
+  </g>
+
+  <!-- ================= LOGO EMBLEM ================= -->
+  <g transform="translate(600, 118)">
+    <!-- Tech Guides -->
+    <path d="M -115 -48 L -135 -48 L -135 48 L -115 48" stroke="#0F2B5C" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/>
+    <path d="M 115 -48 L 135 -48 L 135 48 L 115 48" stroke="#0F2B5C" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/>
+    <line x1="-135" y1="0" x2="-124" y2="0" stroke="#EA580C" stroke-width="2.5"/>
+    <line x1="135" y1="0" x2="124" y2="0" stroke="#EA580C" stroke-width="2.5"/>
+
+    <!-- Reticle Circles -->
+    <circle cx="0" cy="0" r="95" stroke="url(#rmGold)" stroke-width="1.2" stroke-dasharray="3 4" opacity="0.7"/>
+    <circle cx="0" cy="0" r="84" stroke="url(#rmNavy)" stroke-width="1.6" opacity="0.8"/>
+    <circle cx="0" cy="0" r="74" stroke="url(#rmGold)" stroke-width="0.8" opacity="0.5"/>
+
+    <!-- Balance Arms & Pans -->
+    <g transform="translate(-95, 0)">
+      <line x1="0" y1="0" x2="-26" y2="42" stroke="#0A192F" stroke-width="2" stroke-linecap="round"/>
+      <line x1="0" y1="0" x2="26" y2="42" stroke="#0A192F" stroke-width="2" stroke-linecap="round"/>
+      <path d="M -34 42 Q 0 66 34 42 Z" fill="url(#rmPan)" stroke="#0A192F" stroke-width="2.2" stroke-linejoin="round"/>
+      <circle cx="0" cy="44" r="2.5" fill="#EA580C"/>
+    </g>
+    <g transform="translate(95, 0)">
+      <line x1="0" y1="0" x2="-26" y2="42" stroke="#0A192F" stroke-width="2" stroke-linecap="round"/>
+      <line x1="0" y1="0" x2="26" y2="42" stroke="#0A192F" stroke-width="2" stroke-linecap="round"/>
+      <path d="M -34 42 Q 0 66 34 42 Z" fill="url(#rmPan)" stroke="#0A192F" stroke-width="2.2" stroke-linejoin="round"/>
+      <circle cx="0" cy="44" r="2.5" fill="#EA580C"/>
+    </g>
+
+    <line x1="-95" y1="0" x2="-60" y2="0" stroke="url(#rmNavy)" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="60" y1="0" x2="95" y2="0" stroke="url(#rmNavy)" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- Central Lens / Eye -->
+    <path d="M -60 0 C -34 -36 34 -36 60 0 C 34 36 -34 36 -60 0 Z" fill="#FFFFFF" stroke="#0A192F" stroke-width="3"/>
+    <path d="M -52 0 C -28 -28 28 -28 52 0 C 28 28 -28 28 -52 0 Z" stroke="url(#rmGold)" stroke-width="1.3" fill="none"/>
+
+    <circle cx="0" cy="0" r="26" fill="url(#rmNavy)" stroke="url(#rmGold)" stroke-width="2"/>
+    <g stroke="#F59E0B" stroke-width="1" opacity="0.8">
+      <line x1="0" y1="-26" x2="0" y2="26"/>
+      <line x1="-26" y1="0" x2="26" y2="0"/>
+      <line x1="-18" y1="-18" x2="18" y2="18"/>
+      <line x1="-18" y1="18" x2="18" y2="-18"/>
+    </g>
+
+    <circle cx="0" cy="0" r="11" fill="#0A192F"/>
+    <circle cx="0" cy="0" r="4.5" fill="#FF9933" filter="url(#rmCoreGlow)"/>
+    <circle cx="-3.5" cy="-3.5" r="2.2" fill="#FFFFFF"/>
+    <circle cx="3.5" cy="3.5" r="1" fill="#FFFFFF" opacity="0.9"/>
+  </g>
+
+  <!-- ================= WORDMARK ================= -->
+  <g transform="translate(484, 235) scale(0.48)">
+    <g stroke-width="13" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <g stroke="#0A192F">
+        <g transform="translate(0,50)"><path d="M8 100 L8 0 L56 100 L56 0"/></g>
+        <g transform="translate(64,50)"><path d="M8 0 L8 100"/></g>
+        <g transform="translate(90,50)"><path d="M8 100 L8 0 L26 0 A25 25 0 0 1 26 50 L8 50 M27 50 L56 100"/></g>
+      </g>
+      <g stroke="#1E3A8A">
+        <g transform="translate(156,50)"><path d="M8 0 L8 100"/></g>
+        <g transform="translate(182,50)"><path d="M8 0 L8 100 M54 0 L8 50 M22 35 L56 100"/></g>
+        <g transform="translate(246,50)"><path d="M48 14 C40 2 16 4 11 22 C6 40 28 45 37 51 C48 58 52 66 47 80 C41 96 14 96 8 82"/></g>
+        <g transform="translate(302,50)"><path d="M8 0 L8 100 M56 0 L56 100 M8 50 L56 50"/></g>
+        <g transform="translate(366,50)"><path d="M31 0 L6 100 M31 0 L56 100 M14 68 L48 68"/></g>
+        <g transform="translate(428,50)"><path d="M8 0 L8 100 M54 0 L8 50 M22 35 L56 100"/></g>
+      </g>
+    </g>
+    <circle cx="164" cy="27" r="7" stroke="#10B981" stroke-width="4.5"/>
+    <circle cx="164" cy="27" r="2.4" fill="#FF9933"/>
+  </g>
+
+  <!-- ================= LABELS & VERDICT DOTS ================= -->
+  <text x="600" y="334" text-anchor="middle" font-family="'Segoe UI', -apple-system, sans-serif" font-size="15" font-weight="600" letter-spacing="4.5" fill="#334155">
+    LEGAL METROLOGY INSPECTION WORKSTATION
+  </text>
+  <text x="600" y="358" text-anchor="middle" font-family="'Segoe UI', -apple-system, sans-serif" font-size="12" font-weight="500" letter-spacing="1.5" fill="#64748B">
+    Department of Consumer Affairs • Government of India
+  </text>
+
+  <g transform="translate(0, -3)">
+    <circle cx="552" cy="386" r="4" fill="#059669"/>
+    <circle cx="584" cy="386" r="4" fill="#D97706"/>
+    <circle cx="616" cy="386" r="4" fill="#DC2626"/>
+    <circle cx="648" cy="386" r="4" fill="#94A3B8"/>
+  </g>
+</svg>
