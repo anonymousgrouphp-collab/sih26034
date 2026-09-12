@@ -8,8 +8,8 @@ trigger: always_on
 
 ## 1. Python Environment Enforcement (Windows Host)
 - Always execute Python tools and pytest suites using the project-configured Python 3.13 binary:
-  `& "C:\Users\ceoha\AppData\Local\Programs\Python\Python313\python.exe" -m pytest <args>`
-- Never use naked `python` on this host, as it resolves to Python 3.14 which lacks `pytest` and required dependencies.
+  `python -m pytest <args>`
+- Ensure the active environment has required Python dependencies installed.
 
 ## 2. Section 63 BSA 2023 Evidentiary Defense (0.0% False Accusation Rate)
 In digital statutory compliance enforcement, false accusations violate Section 63 of Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023) and trigger immediate judicial dismissal:

@@ -12,7 +12,7 @@
 ### 1.1 The First 30 Seconds: The Hook & Core Problem
 > *"Good morning, respected judges. In India today, over 50 crore pre-packaged commodities are sold daily. Under the Legal Metrology Act, 2009 and LMPC Rules, 2011, every single package must carry mandatory declarations—net weight, MRP, manufacturer address, and minimum numeral font heights.  
 > Today, field officers inspect packages with handheld plastic rulers and paper gazette tables. It takes 15 minutes per product, human measurement error leads to courtroom dismissals, and e-commerce platforms routinely violate Country of Origin rules.  
-> We present **MetroLens (NyayaDrishti-LM)**: an AI-augmented legal metrology compliance workstation that verifies packaging in under 2 seconds, calculates millimeter font heights to sub-millimeter precision, and produces court-admissible show cause notices under Section 63 of the new Bharatiya Sakshya Adhiniyam, 2023."*
+> We present **Nirikshak (NyayaDrishti-LM)**: an AI-augmented legal metrology compliance workstation that verifies packaging in under 2 seconds, calculates millimeter font heights to sub-millimeter precision, and produces tamper-evident show cause notices under Section 63 of the new Bharatiya Sakshya Adhiniyam, 2023."*
 
 ### 1.2 The 2-Minute Workflow Demonstration
 1. **Show the Workstation (`http://localhost:3000`):** Explain the dual-persona switch (Inspector vs Citizen).
@@ -42,7 +42,7 @@
    - *Defense:* Demonstrate planar homography matrix rectification ($3 \times 3$ warp) and show the GUM Guide / ISO 17025 uncertainty propagation ($k=2$) which safely routes borderline cases within $\pm 0.08\text{ mm}$ to `REVIEW`.
 4. **Judge Points Out Repealed Evidence Act:**
    - *Risk:* Many hackathon teams still cite Section 65B of the Indian Evidence Act, 1872.
-   - *Defense:* Proudly state that Section 65B was repealed on 1 July 2024, and MetroLens strictly complies with **Section 63 of the Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)**.
+   - *Defense:* Proudly state that Section 65B was repealed on 1 July 2024, and Nirikshak strictly complies with **Section 63 of the Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)**.
 5. **Over-Claiming Autonomous Legal Action:**
    - *Risk:* Claiming the AI "fines companies automatically" violates administrative law and natural justice.
    - *Defense:* Emphasize the **Human-in-the-Loop (HITL)** architecture: The AI is an Augmented Diagnostic Assistant. Only an authenticated human officer can sign and authorize notices.
@@ -64,18 +64,18 @@
 
 ---
 
-## 3. The Top 10 Reasons MetroLens Will Win
+## 3. The Top 10 Reasons Nirikshak Will Win
 
-1. **Airtight Legal Metrology Domain Fidelity:** Table-I Row 5 ($6.0\text{ mm}$), G.S.R. 779(E) USP math, Rule 6(10) digital exemptions, and Jan Vishwas Act 2023 compounding schedules are 100% accurate.
+1. **Airtight Legal Metrology Domain Fidelity:** Table-I Row 5 ($6.0\text{ mm}$), G.S.R. 779(E) USP math, Rule 6(10) digital exemptions, and Jan Vishwas Act 2023 compounding schedules are fully verified and strictly aligned with statutory Gazettes.
 2. **Genuine Sub-Second CPU Neural Inference:** DBNet++ and PP-OCRv4 running INT8 on CPU with $< 120\text{ MB}$ RAM.
 3. **Dual Metric Calibration:** ArUco $50\text{ mm}$ marker + standard ISO 7810 payment card fallback.
-4. **Section 63 BSA 2023 Legal Chain-of-Custody:** Merkle DAG parent-child hashing guaranteeing tamper-evident court admissibility.
+4. **Section 63 BSA 2023 Legal Chain-of-Custody:** Merkle DAG parent-child hashing guaranteeing tamper-evident cryptographic provenance.
 5. **4-State Epistemic Triaging:** Eliminates false accusations through `REVIEW` and `UNABLE_TO_VERIFY` safety boundaries.
 6. **Dual Inspector & Citizen Personas:** Transparently serves both technical enforcement officers and ordinary consumers.
 7. **Offline Mode B Resilience:** Complete inspection capability without internet connectivity.
 8. **Interactive Visual Adjudication Canvas:** Caliper overlay, ArUco grid, and draggable pixel loupe.
 9. **Zero Copyleft AGPL/GPL Licensing:** Safe for direct Government of India adoption.
-10. **Extensive Automated Verification:** 570 passing tests covering unit, stress, concurrency, and physical FMCG benchmarks.
+10. **Extensive Automated Verification:** 562 passing tests covering unit, stress, concurrency, and physical FMCG benchmarks.
 
 ---
 
@@ -94,7 +94,7 @@
 **Answer:** Optical sensors have finite measurement uncertainty. Under ISO/IEC Guide 98-3 (GUM), our expanded uncertainty at $k=2$ ($95\%$ confidence) is $\pm 0.08\text{ mm}$. A measurement of $2.48\text{ mm}$ falls within the uncertainty band ($|-0.02| \le 0.08\text{ mm}$). The system routes this to **`REVIEW`**, requiring human physical caliper verification, completely preventing wrongful prosecution.
 
 ### Q5: "Is your system allowed to issue notices on its own?"
-**Answer:** **Strictly NO.** Under Indian administrative law and the Principles of Natural Justice, automated software cannot act as prosecutor, judge, and jury. MetroLens is an **Augmented Diagnostic Assistant**. Automated findings are recommendations presented on the Adjudication Canvas. Only an authenticated Legal Metrology Officer (LMO) can adjudicate, and only the Controller can authorize notice issuance.
+**Answer:** **Strictly NO.** Under Indian administrative law and the Principles of Natural Justice, automated software cannot act as prosecutor, judge, and jury. Nirikshak is an **Augmented Diagnostic Assistant**. Automated findings are recommendations presented on the Adjudication Canvas. Only an authenticated Legal Metrology Officer (LMO) can adjudicate, and only the Controller can authorize notice issuance.
 
 ### Q6: "Why do you cite Section 63 BSA 2023 instead of Section 65B?"
 **Answer:** The Indian Evidence Act, 1872—including Section 65B—was formally repealed by Parliament on 1 July 2024 and replaced by the **Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)**. Any electronic notice citing Section 65B today is legally defective and will be quashed by the High Court. Section 63 of BSA 2023 is the current governing law.
@@ -103,7 +103,7 @@
 **Answer:** Under G.S.R. 779(E), packages over $1\text{ kg}$ must declare USP per kg; packages under $1\text{ kg}$ must declare USP per gram. We extract Net Qty and MRP, compute the theoretical USP, and enforce $|(\text{USP}_{\text{calc}} \times \text{NetQty}) - \text{MRP}| \le 0.02\text{ INR}$. For example, on SKU-DEMO-02, a declared USP of ₹0.28/g on a 300g pack costing ₹70 fails because the true unit price is ₹0.23/g.
 
 ### Q8: "How does the system handle e-commerce listings under Rule 6(10)?"
-**Answer:** E-commerce platforms must display manufacturer name, net quantity, MRP, consumer care, and country of origin. Crucially, under Rule 6(10), e-commerce listings are **statutorily exempt from declaring the month and year of manufacture**. Naive scanners falsely flag e-commerce listings for missing mfg dates; MetroLens codifies this statutory exemption.
+**Answer:** E-commerce platforms must display manufacturer name, net quantity, MRP, consumer care, and country of origin. Crucially, under Rule 6(10), e-commerce listings are **statutorily exempt from declaring the month and year of manufacture**. Naive scanners falsely flag e-commerce listings for missing mfg dates; Nirikshak codifies this statutory exemption.
 
 ### Q9: "What if an officer makes a mistake and overrides the AI finding?"
 **Answer:** Natural justice permits officer overrides, but every override requires the officer's PIN and **mandatory written justification remarks**. Both the original AI finding and the officer's determination are permanently preserved in the append-only Merkle DAG ledger with the officer's badge number and monotonic timestamp.
@@ -121,7 +121,7 @@
 **Answer:** Under the Jan Vishwas (Amendment of Provisions) Act, 2023 (Act No. 18 of 2023), imprisonment under Section 36(1) was repealed for first offenses. The law now provides for civil compounding under Section 48. Our system automatically computes compounding fee recommendations up to ₹25,000 for first offenses and flags repeat offenses for higher compounding or prosecution.
 
 ### Q14: "What is your differentiation over other hackathon teams?"
-**Answer:** Other teams built generic OCR wrappers that say "PASS" or "FAIL" without statutory basis. MetroLens provides:
+**Answer:** Other teams built generic OCR wrappers that say "PASS" or "FAIL" without statutory basis. Nirikshak provides:
 1. True millimeter font measurement via coplanar ArUco/Card homography.
 2. 100% deterministic AST rules strictly citing Gazette numbers and Table-I schedules.
 3. Cryptographic Section 63 BSA 2023 certification with Merkle DAG chain-of-custody.

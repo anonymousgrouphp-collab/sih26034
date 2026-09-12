@@ -1,4 +1,5 @@
-# NIRIKSHAK UI/UX Redesign & Integration Changelog
+# Nirikshak — UI/UX Evolution & Component Craft Changelog
+
 
 **Product:** NIRIKSHAK (SIH26034)  
 **Release:** v2.0-combined  

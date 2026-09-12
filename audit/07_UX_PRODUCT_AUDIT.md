@@ -39,7 +39,7 @@ MetroLens successfully strikes the ideal balance for a government enforcement wo
 - Located prominently in the top navigation bar:
   - **Inspector Mode:** Displays full legal statutory sections (`Rule 6(1)(h) read with Table-I, G.S.R. 629(E)`), numerical deficits (`-0.66 mm`), compounding fee schedules under Section 48 of the LM Act, and token lineage hashes.
   - **Citizen / Plain Language Mode:** Rewords statutory violations into plain English consumer explanations (e.g. *"The weight numbers on this package are too small to read comfortably from a shelf distance"*).
-- **Finding:** Bridges the gap between strict court-admissible enforcement and public transparency.
+- **Finding:** Bridges the gap between strict statutory enforcement and public transparency.
 
 ### 2.3 Screen 3: Section 63 BSA 2023 Evidence Audit
 - Visualizes the Merkle DAG chain-of-custody for digital evidence.

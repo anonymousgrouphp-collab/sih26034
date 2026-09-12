@@ -10,7 +10,7 @@
 ## 1. System Architecture & Component Inventory
 
 ### 1.1 Architectural Topology
-MetroLens is structured as an **Online-First Monolith Application (Mode A)** with an **Integrated Local Field Resilience Engine (Mode B)** and **Open Statutory Integration Payloads (Mode C)**.
+Nirikshak is structured as an **Online-First Monolith Application (Mode A)** with an **Integrated Local Field Resilience Engine (Mode B)** and **Open Statutory Integration Payloads (Mode C)**.
 
 ```
                                   +------------------------------------------------------+

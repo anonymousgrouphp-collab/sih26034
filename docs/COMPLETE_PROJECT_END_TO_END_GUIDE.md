@@ -10,7 +10,7 @@ PROJECT TITLE      : Software System to check compliance of Packaged Commodities
                      images and labels.
 MINISTRY           : Ministry of Consumer Affairs, Food & Public Distribution
 DEPARTMENT         : Department of Consumer Affairs (DoCA)
-PRODUCT NAME       : (Legal Metrology)
+PRODUCT NAME       : Nirikshak
 TEAM PROFILE       : 6-Member Multidisciplinary Student Engineering Team
 CURRENT DATE       : 07 September 2026
 SUBMISSION DEADLINE: 13 September 2026 (6 Days Execution Window)
@@ -91,7 +91,7 @@ We will demonstrate our live web portal by uploading/capturing real commercial p
 
 ### What Our MVP Is
 
-A production-ready **FastAPI backend** + **React 18 / Vite frontend SPA** running primarily as an online web application, backed by PostgreSQL 16+ and server-side CPU INT8 ONNX models with zero external GPU/cloud API costs. Its **Mode A primary web portal** handles multi-panel package uploads, calibrated optical measurement, Rule 6 and Table-I compliance, dashboard analytics, and court-ready Section 63 BSA 2023 PDF dossiers. Its **Mode B local inspection capability** provides complete operational resilience for field inspectors when network connectivity is lost.
+A production-ready **FastAPI backend** + **React 18 / Vite frontend SPA** running primarily as an online web application, backed by PostgreSQL 16+ and server-side CPU INT8 ONNX models with zero external GPU/cloud API costs. Its **Mode A primary web portal** handles multi-panel package uploads, calibrated optical measurement, Rule 6 and Table-I compliance, dashboard analytics, and tamper-evident Section 63 BSA 2023 PDF dossiers. Its **Mode B local inspection capability** provides complete operational resilience for field inspectors when network connectivity is lost.
 
 ### What the Six Members Are Doing
 
