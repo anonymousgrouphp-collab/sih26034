@@ -1285,7 +1285,7 @@ class StatutoryDeclarationParser:
 
         norm_text = cls.convert_indic_digits(text)
         origin_pattern = re.compile(
-            r"(?<![a-zA-Z\u0900-\u097F])(?:Country\s*of\s*Origin|Made\s*in|Product\s*of|Manufactured\s*in|Packed\s*in|Produce\s*of|Imported\s*from|Origin|COO|मूल\s*देश|उत्पत्ति\s*का\s*देश)\s*[:\-]?\s*([^\n\r,;]+)",
+            r"(?<![a-zA-Z\u0900-\u097F])(?:Country\s*of\s*Origin|Made\s*in|Product\s*of|Manufactured\s*in|Packed\s*in|Produce\s*of|Imported\s*from|Origin\b|COO\b|मूल\s*देश|उत्पत्ति\s*का\s*देश)\s*[:\-]?\s*([^\n\r,;]+)",
             re.IGNORECASE
         )
         match = origin_pattern.search(norm_text)
@@ -1318,7 +1318,10 @@ class StatutoryDeclarationParser:
         cleaned = cleaned.strip(".- :")
         # Validate that fallback candidate is a reasonable country name (not a sentence, no digits)
         if cleaned and len(cleaned.split()) <= 3 and not re.search(r"\d", cleaned):
-            disallowed_words = {"accordance", "compliance", "standard", "facility", "premises", "licence", "license"}
+            disallowed_words = {
+                "accordance", "compliance", "standard", "facility", "premises",
+                "licence", "license", "place", "dry", "cool", "store", "hygienic", "temperature"
+            }
             if not any(w in cleaned.lower() for w in disallowed_words):
                 return cleaned
         return None

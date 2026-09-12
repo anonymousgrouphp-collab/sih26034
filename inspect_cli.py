@@ -574,17 +574,38 @@ class FieldInspectorCLI:
         font_mm = known_meta["measured_font_mm"] if known_meta else 1.84
 
         # Stage 3: Semantic Extraction
-        if known_meta:
+        if False:
             product_name = known_meta["name"]
             raw_qty = known_meta["declared_qty"]
             parsed_qty = StatutoryDeclarationParser.parse_net_quantity(raw_qty)
             mrp_amount = known_meta["mrp"]
             declared_usp = round(mrp_amount / max(1.0, parsed_qty.get("magnitude", 1.0)), 2)
+            mrp_dict = {"amount": mrp_amount, "tax_inclusive": True}
+            manufacturer_dict = {"name": "Packer Enterprise", "address_line": "Industrial Area", "pin_code": "110020"}
+            consumer_care_dict = {"has_phone": True, "has_email": True}
+            country_of_origin = "India"
+            ocr_tokens_list = [
+                {"field": "Commodity Name", "value": product_name, "confidence": 0.98, "lang": "en"},
+                {"field": "Net Quantity", "value": f"{parsed_qty.get('magnitude')} {parsed_qty.get('unit')}", "confidence": 0.97, "lang": "en"},
+                {"field": "MRP", "value": f"₹{mrp_amount:.2f}", "confidence": 0.97, "lang": "en"},
+                {"field": "Country of Origin", "value": country_of_origin, "confidence": 0.99, "lang": "en"},
+            ]
         else:
+            from engine import MultilingualOCREngine
+            from extractor import CommodityFactExtractor
+            ocr_engine = MultilingualOCREngine()
+            ocr_output = ocr_engine.process_image(img, image_id=inspection_id)
+            extractor = CommodityFactExtractor()
+            facts = extractor.extract(ocr_output, calibration=None)
+            
             product_name = path_obj.stem.replace("_", " ").title()
-            parsed_qty = {"magnitude": 100.0, "unit": "g", "has_banned_unit": False}
-            mrp_amount = 50.0
-            declared_usp = 0.50
+            parsed_qty = facts.net_quantity.model_dump() if facts.net_quantity else None
+            mrp_dict = facts.mrp.model_dump() if facts.mrp else None
+            declared_usp = facts.unit_sale_price.price_per_unit if facts.unit_sale_price else None
+            manufacturer_dict = facts.manufacturer.model_dump() if facts.manufacturer else None
+            consumer_care_dict = facts.consumer_care.model_dump() if facts.consumer_care else None
+            country_of_origin = facts.country_of_origin if facts.country_of_origin else None
+            ocr_tokens_list = [{"field": rf.field_type, "value": rf.normalized_value or rf.raw_ocr_text, "confidence": rf.detection_confidence, "lang": "en"} for rf in facts.raw_fields]
 
         # Stage 4: Rule Engine
         rule_results = LegalMetrologyRuleEngine.evaluate_inspection(
@@ -592,11 +613,11 @@ class FieldInspectorCLI:
             pdp_area_cm2=pdp_cm2,
             font_height_mm=font_mm,
             net_quantity=parsed_qty,
-            mrp={"amount": mrp_amount, "tax_inclusive": True},
+            mrp=mrp_dict,
             declared_usp=declared_usp,
-            manufacturer={"name": "Packer Enterprise", "address_line": "Industrial Area", "pin_code": "110020"},
-            consumer_care={"has_phone": True, "has_email": True},
-            country_of_origin="India",
+            manufacturer=manufacturer_dict,
+            consumer_care=consumer_care_dict,
+            country_of_origin=country_of_origin,
             offense_history="FIRST",
         )
 
@@ -638,12 +659,7 @@ class FieldInspectorCLI:
                 "uncertainty_mm": uncertainty,
                 "pdp_area_cm2": pdp_cm2,
             },
-            "ocr_tokens": [
-                {"field": "Commodity Name", "value": product_name, "confidence": 0.98, "lang": "en"},
-                {"field": "Net Quantity", "value": f"{parsed_qty.get('magnitude')} {parsed_qty.get('unit')}", "confidence": 0.97, "lang": "en"},
-                {"field": "MRP", "value": f"₹{mrp_amount:.2f}", "confidence": 0.97, "lang": "en"},
-                {"field": "Country of Origin", "value": "India", "confidence": 0.99, "lang": "en"},
-            ],
+            "ocr_tokens": ocr_tokens_list,
             "table1_font": font_eval,
             "usp_evaluation": usp_eval,
             "evaluations": rule_results["evaluations"],

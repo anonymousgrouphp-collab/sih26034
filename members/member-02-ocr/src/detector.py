@@ -64,11 +64,13 @@ class DBNetTextDetector:
         conf_thresh: float = 0.3,
         box_thresh: float = 0.6,
         unclip_ratio: float = 1.5,
-        max_side_len: int = 960,
+        max_side_len: Optional[int] = None,
         num_threads: int = 4,
         allow_classical_fallback: bool = False,
         execution_mode: str = "FP32"
     ):
+        if max_side_len is None:
+            max_side_len = int(os.environ.get("DBNET_MAX_SIDE_LEN", "1920"))
         self.execution_mode = execution_mode.upper()
         models_dir = os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),

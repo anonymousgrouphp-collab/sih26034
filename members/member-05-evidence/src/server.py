@@ -777,7 +777,7 @@ def execute_pipeline(
             except Exception:
                 continue
 
-    if matched_sku:
+    if False:
         is_ecom = inspection.capture_source == "ECOMMERCE_URL" or "ecommerce" in str(inspection.package_type).lower() or bool(inspection.ecommerce_url) or bool(matched_sku.get("is_ecommerce")) or matched_sku.get("packaging_type") == "ECOMMERCE_LISTING"
         sku_qg = matched_sku.get("quality_gate", {})
         blur = float(sku_qg.get("blur_variance", ev_image.blur_laplacian_variance or 312.4))
@@ -1047,8 +1047,6 @@ def execute_pipeline(
                         if rf.measured_font_height_mm and rf.measured_font_height_mm > 0:
                             font_mm = rf.measured_font_height_mm
                             break
-                    if font_mm is None:
-                        font_mm = 2.10
 
                     eval_res = LegalMetrologyRuleEngine.evaluate_inspection(
                         inspection_id=inspection.id,
@@ -1082,51 +1080,7 @@ def execute_pipeline(
                             "measurement_confidence": rf.measurement_confidence or 0.95,
                         })
             else:
-                # Synthetic mock fallback when image file is not on disk (preserves synthetic test suite)
-                pdp_area = 112.0
-                font_mm = 2.12
-                net_qty = {"magnitude": 150.0, "unit": "g", "has_banned_unit": False}
-                mrp = {"amount": 35.0, "currency": "INR", "tax_inclusive": True}
-                dec_usp = 0.23
-
-                extracted_fields = [
-                    {
-                        "field_type": "NET_QUANTITY",
-                        "raw_ocr_text": "Net Weight: 150 g",
-                        "normalized_value": {"magnitude": 150.0, "unit": "g"},
-                        "detection_confidence": 0.984,
-                        "ocr_confidence": 0.971,
-                        "bounding_box": [820, 210, 880, 540],
-                        "measured_font_height_mm": 2.12,
-                        "measurement_confidence": 0.94,
-                    },
-                    {
-                        "field_type": "MRP",
-                        "raw_ocr_text": "MRP Rs. 35.00 (incl. of all taxes)",
-                        "normalized_value": {"amount": 35.0, "currency": "INR", "tax_inclusive": True},
-                        "detection_confidence": 0.991,
-                        "ocr_confidence": 0.985,
-                        "bounding_box": [910, 210, 960, 680],
-                        "measured_font_height_mm": 3.45,
-                        "measurement_confidence": 0.96,
-                    },
-                ]
-
-                if LegalMetrologyRuleEngine:
-                    eval_res = LegalMetrologyRuleEngine.evaluate_inspection(
-                        inspection_id=inspection.id,
-                        pdp_area_cm2=pdp_area,
-                        font_height_mm=font_mm,
-                        net_quantity=net_qty,
-                        mrp=mrp,
-                        declared_usp=dec_usp,
-                        is_ecommerce=inspection.capture_source == "ECOMMERCE_URL",
-                    )
-                    ai_verdict = eval_res["overall_verdict"]
-                    evaluations = eval_res["evaluations"]
-                else:
-                    ai_verdict = "PASS"
-                    evaluations = []
+                raise HTTPException(status_code=400, detail="Image file not found on disk. Physical validation requires real image processing.")
 
     # 1. Clear previous bounding boxes for this image
     old_bboxes = db.execute(select(BoundingBox).where(BoundingBox.image_id == ev_image.id)).scalars().all()
