@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 640" fill="none" role="img" aria-labelledby="bhTitle bhDesc">
+  <title id="bhTitle">NIRIKSHAK — Legal Metrology Inspection Workstation</title>
+  <desc id="bhDesc">Hero banner: the Tula Netra eye-of-the-scales mark inside a fine broken ring that opens toward the wordmark, over a soft aurora of saffron, rose, violet and teal pastels; NIRIKSHAK wordmark, department attribution, and four verdict dots for PASS, REVIEW, FAIL and UNABLE_TO_VERIFY.</desc>
+  <defs>
+    <filter id="bhBlur" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="70"/>
+    </filter>
+    <radialGradient id="bhPupil" cx="0.38" cy="0.32" r="0.9">
+      <stop offset="0" stop-color="#FFC069"/>
+      <stop offset="0.55" stop-color="#FF9933"/>
+      <stop offset="1" stop-color="#F07E00"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="640" fill="#FDFCF8"/>
+  <!-- aurora pastels -->
+  <g filter="url(#bhBlur)" opacity="0.62">
+    <ellipse cx="300" cy="185" rx="300" ry="205" fill="#FFE1B3"/>
+    <ellipse cx="530" cy="490" rx="265" ry="185" fill="#F7C9DE"/>
+    <ellipse cx="1145" cy="165" rx="295" ry="210" fill="#DCCEF8"/>
+    <ellipse cx="1345" cy="475" rx="270" ry="185" fill="#BFE8DE"/>
+  </g>
+  <!-- fine double ring, opening toward the wordmark -->
+  <path d="M725.62 417.51 A176 176 0 1 1 874.38 417.51" stroke="#0A192F" stroke-opacity="0.22" stroke-width="2.5"/>
+  <path d="M732.38 403.01 A160 160 0 1 1 867.62 403.01" stroke="#0A192F" stroke-opacity="0.45" stroke-width="1.5"/>
+  <!-- Tula Netra mark -->
+  <g transform="translate(668,198.6) scale(1.1)">
+    <path d="M31 20 L209 20" stroke="#0A192F" stroke-width="9" stroke-linecap="round"/>
+    <path d="M30 20 L30 38 M210 20 L210 38" stroke="#0A192F" stroke-width="5" stroke-linecap="round"/>
+    <path d="M3 40 A27 17 0 0 0 57 40" stroke="#0A192F" stroke-width="7" stroke-linecap="round"/>
+    <path d="M183 40 A27 17 0 0 0 237 40" stroke="#0A192F" stroke-width="7" stroke-linecap="round"/>
+    <path d="M31 20 Q120 158 209 20" stroke="#0A192F" stroke-width="9" stroke-linecap="round"/>
+    <path d="M120 20 L120 32" stroke="#0A192F" stroke-width="4.5" stroke-linecap="round"/>
+    <circle cx="120" cy="56" r="20" stroke="#10B981" stroke-width="8.5"/>
+    <circle cx="120" cy="56" r="8.5" fill="url(#bhPupil)"/>
+    <circle cx="116.2" cy="52.2" r="2.2" fill="#FFFFFF" opacity="0.85"/>
+  </g>
+  <!-- wordmark -->
+  <g transform="translate(645,388) scale(0.62)">
+    <g stroke-width="13" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <g stroke="#0A192F">
+        <g transform="translate(0,50)"><path d="M8 100 L8 0 L56 100 L56 0"/></g>
+        <g transform="translate(64,50)"><path d="M8 0 L8 100"/></g>
+        <g transform="translate(90,50)"><path d="M8 100 L8 0 L26 0 A25 25 0 0 1 26 50 L8 50 M27 50 L56 100"/></g>
+      </g>
+      <g stroke="#1E3A8A">
+        <g transform="translate(156,50)"><path d="M8 0 L8 100"/></g>
+        <g transform="translate(182,50)"><path d="M8 0 L8 100 M54 0 L8 50 M22 35 L56 100"/></g>
+        <g transform="translate(246,50)"><path d="M48 14 C40 2 16 4 11 22 C6 40 28 45 37 51 C48 58 52 66 47 80 C41 96 14 96 8 82"/></g>
+        <g transform="translate(302,50)"><path d="M8 0 L8 100 M56 0 L56 100 M8 50 L56 50"/></g>
+        <g transform="translate(366,50)"><path d="M31 0 L6 100 M31 0 L56 100 M14 68 L48 68"/></g>
+        <g transform="translate(428,50)"><path d="M8 0 L8 100 M54 0 L8 50 M22 35 L56 100"/></g>
+      </g>
+    </g>
+    <circle cx="164" cy="27" r="7" stroke="#10B981" stroke-width="4.5"/>
+    <circle cx="164" cy="27" r="2.4" fill="#FF9933"/>
+  </g>
+  <text x="800" y="516" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="19" font-weight="600" letter-spacing="5.5" fill="#334155">LEGAL METROLOGY INSPECTION WORKSTATION</text>
+  <text x="800" y="548" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="15" font-weight="500" letter-spacing="2" fill="#64748B">Department of Consumer Affairs • Government of India</text>
+  <!-- four-state verdict dots: PASS · REVIEW · FAIL · UNABLE_TO_VERIFY -->
+  <g>
+    <circle cx="739" cy="584" r="5" fill="#059669"/>
+    <circle cx="779" cy="584" r="5" fill="#D97706"/>
+    <circle cx="819" cy="584" r="5" fill="#DC2626"/>
+    <circle cx="859" cy="584" r="5" fill="#94A3B8"/>
+  </g>
+</svg>

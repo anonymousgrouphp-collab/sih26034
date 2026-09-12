@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" fill="none" role="img" aria-labelledby="msTitle msDesc">
+  <title id="msTitle">NIRIKSHAK — Mudra Seal</title>
+  <desc id="msDesc">A government-style double-ring seal carrying the name NIRIKSHAK and the words Legal Metrology Inspection, enclosing the standard verification weight stamped with a compliance checkmark.</desc>
+  <defs>
+    <path id="msArcTop" d="M27 120 A93 93 0 0 1 213 120" fill="none"/>
+    <path id="msArcBottom" d="M27 120 A93 93 0 0 0 213 120" fill="none"/>
+  </defs>
+  <!-- double seal rings -->
+  <circle cx="120" cy="120" r="108" stroke="#0A192F" stroke-width="6"/>
+  <circle cx="120" cy="120" r="78" stroke="#0A192F" stroke-width="2"/>
+  <!-- ring legend -->
+  <text font-family="Georgia, 'Times New Roman', serif" font-size="17" font-weight="700" letter-spacing="7" fill="#0A192F">
+    <textPath href="#msArcTop" startOffset="50%" text-anchor="middle">NIRIKSHAK</textPath>
+  </text>
+  <text font-family="Georgia, 'Times New Roman', serif" font-size="10.5" font-weight="600" letter-spacing="2" fill="#0A192F">
+    <textPath href="#msArcBottom" startOffset="50%" text-anchor="middle">LEGAL METROLOGY INSPECTION</textPath>
+  </text>
+  <!-- side register diamonds -->
+  <circle cx="27" cy="120" r="3.5" fill="#FF9933"/>
+  <circle cx="213" cy="120" r="3.5" fill="#FF9933"/>
+  <!-- the standard weight: knob, neck, body -->
+  <g fill="#0A192F">
+    <circle cx="120" cy="78" r="10"/>
+    <path d="M110 86 L130 86 L124 100 L116 100 Z"/>
+    <rect x="84" y="100" width="72" height="64" rx="10"/>
+  </g>
+  <!-- verification check, knocked out of the weight -->
+  <path d="M100 132 L116 148 L146 118" stroke="#FFFFFF" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M100 132 L116 148 L146 118" stroke="#059669" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

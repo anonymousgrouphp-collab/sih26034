@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 108" fill="none" role="img" aria-labelledby="tnTitle tnDesc">
+  <title id="tnTitle">NIRIKSHAK — Tula Netra mark</title>
+  <desc id="tnDesc">An eye whose straight upper lid is a balance beam with two hanging pans; the iris hangs from the beam's centre like a plumb bob. Inspection (the seeing eye), fairness (the scales) and measurement (the plumb line) fused in one mark.</desc>
+  <defs>
+    <radialGradient id="tnPupil" cx="0.38" cy="0.32" r="0.9">
+      <stop offset="0" stop-color="#FFC069"/>
+      <stop offset="0.55" stop-color="#FF9933"/>
+      <stop offset="1" stop-color="#F07E00"/>
+    </radialGradient>
+  </defs>
+  <!-- balance beam doubling as the upper eyelid -->
+  <path d="M31 20 L209 20" stroke="#0A192F" stroke-width="9" stroke-linecap="round"/>
+  <!-- pan drop-lines -->
+  <path d="M30 20 L30 38 M210 20 L210 38" stroke="#0A192F" stroke-width="5" stroke-linecap="round"/>
+  <!-- weighing pans -->
+  <path d="M3 40 A27 17 0 0 0 57 40" stroke="#0A192F" stroke-width="7" stroke-linecap="round"/>
+  <path d="M183 40 A27 17 0 0 0 237 40" stroke="#0A192F" stroke-width="7" stroke-linecap="round"/>
+  <!-- lower eyelid sweeping between the beam ends -->
+  <path d="M31 20 Q120 158 209 20" stroke="#0A192F" stroke-width="9" stroke-linecap="round"/>
+  <!-- plumb line suspending the iris from the beam's centre -->
+  <path d="M120 20 L120 32" stroke="#0A192F" stroke-width="4.5" stroke-linecap="round"/>
+  <!-- iris: verification-emerald ring (reticle lock-on) -->
+  <circle cx="120" cy="56" r="20" stroke="#10B981" stroke-width="8.5"/>
+  <!-- pupil: India-saffron -->
+  <circle cx="120" cy="56" r="8.5" fill="url(#tnPupil)"/>
+  <circle cx="116.2" cy="52.2" r="2.2" fill="#FFFFFF" opacity="0.85"/>
+</svg>

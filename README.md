@@ -1,5 +1,9 @@
 # NyayaDrishti-LM (न्याय दृष्टि)
 
+<p align="center">
+  <img src="brand/svg/nirikshak-banner-hero.svg" alt="NIRIKSHAK — Legal Metrology Inspection Workstation" width="100%" />
+</p>
+
 ### Online AI-Powered Legal Metrology Compliance Inspection & Verification Web Platform
 #### Problem Statement ID: SIH26034 | Smart India Hackathon 2026
 
