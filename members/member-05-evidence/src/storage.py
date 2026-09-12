@@ -114,6 +114,17 @@ class DecoupledStorageManager:
         relative_path = str(target_file.relative_to(self.base_dir)).replace("\\", "/")
         return relative_path, file_hash, mime_type
 
+    def compress_for_archival_lossless(self, raw_bytes: bytes) -> bytes:
+        """Lossless archive compression without data/pixel loss for secondary datastore archival.
+        Guarantees 100% bitwise decompression fidelity without altering statutory pixel values."""
+        import zlib
+        return zlib.compress(raw_bytes, level=6)
+
+    def decompress_archival_lossless(self, compressed_bytes: bytes) -> bytes:
+        """Decompresses lossless archive bytes back to bitwise identical original image bytes."""
+        import zlib
+        return zlib.decompress(compressed_bytes)
+
     def save_evidence_document(
         self,
         doc_bytes: bytes,

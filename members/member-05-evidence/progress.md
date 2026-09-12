@@ -504,3 +504,43 @@ Team Lead review of P0-SEC-001 (seeded demo credentials in client bundle) remedi
 
 ### Signing Note
 SIGNED OFF BY: kunal-raj-dev (kunal-raj-dev@users.noreply.github.com) — 2026-09-12 23:05 IST [VERIFIED]
+
+---
+
+## [13 September 2026] [01:40] IST
+
+### Task / Chunk
+Multi-Image Packaging Fact Aggregation & Bi-directional Calibration Propagation (`server.py`, `liveApi.ts`, `NewInspection.tsx`).
+
+### Status
+COMPLETE
+
+### Completed
+- **Multi-Angle Declaration Aggregation in Pipeline (`server.py`):**
+  - Integrated cross-facet statutory fact aggregation in `execute_pipeline`. Declarations distributed across different package angles (e.g. Front PDP with Net Qty & MRP, Back Panel with Manufacturer Address & Consumer Care, Side Panel with Origin) are combined from stored bounding boxes before rule evaluation.
+  - Eliminates false violations where an image was flagged missing declarations located on other facets of the same physical item.
+- **Bi-Directional Metric Calibration Propagation:**
+  - When an image containing a physical reference (ArUco 50mm marker or ISO 7810 card) is calibrated, the scale (`px_to_mm_scale`) automatically propagates to all sibling uncalibrated images of the inspection.
+  - When an uncalibrated image is ingested, it automatically inherits scale and reference metadata from any calibrated sibling image.
+- **Optical Gate Multi-Factor Verification (`server.py` & `liveApi.ts`):**
+  - Enforced dual check for `quality_passed`: requires both `blur_variance >= 100.0` AND `glare_percentage <= 3.0%`.
+  - Preserved cached rule evaluations in `liveApi.ts` to prevent UI state loss when backend detail returns before evaluations are fully persisted.
+- **Facet Ordering Correction (`NewInspection.tsx`):**
+  - Corrected default multi-image panel sequencing to standard retail packaging workflow: Index 0 = `PDP_FRONT`, Index 1 = `BACK_PANEL`, Index 2+ = `SIDE_PANEL`.
+
+### Tests
+- `& "C:\Users\ceoha\AppData\Local\Programs\Python\Python314\python.exe" -m pytest members/member-01-cv-metrology/tests/ members/member-05-evidence/tests/ -v` (114 passed in 5.98s)
+- `npm run test` in `ui-combined` (142 passed in 1.36s)
+- `npm run build` in `ui-combined` (Clean build in 5.32s)
+- `inspect_cli.py` verification on real earbuds images (186.7ms execution with ISO 7810 card calibration)
+
+### Decisions
+1. In multi-angle consumer packaging, statutory declarations are legal across any combination of PDP and information panels. The rule engine must evaluate the unified commodity fact set rather than failing individual panel photographs in isolation.
+2. An ArUco or ISO 7810 standard placed alongside one facet establishes the photogrammetric scale for all co-planar facet captures of that physical unit.
+
+### Next Step
+Push verified updates to `main`.
+
+### Signing Note
+SIGNED OFF BY: Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-13 01:40 IST [VERIFIED]
+

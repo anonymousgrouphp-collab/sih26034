@@ -172,7 +172,8 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
   const formatDateTime = (isoString: string) => {
     try {
       const d = new Date(isoString);
-      return d.toLocaleDateString("en-IN", {
+      if (isNaN(d.getTime())) return isoString ? isoString.slice(0, 16).replace("T", " ") : "";
+      return d.toLocaleString("en-IN", {
         day: "2-digit",
         month: "short",
         year: "numeric",
@@ -624,11 +625,11 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                               e.stopPropagation();
                               setCaseToDelete(c);
                             }}
-                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-300 rounded transition-colors"
+                            className="p-1.5 text-rose-600 hover:text-white bg-rose-50 hover:bg-rose-600 border border-rose-200 hover:border-rose-600 rounded-md transition-all flex items-center justify-center shrink-0 shadow-2xs"
                             title={language === "hi" ? "मामला स्थायी रूप से हटाएं" : "Permanently Delete Case"}
                             aria-label={`Delete case ${c.inspection_number}`}
                           >
-                            <Trash2 size={13} />
+                            <Trash2 size={14} />
                           </button>
                           <button
                             type="button"
