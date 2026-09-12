@@ -149,3 +149,19 @@ class DecoupledStorageManager:
     def get_file_path(self, relative_path: str) -> Path:
         """Alias for resolve_absolute_path."""
         return self.resolve_absolute_path(relative_path)
+
+    def delete_file(self, relative_path: str) -> bool:
+        """Permanently unlinks an evidence or upload file from storage."""
+        if not relative_path:
+            return False
+        try:
+            clean_rel = relative_path.replace("\\", "/").lstrip("/")
+            if clean_rel.startswith("storage/"):
+                clean_rel = clean_rel[len("storage/"):]
+            resolved = self.resolve_absolute_path(clean_rel)
+            if resolved.exists() and resolved.is_file():
+                resolved.unlink()
+                return True
+        except Exception:
+            pass
+        return False

@@ -91,15 +91,16 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
         compounding_fee_amount: 5000,
         reply_window_days: 15,
       });
-      const targetUrl = res.pdf_download_url || "/form1.pdf";
-      const filename = `Form-1-Notice-${caseData.inspection_number || caseData.id}.pdf`;
-      const dlLink = document.createElement("a");
-      dlLink.href = targetUrl;
-      dlLink.download = filename;
-      dlLink.target = "_blank";
-      document.body.appendChild(dlLink);
-      dlLink.click();
-      document.body.removeChild(dlLink);
+      if (res && res.pdf_download_url && res.pdf_download_url.startsWith("http") && res.pdf_download_url !== "/form1.pdf") {
+        const filename = `Form-1-Notice-${caseData.inspection_number || caseData.id}.pdf`;
+        const dlLink = document.createElement("a");
+        dlLink.href = res.pdf_download_url;
+        dlLink.download = filename;
+        dlLink.target = "_blank";
+        document.body.appendChild(dlLink);
+        dlLink.click();
+        document.body.removeChild(dlLink);
+      }
 
       setNoticeResultMsg(`Form-1 Notice ${res.notice_reference_number} generated with Section 63 BSA certificate.`);
       setTimeout(() => setNoticeResultMsg(null), 6000);

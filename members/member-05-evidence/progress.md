@@ -359,7 +359,34 @@ Provide full architectural and statutory compliance explanation to Team Lead and
 ### Signing Note
 SIGNED OFF BY: Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-13 00:15 IST [VERIFIED]
 
+---
 
+## [13 September 2026] [00:35] IST
 
+### Task / Chunk
+Statutory Form-1 Notice Dynamic Commodity Schedule & Evidentiary Unique Certificate Fix (`members/member-05-evidence/src/notice_generator.py`, `server.py`).
 
+### Status
+COMPLETE
 
+### Completed
+- **Dynamic Commodity Particulars (Schedule A) in Form-1 Notice (`notice_generator.py`):** Added Schedule A to `Form1NoticePDFGenerator.generate_form1_pdf` rendering the exact inspected commodity name, brand name, batch/lot number, declared net quantity, retail sale price (MRP), packaging format, and measured PDP area. Renamed violations schedule to Schedule B.
+- **Backend Inspection Details Wiring (`server.py`):** Updated `POST /api/v1/notices/generate` to pass actual `commodity_name`, `brand_name`, `batch_number`, `declared_net_quantity`, `declared_mrp`, and `package_type` from the inspection database record.
+- **BSACertificate Duplicate Fix (`server.py`):** Resolved HTTP 500 `IntegrityError: UNIQUE constraint failed: bsa_certificates.inspection_id` by checking for existing certificates on `inspection_id` and updating/reusing instead of blind duplicate inserts.
+- **Ephemeral Storage Resilience (`server.py`):** Added on-the-fly PDF regeneration in `GET /api/v1/notices/{id}/pdf` so that container restarts on Render never throw HTTP 404 for generated notices.
+
+### Tests
+- `python -m pytest members/member-05-evidence/tests/` (60 passed in 5.28s)
+
+### Problems
+None. All 60 tests pass cleanly.
+
+### Decisions
+1. Every Form-1 Statutory Notice must explicitly state the inspected commodity's exact identity and deficits in Schedule A & B; generic or mismatched notices violate Section 63 BSA 2023.
+2. Regenerating PDFs on-the-fly ensures zero lost dossiers on cloud platforms with ephemeral local filesystems.
+
+### Next Step
+Sync frontend notice download workflows and commit to main.
+
+### Signing Note
+SIGNED OFF BY: Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-13 00:35 IST [VERIFIED]

@@ -2106,8 +2106,35 @@ Commit and push to `origin/main` to trigger automated Vercel deployment.
 ### Signing Note
 SIGNED OFF BY: Parmarth Kumar (parmarth.kumar@example.com) — 2026-09-12 23:56 IST [VERIFIED]
 
+---
 
+## [13 September 2026] [00:35] IST
 
+### Task / Chunk
+Elimination of Static Specimen Notice Hijacking (`/form1.pdf`) and Dynamic Commodity Notice Wiring across UI (`InspectionReportView.tsx`, `CaseWorkspace.tsx`, `AdjudicationCanvas.tsx`, `liveApi.ts`, `api.ts`).
 
+### Status
+COMPLETE
 
+### Completed
+- **Eliminated Hardcoded `/form1.pdf` Links:** Replaced the hardcoded `<a href="/form1.pdf">` in `InspectionReportView.tsx` with dynamic `handleDownloadPdf`. If backend PDF generation is available, it downloads the exact commodity PDF from Render. If running locally or offline, it triggers the high-fidelity browser Print-to-PDF engine with Section 63 BSA 2023 seal, never serving a mismatched product.
+- **Removed Silent Fallbacks in `CaseWorkspace.tsx` and `AdjudicationCanvas.tsx`:** When generating notice, if a backend URL is unavailable, officers are redirected to the on-screen Form-1 Report View (`setActiveWorkspaceView("REPORT")`), rendering the exact commodity particulars (Boult Earbuds, etc.) instead of downloading "FizzUp Lemon Drink".
+- **Absolute Backend Origin Resolution (`liveApi.ts`):** Fixed `pdf_download_url` resolution so relative `/api/v1/notices/{id}/pdf` paths prepend the live backend origin (`https://nyayadrishti-backend.onrender.com`), resolving Vercel 404 errors.
+- **Overhauled Static Specimen (`public/form1.pdf`):** Regenerated `public/form1.pdf` using Python ReportLab to serve a neutral, official Government of India Model Statutory Specimen Notice with zero reference to "FizzUp Lemon Drink".
 
+### Tests
+- `npm test` in `ui-combined`: 121/121 passed (39 suites)
+- `npm run build` in `ui-combined`: Clean exit code 0 (`tsc -b && vite build`)
+
+### Problems
+None. All 121 tests pass cleanly.
+
+### Decisions
+1. Under Section 63 BSA 2023, every notice issued or downloaded must strictly reflect the actual inspected case particulars (commodity name, brand, manufacturer, deficits). Static demo PDFs must never be served as live enforcement notices.
+2. In the absence of network connectivity, high-resolution Gazette Print-to-PDF is invoked rather than falling back to an unrelated demo product.
+
+### Next Step
+Push changes to `main` to trigger automated Vercel and Render deployments.
+
+### Signing Note
+SIGNED OFF BY: Parmarth Kumar (parmarth.kumar@example.com) — 2026-09-13 00:35 IST [VERIFIED]

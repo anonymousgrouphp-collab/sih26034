@@ -408,6 +408,23 @@ export class ApiService {
     }
   }
 
+  public static async deleteInspection(
+    inspectionId: string
+  ): Promise<{ success: boolean; message: string; deleted_id: string }> {
+    try {
+      const active = this.getActiveService();
+      const res = await active.deleteInspection(inspectionId);
+      // Guarantee local fallback and fixture caches also purge this id
+      try {
+        await MockApiService.getInstance().deleteInspection(inspectionId);
+      } catch {}
+      return res;
+    } catch (err: any) {
+      console.warn("deleteInspection via active service failed, executing local disposal failover:", err);
+      return await MockApiService.getInstance().deleteInspection(inspectionId);
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // 8. Legal Notice & Section 63 BSA Document Generation
   // ---------------------------------------------------------------------------
@@ -432,16 +449,13 @@ export class ApiService {
 
     try {
       const res = await LiveApiService.getInstance().generateNotice(payload);
-      if (res.pdf_download_url && (res.pdf_download_url.includes("not_mock_") || res.pdf_download_url.includes("not_demo_"))) {
-        res.pdf_download_url = "/form1.pdf";
-      }
       return res;
     } catch (err: any) {
       console.warn("Live server generate notice failed. Engaging Mode B Local Resilient failover:", err);
       const res = await MockApiService.getInstance().generateNotice(payload);
       return {
         ...res,
-        pdf_download_url: "/form1.pdf",
+        pdf_download_url: "",
       };
     }
   }

@@ -52,6 +52,7 @@ import {
   RefreshCw,
   Scale,
   Activity,
+  Trash2,
 } from "lucide-react";
 
 interface CaseWorkspaceProps {
@@ -84,6 +85,21 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
   const [selectedBoxId, setSelectedBoxId] = useState<string | undefined>(undefined);
   const [auditSubTab, setAuditSubTab] = useState<"PROVENANCE" | "DIAGNOSTICS">("PROVENANCE");
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeletingCase, setIsDeletingCase] = useState(false);
+
+  const handleDeleteCase = async () => {
+    setIsDeletingCase(true);
+    try {
+      await ApiService.deleteInspection(caseData.id);
+      onBack();
+    } catch (err) {
+      console.error("Failed to delete case:", err);
+    } finally {
+      setIsDeletingCase(false);
+      setIsDeleteDialogOpen(false);
+    }
+  };
 
   useEffect(() => {
     if (caseData?.id) {
@@ -214,19 +230,24 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
         compounding_fee_amount: 5000,
         reply_window_days: 15,
       });
-      const targetUrl = res.pdf_download_url || "/form1.pdf";
-      const filename = `Form-1-Notice-${caseData.inspection_number || caseData.id}.pdf`;
-      const dlLink = document.createElement("a");
-      dlLink.href = targetUrl;
-      dlLink.download = filename;
-      dlLink.target = "_blank";
-      document.body.appendChild(dlLink);
-      dlLink.click();
-      document.body.removeChild(dlLink);
+      if (res && res.pdf_download_url && res.pdf_download_url.startsWith("http") && res.pdf_download_url !== "/form1.pdf") {
+        const filename = `Form-1-Notice-${caseData.inspection_number || caseData.id}.pdf`;
+        const dlLink = document.createElement("a");
+        dlLink.href = res.pdf_download_url;
+        dlLink.download = filename;
+        dlLink.target = "_blank";
+        document.body.appendChild(dlLink);
+        dlLink.click();
+        document.body.removeChild(dlLink);
+      } else {
+        // Direct officer to authentic on-screen Form-1 Report View
+        setActiveWorkspaceView("REPORT");
+      }
 
       setQuickDecisionSaved(true);
       setTimeout(() => setQuickDecisionSaved(false), 5000);
     } catch (err: any) {
+      setActiveWorkspaceView("REPORT");
       setActionError(err.message || (language === "hi" ? "प्रपत्र-1 नोटिस तैयार करने में विफल।" : "Failed to generate Form-1 notice."));
     } finally {
       setIsGeneratingNotice(false);
