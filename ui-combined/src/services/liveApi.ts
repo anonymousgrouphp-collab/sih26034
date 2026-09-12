@@ -417,7 +417,8 @@ export class LiveApiService implements IInspectionApiService {
           } else if (rawLower.includes("real-pkg-08")) {
             resolvedPath = "/storage/uploads/REAL-PKG-08_9556001137722.jpg";
           } else if (rawPath.startsWith("uploads/") || rawPath.startsWith("storage/uploads/") || rawPath.startsWith("/uploads/")) {
-            resolvedPath = `${this.baseUrl}/evidence/image/${img.id}`;
+            const cleanPath = rawPath.replace(/^\/?(storage\/)?/, "");
+            resolvedPath = `/storage/${cleanPath}`;
           } else if (rawPath.startsWith("storage/")) {
             resolvedPath = `/${rawPath}`;
           } else if (rawPath.length > 0) {

@@ -424,7 +424,14 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
                       <div className="w-7 h-7 rounded bg-slate-200 overflow-hidden shrink-0 flex items-center justify-center border border-slate-300">
                         {asset.preview_url || asset.file_path ? (
                           <img
-                            src={asset.preview_url || asset.file_path}
+                            src={
+                              (asset.preview_url || asset.file_path || "").startsWith("http") ||
+                              (asset.preview_url || asset.file_path || "").startsWith("/") ||
+                              (asset.preview_url || asset.file_path || "").startsWith("blob:") ||
+                              (asset.preview_url || asset.file_path || "").startsWith("data:")
+                                ? (asset.preview_url || asset.file_path)
+                                : `/storage/${asset.preview_url || asset.file_path}`
+                            }
                             alt={`Facet ${index + 1}`}
                             className="w-full h-full object-cover"
                           />

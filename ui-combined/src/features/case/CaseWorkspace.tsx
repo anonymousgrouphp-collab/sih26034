@@ -386,7 +386,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
       if (!u) return imgId ? `https://nyayadrishti-backend.onrender.com/api/v1/evidence/image/${imgId}` : "";
       if (u.startsWith("http://") || u.startsWith("https://") || u.startsWith("data:") || u.startsWith("blob:")) return u;
       if (u.startsWith("uploads/") || u.startsWith("/uploads/")) {
-        return imgId ? `https://nyayadrishti-backend.onrender.com/api/v1/evidence/image/${imgId}` : u;
+        return `/storage/${u.replace(/^\//, "")}`;
       }
       if (u.startsWith("/")) return u;
       return `/${u}`;

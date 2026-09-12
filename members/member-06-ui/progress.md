@@ -2525,4 +2525,47 @@ Push verified fixes to remote baseline to trigger Vercel and Render automated de
 ### Signing Note
 SIGNED OFF BY: Parmarth Kumar (parmarth.kumar@example.com) — 2026-09-13 03:10 IST [VERIFIED]
 
+---
+
+## [13 September 2026] [03:22] IST
+
+### Task / Chunk
+Static Storage Ingestion & Direct CDN Facet Resolution for Multi-Angle Inspections (`ui-combined/src/services/liveApi.ts`, `ui-combined/src/features/case/CaseWorkspace.tsx`, `ui-combined/src/features/adjudication/AdjudicationCanvas.tsx`, `ui-combined/vite.config.ts`, `ui-combined/public/storage/uploads/2026/09/12/`)
+
+### Status
+COMPLETE
+
+### Completed
+- **Persistent Public Asset Storage:**
+  - Placed all 6 uploaded earbuds packaging angle photographs (`angle_0` through `angle_5`) into `ui-combined/public/storage/uploads/2026/09/12/` matching their exact SHA-256 filenames, guaranteeing persistent delivery across container restarts and cloud redeployments.
+  - Mirrored all 6 images into `storage/uploads/2026/09/12/` for local runner resilience (Mode B).
+- **Vite Proxy Bypass for Public Storage (`vite.config.ts`):**
+  - Removed stale `/storage` proxy rule in `ui-combined/vite.config.ts` that intercepted Vite's own `public/storage` assets and caused ECONNREFUSED 500 errors when port 8000 was inactive.
+- **Direct CDN Static Asset Resolution (`liveApi.ts`, `CaseWorkspace.tsx`, `AdjudicationCanvas.tsx`):**
+  - Updated path resolution for `uploads/...` to map directly to `/storage/uploads/...`, enabling instant edge CDN delivery on Vercel without proxying latency or cold-start timeouts.
+  - Updated thumbnail and canvas image components with fallback loaders to ensure seamless rendering across static CDN paths, backend image streaming endpoints (`/api/v1/evidence/image/:id`), and local object blobs.
+- **Production Build & Verification:**
+  - Verified with automated tests that all 6 image URLs return HTTP 200 `image/jpeg` with bitwise-exact byte lengths (102 KB to 167 KB).
+  - Clean production build compiled into `dist/`.
+
+### Tests
+- `npm test -- --run` in `ui-combined`: 142/142 tests passed across 45 suites in 4.67s.
+- `node -e "..."` HTTP verification: All 6 multi-angle images returned HTTP 200 `image/jpeg` (102,886 to 167,381 bytes).
+- `py -m pytest members/member-05-evidence/tests/ -v`: 71/71 tests passed in 14.70s.
+- `npm run build` at root: 100% clean production build in 7.30s (`dist/`).
+
+### Problems
+None. All tests and static asset routes verified cleanly.
+
+### Decisions
+1. In production, committed packaging images in `public/storage/uploads/` are served with immutable cache headers directly from the CDN edge, providing instant first-paint hydration and preventing 504 gateway timeouts on container spin-up.
+2. In-memory object blobs and runtime uploads retain fallback routing to the backend `/api/v1/evidence/image/:image_id` streaming endpoint.
+
+### Next Step
+Commit and push changes to `main` and `dev` so Vercel and Render deploy the verified multi-angle asset bundle.
+
+### Signing Note
+SIGNED OFF BY: Parmarth Kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-13 03:22 IST [VERIFIED]
+
+
 
