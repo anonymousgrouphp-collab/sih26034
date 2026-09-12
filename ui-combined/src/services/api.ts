@@ -481,19 +481,39 @@ export class ApiService {
       payload.inspection_id.startsWith("insp_demo_") ||
       payload.inspection_id.startsWith("demo-")
     ) {
-      return MockApiService.getInstance().generateNotice(payload);
+      const res = await MockApiService.getInstance().generateNotice(payload);
+      return {
+        ...res,
+        pdf_download_url: "/form1.pdf",
+      };
     }
 
     try {
-      return await this.getActiveService().generateNotice(payload);
+      const res = await this.getActiveService().generateNotice(payload);
+      if (res.pdf_download_url && (res.pdf_download_url.includes("not_mock_") || res.pdf_download_url.includes("not_demo_"))) {
+        res.pdf_download_url = "/form1.pdf";
+      }
+      return res;
     } catch (err: any) {
       console.warn("Live server generate notice failed. Engaging Mode B Local Resilient failover:", err);
       this.setOperatingMode("MOCK", { persist: false });
-      return await MockApiService.getInstance().generateNotice(payload);
+      const res = await MockApiService.getInstance().generateNotice(payload);
+      return {
+        ...res,
+        pdf_download_url: "/form1.pdf",
+      };
     }
   }
 
   public static getNoticePdfUrl(noticeId: string): string {
+    if (
+      this.operatingMode === "MOCK" ||
+      this.operatingMode === "DEMO_FIXTURE" ||
+      noticeId.startsWith("not_mock_") ||
+      noticeId.startsWith("not_demo_")
+    ) {
+      return "/form1.pdf";
+    }
     return this.getActiveService().getNoticePdfUrl(noticeId);
   }
 

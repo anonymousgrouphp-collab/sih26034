@@ -128,6 +128,26 @@ export const EvidenceDossier: React.FC = () => {
       if (certRes) {
         setDossierCert(certRes);
       }
+      const res = await ApiService.generateNotice({
+        inspection_id: caseData.id,
+        recipient: {
+          type: "MANUFACTURER",
+          name: caseData.manufacturer_name || caseData.brand_name || "Responsible Enterprise",
+          address: caseData.premises_address || "Inspection location",
+        },
+        compounding_fee_amount: 5000,
+        reply_window_days: 15,
+      });
+
+      const targetUrl = res.pdf_download_url || "/form1.pdf";
+      const filename = `Form-1-Notice-${caseData.inspection_number || caseData.id}.pdf`;
+      const dlLink = document.createElement("a");
+      dlLink.href = targetUrl;
+      dlLink.download = filename;
+      dlLink.target = "_blank";
+      document.body.appendChild(dlLink);
+      dlLink.click();
+      document.body.removeChild(dlLink);
 
       setExportNotice(
         language === "hi"
@@ -199,7 +219,7 @@ export const EvidenceDossier: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
-  if (isLoading) {
+  if (isLoading || !caseData) {
     return (
       <div className="card p-12 text-center bg-white space-y-3">
         <div className="w-8 h-8 border-4 border-govNavy border-t-transparent rounded-full animate-spin mx-auto" />

@@ -217,9 +217,16 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
         compounding_fee_amount: 5000,
         reply_window_days: 15,
       });
-      if (res.pdf_download_url) {
-        window.open(res.pdf_download_url, "_blank");
-      }
+      const targetUrl = res.pdf_download_url || "/form1.pdf";
+      const filename = `Form-1-Notice-${caseData.inspection_number || caseData.id}.pdf`;
+      const dlLink = document.createElement("a");
+      dlLink.href = targetUrl;
+      dlLink.download = filename;
+      dlLink.target = "_blank";
+      document.body.appendChild(dlLink);
+      dlLink.click();
+      document.body.removeChild(dlLink);
+
       setQuickDecisionSaved(true);
       setTimeout(() => setQuickDecisionSaved(false), 5000);
     } catch (err: any) {

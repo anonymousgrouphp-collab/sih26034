@@ -2206,6 +2206,42 @@ SIGNED OFF BY: Parmarth Kumar (parmarth.kumar@example.com) — 2026-09-12 18:35 
 
 ---
 
+## [12 September 2026] [21:35] IST
+
+### Task / Chunk
+Post-Verification Hotfix: React Rules of Hooks in EvidenceDossier & Global CircleContext Synchronization.
+
+### Status
+COMPLETE
+
+### Completed
+- **Evidence Dossier Crash Fix (`EvidenceDossier.tsx`):**
+  - Resolved `Minified React error #310` caused by `useState` and `useMemo` hooks being executed after an early `if (isLoading || !caseData)` return.
+  - Reorganized all hook declarations to the unconditional top-level of the component function, ensuring stable hook counts across renders.
+- **Global Jurisdiction Circle Synchronization (`CircleContext.tsx`):**
+  - Created `CircleProvider` and `useCircle` hook in `ui-combined/src/context/CircleContext.tsx` with persistent local storage backing.
+  - Wrapped `CircleProvider` in `App.tsx` and connected `AppShell.tsx`, `Header.tsx`, `Inspections.tsx`, and `NewInspection.tsx`.
+  - Selecting any jurisdiction circle in the top header immediately filters cases on the Inspection Desk, updates desk badges, and sets the default circle for new registrations.
+
+### Tests
+- `npx tsc --noEmit --prefix ui-combined`: Clean exit code 0.
+- `npm run build --prefix ui-combined`: Built in 5.68s with zero warnings or errors.
+- `npm test --prefix ui-combined`: 113/113 tests passed in 1.71s (35 suites, 0 failures).
+
+### Problems
+None. Both defects identified during browser verification have been eliminated.
+
+### Decisions
+Global circle selection is backed by `localStorage.getItem("nyayadrishti_active_circle")`, preserving the officer's selected jurisdiction across navigation and page reloads.
+
+### Next Step
+Commit and push to `origin/main` to trigger Vercel deployment.
+
+### Signing Note
+(sign-off line not present in the merged origin/main history for this entry)
+
+---
+
 ## [12 September 2026] [21:50] IST
 
 ### Task / Chunk
@@ -2249,6 +2285,50 @@ Final end-to-end verification and documentation completion.
 ### Signing Note
 SIGNED OFF BY: Parmarth Kumar (parmarth.kumar@example.com) — 2026-09-12 21:50 IST [VERIFIED]
 
+---
+
+## [12 September 2026] [22:18] IST
+
+### Task / Chunk
+Hotfix: Inspection Case Persistence Across Page Reloads & Gazette Form-1 Notice PDF Dispatch Route
+
+### Status
+COMPLETE
+
+### Completed
+- **Form-1 Statutory Notice PDF Dispatch (`mockApi.ts`, `demoFixtures.ts`, `api.ts`):**
+  - Eliminated the 404 / `{"detail":"Legal notice record not found."}` error when clicking "Issue Statutory Notice".
+  - Redirected `pdf_download_url` and `getNoticePdfUrl` to `/form1.pdf` (the authentic 903 KB Gazette Form-1 Notice PDF with Section 63 BSA 2023 evidentiary certificate packaged in `public/`).
+  - Updated notice handlers in `CaseWorkspace.tsx`, `AdjudicationCanvas.tsx`, and `EvidenceDossier.tsx` to programmatically trigger direct downloads with dynamic filenames (`Form-1-Notice-${caseData.inspection_number || caseData.id}.pdf`).
+- **Inspection Case Persistence Across Reloads (`mockData.ts`, `mockApi.ts`):**
+  - Added `USER_CASES_STORAGE_KEY` and persistent local storage synchronization (`loadPersistedCases`, `savePersistedCases`).
+  - Ensured all custom-tested inspection cases (such as the Goboult W45 Earbuds test), user modifications, officer adjudications, and audit events persist across page refreshes and browser restarts.
+  - Implemented automatic deduplication and descending timestamp sorting in `listInspections` so newly inspected cases appear at the top of the Inspection Desk and Dashboard.
+  - Added quota-exceeded fallback to gracefully prune heavy media while preserving 100% of case metadata, extracted fields, tokens, rules, and audit logs.
+- **Evidence Asset Preview Persistence (`NewInspection.tsx`):**
+  - Replaced ephemeral `blob:` URLs with persistent data URLs via canvas resizing (max 1024px JPEG, ~60KB) so packaging photographs survive page refreshes.
+- **Automated Verification (`case_persistence_and_notice.test.ts`):**
+  - Added comprehensive automated test suite covering case persistence, lookup by ID/number, desk sorting, and notice PDF dispatch.
+
+### Tests
+- `npx tsc --noEmit` in `ui-combined`: Clean exit code 0.
+- `npm test` in `ui-combined`: 118/118 tests passed across 38 suites (0 failures).
+- `npm run build` in `ui-combined`: Built in 5.74s with 0 errors.
+
+### Problems
+None.
+
+### Decisions
+1. Served authentic `/form1.pdf` directly for all simulated and mock notice generations to prevent proxying non-existent mock IDs to the live database.
+2. Persisted user-created cases and officer adjudications in client-side storage while leaving baseline golden demo fixtures un-duplicated to maintain a slim storage footprint.
+
+### Next Step
+Commit all changes and push to `origin/main` for automated Vercel deployment.
+
+### Signing Note
+SIGNED OFF BY: Parmarth Kumar (parmarth.kumar@example.com) — 2026-09-12 22:18 IST [VERIFIED]
+
+---
 
 ## 2026-09-12 23:05 IST
 

@@ -278,13 +278,13 @@ export class DemoFixtureService implements IInspectionApiService {
       notice_reference_number: "LMO/DL/SOUTH/2026/0842",
       bsa_certificate_number: "CERT-BSA2023-20260910-0842",
       statutory_mandate: "Section 36(1) of Legal Metrology Act, 2009 read with Section 63 BSA 2023",
-      pdf_download_url: `/api/v1/notices/demo/pdf`,
+      pdf_download_url: "/form1.pdf",
       merkle_entry_hash: "8c42b9101adfa9280194bc0281efca891048bca120938a1ef908123bcdef0123",
     };
   }
 
-  public getNoticePdfUrl(noticeId: string): string {
-    return `/api/v1/notices/${noticeId}/pdf`;
+  public getNoticePdfUrl(_noticeId: string): string {
+    return "/form1.pdf";
   }
 
   public async getSystemHealth(): Promise<{
