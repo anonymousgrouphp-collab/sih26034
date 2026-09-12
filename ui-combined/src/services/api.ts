@@ -175,17 +175,7 @@ export class ApiService {
   }
 
   public static async getInspection(id: string): Promise<InspectionCase> {
-    // 1. If ID is a recognized demo identifier or mode is DEMO_FIXTURE, resolve via DemoFixtureService
-    if (this.operatingMode === "DEMO_FIXTURE" || this.isDemoId(id)) {
-      try {
-        const demoCase = await DemoFixtureService.getInstance().getInspection(id);
-        if (demoCase) return demoCase;
-      } catch {
-        // Fall back to active service if fixture resolution misses
-      }
-    }
-
-    // 2. In LIVE mode: Prioritize real engine & PostgreSQL database on Render
+    // 1. In LIVE mode: Prioritize real engine & PostgreSQL database on Render
     if (this.operatingMode === "LIVE") {
       try {
         return await LiveApiService.getInstance().getInspection(id);
@@ -198,7 +188,17 @@ export class ApiService {
       }
     }
 
-    // 3. In MOCK mode or default fallback
+    // 2. In DEMO_FIXTURE mode or when explicitly querying a demo SKU in non-MOCK mode:
+    if (this.operatingMode === "DEMO_FIXTURE" || (this.isDemoId(id) && this.operatingMode !== "MOCK")) {
+      try {
+        const demoCase = await DemoFixtureService.getInstance().getInspection(id);
+        if (demoCase) return demoCase;
+      } catch {
+        // Fall back to active service if fixture resolution misses
+      }
+    }
+
+    // 3. In MOCK mode or default fallback: Query active service (e.g. MockApiService)
     try {
       return await this.getActiveService().getInspection(id);
     } catch (err) {
