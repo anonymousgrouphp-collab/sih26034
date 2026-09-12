@@ -2036,7 +2036,87 @@ export const MOCK_DASHBOARD_SUMMARY: DashboardSummary = {
   })),
 };
 
-const dynamicCases: Map<string, InspectionCase> = new Map(Object.entries(GOLDEN_SKU_CASES));
+export const USER_CASES_STORAGE_KEY = "nyayadrishti_persisted_cases_v2";
+
+function getStorage(): Storage | null {
+  try {
+    if (typeof window !== "undefined" && window.localStorage) {
+      return window.localStorage;
+    }
+    if (typeof globalThis !== "undefined" && (globalThis as any).window?.localStorage) {
+      return (globalThis as any).window.localStorage;
+    }
+  } catch {
+    // Ignore storage detection error
+  }
+  return null;
+}
+
+export function loadPersistedCases(): Record<string, InspectionCase> {
+  try {
+    const storage = getStorage();
+    if (!storage) return {};
+    const raw = storage.getItem(USER_CASES_STORAGE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return {};
+    return parsed as Record<string, InspectionCase>;
+  } catch (err) {
+    console.warn("Failed to load persisted cases from storage:", err);
+    return {};
+  }
+}
+
+export function savePersistedCases(casesMap: Map<string, InspectionCase>): void {
+  try {
+    const storage = getStorage();
+    if (!storage) return;
+    const toPersist: Record<string, InspectionCase> = {};
+    casesMap.forEach((val, key) => {
+      // Avoid re-persisting unmodified demo fixtures to keep storage compact.
+      // Persist any user-registered case or modified demo fixture.
+      const isBaselineDemo = (GOLDEN_SKU_CASES as Record<string, InspectionCase>)[key];
+      const isModifiedDemo =
+        Boolean(isBaselineDemo && (val.adjudication || (val.audit_trail && val.audit_trail.length > 4)));
+      if (!isBaselineDemo || isModifiedDemo) {
+        toPersist[key] = val;
+      }
+    });
+
+    try {
+      storage.setItem(USER_CASES_STORAGE_KEY, JSON.stringify(toPersist));
+    } catch (quotaErr) {
+      console.warn("Storage quota exceeded, pruning heavy media assets for persistence:", quotaErr);
+      const pruned: Record<string, InspectionCase> = {};
+      Object.entries(toPersist).forEach(([k, c]) => {
+        pruned[k] = {
+          ...c,
+          evidence_assets: c.evidence_assets.map((a) => ({
+            ...a,
+            preview_url: a.preview_url && a.preview_url.length > 2048 ? "" : a.preview_url,
+          })),
+        };
+      });
+      storage.setItem(USER_CASES_STORAGE_KEY, JSON.stringify(pruned));
+    }
+  } catch (err) {
+    console.warn("Failed to save persisted cases to storage:", err);
+  }
+}
+
+function initDynamicCases(): Map<string, InspectionCase> {
+  const map = new Map<string, InspectionCase>(Object.entries(GOLDEN_SKU_CASES));
+  const persisted = loadPersistedCases();
+  Object.entries(persisted).forEach(([k, v]) => {
+    map.set(k, v);
+    if (v.id && !map.has(v.id)) {
+      map.set(v.id, v);
+    }
+  });
+  return map;
+}
+
+const dynamicCases: Map<string, InspectionCase> = initDynamicCases();
 
 /**
  * Creates a baseline chronological audit record for an inspection case
@@ -2212,6 +2292,7 @@ export function appendAuditEvent(
       ...existing,
       audit_trail: updatedTrail,
     });
+    savePersistedCases(dynamicCases);
   }
 
   return newEvent;
@@ -2267,6 +2348,16 @@ export function computeCaseReadiness(caseData: InspectionCase): CaseReadinessChe
 }
 
 export function getMockCases(): Record<string, InspectionCase> {
+  const persisted = loadPersistedCases();
+  Object.entries(persisted).forEach(([k, v]) => {
+    if (!dynamicCases.has(k) || JSON.stringify(dynamicCases.get(k)?.adjudication) !== JSON.stringify(v.adjudication)) {
+      dynamicCases.set(k, v);
+      if (v.id && !dynamicCases.has(v.id)) {
+        dynamicCases.set(v.id, v);
+      }
+    }
+  });
+
   const res: Record<string, InspectionCase> = {};
   dynamicCases.forEach((val, key) => {
     if (!val.audit_trail || val.audit_trail.length === 0) {
@@ -2282,6 +2373,10 @@ export function addMockCase(c: InspectionCase): void {
     c.audit_trail = createDefaultAuditTrail(c);
   }
   dynamicCases.set(c.id, c);
+  if (c.inspection_number) {
+    dynamicCases.set(c.inspection_number, c);
+  }
+  savePersistedCases(dynamicCases);
 }
 
 export function resetMockCases(): void {
@@ -2291,6 +2386,14 @@ export function resetMockCases(): void {
     cloned.audit_trail = createDefaultAuditTrail(cloned);
     dynamicCases.set(k, cloned);
   });
+  try {
+    const storage = getStorage();
+    if (storage) {
+      storage.removeItem(USER_CASES_STORAGE_KEY);
+    }
+  } catch {
+    // Ignore cleanup error
+  }
 }
 
 export function updateMockCase(id: string, updates: Partial<InspectionCase>): InspectionCase | undefined {
@@ -2306,6 +2409,14 @@ export function updateMockCase(id: string, updates: Partial<InspectionCase>): In
     }
   }
 
+  if (!targetKey) {
+    const persisted = loadPersistedCases();
+    if (persisted[id]) {
+      dynamicCases.set(id, persisted[id]);
+      targetKey = id;
+    }
+  }
+
   if (!targetKey) return undefined;
   const existing = dynamicCases.get(targetKey)!;
   const updated: InspectionCase = {
@@ -2313,6 +2424,10 @@ export function updateMockCase(id: string, updates: Partial<InspectionCase>): In
     ...updates,
   };
   dynamicCases.set(targetKey, updated);
+  if (updated.id && updated.id !== targetKey) {
+    dynamicCases.set(updated.id, updated);
+  }
+  savePersistedCases(dynamicCases);
   return updated;
 }
 

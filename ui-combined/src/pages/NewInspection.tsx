@@ -113,12 +113,78 @@ export const NewInspection: React.FC = () => {
   const [packageType, setPackageType] = useState<PackagingType>("RECTANGULAR");
   const [inspectionType, setInspectionType] = useState<InspectionType>("ROUTINE_MARKET_SURVEILLANCE");
 
+  const getPersistentPreview = (file: File, fallbackPreview?: string): Promise<string> => {
+    if (fallbackPreview && fallbackPreview.startsWith("data:image/")) {
+      return Promise.resolve(fallbackPreview);
+    }
+    return new Promise((resolve) => {
+      if (!file || !file.type.startsWith("image/")) {
+        resolve(fallbackPreview || URL.createObjectURL(file));
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        if (!dataUrl) {
+          resolve(fallbackPreview || URL.createObjectURL(file));
+          return;
+        }
+        const img = new Image();
+        img.onload = () => {
+          try {
+            const maxDim = 1024;
+            let { width, height } = img;
+            if (width > maxDim || height > maxDim) {
+              if (width > height) {
+                height = Math.round((height * maxDim) / width);
+                width = maxDim;
+              } else {
+                width = Math.round((width * maxDim) / height);
+                height = maxDim;
+              }
+            }
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d");
+            if (ctx) {
+              ctx.drawImage(img, 0, 0, width, height);
+              resolve(canvas.toDataURL("image/jpeg", 0.75));
+              return;
+            }
+          } catch {
+            // Fallback to dataUrl
+          }
+          resolve(dataUrl);
+        };
+        img.onerror = () => resolve(dataUrl);
+        img.src = dataUrl;
+      };
+      reader.onerror = () => resolve(fallbackPreview || URL.createObjectURL(file));
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleFilesSelected = (newFiles: FileList | null) => {
     if (!newFiles || newFiles.length === 0) return;
     const fileList = Array.from(newFiles);
+    const startIdx = files.length;
     setFiles((prev) => [...prev, ...fileList]);
     const previews = fileList.map((f) => URL.createObjectURL(f));
     setFilePreviews((prev) => [...prev, ...previews]);
+
+    fileList.forEach((f, idx) => {
+      getPersistentPreview(f).then((persistentUrl) => {
+        setFilePreviews((prev) => {
+          const next = [...prev];
+          const pos = startIdx + idx;
+          if (pos < next.length) {
+            next[pos] = persistentUrl;
+          }
+          return next;
+        });
+      });
+    });
   };
 
   const handleRemoveFile = (index: number) => {
@@ -153,6 +219,7 @@ export const NewInspection: React.FC = () => {
       if (files.length > 0) {
         for (let i = 0; i < files.length; i++) {
           const file = files[i];
+          const persistentPreview = await getPersistentPreview(file, filePreviews[i]);
           const panelType =
             i === 0
               ? "PDP_FRONT"
@@ -169,7 +236,7 @@ export const NewInspection: React.FC = () => {
             mime_type: file.type || "image/jpeg",
             image_width: 1920,
             image_height: 1080,
-            preview_url: filePreviews[i] || URL.createObjectURL(file),
+            preview_url: persistentPreview,
           });
           if (uploadResult?.image_id) {
             uploadedImageIds.push(uploadResult.image_id);

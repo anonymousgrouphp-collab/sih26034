@@ -42,6 +42,7 @@ import {
   updateMockCase,
   appendAuditEvent,
   computeCaseReadiness,
+  loadPersistedCases,
 } from "./mockData";
 
 export class MockApiService implements IInspectionApiService {
@@ -69,7 +70,18 @@ export class MockApiService implements IInspectionApiService {
     limit?: number;
     offset?: number;
   }): Promise<{ total: number; items: InspectionSummary[] }> {
-    const allCases = Object.values(getMockCases());
+    const allCasesMap = getMockCases();
+    const seen = new Set<string>();
+    const allCases: InspectionCase[] = [];
+    for (const c of Object.values(allCasesMap)) {
+      if (!seen.has(c.id)) {
+        seen.add(c.id);
+        allCases.push(c);
+      }
+    }
+    // Sort descending by creation timestamp so newly created cases appear prominently at top of register
+    allCases.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
     let items = allCases.map((c) => ({
       id: c.id,
       inspection_number: c.inspection_number,
@@ -83,7 +95,7 @@ export class MockApiService implements IInspectionApiService {
       workflow_status: c.workflow_status || "OPEN",
       overall_status: c.overall_status,
       ai_verdict: c.ai_verdict,
-      jurisdiction_id: c.jurisdiction_id,
+      jurisdiction_id: c.jurisdiction_id || params?.circleId || "CIRCLE_DL_SOUTH_01",
       created_at: c.created_at,
       violations_count: c.rule_evaluations.filter((e) => e.status === "FAIL").length,
       adjudicated: !!c.adjudication,
@@ -96,7 +108,7 @@ export class MockApiService implements IInspectionApiService {
     if (params?.workflowStatus) {
       items = items.filter((i) => i.workflow_status === params.workflowStatus);
     }
-    if (params?.circleId) {
+    if (params?.circleId && params.circleId !== "ALL") {
       items = items.filter((i) => i.jurisdiction_id === params.circleId);
     }
     if (params?.search) {
@@ -159,11 +171,23 @@ export class MockApiService implements IInspectionApiService {
 
   public async getInspection(id: string): Promise<InspectionCase> {
     const mockCases = getMockCases();
-    const found =
+    let found =
       mockCases[id] ||
       Object.values(mockCases).find(
         (c) => c.id === id || c.sku_demo_id === id || c.inspection_number === id
       );
+
+    if (!found) {
+      const persisted = loadPersistedCases();
+      found =
+        persisted[id] ||
+        Object.values(persisted).find(
+          (c) => c.id === id || c.sku_demo_id === id || c.inspection_number === id
+        );
+      if (found) {
+        addMockCase(found);
+      }
+    }
 
     if (found) {
       return {
@@ -947,13 +971,13 @@ export class MockApiService implements IInspectionApiService {
       notice_reference_number: "LMO/DL/SOUTH/2026/0842",
       bsa_certificate_number: "CERT-BSA2023-20260910-0842",
       statutory_mandate: "Section 36(1) of Legal Metrology Act, 2009 read with Section 63 BSA 2023",
-      pdf_download_url: `/api/v1/notices/not_mock_${Date.now()}/pdf`,
+      pdf_download_url: "/form1.pdf",
       merkle_entry_hash: "8c42b9101adfa9280194bc0281efca891048bca120938a1ef908123bcdef0123",
     };
   }
 
-  public getNoticePdfUrl(noticeId: string): string {
-    return `/api/v1/notices/${noticeId}/pdf`;
+  public getNoticePdfUrl(_noticeId: string): string {
+    return "/form1.pdf";
   }
 
   public async getSystemHealth(): Promise<{
