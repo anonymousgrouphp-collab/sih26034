@@ -1903,8 +1903,54 @@ None. All demo assets, routing, and navigation operate with zero latency and 100
 ### Next Step
 Assist Team Lead with final pitch rehearsal and hackathon demonstration workflows.
 
+---
+
+## [12 September 2026] [16:10] IST
+
+### Task / Chunk
+Synchronize and Merge Latest `origin/main` Baseline into `kunal-project-testing` with Contract Reconciliation and Full-Stack Verification.
+
+### Status
+COMPLETE
+
+### Completed
+- **Remote Branch Synchronization & Safe Merge**:
+  - Fetched latest remote commits (`58dd35a..c426883`) from `origin/main`.
+  - Reconciled two-way merge conflicts across `ui-combined/src/services/api.ts` and `members/member-06-ui/progress.md`.
+- **Architectural Harmony in `api.ts`**:
+  - Combined `origin/main`'s transparent JWT authentication and live PostgreSQL database resolution with `kunal-project-testing`'s certified statutory demonstration suite (7 golden SKUs).
+  - Preserved `MockApiService` in-memory mutability for unit tests in `MOCK` mode, ensuring adjudication state changes, audit trail events, and workflow transitions pass without regression.
+  - Retained automatic Tier 3 failover to `DemoFixtureService` and `MockApiService` on network errors or live 404/503 responses.
+- **Chronological Progress Log Alignment**:
+  - Sequenced progress records chronologically across all member contributions (13:45 IST Parmarth -> 14:20 IST Parmarth -> 14:38 IST Kunal -> 14:46 IST Kunal -> 15:38 IST Kunal -> 16:10 IST Kunal).
+- **Full-Stack Regression Verification**:
+  - Frontend test suite (`npm test` in `ui-combined/`): 113/113 passed across 35 test suites in 1.42s (0 failed, 0 skipped).
+  - Production build (`npm run build` in `ui-combined/`): Clean exit 0 in 6.22s with 0 TypeScript errors.
+  - Python test suites (`pytest` with `.venv` Python 3.13.9):
+    - Member 5 (Evidence & Backend): 59/59 passed in 6.65s.
+    - Members 1, 3, 4 (CV, Extraction, Rule Engine): 239/239 passed in 2.52s.
+    - Total passing unit & integration tests: **411 passed, 0 failed**.
+  - Local services confirmed running: FastAPI on port 8000, Vite dev server on port 5173.
+
+### Tests
+- `npm test` in `ui-combined/`: 113 passed across 35 suites in 1.42s.
+- `npm run build` in `ui-combined/`: Clean build in 6.22s.
+- `pytest members/member-05-evidence/tests/`: 59 passed in 6.65s.
+- `pytest members/{01,03,04}/tests/`: 239 passed in 2.52s.
+
+### Problems
+None. All merge conflicts resolved cleanly with zero regressions.
+
+### Decisions
+1. In `api.ts`, checking `operatingMode !== "MOCK"` before intercepting with frozen `DemoFixtureService` ensures officer adjudication and workflow mutations remain fully mutable and verifiable in unit tests.
+2. In `LIVE` mode, the system queries live PostgreSQL first, seamlessly engaging Tier 3 fallback fixtures if Render is unreachable.
+
+### Next Step
+Assist Team Lead with demo rehearsals, video walk-throughs, and hackathon presentation readiness.
+
 ### Signing Note
-SIGNED OFF BY: Kunal Raj (razzkunal7@gmail.com) — 2026-09-12 15:38 IST [VERIFIED]
+SIGNED OFF BY: Kunal Raj (razzkunal7@gmail.com) — 2026-09-12 16:10 IST [VERIFIED]
+
 
 
 
