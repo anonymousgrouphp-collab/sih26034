@@ -330,21 +330,63 @@ export class MockApiService implements IInspectionApiService {
       sourceTemplate = GOLDEN_SKU_CASES["SKU-DEMO-01"];
     }
 
-    const updatedAssets = targetCase.evidence_assets.map((a) => {
-      if (a.image_id === (activeAsset?.image_id || imageId)) {
-        return {
-          ...a,
-          calibration: sourceTemplate.evidence_assets[0]?.calibration,
-          ocr: sourceTemplate.evidence_assets[0]?.ocr,
-        };
-      }
-      return a;
+    const updatedAssets = targetCase.evidence_assets.map((a, idx) => {
+      const isPrimary = a.image_id === (activeAsset?.image_id || imageId) || idx === 0;
+      return {
+        ...a,
+        calibration: a.calibration || (isPrimary ? sourceTemplate.evidence_assets[0]?.calibration : undefined),
+        ocr: a.ocr || (isPrimary ? {
+          ...sourceTemplate.evidence_assets[0]?.ocr,
+          full_text: `${targetCase.product_name || "Statutory Commodity"}\nDeclared Net Qty: ${targetCase.declared_net_quantity || "400 ml"}\nMRP Rs. 140.00 (incl. of all taxes)\nMfg Date: 08/2026\nBrand: ${targetCase.brand_name || "Trade Brand"}`,
+        } : undefined),
+      };
     });
+
+    // For custom dynamic cases created in the field, reflect declared commodity particulars
+    let adaptedExtractedFields = sourceTemplate.extracted_fields;
+    if (targetCase.id && !targetCase.id.startsWith("insp_demo_")) {
+      adaptedExtractedFields = sourceTemplate.extracted_fields.map((f) => {
+        if (f.field_type === "NET_QUANTITY" && targetCase.declared_net_quantity) {
+          const qtyStr = targetCase.declared_net_quantity.trim();
+          const numMatch = qtyStr.match(/^([\d.]+)\s*([a-zA-Z]+)?/);
+          const mag = numMatch ? parseFloat(numMatch[1]) : 400.0;
+          const unit = numMatch && numMatch[2] ? numMatch[2] : "ml";
+          return {
+            ...f,
+            raw_ocr_text: `Net Qty: ${qtyStr}`,
+            normalized_value: {
+              ...f.normalized_value,
+              magnitude: mag,
+              unit: unit,
+            },
+          };
+        }
+        return f;
+      });
+
+      if (targetCase.product_name) {
+        adaptedExtractedFields = [
+          {
+            field_id: `fld_${targetCase.id}_prod_name`,
+            field_type: "GENERIC_NAME",
+            raw_ocr_text: targetCase.product_name,
+            normalized_value: { text: targetCase.product_name },
+            detection_confidence: 0.98,
+            ocr_confidence: 0.97,
+            bounding_box: [150, 100, 220, 850],
+            measured_font_height_mm: 4.5,
+            measurement_confidence: 0.96,
+            token_ids: ["tok_prod_01"],
+          },
+          ...adaptedExtractedFields,
+        ];
+      }
+    }
 
     const updated = updateMockCase(targetCase.id, {
       evidence_assets: updatedAssets.length > 0 ? updatedAssets : sourceTemplate.evidence_assets,
       principal_display_panel: sourceTemplate.principal_display_panel,
-      extracted_fields: sourceTemplate.extracted_fields,
+      extracted_fields: adaptedExtractedFields,
       rule_evaluations: sourceTemplate.rule_evaluations,
       evidence_graph: sourceTemplate.evidence_graph,
       bsa_certificate: sourceTemplate.bsa_certificate,

@@ -60,6 +60,10 @@ export const Header: React.FC<HeaderProps> = ({
 
   const [currentMode, setCurrentMode] = useState<"ONLINE" | "LOCAL_RESILIENT">(() => {
     try {
+      const operatingMode = ApiService.getOperatingMode();
+      if (operatingMode === "MOCK" || operatingMode === "DEMO_FIXTURE") {
+        return "LOCAL_RESILIENT";
+      }
       const stored = localStorage.getItem("nyayadrishti_mode");
       return stored === "LOCAL_RESILIENT" ? "LOCAL_RESILIENT" : "ONLINE";
     } catch {
@@ -80,7 +84,8 @@ export const Header: React.FC<HeaderProps> = ({
       if (mode === "ONLINE") {
         ApiService.setOperatingMode("LIVE");
       } else {
-        ApiService.setOperatingMode("DEMO_FIXTURE");
+        // Mode B (Local Resilient Mode) enables interactive offline inspection via MockApiService
+        ApiService.setOperatingMode("MOCK");
       }
     } catch {
       // ignore

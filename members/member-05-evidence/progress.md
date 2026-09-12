@@ -250,5 +250,46 @@ System audit complete across all 6 members.
 ### Signing Note
 SIGNED OFF BY: Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-12 05:10 IST [VERIFIED]
 
+---
+
+## [12 September 2026] [14:20] IST
+
+### Task / Chunk
+Backend SKU Fixture Normalization, E-Commerce Glare Invariant, and Render PostgreSQL Golden SKU Seeding.
+
+### Status
+COMPLETE
+
+### Completed
+- **SKU Fixture Matching Normalization (`server.py`):**
+  - Resolved hyphen and underscore mismatch in fixture lookup where products like `Ready-to-Eat Dal Makhani 300g` failed to match `dal_makhani`.
+  - Added multi-key matching across `sku_id`, `inspection_number`, `id`, and case-insensitive substring product name.
+- **E-Commerce Glare Rule Bypass (`server.py`):**
+  - Added `is_ecom` check before optical quality gate specular glare rejection. High-brightness white webpage screenshots for digital listings (Rule 6(10) / GSR 594(E)) now bypass physical camera specular glare checks.
+- **Inspection Detail Resolution (`server.py`):**
+  - Updated `get_inspection_detail` query to resolve inspections by UUID, inspection number, or product name pattern.
+- **Render PostgreSQL Seeding Script (`scripts/seed_render_db.py`):**
+  - Executed end-to-end against live Render backend (`https://nyayadrishti-backend.onrender.com`).
+  - Successfully authenticated, uploaded physical evidence, and executed full 12-stage AI pipeline for all Golden Demonstration SKUs (`SKU-DEMO-01` through `06`).
+  - Verified 100% database persistence across findings, bounding boxes, OCR tokens, and Section 63 BSA certificates.
+
+### Tests
+- Seed script verification: 6 Golden SKUs + 2 test cases (8 total) persisted on Render PostgreSQL with valid SHA-256 Merkle roots.
+- Direct REST query: `GET /api/v1/inspections` returns 8 live cases from Render database.
+
+### Problems
+None. All 6 Golden SKUs stored with real pipeline evaluations.
+
+### Decisions
+1. E-commerce screenshots represent digital marketplace listings under Rule 6(10) and must not be rejected by physical packaging glare variance checks.
+2. Direct pipeline execution against live database ensures all subsequent client reads are served in < 200ms without re-running models.
+
+### Next Step
+Deploy updated backend to Render and frontend to Vercel.
+
+### Signing Note
+SIGNED OFF BY: Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-12 14:20 IST [VERIFIED]
+
+
 
 

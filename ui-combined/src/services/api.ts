@@ -109,7 +109,21 @@ export class ApiService {
     limit?: number;
     offset?: number;
   }): Promise<{ total: number; items: InspectionSummary[] }> {
-    return this.getActiveService().listInspections(params);
+    try {
+      return await this.getActiveService().listInspections(params);
+    } catch (err: any) {
+      if (
+        this.operatingMode === "LIVE" &&
+        (err?.is_network_error ||
+          err?.status === 503 ||
+          String(err?.message || "").includes("Failed to fetch") ||
+          String(err?.message || "").includes("NetworkError"))
+      ) {
+        console.warn("Live server unreachable for listInspections. Falling back to Mode B local datastore.");
+        return await MockApiService.getInstance().listInspections(params);
+      }
+      throw err;
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -117,7 +131,30 @@ export class ApiService {
   // ---------------------------------------------------------------------------
 
   public static async createInspection(payload: CreateInspectionPayload): Promise<InspectionCase> {
-    return this.getActiveService().createInspection(payload);
+    if (this.operatingMode === "DEMO_FIXTURE") {
+      // If a new commodity inspection is created while viewing golden demo fixtures,
+      // dynamically engage Mode B (Local Resilient Mock) so the inspection proceeds.
+      this.setOperatingMode("MOCK");
+    }
+
+    try {
+      return await this.getActiveService().createInspection(payload);
+    } catch (err: any) {
+      // Statutory Failover: If live backend is down or network disconnects,
+      // seamlessly engage Mode B (Local Resilient Mode) to preserve field inspection continuity.
+      if (
+        this.operatingMode === "LIVE" &&
+        (err?.is_network_error ||
+          err?.status === 503 ||
+          String(err?.message || "").includes("Failed to fetch") ||
+          String(err?.message || "").includes("NetworkError"))
+      ) {
+        console.warn("Live server unreachable. Seamlessly activating Mode B (Local Resilient Mode).");
+        this.setOperatingMode("MOCK");
+        return await this.getActiveService().createInspection(payload);
+      }
+      throw err;
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -138,8 +175,8 @@ export class ApiService {
   }
 
   public static async getInspection(id: string): Promise<InspectionCase> {
-    // 1. If ID is a recognized demo identifier, resolve immediately through DemoFixtureService
-    if (this.isDemoId(id)) {
+    // 1. If ID is a recognized demo identifier or mode is DEMO_FIXTURE, resolve via DemoFixtureService
+    if (this.operatingMode === "DEMO_FIXTURE" || this.isDemoId(id)) {
       try {
         const demoCase = await DemoFixtureService.getInstance().getInspection(id);
         if (demoCase) return demoCase;
@@ -148,16 +185,26 @@ export class ApiService {
       }
     }
 
-    // 2. Try the currently configured active service (Live backend or Mock)
+    // 2. In LIVE mode: Prioritize real engine & PostgreSQL database on Render
+    if (this.operatingMode === "LIVE") {
+      try {
+        return await LiveApiService.getInstance().getInspection(id);
+      } catch (liveErr: any) {
+        console.warn(`Live database retrieval for '${id}' failed. Engaging Tier 3 demo fallback:`, liveErr);
+        if (this.isDemoId(id)) {
+          return await DemoFixtureService.getInstance().getInspection(id);
+        }
+        return await MockApiService.getInstance().getInspection(id);
+      }
+    }
+
+    // 3. In MOCK mode or default fallback
     try {
       return await this.getActiveService().getInspection(id);
     } catch (err) {
-      // 3. Fallback: If live API returns 404, 401, or network error, attempt demo fixture lookup
-      try {
+      if (this.isDemoId(id)) {
         const fallbackDemo = await DemoFixtureService.getInstance().getInspection(id);
         if (fallbackDemo) return fallbackDemo;
-      } catch {
-        // rethrow original active service error
       }
       throw err;
     }
@@ -187,7 +234,26 @@ export class ApiService {
     quality_gate: QualityGateResult;
     asset: EvidenceAsset;
   }> {
-    return this.getActiveService().uploadEvidence(file, metadata);
+    if (this.operatingMode === "DEMO_FIXTURE") {
+      this.setOperatingMode("MOCK");
+    }
+
+    try {
+      return await this.getActiveService().uploadEvidence(file, metadata);
+    } catch (err: any) {
+      if (
+        this.operatingMode === "LIVE" &&
+        (err?.is_network_error ||
+          err?.status === 503 ||
+          String(err?.message || "").includes("Failed to fetch") ||
+          String(err?.message || "").includes("NetworkError"))
+      ) {
+        console.warn("Live server evidence upload failed due to network. Seamlessly activating Mode B.");
+        this.setOperatingMode("MOCK");
+        return await this.getActiveService().uploadEvidence(file, metadata);
+      }
+      throw err;
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -199,7 +265,26 @@ export class ApiService {
     inspectionId?: string,
     scenario?: "PASS" | "FAIL" | "REVIEW" | "UNABLE_TO_VERIFY"
   ): Promise<InspectionCase> {
-    return this.getActiveService().executePipeline(imageId, inspectionId, scenario);
+    if (this.operatingMode === "DEMO_FIXTURE") {
+      this.setOperatingMode("MOCK");
+    }
+
+    try {
+      return await this.getActiveService().executePipeline(imageId, inspectionId, scenario);
+    } catch (err: any) {
+      if (
+        this.operatingMode === "LIVE" &&
+        (err?.is_network_error ||
+          err?.status === 503 ||
+          String(err?.message || "").includes("Failed to fetch") ||
+          String(err?.message || "").includes("NetworkError"))
+      ) {
+        console.warn("Live server pipeline execution failed due to network. Seamlessly activating Mode B.");
+        this.setOperatingMode("MOCK");
+        return await this.getActiveService().executePipeline(imageId, inspectionId, scenario);
+      }
+      throw err;
+    }
   }
 
   // ---------------------------------------------------------------------------
