@@ -2437,3 +2437,47 @@ Push changes to `main` to trigger automated Vercel and Render deployments.
 
 ### Signing Note
 SIGNED OFF BY: Parmarth Kumar (parmarth.kumar@example.com) — 2026-09-13 00:35 IST [VERIFIED]
+
+---
+
+## [13 September 2026] [01:28] IST
+
+### Task / Chunk
+Original Uncompressed Packaging Image Pipeline Ingestion & Zero-Pixel-Loss Archival Storage Architecture (`NewInspection.tsx`, `liveApi.ts`, `imageCompression.ts`, `storage.py`, `test_storage_manager.py`)
+
+### Status
+COMPLETE
+
+### Completed
+- **Uncompressed Initial Pipeline Execution (`NewInspection.tsx` & `liveApi.ts`):**
+  - Eliminated forced pre-upload downscaling (`1280px / 80% JPEG`) in `NewInspection.tsx` and `LiveApiService.uploadEvidence()`.
+  - Staged packaging photographs retain their true, unaltered `File` objects in state; lightweight thumbnails are generated asynchronously for UI preview only without mutating original evidence buffers.
+  - Native image sensor dimensions (`naturalWidth`, `naturalHeight`) are preserved and passed to `uploadEvidence`, ensuring ArUco 50mm fiducial calibration ($px\_to\_mm$), homography rectification, and Table-I font schedule measurements receive full sensor resolution without downscaling discrepancy.
+- **Zero-Pixel-Loss Storage Compression Decoupling (`imageCompression.ts` & `storage.py`):**
+  - Added `compressForStorageWithoutPixelLoss()` in `imageCompression.ts` with `lossless: true` and `preserveNativeDimensions: true`, ensuring compression without pixel or data loss is reserved exclusively for secondary storage/database archiving.
+  - Added `compress_for_archival_lossless()` and `decompress_archival_lossless()` in backend `StorageManager`, providing $100\%$ bitwise roundtrip decompression fidelity with identical SHA-256 digests under Section 63 BSA 2023.
+- **Intake UI High-Fidelity Feedback (`NewInspection.tsx`):**
+  - Added high-fidelity badge: `"Full-Fidelity Original Intake • Zero Precision Loss"` alongside SHA-256 Merkle provenance.
+  - Updated selected photograph listing to display true uncompressed file size (e.g. `3.4 MB • Original Uncompressed PDP`).
+- **Automated Verification:**
+  - Added unit test `compressForStorageWithoutPixelLoss preserves lossless flag and native resolution` in `ui-combined/tests/image_compression.test.ts`.
+  - Added unit test `test_lossless_archival_storage_roundtrip` in `members/member-05-evidence/tests/test_storage_manager.py`.
+
+### Tests
+- `npm test` in `ui-combined`: 128/128 passed (40 suites).
+- `npm run build` in `ui-combined`: Built in 3.41s with 0 errors (`tsc -b && vite build`).
+- Backend Python test suite: 319/319 passed across CV, Extraction, Rule Engine, and Storage Manager (`test_storage_manager.py` 11/11 passed in 0.13s).
+
+### Problems
+None.
+
+### Decisions
+1. Statutory analysis (1st time upload and updates) MUST run on original uncompressed imagery. Lowering resolution or introducing lossy artifacts degrades ArUco edge detection, blurs small font schedules, and causes legal discrepancies.
+2. Compression is strictly reserved for database/datastore archiving and MUST be zero-pixel-loss (lossless).
+
+### Next Step
+Deployment and live inspection validation across field devices.
+
+### Signing Note
+SIGNED OFF BY: Parmarth Kumar (parmarth.kumar@example.com) — 2026-09-13 01:28 IST [VERIFIED]
+
