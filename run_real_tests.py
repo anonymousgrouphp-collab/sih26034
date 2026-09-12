@@ -7,13 +7,23 @@ import cv2
 import sys
 import traceback
 
-sys.path.insert(0, "C:\\Users\\kunal\\Desktop\\updated SIH26034 - 10th sep")
+_PROJECT_ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(_PROJECT_ROOT))
 from inspect_cli import FieldInspectorCLI
 
-images_dir = Path("C:\\Users\\kunal\\Desktop\\updated SIH26034 - 10th sep\\Legal Metrology real product images")
-output_dir = Path("C:\\Users\\kunal\\Desktop\\updated SIH26034 - 10th sep")
+images_dir = _PROJECT_ROOT / "Legal Metrology real product images"
+output_dir = _PROJECT_ROOT
 
-csv_file = output_dir / "REAL_SKU_TEST_MATRIX.csv"
+
+def _out_path(name: str) -> Path:
+    """Resolve an output filename against the project root and refuse traversal."""
+    resolved = (output_dir / name).resolve()
+    if not resolved.is_relative_to(output_dir):
+        raise ValueError(f"Output path escapes project root: {name}")
+    return resolved
+
+
+csv_file = _out_path("REAL_SKU_TEST_MATRIX.csv")
 
 def get_images():
     images = []

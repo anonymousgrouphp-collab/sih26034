@@ -230,38 +230,44 @@ export const AnalysisHUD: React.FC<AnalysisHUDProps> = ({
             {/* Metrics Telemetry Grid */}
             <div className="grid grid-cols-3 gap-3 text-xs">
               <div className="bg-slate-50 p-2.5 rounded border border-slate-200">
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">
-                  {language === "hi" ? "लाप्लासियन धुंधलापन प्रसरण" : "Laplacian Blur Variance"}
+                <span className="text-[10px] font-bold text-slate-600 uppercase block">
+                  {language === "hi" ? "छवि स्पष्टता एवं फोकस" : "Image Clarity & Focus"}
                 </span>
                 <span className={`font-mono font-bold text-sm ${!qg.passed && qg.rejection_reason?.toLowerCase().includes("blur") ? "text-rose-700" : "text-slate-800"}`}>
-                  {qg.blur_variance.toFixed(1)}
+                  {qg.blur_variance >= 150.0
+                    ? (language === "hi" ? "स्पष्ट (पास)" : "Clear / In-Focus")
+                    : (language === "hi" ? "धुंधला (पुनः लें)" : "Too Blurry")}
                 </span>
-                <span className="text-[10px] text-slate-400 block mt-0.5">
-                  {language === "hi" ? "मानक विनिर्देश: ≥ 150.0" : "Reference Spec: ≥ 150.0"}
+                <span className="text-[10px] text-slate-400 block mt-0.5 font-mono">
+                  Laplacian σ²: {qg.blur_variance.toFixed(1)} (min 150.0)
                 </span>
               </div>
 
               <div className="bg-slate-50 p-2.5 rounded border border-slate-200">
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">
-                  {language === "hi" ? "चकाचौंध फैलाव (Glare)" : "Specular Glare Bloom"}
+                <span className="text-[10px] font-bold text-slate-600 uppercase block">
+                  {language === "hi" ? "प्रकाश एवं प्रतिबिंब" : "Lighting & Reflection"}
                 </span>
                 <span className={`font-mono font-bold text-sm ${!qg.passed && qg.rejection_reason?.toLowerCase().includes("glare") ? "text-rose-700" : "text-slate-800"}`}>
-                  {qg.glare_percentage.toFixed(2)}%
+                  {qg.glare_percentage <= 3.0
+                    ? (language === "hi" ? "अनुकूल प्रकाश" : "Optimal Light")
+                    : (language === "hi" ? "अत्यधिक चमक" : "Severe Glare")}
                 </span>
-                <span className="text-[10px] text-slate-400 block mt-0.5">
-                  {language === "hi" ? "मानक विनिर्देश: ≤ 3.00%" : "Reference Spec: ≤ 3.00%"}
+                <span className="text-[10px] text-slate-400 block mt-0.5 font-mono">
+                  Glare: {qg.glare_percentage.toFixed(2)}% (max 3.0%)
                 </span>
               </div>
 
               <div className="bg-slate-50 p-2.5 rounded border border-slate-200">
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">
-                  {language === "hi" ? "परिप्रेक्ष्य झुकाव कोण (Skew)" : "Perspective Skew Angle"}
+                <span className="text-[10px] font-bold text-slate-600 uppercase block">
+                  {language === "hi" ? "कैमरा कोण एवं झुकाव" : "Camera Angle & Alignment"}
                 </span>
                 <span className={`font-mono font-bold text-sm ${!qg.passed && qg.rejection_reason?.toLowerCase().includes("skew") ? "text-rose-700" : "text-slate-800"}`}>
-                  {qg.skew_angle_deg.toFixed(1)}°
+                  {qg.skew_angle_deg <= 15.0
+                    ? (language === "hi" ? "समतल संरेखित" : "Planar Aligned")
+                    : (language === "hi" ? "अत्यधिक झुकाव" : "Tilted Beyond Limit")}
                 </span>
-                <span className="text-[10px] text-slate-400 block mt-0.5">
-                  {language === "hi" ? "मानक विनिर्देश: ≤ 15.0°" : "Reference Spec: ≤ 15.0°"}
+                <span className="text-[10px] text-slate-400 block mt-0.5 font-mono">
+                  Skew: {qg.skew_angle_deg.toFixed(1)}° (max 15.0°)
                 </span>
               </div>
             </div>

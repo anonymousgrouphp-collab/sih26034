@@ -73,15 +73,16 @@ export const Reports: React.FC = () => {
       )}
 
       {/* Filter Row */}
-      <div className="card p-4 bg-white">
+      <form className="card p-4 bg-white" onSubmit={(e) => e.preventDefault()}>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
           <div>
-            <label className="block text-slate-600 font-bold mb-1">
+            <label htmlFor="reporting-period" className="block text-slate-600 font-bold mb-1">
               {language === "hi" ? "रिपोर्टिंग अवधि" : "Reporting Period"}
             </label>
             <div className="relative">
               <CalendarRange size={16} className="absolute left-3 top-2.5 text-slate-400" />
               <select
+                id="reporting-period"
                 value={period}
                 onChange={(e) => setPeriod(e.target.value)}
                 className="input pl-9 text-xs"
@@ -100,10 +101,11 @@ export const Reports: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-slate-600 font-bold mb-1">
+            <label htmlFor="enforcement-division" className="block text-slate-600 font-bold mb-1">
               {language === "hi" ? "प्रवर्तन प्रभाग / मंडल" : "Enforcement Division / Circle"}
             </label>
             <select
+              id="enforcement-division"
               value={division}
               onChange={(e) => setDivision(e.target.value)}
               className="input text-xs"
@@ -124,17 +126,17 @@ export const Reports: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-slate-600 font-bold mb-1">
+            <label htmlFor="document-classification" className="block text-slate-600 font-bold mb-1">
               {language === "hi" ? "दस्तावेज़ वर्गीकरण" : "Document Classification"}
             </label>
-            <select className="input text-xs">
+            <select id="document-classification" className="input text-xs">
               <option>{language === "hi" ? "सभी औपचारिक रिपोर्ट एवं नोटिस" : "All Formal Reports & Notices"}</option>
               <option>{language === "hi" ? "प्रपत्र-1 शमन नोटिस (धारा 36)" : "Form-1 Compounding Notices (Section 36)"}</option>
               <option>{language === "hi" ? "धारा 63 बीएसए डिजिटल प्रमाणपत्र" : "Section 63 BSA Digital Certificates"}</option>
             </select>
           </div>
         </div>
-      </div>
+      </form>
 
       {/* Two Column Section: Left Outcome Distribution, Right Generated Reports */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

@@ -216,3 +216,43 @@
   }
 }
 
+/* High Contrast Mode for Accessibility (WCAG AAA) */
+html.high-contrast-mode body {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+}
+html.high-contrast-mode .card,
+html.high-contrast-mode header,
+html.high-contrast-mode aside,
+html.high-contrast-mode [role="navigation"],
+html.high-contrast-mode .bg-white,
+html.high-contrast-mode .bg-slate-50,
+html.high-contrast-mode .bg-slate-100 {
+  background: #000000 !important;
+  border-color: #FFFFFF !important;
+  color: #FFFFFF !important;
+}
+html.high-contrast-mode .text-govNavy,
+html.high-contrast-mode .text-slate-900,
+html.high-contrast-mode .text-slate-800,
+html.high-contrast-mode .text-slate-700,
+html.high-contrast-mode .text-slate-600,
+html.high-contrast-mode .text-slate-500 {
+  color: #FFFFFF !important;
+}
+html.high-contrast-mode button,
+html.high-contrast-mode a,
+html.high-contrast-mode .btn-primary,
+html.high-contrast-mode .btn-secondary {
+  border: 2px solid #FFFFFF !important;
+  background: #000000 !important;
+  color: #FFFF00 !important;
+}
+html.high-contrast-mode .bg-govNavy,
+html.high-contrast-mode .bg-amber-500,
+html.high-contrast-mode .bg-emerald-500,
+html.high-contrast-mode .bg-rose-500 {
+  background: #000000 !important;
+  border: 2px solid #FFFFFF !important;
+  color: #FFFFFF !important;
+}

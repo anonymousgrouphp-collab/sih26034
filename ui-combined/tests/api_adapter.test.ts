@@ -192,4 +192,37 @@ describe("API Adapter & Service Layer Architecture", () => {
     assert.ok(netQtyField);
     assert.strictEqual(netQtyField.raw_ocr_text, "Net Qty: 400 ml");
   });
+
+  it("7. Automatic failover never persists operating mode; explicit user toggle does (stale-session regression)", async () => {
+    // Shim window.localStorage to observe persistence side effects
+    const store = new Map<string, string>();
+    const fakeWindow = {
+      localStorage: {
+        getItem: (k: string) => (store.has(k) ? store.get(k)! : null),
+        setItem: (k: string, v: string) => store.set(k, v),
+        removeItem: (k: string) => store.delete(k),
+      },
+    };
+    const originalWindow = (globalThis as any).window;
+    (globalThis as any).window = fakeWindow;
+
+    try {
+      // 1. Automatic failover transition: in-memory only, nothing persisted
+      ApiService.setOperatingMode("MOCK", { persist: false });
+      assert.strictEqual(ApiService.getOperatingMode(), "MOCK");
+      assert.strictEqual(store.get("nyayadrishti_operating_mode"), undefined);
+
+      // 2. Explicit user toggle (Header mode switch / Mode B retry button): persisted
+      ApiService.setOperatingMode("LIVE");
+      assert.strictEqual(store.get("nyayadrishti_operating_mode"), "LIVE");
+
+      // 3. Restore in-memory mode for subsequent assertions without polluting storage
+      ApiService.setOperatingMode("MOCK", { persist: false });
+      assert.strictEqual(store.get("nyayadrishti_operating_mode"), "LIVE");
+      assert.strictEqual(ApiService.getOperatingMode(), "MOCK");
+    } finally {
+      (globalThis as any).window = originalWindow;
+      ApiService.setOperatingMode("MOCK", { persist: false });
+    }
+  });
 });

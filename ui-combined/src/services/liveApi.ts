@@ -412,12 +412,12 @@ export class LiveApiService implements IInspectionApiService {
               glare_percentage: img.glare_percentage || 0.8,
               skew_angle_deg: img.skew_angle_deg || 1.2,
             },
-            calibration: cached?.calibration,
-            ocr: cached?.ocr,
+            calibration: img.calibration || cached?.calibration,
+            ocr: img.ocr || cached?.ocr,
             is_original_untouched: true,
           };
         }),
-        // Preserve extracted fields from pipeline execution cache if backend inspection detail lacks them
+        // Preserve extracted fields from backend inspection detail or cached execution
         extracted_fields: (data.extracted_fields && data.extracted_fields.length > 0)
           ? data.extracted_fields
           : (cached?.extracted_fields || []),
@@ -431,6 +431,20 @@ export class LiveApiService implements IInspectionApiService {
           measured_value: e.actual || e.measured_value || "Observed value",
           discrepancy: e.discrepancy,
           legal_consequence: e.legal_consequence || "Section 36(1) LM Act 2009",
+        })),
+        audit_trail: (data.audit_trail || []).map((a: any, idx: number) => ({
+          id: a.id || `audit_${idx}`,
+          sequence_number: idx + 1,
+          timestamp_utc: a.timestamp_utc || new Date().toISOString(),
+          event_type: a.action_type || "SYSTEM_AUDIT",
+          event_label: a.action_type || "System Action",
+          actor_type: "OFFICER",
+          actor_id: a.actor_id || "SYSTEM",
+          actor_name: a.actor_id || "System Officer",
+          entity_type: "INSPECTION",
+          entity_id: insp.id,
+          entry_hash: a.event_hash || a.entry_hash,
+          metadata: a.payload || {},
         })),
         principal_display_panel: cached?.principal_display_panel,
         evidence_graph: cached?.evidence_graph,
@@ -608,29 +622,23 @@ export class LiveApiService implements IInspectionApiService {
   public async submitFindingAdjudication(
     _inspectionId: string,
     findingId: string,
-    decision: FindingOfficerDecision,
-    remarks: string,
-    actionOrder?: OfficerActionOrder
+    _decision: FindingOfficerDecision,
+    _remarks: string,
+    _actionOrder?: OfficerActionOrder
   ): Promise<FindingAdjudication> {
-    if (!remarks || remarks.trim().length === 0) {
-      throw {
-        error_code: "MISSING_OFFICER_REMARKS",
-        status: 400,
-        message: "Mandatory officer justification remarks required for statutory record.",
-        remediation: "Provide detailed reasoning for adjudication decision before proceeding.",
-      } as ApiError;
-    }
-
-    return {
+    // TRUTH RULE: the live backend exposes no per-finding adjudication endpoint
+    // (only case-level PATCH /inspections/{id}/adjudicate per contract 07 §3.3).
+    // Fabricating a persisted-looking decision here would create a false legal
+    // record, so the live adapter refuses instead of pretending success.
+    throw {
+      error_code: "FINDING_ADJUDICATION_NOT_AVAILABLE_ON_LIVE_BACKEND",
+      status: 501,
+      message:
+        "Per-finding adjudication is not persisted by the live backend. Use case-level officer adjudication (PATCH /inspections/{id}/adjudicate), which is recorded in the statutory database.",
+      remediation:
+        "Record the officer decision through the Adjudication Canvas case-level sign-off; per-finding persistence requires a backend contract extension (Decision-Change Process).",
       finding_id: findingId,
-      decision,
-      officer_id: "INSP-DL-0842",
-      officer_name: "Rajesh Sharma",
-      badge_number: "INSP-DL-0842",
-      remarks: remarks.trim(),
-      timestamp_utc: new Date().toISOString(),
-      action_order: actionOrder,
-    };
+    } as ApiError;
   }
 
   public async getAuditTrail(inspectionId: string): Promise<AuditEvent[]> {
@@ -701,6 +709,20 @@ export class LiveApiService implements IInspectionApiService {
       return await res.json();
     } catch (e: any) {
       throw this.normalizeError(e, "Notice and Section 63 BSA Certificate generation failed.");
+    }
+  }
+
+  public async getEvidenceDossier(inspectionId: string): Promise<any> {
+    try {
+      const res = await this.fetchWithAuth(
+        `${this.baseUrl}/inspections/${encodeURIComponent(inspectionId)}/evidence-dossier`
+      );
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+      return await res.json();
+    } catch (e: any) {
+      throw this.normalizeError(e, "Failed to retrieve Section 63 BSA evidence dossier.");
     }
   }
 

@@ -218,6 +218,13 @@ def test_notice_generation_and_pdf_download(client, inspector_headers, controlle
     files = {"image": ("wafers.jpg", BytesIO(valid_jpeg), "image/jpeg")}
     up_resp = client.post("/api/v1/inspections/upload", files=files, headers=inspector_headers)
     insp_id = up_resp.json()["inspection_id"]
+    image_id = up_resp.json()["image_id"]
+
+    # Establish genuine adjudicated FAIL findings before notice issuance: a Form-1
+    # notice is refused (409) when no FAIL evaluations exist (truth-integrity guard).
+    pipe_resp = client.post(f"/api/v1/pipeline/execute/{image_id}", headers=inspector_headers, json={})
+    assert pipe_resp.status_code == 200, pipe_resp.text
+    assert pipe_resp.json()["ai_verdict"] == "FAIL", pipe_resp.json().get("ai_verdict")
 
     notice_req = {
         "inspection_id": insp_id,

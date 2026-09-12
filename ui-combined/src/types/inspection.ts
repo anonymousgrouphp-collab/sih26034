@@ -577,6 +577,7 @@ export interface IInspectionApiService {
   getAuditTrail(inspectionId: string): Promise<AuditEvent[]>;
   getCaseReadiness(inspectionId: string): Promise<CaseReadinessChecklist>;
   closeInspection(inspectionId: string, remarks?: string): Promise<InspectionCase>;
+  getEvidenceDossier?(inspectionId: string): Promise<any>;
   generateNotice(payload: GenerateNoticePayload): Promise<LegalNoticeResult>;
   getNoticePdfUrl(noticeId: string): string;
   getSystemHealth(): Promise<{

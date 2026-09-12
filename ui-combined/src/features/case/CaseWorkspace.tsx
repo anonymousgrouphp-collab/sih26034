@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext";
 import { InspectionCase, EvidenceAsset, AdjudicationRequest, OfficerRole } from "../../types/inspection";
 import { CaseHeader } from "./CaseHeader";
@@ -53,6 +54,7 @@ import {
   RefreshCw,
   Scale,
   Activity,
+  Lock,
 } from "lucide-react";
 
 interface CaseWorkspaceProps {
@@ -725,6 +727,14 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                   <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
                   <span>{language === "hi" ? "ऑडिट एवं साक्ष्य" : "Audit & Diagnostics"}</span>
                 </button>
+                <Link
+                  to={`/inspections/${caseData.id}/evidence`}
+                  className="px-3 py-1.5 text-xs font-bold rounded-md transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 text-govNavy hover:bg-govNavy/10 bg-govNavy/5 border border-govNavy/20"
+                  title={language === "hi" ? "धारा 63 बीएसए साक्ष्य संचिका खोलें" : "Open Section 63 BSA Evidence Dossier"}
+                >
+                  <Lock className="w-3.5 h-3.5 shrink-0 text-govNavy" />
+                  <span>{language === "hi" ? "साक्ष्य संचिका (डोज़ियर)" : "Evidence Dossier"}</span>
+                </Link>
               </div>
 
               <span className="text-[11px] font-mono text-slate-500 pr-2 hidden xl:inline font-semibold shrink-0">

@@ -2203,3 +2203,78 @@ Push all verified changes to `origin/main` to update the live Vercel deployment.
 
 ### Signing Note
 SIGNED OFF BY: Parmarth Kumar (parmarth.kumar@example.com) — 2026-09-12 18:35 IST [VERIFIED]
+
+---
+
+## [12 September 2026] [21:50] IST
+
+### Task / Chunk
+Evidence Dossier Export Repair, Font Height Scale Normalization & Bounding Token Persistence (`ui-combined/src/pages/EvidenceDossier.tsx`, `liveApi.ts`).
+
+### Status
+COMPLETE
+
+### Completed
+- **Evidence Dossier Export Workflow Overhaul (`EvidenceDossier.tsx`):**
+  - Eliminated erroneous call to `ApiService.generateNotice` (which was restricted to CONTROLLER and produced 403s leading to mock notice 404s).
+  - Replaced with direct invocation of `ApiService.getEvidenceDossier(caseData.id)` and native high-fidelity browser print/PDF export (`window.print()`).
+  - Added dedicated print stylesheet (`@media print`) rendering official Government of India / DoCA header, Section 63 BSA certificate details, and clean print typography.
+  - Added "Evidence JSON" export button for instant download of complete Section 63 BSA Evidence Bundle (`.json`) for e-Courts / judicial filing.
+- **Font Height Calculation Fix (`EvidenceDossier.tsx`):**
+  - Resolved 1.5-meter font height anomaly (`1573.00 mm` for 130px text) caused by scale inversion (`px_to_mm` stored as px/mm ~12.1).
+  - Implemented prioritized check for `token.measured_font_height_mm` and dynamic scale checking (`scale > 1.0 ? heightPx / scale : heightPx * scale`), displaying accurate millimeter measurements (~10.74 mm).
+- **Asset Thumbnail & Token Persistence (`liveApi.ts`):**
+  - Preserved `calibration` and `ocr` metadata when mapping backend `InspectionDetail` to `InspectionCase`.
+  - Mapped backend `audit_trail` into `InspectionCase` to render chronological audit logs with SHA-256 hashes.
+- **Packaging Photo Thumbnails (`EvidenceDossier.tsx`):**
+  - Rendered real image previews in Tier 1 packaging cards.
+- **Verification:**
+  - `npm test`: 119/119 passed.
+  - `npm run typecheck`: 0 errors.
+
+### Tests
+- `npm test` in `ui-combined/`: 119 passed in 2.32s (0 failed, 0 skipped).
+- `npm run typecheck` in `ui-combined/`: Clean exit code 0.
+
+### Problems
+None. All 119 tests pass and typecheck clean.
+
+### Decisions
+1. Evidence Dossier export is decoupled from Form-1 notice generation: an evidence dossier is an authentic electronic record certificate, not a punitive notice.
+2. High-fidelity print preview leverages standard browser PDF engines, guaranteeing 100% fidelity without server PDF rendering bottlenecks.
+
+### Next Step
+Final end-to-end verification and documentation completion.
+
+### Signing Note
+SIGNED OFF BY: Parmarth Kumar (parmarth.kumar@example.com) — 2026-09-12 21:50 IST [VERIFIED]
+
+
+## 2026-09-12 23:05 IST
+
+### Task / Chunk
+P1 "stale data on refresh" root-cause fix (operating-mode persistence) + P0-MOCK-003 truthful per-finding adjudication refusal (register rows P0-INT-001/002, P0-MOCK-003/004, P1-FE-001).
+
+### Status
+COMPLETE
+
+### Completed
+- `services/api.ts`: `setOperatingMode(mode, {persist})` — all automatic network-failover transitions are in-memory only; explicit user toggles (Header Mode A/B switch, NewInspection Mode B retry) still persist. Refresh now always returns to LIVE and retries the backend first, eliminating silent BACKEND_SIMULATION sessions.
+- `services/liveApi.ts`: `submitFindingAdjudication` no longer returns a fabricated officer decision with hardcoded identity; throws truthful `FINDING_ADJUDICATION_NOT_AVAILABLE_ON_LIVE_BACKEND` (backend has no per-finding endpoint; case-level PATCH adjudication is the persisted path).
+- `services/api.ts`: removed silent MOCK failover for per-finding adjudication (a fabricated statutory record must never be substituted).
+- NEW regression test: `tests/api_adapter.test.ts` #7 (failover never persists; user toggle persists).
+
+### Tests
+`npm test` → 119 passed, 0 failed. `npm run build` → clean (tsc + vite, 0 errors). Browser-verified: fresh-session login → dashboard (real DB rows) → new inspection → real-image upload → truthful verdict → evidence dossier (BUG-04/06/07 regressions hold).
+
+### Problems
+Frontend vitest run reported "No test suite found" for all files — tests use the Node `tsx --test` runner (`npm test`), not vitest; no product defect.
+
+### Decisions
+Persistence is opt-in for mode changes: only deliberate user choices survive reload; automatic degradation never does.
+
+### Next Step
+Team Lead review of P0-SEC-001 (hardcoded demo credentials in liveApi auto-login).
+
+### Signing Note
+SIGNED OFF BY: kunal-raj-dev (kunal-raj-dev@users.noreply.github.com) — 2026-09-12 23:05 IST [VERIFIED]

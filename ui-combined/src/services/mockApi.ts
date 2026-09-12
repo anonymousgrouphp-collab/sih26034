@@ -941,6 +941,28 @@ export class MockApiService implements IInspectionApiService {
     return await this.getInspection(inspectionId);
   }
 
+  public async getEvidenceDossier(inspectionId: string): Promise<any> {
+    const insp = await this.getInspection(inspectionId);
+    return {
+      status: "SUCCESS",
+      inspection_id: insp.id,
+      inspection_number: insp.inspection_number,
+      product_name: insp.product_name,
+      overall_status: insp.overall_status,
+      certificate_number: `SEC63-BSA-2026-${(insp.sku_demo_id || insp.id).replace(/[^a-zA-Z0-9]/g, "").slice(-8).toUpperCase()}`,
+      merkle_root: insp.evidence_graph?.merkle_root || "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+      statutory_mandate: "Section 63 of Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)",
+      adjudicating_officer: "Rajesh Sharma (INSP-DL-0842)",
+      officer_badge: "INSP-DL-0842",
+      jurisdiction_circle: insp.jurisdiction_id || "CIRCLE_DL_SOUTH_01",
+      total_evidence_assets: (insp.evidence_assets || []).length,
+      total_extracted_fields: (insp.extracted_fields || []).length,
+      total_rule_checks: (insp.rule_evaluations || []).length,
+      generated_at: new Date().toISOString(),
+      audit_events_count: (insp.audit_trail || []).length,
+    };
+  }
+
   public async generateNotice(_payload: GenerateNoticePayload): Promise<LegalNoticeResult> {
     return {
       notice_id: `not_mock_${Date.now()}`,
