@@ -197,6 +197,23 @@ python local_runner.py
 
 ---
 
+## 👥 Core Engineering Team & Contributors
+
+NyayaDrishti-LM is developed by a six-member parallel engineering workstream under Smart India Hackathon 2026:
+
+| Member | Workstream & Focus | Subsystem Scope | GitHub Profile |
+|:---|:---|:---|:---:|
+| **Kunal Raj** | **Member 1: CV & Metrology** | Optical quality gate, ArUco 4×4 calibration, planar homography, PDP metric surface area | [@kunal-raj-dev](https://github.com/kunal-raj-dev) |
+| **Parmarth Kumar** | **Member 2: Multilingual OCR** | DBNet++ text detection, PP-OCRv4 Indic recognition, ONNX INT8 CPU inference | [@parmarth-kumar](https://github.com/parmarth-kumar) |
+| **Harsh Patel** | **Member 3: Semantic Extraction** | Statutory field parsing (MRP, Net Qty, Dates, Address, PIN), banned unit flagger | [@anonymousgrouphp-collab](https://github.com/anonymousgrouphp-collab) |
+| **Ambika Bansal** | **Member 4: Statutory Rule Engine** | AST statutory engine, Table-I font schedule (Row 5 = 6.0 mm), USP math, 4-state triage | [@bansalambika12-ship-it](https://github.com/bansalambika12-ship-it) |
+| **Shailendra Pratap Singh** | **Member 5: Evidence & Cryptography** | FastAPI REST services, PostgreSQL 16 schema, Merkle DAG, Section 63 BSA 2023 certificate, Form-1 PDF | [@shailendrapratap1](https://github.com/shailendrapratap1) |
+| **Parmarth Kumar** | **Member 6: Frontend & HUD** | React 18 + Vite SPA, Metrology workbench, split-view Adjudication Canvas, zero-broken-image HUD | [@parmarth-kumar](https://github.com/parmarth-kumar) |
+
+See **[CONTRIBUTORS.md](CONTRIBUTORS.md)** for full details and attribution policies.
+
+---
+
 ## 🤝 Community & Governance
 
 - **[Contributing Guidelines](CONTRIBUTING.md)**: Branching policy, definition of done (DoD), commit standards.
