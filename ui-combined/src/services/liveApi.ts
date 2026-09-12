@@ -257,10 +257,15 @@ export class LiveApiService implements IInspectionApiService {
           (insp.overall_status === "PENDING_REVIEW" ? "PENDING_REVIEW" : "COMPLETED"),
         overall_status: insp.overall_status || "PENDING_REVIEW",
         ai_verdict: insp.ai_verdict || "PENDING",
-        evidence_assets: (data.evidence_images || []).map((img: any) => ({
-          image_id: img.id,
-          inspection_id: insp.id,
-          file_path: img.file_path,
+        evidence_assets: (data.evidence_images || []).map((img: any) => {
+          const rawPath = img.file_path || "";
+          const resolvedPath = rawPath.startsWith("/") || rawPath.startsWith("http")
+            ? rawPath
+            : (rawPath.startsWith("storage/") ? `/${rawPath}` : `/storage/${rawPath}`);
+          return {
+            image_id: img.id,
+            inspection_id: insp.id,
+            file_path: resolvedPath,
           raw_sha256: img.sha256,
           panel_type: img.panel_type || "PDP_FRONT",
           image_width: img.image_width || 1920,
@@ -274,7 +279,8 @@ export class LiveApiService implements IInspectionApiService {
           calibration: cached?.calibration,
           ocr: cached?.ocr,
           is_original_untouched: true,
-        })),
+        };
+      }),
         // Preserve extracted fields from pipeline execution cache if backend inspection detail lacks them
         extracted_fields: (data.extracted_fields && data.extracted_fields.length > 0)
           ? data.extracted_fields

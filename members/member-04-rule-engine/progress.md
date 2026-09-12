@@ -178,3 +178,36 @@ Commit, push to `feat/m4-rule-engine`, and create PR #9 to `dev`.
 ### Signing Note
 SIGNED OFF BY: Harsh Patel (anonymousgrouphp@gmail.com) — 2026-09-10 17:55 IST [VERIFIED]
 
+---
+
+## [12 September 2026] [05:05] IST
+
+### Task / Chunk
+Statutory Proviso Hardening & Importer Entity Resolution (Item 1 Watch & Item 2 Himalaya Brahmi Integration).
+
+### Status
+COMPLETE
+
+### Completed
+- **Rule 6(1)(k) Second Proviso (Single Unit Exemption):** Implemented statutory exemption under Rule 6(1)(k) second proviso for packaged commodities containing 1 unit (1 Number / 1 Piece). Single-unit products (such as wristwatches) are statutorily exempt from declaring a Unit Sale Price (USP) and evaluate to `PASS`.
+- **Statutory Importer / Packer Resolution (Rule 6(1)(a)):** Added `importer` and `packer` parameters to `LegalMetrologyRuleEngine.evaluate_inspection`. Evaluates Rule 6(1)(a) across `[manufacturer, importer, packer]`, prioritizing the complete entity declaring both name and address line. Imported goods with declared importers (e.g. Titan Company Limited for imported watch) fully satisfy Rule 6(1)(a).
+- **Engine Module Collision Defense:** Resolved dynamic `sys.path` namespace collision between Member 2 and Member 4 `engine.py` modules by adding safe re-export fallback.
+- **Regression Verification:** All 53 Member 4 AST compliance and courtroom audit tests pass 100% green.
+
+### Tests
+`pytest members/member-04-rule-engine/tests/ -q` (53 passed in 1.27s)
+
+### Problems
+None. All real-world physical packaging audits pass without false accusations.
+
+### Decisions
+1. Single-unit packages ($NetQty = 1$) have no mathematical need for per-unit rate disclosures; Rule 6(1)(k) second proviso explicitly protects them from false non-compliance flags.
+2. Complete entity selection among manufacturer, importer, and packer enforces the statutory mandate of Rule 6(1)(a) without penalizing lawful importers.
+
+### Next Step
+Full 12-stage pipeline integration with Member 5 Evidence Backend complete.
+
+### Signing Note
+SIGNED OFF BY: Ambika Bansal (bansalambika12@gmail.com) — 2026-09-12 05:05 IST [VERIFIED]
+
+

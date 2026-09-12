@@ -120,8 +120,8 @@ export class StorageService {
    */
   static getAuthToken(): string | null {
     try {
-      if (typeof window === "undefined" || !window.sessionStorage) return null;
-      return window.sessionStorage.getItem(STORAGE_KEYS.TOKEN);
+      if (typeof window === "undefined") return null;
+      return window.sessionStorage?.getItem(STORAGE_KEYS.TOKEN) || window.localStorage?.getItem(STORAGE_KEYS.TOKEN);
     } catch {
       return null;
     }
@@ -129,8 +129,9 @@ export class StorageService {
 
   static setAuthToken(token: string): void {
     try {
-      if (typeof window !== "undefined" && window.sessionStorage) {
-        window.sessionStorage.setItem(STORAGE_KEYS.TOKEN, token);
+      if (typeof window !== "undefined") {
+        window.sessionStorage?.setItem(STORAGE_KEYS.TOKEN, token);
+        window.localStorage?.setItem(STORAGE_KEYS.TOKEN, token);
       }
     } catch {
       // Non-blocking
@@ -139,8 +140,9 @@ export class StorageService {
 
   static clearAuthToken(): void {
     try {
-      if (typeof window !== "undefined" && window.sessionStorage) {
-        window.sessionStorage.removeItem(STORAGE_KEYS.TOKEN);
+      if (typeof window !== "undefined") {
+        window.sessionStorage?.removeItem(STORAGE_KEYS.TOKEN);
+        window.localStorage?.removeItem(STORAGE_KEYS.TOKEN);
       }
     } catch {
       // Non-blocking

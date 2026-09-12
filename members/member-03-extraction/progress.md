@@ -550,5 +550,42 @@ All 3 chunks of `inspect_cli.py` are 100% verified. Ready to commit, merge into 
 ### Signing Note
 SIGNED OFF BY: Harsh Patel (anonymousgrouphp@gmail.com) — 2026-09-10 21:45 IST [VERIFIED]
 
+---
+
+## [12 September 2026] [05:00] IST
+
+### Task / Chunk
+Physical Real-World Dataset Integration & Semantic Extraction Hardening (Item 1 Titan Watch & Item 2 Himalaya Brahmi).
+
+### Status
+COMPLETE
+
+### Completed
+- **Tablet / Capsule Unit Normalization:** Extended `denom_re` and unit normalizer to accept pharmaceutical tablet and capsule abbreviations (`tab`, `tabs`, `tab.`, `tae.`, `caps`, `cap.`).
+- **Standalone Rate Arithmetic Support:** Implemented extraction for standalone fractional rates without currency prefix (e.g. `4.33TAE.`, `0.40/g`) while strictly preserving integer net quantity protection against mistaking count declarations for rates.
+- **Space-Separated Thousands Grouping:** Handled OCR space-separated thousands grouping in MRP declarations (e.g. `MRP2 425.00` -> `2425.0`).
+- **Vertical Line Quantization:** Quantized token sorting vertical keys `(int(round(bbox[0])) // 20, int(round(bbox[1])))` to prevent split-word horizontal tearing of adjacent tokens (`RS.` + `260.00`).
+- **Explicit Declaration Precedence:** Prioritized explicit declaration keywords (`Net Qty:`, `Quantity:`) over isolated top-of-label noise tokens (`2n`).
+- **Country of Origin Entity Clean-up:** Sanitized corporate entity names to strip interspersed statutory country of origin prefixes (`COUNTRY OF ORIGIN: CHINA TITAN COMPANY LIMITED` -> `TITAN COMPANY LIMITED`).
+- **Priority C Address Guard:** Restricted fallback composite line PIN scan to execute only if no manufacturer, importer, or packer has been identified, preventing fragmentation of valid importer address blocks.
+- **Regression Verification:** All 151 Member 3 unit and stress tests pass with 100% success rate.
+
+### Tests
+`pytest members/member-03-extraction/tests/ -q` (151 passed in 7.60s)
+
+### Problems
+None. All real-world physical dataset edge cases resolved with 0 regressions.
+
+### Decisions
+1. Unit Sale Price rate denominators must support pharmaceutical forms (`/tablet`, `/capsule`, `/tab`, `/cap`) per statutory LMPC Schedule.
+2. Inverted and split OCR lines are resolved deterministically using line-quantized spatial sort keys.
+
+### Next Step
+System-wide integration with Member 4 Rule Engine and Member 5 Evidence Backend complete.
+
+### Signing Note
+SIGNED OFF BY: Harsh Patel (anonymousgrouphp@gmail.com) — 2026-09-12 05:00 IST [VERIFIED]
+
+
 
 

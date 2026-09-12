@@ -75,7 +75,7 @@ export const Header: React.FC<HeaderProps> = ({
     try {
       localStorage.setItem("nyayadrishti_mode", mode);
       if (mode === "ONLINE") {
-        ApiService.setOperatingMode("MOCK");
+        ApiService.setOperatingMode("LIVE");
       } else {
         ApiService.setOperatingMode("DEMO_FIXTURE");
       }

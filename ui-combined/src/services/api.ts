@@ -45,7 +45,7 @@ export { DemoFixtureService } from "./demoFixtures";
 export class ApiService {
   private static operatingMode: ApiOperatingMode =
     (typeof window !== "undefined" && (window.localStorage?.getItem("nyayadrishti_operating_mode") as ApiOperatingMode)) ||
-    (((import.meta as any)?.env?.VITE_OPERATING_MODE as ApiOperatingMode) || "MOCK");
+    (((import.meta as any)?.env?.VITE_OPERATING_MODE as ApiOperatingMode) || "LIVE");
 
   public static setOperatingMode(mode: ApiOperatingMode): void {
     this.operatingMode = mode;

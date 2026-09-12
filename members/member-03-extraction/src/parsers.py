@@ -617,7 +617,7 @@ class StatutoryDeclarationParser:
             r"कर\s*सहित|सभी\s*कर(?:ों)?\s*सहित)"
         )
         curr = r"(?:(?<![a-zA-Z])(?:Rs\.?|R\s*s\.?|R[58]\.?|Ps\.?|Re\.?|INR|₹|रु\.?|रू\.?|रुपये|रुपए))"
-        amount_re = r"((?=[0-9Ool]*[0-9])[0-9Ool]+(?:,\s*[0-9Ool]+)*(?:\s*\.\s*[0-9Ool]{1,2})?)"
+        amount_re = r"((?=[0-9Ool]*[0-9])[0-9Ool]+(?:[,\s]\s*[0-9Ool]{3})*(?:\s*\.\s*[0-9Ool]{1,2})?)"
         unit_den_re = r"\s*(?:/|per|प्रति)\s*(?:[0-9]+\s*)?(?:g(?:m|ms)?|kg(?:m|ms)?|m?l|ltrs?|units?|pcs?|nos?|items?|packs?|सेंटीमीटर|सेमी|मीटर|ग्राम|ग्रा|किग्रा|कि\.ग्रा|मिलीलीटर|मिली|मि\.ली|लीटर|ली|नग|इकाई|N)\b"
 
         # Priority 0: Struck-through crossed price (common in e-commerce: ~~₹199~~ ₹99 or <s>199</s> 99)
@@ -704,7 +704,7 @@ class StatutoryDeclarationParser:
         curr = r"(?:Rs\.?|INR|₹|रु\.?|रू\.?|रुपये)?"
         amount_re = r"([0-9]+(?:,\s*[0-9]+)*(?:\.[0-9]{1,4})?)"
         # Restrict denominator strictly to recognized statutory metric and count units (with Unicode-safe word boundary for Indic matras)
-        denom_re = r"((?:100\s*)?(?:g|kg|mg|ml|l|cl|m|cm|mm|sq\s*m|sq\s*cm|sq\s*mm|n|u|pieces?|pcs|units?|items?|nos?|tablets?|capsules?|sachets?|packs?|ग्राम|किग्रा|मिली|लीटर|मीटर|नग|इकाई))(?!\w|[\u0900-\u097F])"
+        denom_re = r"((?:100\s*)?(?:g|kg|mg|ml|l|cl|m|cm|mm|sq\s*m|sq\s*cm|sq\s*mm|n|u|pieces?|pcs|units?|items?|nos?|tablets?|tabs?\.?|tae\.?|capsules?|caps?\.?|sachets?|packs?|ग्राम|किग्रा|मिली|लीटर|मीटर|नग|इकाई))(?!\w|[\u0900-\u097F])"
 
         # Pattern 1: Explicit USP prefix
         p1 = re.compile(
@@ -713,18 +713,33 @@ class StatutoryDeclarationParser:
         )
         match = p1.search(norm_text)
 
-        # Pattern 2: Standalone 'Rs. X / g' or '₹ X per ml' or '₹ X / ग्राम'
-        if not match:
+        price_str = None
+        unit_raw = None
+
+        if match:
+            price_str, unit_raw = match.groups()
+        elif not re.search(r"(?:MRP|Maximum\s*Retail\s*Price|अ\.वि\.मू)", norm_text, re.IGNORECASE):
             p2 = re.compile(
-                rf"(?:Rs\.?|INR|₹|रु\.?|रू\.?|रुपये)\s*{amount_re}\s*(?:/|per|प्रति)\s*{denom_re}",
+                rf"(?:Rs\.?|INR|₹|रु\.?|रू\.?|रुपये)\s*{amount_re}\s*(?:/|per|प्रति|\s*)\s*{denom_re}",
                 re.IGNORECASE
             )
             match = p2.search(norm_text)
+            if match:
+                price_str, unit_raw = match.groups()
+            else:
+                p2_no_curr = re.compile(
+                    rf"(?:{amount_re}\s*(?:/|per|प्रति)\s*{denom_re}|([0-9]+\.[0-9]{{1,4}})\s*{denom_re})",
+                    re.IGNORECASE
+                )
+                m_nc = p2_no_curr.search(norm_text)
+                if m_nc:
+                    groups = [g for g in m_nc.groups() if g is not None]
+                    if len(groups) >= 2:
+                        price_str, unit_raw = groups[0], groups[1]
+                        match = m_nc
 
-        if not match:
+        if not match or not price_str or not unit_raw:
             return None
-
-        price_str, unit_raw = match.groups()
         try:
             price = float(price_str.replace(",", "").replace(" ", ""))
             if price <= 0:
@@ -739,6 +754,10 @@ class StatutoryDeclarationParser:
             clean_unit = "piece"
         elif clean_unit in ("units", "unit", "nos", "no"):
             clean_unit = "unit"
+        elif clean_unit in ("tablets", "tablet", "tabs", "tab", "tab.", "tabs.", "tae", "tae."):
+            clean_unit = "tablet"
+        elif clean_unit in ("capsules", "capsule", "caps", "cap", "cap.", "caps."):
+            clean_unit = "capsule"
         elif clean_unit in ("n", "u"):
             clean_unit = "N"
 
@@ -1085,6 +1104,7 @@ class StatutoryDeclarationParser:
         anchor_match = pref_anchor_re.search(norm_text)
         if anchor_match:
             cand_name = anchor_match.group(1).strip()
+            cand_name = re.sub(r"COUNTRY\s*OF\s*ORIGIN\s*:\s*[A-Za-z]+", "", cand_name, flags=re.IGNORECASE).strip(" ,-:")
             # Clean trailing periods or dashes
             cand_name = cand_name.strip("- :")
             if len(cand_name) >= 3 and not cand_name.isdigit():
@@ -1115,6 +1135,7 @@ class StatutoryDeclarationParser:
                     cand_chunk,
                     flags=re.IGNORECASE
                 ).strip(" ,-:")
+                cleaned_entity = re.sub(r"COUNTRY\s*OF\s*ORIGIN\s*:\s*[A-Za-z]+", "", cleaned_entity, flags=re.IGNORECASE).strip(" ,-:")
                 if cleaned_entity and len(cleaned_entity) >= 3:
                     entity_name = cleaned_entity
 

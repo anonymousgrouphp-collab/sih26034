@@ -14,6 +14,18 @@ if str(REPO_ROOT) not in sys.path:
 
 from evaluators import LegalMetrologyRuleEngine
 
+# Prevent module collision across members/member-02-ocr/src/engine.py and member-04
+try:
+    import importlib.util
+    m2_engine_path = REPO_ROOT / "members" / "member-02-ocr" / "src" / "engine.py"
+    if m2_engine_path.exists():
+        spec = importlib.util.spec_from_file_location("m2_ocr_engine", str(m2_engine_path))
+        m2_mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(m2_mod)
+        MultilingualOCREngine = getattr(m2_mod, "MultilingualOCREngine", None)
+except Exception:
+    MultilingualOCREngine = None
+
 
 def run_demo() -> None:
     print("=" * 70)

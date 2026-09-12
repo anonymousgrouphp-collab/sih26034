@@ -145,3 +145,7 @@ class DecoupledStorageManager:
         if not str(resolved).startswith(str(self.base_dir)):
             raise StorageSecurityError("Illegal path traversal detected.")
         return resolved
+
+    def get_file_path(self, relative_path: str) -> Path:
+        """Alias for resolve_absolute_path."""
+        return self.resolve_absolute_path(relative_path)

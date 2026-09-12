@@ -1612,6 +1612,53 @@ Commit and push to remote `main` branch.
 ### Signing Note
 SIGNED OFF BY: kunal-raj-dev (kunal.raj.dev@gmail.com) — 2026-09-12 03:12 IST [VERIFIED]
 
+---
+
+## [12 September 2026] [05:40] IST
+
+### Task / Chunk
+Full End-to-End Playwright Browser Automation Audit, Physical Package Intake (Himalaya Brahmi), Decoupled Evidence Rendering & Test Suite Isolation Fix (`golden_sku_selector.test.ts`).
+
+### Status
+COMPLETE
+
+### Completed
+- **Playwright Full End-to-End Browser Audit**:
+  - Executed automated browser journey against live backend on `localhost:8000`.
+  - Officer login (`/login`) with live JWT session persistence in `StorageService`.
+  - Executive Dashboard KPI verification (`/dashboard`).
+  - Physical package intake (`/inspections/new`) with 4.4MB physical label image (`left_01.jpg` from Item 2 - Himalaya Brahmi).
+  - Executed real M1-M5 pipeline on raw image upload bytes without mock simulation.
+  - Split-view Adjudication Canvas verification: loaded original image from decoupled storage mount (`/storage/uploads/...`), rendered interactive SVG bounding box overlays (Net Qty, MRP, Consumer Care), triage findings ledger (7 rules evaluated: 5 compliant, 2 violations), and Section 63 BSA badge.
+  - Officer Preliminary Adjudication: recorded officer determination with mandatory statutory remarks.
+  - Page Refresh State Persistence: reloaded case from SQLite datastore verifying that all bounding boxes, findings, and officer remarks persist with zero data loss.
+  - Case Catalog Desk: verified case register table with active filters and pagination.
+  - Responsive Viewports Audit: validated responsive rendering across Mobile (390x844), Tablet (768x1024), and Desktop (1440x900) viewports with zero layout breakage.
+- **Frontend Test Suite Isolation Fix (`tests/golden_sku_selector.test.ts`)**:
+  - Added `beforeEach(() => { ApiService.setOperatingMode("MOCK"); })` ensuring test runs on Node.js test runner isolate mock/demo resolution and prevent unhandled relative fetch parsing.
+  - Validated all 111 unit tests across all 35 suites in `ui-combined/tests/` (100% pass rate).
+- **Production Distribution Rebuild**:
+  - Executed `npm run build` cleanly in 21.60s (`dist/index.html`, `dist/assets/index-CmY5xbxd.js`, `dist/assets/index-DeDdmMWn.css`).
+
+### Tests
+- `python verify_playwright_full_flow.py`: PASSED 100% with 0 browser errors; captured 10 evidentiary screenshots in `scratch/`.
+- `npm test` in `ui-combined/`: 111 passed across 35 suites in 9.89s (0 failed, 0 skipped).
+- `npm run build` in `ui-combined/`: Exit code 0 (2060 modules transformed cleanly).
+
+### Problems
+None. Resolved test isolation collision across Node.js singleton state.
+
+### Decisions
+1. Static storage mount at `/storage` serves physical evidence directly to standard `<img>` tags while preserving original disk immutability and SHA-256 integrity.
+2. Production React 18 SPA is rebuilt and ready for live demonstration and distribution.
+
+### Next Step
+Publish comprehensive 16-discipline engineering audit report.
+
+### Signing Note
+SIGNED OFF BY: Parmarth Kumar (parmarth.kumar@example.com) — 2026-09-12 05:40 IST [VERIFIED]
+
+
 
 
 

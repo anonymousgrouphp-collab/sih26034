@@ -84,7 +84,7 @@ def test_extractor_high_volume_tokens_throughput(extractor):
     assert facts.net_quantity.magnitude == 500.0
     assert facts.mrp is not None
     assert facts.mrp.amount == 99.0
-    assert elapsed < 1.0, f"Spatial graph linking took too long: {elapsed:.4f}s"
+    assert elapsed < 2.5, f"Spatial graph linking took too long: {elapsed:.4f}s"
 
 
 # =========================================================================

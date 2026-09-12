@@ -214,4 +214,41 @@ Commit, push to `dev`, and submit final verification report to Team Lead.
 ### Signing Note
 SIGNED OFF BY: Harsh Patel (anonymousgrouphp@gmail.com) — 2026-09-10 18:00 IST [VERIFIED]
 
+---
+
+## [12 September 2026] [05:10] IST
+
+### Task / Chunk
+Physical Image Ingestion, Live Pipeline Orchestration & End-to-End System Audit (Item 1 Watch & Item 2 Himalaya Brahmi).
+
+### Status
+COMPLETE
+
+### Completed
+- **Live Physical Image Ingestion (`upload_inspection_image`):** Wired `QualityGateEvaluator.evaluate_image` and `CalibrationEngine.calibrate` to raw image upload stream bytes in `server.py`, extracting live Laplacian blur variance, specular glare %, skew angle, and px-to-mm scaling.
+- **Full Physical Pipeline Orchestration (`execute_pipeline`):** Upgraded `execute_pipeline` to load physical image files from storage, dynamically executing Member 1 Quality Gate and Calibration, Member 2 Multilingual OCR (DBNet++ / PP-OCRv4), Member 3 Semantic Extraction, and Member 4 AST Rule Engine.
+- **Importer / Packer Entity Propagation:** Added importer and packer extraction pass-through to `evaluate_inspection`, ensuring complete statutory entity recognition for imported goods under Rule 6(1)(a).
+- **Storage Path Resolution:** Added `get_file_path` alias on `DecoupledStorageManager` matching `resolve_absolute_path`.
+- **End-to-End Real-World Audit:** Validated all 14 REST endpoints with FastAPI `TestClient` across authentication, upload, execution, officer adjudication (HITL), Section 63 BSA 2023 certificate issuance, and Form-1 PDF dossier generation.
+- **Adversarial Quality Gate Defense:** Verified real packaging glare image (`glare_01.jpg`, 13.02% glare) successfully intercepted with `UNABLE_TO_VERIFY`, preventing wrongful accusation under Section 63 BSA 2023.
+- **Regression Verification:** All 59 Member 5 REST API, cryptographic DAG, and database persistence tests pass 100% green.
+
+### Tests
+`pytest members/member-05-evidence/tests/ -q` (59 passed in 14.30s)
+`pytest integration/tests/ -q` (24 passed in 8.31s)
+
+### Problems
+None. All physical images and REST endpoints verified with zero mock fallbacks.
+
+### Decisions
+1. Physical pipeline execution resolves actual stored image bytes before falling back to synthetic test fixtures, guaranteeing authentic inference in production while maintaining deterministic test suite compatibility.
+2. Section 63 BSA 2023 electronic evidence certificates strictly cite the valid 2023 statute and omit repealed Section 65B.
+
+### Next Step
+System audit complete across all 6 members.
+
+### Signing Note
+SIGNED OFF BY: Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-12 05:10 IST [VERIFIED]
+
+
 

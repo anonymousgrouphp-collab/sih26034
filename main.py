@@ -28,6 +28,11 @@ TEST_UI_DIR = REPO_ROOT / "integration" / "test_ui"
 if TEST_UI_DIR.is_dir():
     app.mount("/test-ui", StaticFiles(directory=str(TEST_UI_DIR), html=True), name="test_ui")
 
+# 3b. Mount Decoupled Evidence Storage
+STORAGE_DIR = REPO_ROOT / "storage"
+STORAGE_DIR.mkdir(parents=True, exist_ok=True)
+app.mount("/storage", StaticFiles(directory=str(STORAGE_DIR)), name="storage")
+
 # 4. Mount React 18 Production Build (from ui-combined/dist)
 DIST_DIR = REPO_ROOT / "ui-combined" / "dist"
 if not DIST_DIR.is_dir():
@@ -41,8 +46,8 @@ if DIST_DIR.is_dir():
     # Catch-all route to serve index.html for client-side routing (SPA)
     @app.get("/{full_path:path}", include_in_schema=False)
     async def serve_spa(full_path: str):
-        # Allow API, docs, and test-ui endpoints to pass through to FastAPI handlers
-        if full_path.startswith(("api/", "docs", "redoc", "openapi.json", "test-ui")):
+        # Allow API, docs, test-ui, and storage endpoints to pass through to FastAPI handlers
+        if full_path.startswith(("api/", "docs", "redoc", "openapi.json", "test-ui", "storage/")):
             from fastapi import HTTPException
             raise HTTPException(status_code=404, detail="API endpoint not found.")
         file_path = DIST_DIR / full_path

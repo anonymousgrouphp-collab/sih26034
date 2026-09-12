@@ -9,12 +9,16 @@
  * 4. 1-Click case ID resolution to the underlying inspection cases
  */
 
-import { describe, it } from "node:test";
+import { describe, it, beforeEach } from "node:test";
 import assert from "node:assert";
 import { GOLDEN_SKU_ITEMS } from "../src/features/desk/GoldenSkuQuickSelector";
 import { ApiService } from "../src/services/api";
 
 describe("Golden Demonstration SKU Quick-Selector Integration", () => {
+  beforeEach(() => {
+    ApiService.setOperatingMode("MOCK");
+  });
+
   it("1. Catalog contains certified demonstration SKUs including the original 6", () => {
     assert.ok(GOLDEN_SKU_ITEMS.length >= 6, "Must define at least 6 pre-certified SKUs");
     const skuIds = GOLDEN_SKU_ITEMS.map((item) => item.skuId);

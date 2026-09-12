@@ -808,6 +808,8 @@ class LegalMetrologyRuleEngine:
         mrp: Optional[Dict[str, Any]] = None,
         declared_usp: Optional[float] = None,
         manufacturer: Optional[Dict[str, Any]] = None,
+        importer: Optional[Dict[str, Any]] = None,
+        packer: Optional[Dict[str, Any]] = None,
         consumer_care: Optional[Dict[str, Any]] = None,
         country_of_origin: Optional[str] = None,
         mfg_date_iso: Optional[str] = None,
@@ -827,13 +829,22 @@ class LegalMetrologyRuleEngine:
             font_result = Table1FontSchedule.evaluate(pdp_area_cm2, font_height_mm)
             evaluations.append(font_result)
 
-        # 3. Rule 6(1)(a) Manufacturer / Packer
-        if manufacturer:
+        # 3. Rule 6(1)(a) Manufacturer / Packer / Importer
+        entities = [e for e in [manufacturer, importer, packer] if e]
+        complete_entities = [e for e in entities if e.get("name") and e.get("address_line")]
+        if complete_entities:
+            mfg_entity = complete_entities[0]
+        elif entities:
+            mfg_entity = entities[0]
+        else:
+            mfg_entity = None
+
+        if mfg_entity:
             evaluations.append(Rule6DeclarationsEvaluator.evaluate_manufacturer(
-                name=manufacturer.get("name"),
-                address_line=manufacturer.get("address_line"),
-                pin_code=manufacturer.get("pin_code"),
-                state=manufacturer.get("state"),
+                name=mfg_entity.get("name"),
+                address_line=mfg_entity.get("address_line"),
+                pin_code=mfg_entity.get("pin_code"),
+                state=mfg_entity.get("state"),
             ))
         else:
             evaluations.append(Rule6DeclarationsEvaluator.evaluate_manufacturer(None))
@@ -873,17 +884,31 @@ class LegalMetrologyRuleEngine:
                 piece_count=piece_cnt,
             ))
         elif TemporalEpochDispatcher.is_usp_mandatory(epoch) and not is_ecommerce:
-            evaluations.append({
-                "rule_code": "RULE_06_1_K_USP_COMPUTATION",
-                "statutory_reference": "Rule 6(1)(k), G.S.R. 779(E)",
-                "citation": "Rule 6(1)(k), G.S.R. 779(E)",
-                "status": "FAIL",
-                "severity": "CRITICAL",
-                "required_value": "Mandatory Unit Sale Price declaration under G.S.R. 779(E)",
-                "measured_value": "MISSING",
-                "discrepancy": "Unit Sale Price declaration missing on post-2021 packaging",
-                "legal_consequence": "Violation of Rule 6(1)(k) and Section 36(1) LM Act 2009",
-            })
+            # Check Rule 6(1)(k) second proviso: packages containing 1 unit (1 Number / 1 piece) are exempt
+            if net_qty_val == 1.0 and str(net_qty_unit).upper() in ("N", "U", "PIECE", "PIECES", "UNIT", "UNITS", "NUMBER", "NUMBERS"):
+                evaluations.append({
+                    "rule_code": "RULE_06_1_K_USP_COMPUTATION",
+                    "statutory_reference": "Rule 6(1)(k) second proviso, G.S.R. 779(E)",
+                    "citation": "Rule 6(1)(k) Proviso (Net Qty = 1 Exemption)",
+                    "status": "PASS",
+                    "severity": "CRITICAL",
+                    "required_value": "Statutorily exempt under Rule 6(1)(k) proviso when Net Qty = 1 unit",
+                    "measured_value": "NOT_DECLARED (STATUTORILY_EXEMPT)",
+                    "discrepancy": None,
+                    "legal_consequence": "Compliant: Unit Sale Price is statutorily exempt for single-unit commodity",
+                })
+            else:
+                evaluations.append({
+                    "rule_code": "RULE_06_1_K_USP_COMPUTATION",
+                    "statutory_reference": "Rule 6(1)(k), G.S.R. 779(E)",
+                    "citation": "Rule 6(1)(k), G.S.R. 779(E)",
+                    "status": "FAIL",
+                    "severity": "CRITICAL",
+                    "required_value": "Mandatory Unit Sale Price declaration under G.S.R. 779(E)",
+                    "measured_value": "MISSING",
+                    "discrepancy": "Unit Sale Price declaration missing on post-2021 packaging",
+                    "legal_consequence": "Violation of Rule 6(1)(k) and Section 36(1) LM Act 2009",
+                })
 
         # 7. Rule 6(1)(n) Consumer Care
         if consumer_care:

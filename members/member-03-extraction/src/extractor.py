@@ -259,7 +259,9 @@ class CommodityFactExtractor:
         def _token_sort_key(t: Dict[str, Any]) -> Tuple[int, int]:
             bbox = t.get("bounding_box")
             if isinstance(bbox, (list, tuple)) and len(bbox) >= 2:
-                return (bbox[0], bbox[1])
+                # Quantize y-coordinate to group adjacent tokens on the same line (within 20px)
+                # so left-to-right reading order (bbox[1]) is preserved despite minor vertical pixel jitter
+                return (int(round(bbox[0])) // 20, int(round(bbox[1])))
             return (0, 0)
 
         return sorted(tokens, key=_token_sort_key)
@@ -539,15 +541,17 @@ class CommodityFactExtractor:
     def extract(
         self,
         ocr_data: Union[Dict[str, Any], Any],
-        calibration: Optional[Any] = None
+        calibration: Optional[Any] = None,
+        explicit_calibration: Optional[Any] = None,
     ) -> NormalizedCommodityFacts:
         """Processes OCR tokens to extract and normalize all statutory commodity declarations.
 
         Accepts optional Member 1 calibration results (CalibrationResult, CalibrationDTO, dict, or float)
         to accurately resolve physical mm font height and measurement confidence for downstream Rule Engine checks.
         """
+        calib_arg = calibration if calibration is not None else explicit_calibration
         image_id, tokens, full_text = self._normalize_tokens(ocr_data)
-        px_to_mm, calib_confidence = self._resolve_calibration(ocr_data, calibration)
+        px_to_mm, calib_confidence = self._resolve_calibration(ocr_data, calib_arg)
         sorted_tokens = self._sort_tokens_reading_order(tokens)
         composite_lines = self._cluster_horizontal_lines(tokens)
         text_units = self._build_spatial_linked_candidates(composite_lines, sorted_tokens)
@@ -574,25 +578,42 @@ class CommodityFactExtractor:
             return None, None
 
         # 1. NET QUANTITY & BANNED UNITS
+        qty_cand_explicit: Optional[Tuple[Dict[str, Any], Dict[str, Any]]] = None
+        qty_cand_standalone: Optional[Tuple[Dict[str, Any], Dict[str, Any]]] = None
+
+        qty_kw_re = re.compile(
+            r"(?:Net\s*(?:Quantity|Qty\.?|Weight|Wt\.?|Content|Contents|Volume|Vol\.?|Mass)|Quantity|Qty\.?|Pack\s*of|शुद्ध\s*(?:मात्रा|भार|वजन)|निवल\s*(?:मात्रा|भार|वजन))",
+            re.IGNORECASE
+        )
+
         for unit in text_units:
             text = unit["text"]
             parsed_qty = self.parser.parse_net_quantity(text)
-            if parsed_qty and extracted_net_qty is None:
-                extracted_net_qty = NetQuantityValue(**parsed_qty)
-                font_mm, font_conf = compute_font_height(unit["bounding_box"])
-                raw_fields.append(
-                    ExtractedFieldDTO(
-                        field_type="NET_QUANTITY",
-                        raw_ocr_text=text,
-                        normalized_value=parsed_qty,
-                        detection_confidence=0.98,
-                        ocr_confidence=unit["confidence"],
-                        bounding_box=unit["bounding_box"],
-                        measured_font_height_mm=font_mm,
-                        measurement_confidence=font_conf,
-                    )
+            if parsed_qty:
+                if qty_kw_re.search(text):
+                    if qty_cand_explicit is None:
+                        qty_cand_explicit = (parsed_qty, unit)
+                        break
+                elif qty_cand_standalone is None:
+                    qty_cand_standalone = (parsed_qty, unit)
+
+        chosen_qty = qty_cand_explicit or qty_cand_standalone
+        if chosen_qty:
+            parsed_qty, unit = chosen_qty
+            extracted_net_qty = NetQuantityValue(**parsed_qty)
+            font_mm, font_conf = compute_font_height(unit["bounding_box"])
+            raw_fields.append(
+                ExtractedFieldDTO(
+                    field_type="NET_QUANTITY",
+                    raw_ocr_text=unit["text"],
+                    normalized_value=parsed_qty,
+                    detection_confidence=0.98,
+                    ocr_confidence=unit["confidence"],
+                    bounding_box=unit["bounding_box"],
+                    measured_font_height_mm=font_mm,
+                    measurement_confidence=font_conf,
                 )
-                break
+            )
 
         # 2. MAXIMUM RETAIL PRICE (MRP) & TAX INCLUSIVITY
         # Priority 1: Check candidates with explicit MRP indicators (MRP, M.R.P., Max Retail Price, अ.वि.मू.)
@@ -888,7 +909,7 @@ class CommodityFactExtractor:
                             )
 
         # Priority C: Scan remaining composite lines for PIN code and State if manufacturer is still incomplete
-        if extracted_mfg is None:
+        if extracted_mfg is None and extracted_importer is None and extracted_packer is None:
             for unit in composite_lines:
                 text = unit["text"]
                 parsed_addr = self.parser.parse_address(text)

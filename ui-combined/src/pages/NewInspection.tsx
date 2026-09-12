@@ -145,9 +145,10 @@ export const NewInspection: React.FC = () => {
       });
 
       // 3. Upload evidence file if provided
+      let uploadedImageId: string | null = null;
       if (files.length > 0) {
         const file = files[0];
-        await ApiService.uploadEvidence(file, {
+        const uploadResult = await ApiService.uploadEvidence(file, {
           inspection_id: newCase.id,
           panel_type: "PDP_FRONT",
           original_filename: file.name,
@@ -157,6 +158,9 @@ export const NewInspection: React.FC = () => {
           image_height: 1080,
           preview_url: filePreviews[0] || URL.createObjectURL(file),
         });
+        if (uploadResult?.image_id) {
+          uploadedImageId = uploadResult.image_id;
+        }
       }
 
       // Step simulation for visual feedback
@@ -169,9 +173,9 @@ export const NewInspection: React.FC = () => {
       }
 
       // Final: Execute pipeline
-      const activeAsset = newCase.evidence_assets[0];
-      if (activeAsset) {
-        await ApiService.executePipeline(activeAsset.image_id, newCase.id);
+      const activeAssetId = uploadedImageId || newCase.evidence_assets[0]?.image_id;
+      if (activeAssetId) {
+        await ApiService.executePipeline(activeAssetId, newCase.id);
       }
 
       navigate(`/inspections/${newCase.id}`);
