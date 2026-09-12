@@ -4,11 +4,12 @@ import { ApiService } from "../services/api";
 import { InspectionSummary, InspectionCase } from "../types/inspection";
 import { InspectionDesk } from "../features/desk/InspectionDesk";
 import { NewInspectionModal } from "../features/new-inspection/NewInspectionModal";
+import { useCircle } from "../context/CircleContext";
 
 export const Inspections: React.FC = () => {
   const [cases, setCases] = useState<InspectionSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeCircle, setActiveCircle] = useState("CIRCLE_DL_SOUTH_01");
+  const { activeCircle } = useCircle();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -16,7 +17,9 @@ export const Inspections: React.FC = () => {
   const loadCases = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await ApiService.listInspections({ circleId: activeCircle });
+      const res = await ApiService.listInspections({
+        circleId: activeCircle && activeCircle !== "ALL" ? activeCircle : undefined,
+      });
       setCases(res.items);
     } catch (err) {
       console.error("Failed to load cases:", err);

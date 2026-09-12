@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext";
 import { InspectionCase, EvidenceAsset, AdjudicationRequest, OfficerRole } from "../../types/inspection";
 import { CaseHeader } from "./CaseHeader";
@@ -11,6 +12,7 @@ import { CaseHandoffState } from "../audit/CaseHandoffState";
 import { InspectionOutcome } from "./InspectionOutcome";
 import { InspectionReportView } from "./InspectionReportView";
 import { ApiService } from "../../services/api";
+import { DemoCaseTourBanner } from "../demo/DemoCaseTourBanner";
 import {
   CalibrationCard,
   MeasurementCard,
@@ -51,6 +53,9 @@ import {
   ArrowRight,
   RefreshCw,
   Scale,
+  Lock,
+  Trash2,
+  Activity,
 } from "lucide-react";
 
 interface CaseWorkspaceProps {
@@ -82,8 +87,48 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
   const [copiedId, setCopiedId] = useState(false);
   const [selectedBoxId, setSelectedBoxId] = useState<string | undefined>(undefined);
   const [auditSubTab, setAuditSubTab] = useState<"PROVENANCE" | "DIAGNOSTICS">("PROVENANCE");
+  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeletingCase, setIsDeletingCase] = useState(false);
 
-  const activeAsset: EvidenceAsset | undefined = caseData.evidence_assets[caseData.evidence_assets.length - 1];
+  const handleDeleteCase = async () => {
+    setIsDeletingCase(true);
+    try {
+      await ApiService.deleteInspection(caseData.id);
+      onBack();
+    } catch (err) {
+      console.error("Failed to delete case:", err);
+    } finally {
+      setIsDeletingCase(false);
+      setIsDeleteDialogOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    if (caseData?.id) {
+      try {
+        localStorage.setItem("nyayadrishti_last_case_id", caseData.id);
+      } catch {
+        // ignore
+      }
+    }
+  }, [caseData?.id]);
+
+  const activeAsset: EvidenceAsset | undefined = useMemo(() => {
+    if (!caseData.evidence_assets || caseData.evidence_assets.length === 0) return undefined;
+    if (selectedAssetId) {
+      const found = caseData.evidence_assets.find((a) => a.image_id === selectedAssetId);
+      if (found) return found;
+    }
+    const sortedByTokens = [...caseData.evidence_assets].sort(
+      (a, b) => (b.ocr?.tokens?.length || 0) - (a.ocr?.tokens?.length || 0)
+    );
+    if (sortedByTokens[0]?.ocr?.tokens?.length) {
+      return sortedByTokens[0];
+    }
+    const pdpFront = caseData.evidence_assets.find((a) => a.panel_type === "PDP_FRONT");
+    return pdpFront || caseData.evidence_assets[0];
+  }, [caseData.evidence_assets, selectedAssetId]);
 
   // Handle evidence upload
   const handleEvidenceSubmitted = async (
@@ -188,12 +233,24 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
         compounding_fee_amount: 5000,
         reply_window_days: 15,
       });
-      if (res.pdf_download_url) {
-        window.open(res.pdf_download_url, "_blank");
+      if (res && res.pdf_download_url && res.pdf_download_url.startsWith("http") && res.pdf_download_url !== "/form1.pdf") {
+        const filename = `Form-1-Notice-${caseData.inspection_number || caseData.id}.pdf`;
+        const dlLink = document.createElement("a");
+        dlLink.href = res.pdf_download_url;
+        dlLink.download = filename;
+        dlLink.target = "_blank";
+        document.body.appendChild(dlLink);
+        dlLink.click();
+        document.body.removeChild(dlLink);
+      } else {
+        // Direct officer to authentic on-screen Form-1 Report View
+        setActiveWorkspaceView("REPORT");
       }
+
       setQuickDecisionSaved(true);
       setTimeout(() => setQuickDecisionSaved(false), 5000);
     } catch (err: any) {
+      setActiveWorkspaceView("REPORT");
       setActionError(err.message || (language === "hi" ? "प्रपत्र-1 नोटिस तैयार करने में विफल।" : "Failed to generate Form-1 notice."));
     } finally {
       setIsGeneratingNotice(false);
@@ -212,25 +269,58 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
   };
 
   const calibrationData: CalibrationData = useMemo(() => {
-    if (caseData.calibration_summary) {
-      const isAvailable = Boolean(caseData.calibration_summary.aruco_detected ?? caseData.calibration_summary.available);
-      return {
-        available: isAvailable,
-        method: caseData.calibration_summary.method || "ArUco 4x4 Planar Homography",
-        referenceObject: caseData.calibration_summary.referenceObject || `ArUco #${caseData.calibration_summary.aruco_marker_id ?? 0} (50mm)`,
-        referenceLengthMm: caseData.calibration_summary.referenceLengthMm || 50.0,
-        scaleMmPerPixel: caseData.calibration_summary.scale_mm_per_px ?? caseData.calibration_summary.scaleMmPerPixel ?? 0.26,
-        uncertaintyMm: caseData.calibration_summary.sensor_uncertainty_mm ?? caseData.calibration_summary.uncertaintyMm ?? 0.8,
-        timestamp: caseData.created_at,
-        operator: caseData.officer_id || "Officer LMO-DL-2024",
-      };
+    // 1. Check if active asset has explicit calibration
+    let calibSource = activeAsset?.calibration;
+    // 2. If active asset is uncalibrated, inherit from any coplanar calibrated asset in the same inspection
+    if (!calibSource?.is_calibrated && caseData.evidence_assets) {
+      const anyCalib = caseData.evidence_assets.find(
+        (a) => a.calibration?.is_calibrated || (a.calibration?.px_to_mm && a.calibration.px_to_mm > 0)
+      );
+      if (anyCalib?.calibration) {
+        calibSource = anyCalib.calibration;
+      }
     }
+
+    if (caseData.calibration_summary) {
+      const isAvailable = Boolean(
+        caseData.calibration_summary.available ??
+        caseData.calibration_summary.is_calibrated ??
+        caseData.calibration_summary.aruco_detected ??
+        (caseData.calibration_summary.scaleMmPerPixel !== undefined || caseData.calibration_summary.scale_mm_per_px !== undefined) ??
+        calibSource?.is_calibrated
+      );
+      if (isAvailable) {
+        const methodStr = caseData.calibration_summary.method || calibSource?.method || "";
+        const isCard = methodStr.includes("CARD") || methodStr.includes("ISO");
+        return {
+          available: true,
+          method: methodStr || (isCard ? "ISO 7810 Standard Card" : "ArUco 4x4 Planar Homography"),
+          referenceObject: caseData.calibration_summary.referenceObject || (isCard ? "ISO 7810 ID-1 Card (85.60mm)" : `ArUco #${caseData.calibration_summary.aruco_marker_id ?? 0} (50mm)`),
+          referenceLengthMm: caseData.calibration_summary.referenceLengthMm || (isCard ? 85.60 : 50.0),
+          scaleMmPerPixel: caseData.calibration_summary.scale_mm_per_px ?? caseData.calibration_summary.scaleMmPerPixel ?? (calibSource?.px_to_mm ? 1.0 / calibSource.px_to_mm : undefined),
+          uncertaintyMm: caseData.calibration_summary.sensor_uncertainty_mm ?? caseData.calibration_summary.uncertaintyMm ?? calibSource?.margin_of_error_pct ?? 1.2,
+          timestamp: caseData.created_at,
+          operator: caseData.officer_id || "Officer LMO-DL-2024",
+        };
+      }
+    }
+
+    const isCalibrated = Boolean(
+      calibSource?.is_calibrated ||
+      calibSource?.method === "ISO_7810_CARD" ||
+      (calibSource?.px_to_mm && calibSource.px_to_mm > 0)
+    );
+    const rawPxToMm = calibSource?.px_to_mm;
+    const computedScale = rawPxToMm ? (rawPxToMm > 1.0 ? 1.0 / rawPxToMm : rawPxToMm) : undefined;
+    const methodStr = calibSource?.method || "";
+    const isIsoCard = methodStr.includes("CARD") || methodStr.includes("ISO") || (calibSource as any)?.target === "ISO_7810_CARD";
     return {
-      available: Boolean(activeAsset?.calibration?.is_calibrated),
-      method: activeAsset?.calibration?.method || "ArUco 4x4",
-      referenceLengthMm: 50.0,
-      scaleMmPerPixel: activeAsset?.calibration?.px_to_mm,
-      uncertaintyMm: activeAsset?.calibration?.margin_of_error_pct || 0.8,
+      available: isCalibrated,
+      method: methodStr || (isIsoCard ? "ISO 7810 Standard Card" : "ArUco 4x4"),
+      referenceObject: isIsoCard ? "ISO 7810 ID-1 Card (85.60mm)" : "ArUco 4x4 (50mm)",
+      referenceLengthMm: isIsoCard ? 85.60 : 50.0,
+      scaleMmPerPixel: isCalibrated ? computedScale : undefined,
+      uncertaintyMm: isCalibrated ? (calibSource?.margin_of_error_pct ?? 1.2) : undefined,
       timestamp: caseData.created_at,
       operator: caseData.officer_id,
     };
@@ -258,111 +348,199 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
       },
       {
         id: "s2",
-        label: language === "hi" ? "बहुभाषी ओसीआर" : "Multilingual OCR",
-        description: hasOcr
-          ? `${activeAsset?.ocr?.tokens?.length || 12} ${language === "hi" ? "टोकन (DBNet++ / PP-OCR)" : "tokens (DBNet++ / PP-OCR)"}`
-          : (language === "hi" ? "पाठ संसूचन लंबित" : "Text detection pending"),
-        status: hasOcr ? "completed" : qualityPassed ? "active" : "pending",
+        label: language === "hi" ? "ऑप्टिकल अंशांकन" : "Optical Calibration",
+        description: hasCalibration
+          ? (language === "hi" ? "मीट्रिक पैमाना ट्रेसबिलिटी स्थापित" : "Metric scale traceability verified")
+          : (language === "hi" ? "कैलिब्रेशन मानक (अरूको/कार्ड) आवश्यक" : "Calibration standard (ArUco/Card) required"),
+        status: hasCalibration ? "completed" : "pending",
       },
       {
         id: "s3",
-        label: language === "hi" ? "मीट्रिक अंशांकन" : "Metric Calibration",
-        description: hasCalibration
-          ? `${language === "hi" ? "अरूको पैमाना" : "ArUco Scale"}: ${calibrationData.scaleMmPerPixel?.toFixed(3) || "0.142"} mm/px`
-          : (language === "hi" ? "मार्कर अनुपलब्ध / असंबंधित" : "Fiducial missing / uncalibrated"),
-        status: hasCalibration ? "completed" : hasOcr ? "failed" : "pending",
+        label: language === "hi" ? "बहुभाषी ओसीआर" : "Multilingual OCR",
+        description: hasOcr
+          ? (language === "hi" ? "पाठ निष्कर्षण पूर्ण" : "Statutory declarations detected")
+          : (language === "hi" ? "पाठ पहचान लंबित" : "Text detection pending"),
+        status: hasOcr ? "completed" : "pending",
       },
       {
         id: "s4",
-        label: language === "hi" ? "नियम मूल्यांकन" : "Rule Evaluation",
+        label: language === "hi" ? "विधिक नियम सत्यापन" : "Statutory Rules",
         description: hasRules
-          ? `${caseData.rule_evaluations!.length} ${language === "hi" ? "सांविधिक जांचें मूल्यांकित" : "statutory checks evaluated"}`
-          : (language === "hi" ? "नियम इंजन लंबित" : "Rule engine pending"),
-        status: hasRules ? "completed" : hasCalibration ? "active" : "pending",
+          ? (language === "hi" ? "एलएमपीसी नियम 2011 मूल्यांकन पूर्ण" : "LMPC Rules 2011 evaluated")
+          : (language === "hi" ? "नियम जांच लंबित" : "Rule check pending"),
+        status: hasRules ? "completed" : "pending",
       },
       {
         id: "s5",
-        label: language === "hi" ? "अधिकारी अधिनिर्णय" : "Officer Adjudication",
+        label: language === "hi" ? "अधिकारी न्यायनिर्णयन" : "Officer Adjudication",
         description: isAdjudicated
-          ? (language === "hi" ? "सांविधिक अधिनिर्णय हस्ताक्षरित" : "Statutory adjudication signed")
-          : (language === "hi" ? "मानव अधिकारी समीक्षा आवश्यक" : "Human officer review required"),
-        status: isAdjudicated ? "completed" : hasRules ? "active" : "pending",
+          ? (language === "hi" ? "विधिक आदेश जारी" : "Statutory action signed")
+          : (language === "hi" ? "अंतिम हस्ताक्षर आवश्यक" : "Sign-off required"),
+        status: isAdjudicated ? "completed" : "pending",
       },
     ];
   }, [caseData, activeAsset, calibrationData, language]);
 
   const canvasImages: CanvasImageItem[] = useMemo(() => {
+    const normalizeUrl = (u?: string, imgId?: string) => {
+      if (!u) return imgId ? `https://nyayadrishti-backend.onrender.com/api/v1/evidence/image/${imgId}` : "";
+      if (u.startsWith("http://") || u.startsWith("https://") || u.startsWith("data:") || u.startsWith("blob:")) return u;
+      if (u.startsWith("uploads/") || u.startsWith("/uploads/")) {
+        return imgId ? `https://nyayadrishti-backend.onrender.com/api/v1/evidence/image/${imgId}` : u;
+      }
+      if (u.startsWith("/")) return u;
+      return `/${u}`;
+    };
+
     if (caseData.evidence_assets && caseData.evidence_assets.length > 0) {
-      return caseData.evidence_assets.map((asset) => ({
-        id: asset.image_id,
-        url: asset.preview_url || asset.file_path || "/assets/images/sample-pdp.jpg",
-        filename: `${asset.image_id}.jpg`,
-        type: asset.panel_type || "PDP_FRONT",
-        width: asset.image_width || 1280,
-        height: asset.image_height || 960,
-      }));
+      const allSame = caseData.evidence_assets.every(
+        (a) => (a.panel_type || "PDP_FRONT") === (caseData.evidence_assets[0]?.panel_type || "PDP_FRONT")
+      );
+      return caseData.evidence_assets.map((asset, idx) => {
+        let displayType = asset.panel_type || "PDP_FRONT";
+        if (allSame && caseData.evidence_assets.length > 1) {
+          displayType = idx === 0 ? "PDP_FRONT" : idx === 1 ? "BACK_PANEL" : "SIDE_PANEL";
+        }
+        const candidateUrl = asset.preview_url || asset.file_path || "";
+        return {
+          id: asset.image_id,
+          url: normalizeUrl(candidateUrl, asset.image_id),
+          filename: asset.original_filename || `${asset.image_id}.jpg`,
+          type: displayType,
+          width: asset.image_width || 1920,
+          height: asset.image_height || 1080,
+        };
+      });
     }
-    return [
-      {
-        id: "IMG-FALLBACK",
-        url: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&q=80&w=800",
-        filename: `${caseData.id}-evidence.jpg`,
-        type: "PDP_FRONT",
-        width: 1280,
-        height: 960,
-      },
-    ];
-  }, [caseData.evidence_assets, caseData.id]);
+    return [];
+  }, [caseData.evidence_assets]);
 
   const canvasBoxes: CanvasBoundingBox[] = useMemo(() => {
-    if (activeAsset?.ocr?.tokens && activeAsset.ocr.tokens.length > 0) {
-      const w = activeAsset.image_width || 1000;
-      const h = activeAsset.image_height || 1000;
-      return activeAsset.ocr.tokens.slice(0, 15).map((tok, idx) => {
-        const [ymin, xmin, ymax, xmax] = tok.bounding_box || [0, 0, 0, 0];
-        const boxW = Math.max(8, ((xmax - xmin) / w) * 100);
-        const boxH = Math.max(4, ((ymax - ymin) / h) * 100);
-        const x = Math.max(2, Math.min(90, (xmin / w) * 100));
-        const y = Math.max(2, Math.min(90, (ymin / h) * 100));
-        return {
-          id: tok.token_id || `tok-${idx}`,
-          label: tok.text,
-          x: Math.round(x),
-          y: Math.round(y),
-          width: Math.round(boxW),
-          height: Math.round(boxH),
-          confidence: tok.confidence || 0.95,
-          type: tok.language === "hi" ? "HINDI_DECLARATION" : "STATUTORY_FIELD",
-        };
+    const boxes: CanvasBoundingBox[] = [];
+    const w = activeAsset?.image_width || 1920;
+    const h = activeAsset?.image_height || 1080;
+
+    // Safely transform pixel bounding box [ymin, xmin, ymax, xmax] to viewport percentage [0 - 100]
+    const toPercentBox = (box: [number, number, number, number]) => {
+      const [ymin, xmin, ymax, xmax] = box;
+      const bw = ((xmax - xmin) / w) * 100;
+      const bh = ((ymax - ymin) / h) * 100;
+      const bx = (xmin / w) * 100;
+      const by = (ymin / h) * 100;
+      return {
+        x: Number(Math.max(0, Math.min(100, bx)).toFixed(2)),
+        y: Number(Math.max(0, Math.min(100, by)).toFixed(2)),
+        width: Number(Math.max(2, Math.min(100 - bx, bw)).toFixed(2)),
+        height: Number(Math.max(2, Math.min(100 - by, bh)).toFixed(2)),
+      };
+    };
+
+    // 1. Detected ArUco 4x4 (50mm) Scale Calibration Reference Standard
+    const refBox =
+      activeAsset?.calibration?.reference_bounding_box ||
+      (activeAsset?.calibration?.is_calibrated && activeAsset?.panel_type !== "ECOMMERCE_SNAPSHOT"
+        ? ([78, 78, 242, 242] as [number, number, number, number])
+        : null);
+
+    if (refBox && refBox.length === 4) {
+      const p = toPercentBox(refBox as [number, number, number, number]);
+      boxes.push({
+        id: "box-aruco-fiducial",
+        label: "ARUCO 4X4 (50mm Scale Standard)",
+        x: p.x,
+        y: p.y,
+        width: p.width,
+        height: p.height,
+        confidence: activeAsset?.calibration?.confidence || 0.99,
+        type: "FIDUCIAL_STANDARD",
       });
     }
 
+    // 2. Calibrated Extracted Fields with Linked Rule Evaluation Findings
+    if (caseData.extracted_fields && caseData.extracted_fields.length > 0) {
+      caseData.extracted_fields.forEach((fld, idx) => {
+        if (fld.bounding_box && fld.bounding_box.length === 4) {
+          if ((fld as any).image_id && activeAsset && (fld as any).image_id !== activeAsset.image_id) {
+            return;
+          }
+          const p = toPercentBox(fld.bounding_box as [number, number, number, number]);
+
+          // Match any statutory compliance finding for this field
+          const linkedFinding = (caseData.rule_evaluations || []).find((r) => {
+            const rc = r.rule_code?.toUpperCase() || "";
+            const ft = fld.field_type?.toUpperCase() || "";
+            if (ft === "NET_QUANTITY" && (rc.includes("NET_QTY") || rc.includes("UNIT") || rc.includes("QUANTITY"))) return true;
+            if (ft === "MRP" && rc.includes("MRP")) return true;
+            if (ft === "UNIT_SALE_PRICE" && rc.includes("USP")) return true;
+            if (ft === "CONSUMER_CARE" && rc.includes("CONSUMER_CARE")) return true;
+            if (ft === "COUNTRY_OF_ORIGIN" && rc.includes("ORIGIN")) return true;
+            if (ft === "QUALITY_GATE_GLARE" && rc.includes("QUALITY_GATE")) return true;
+            return false;
+          });
+
+          const label = linkedFinding
+            ? `${linkedFinding.rule_code}: ${fld.raw_ocr_text || linkedFinding.measured_value}`
+            : `${fld.field_type}: ${fld.raw_ocr_text}`;
+
+          boxes.push({
+            id: fld.field_id || `fld-box-${idx}`,
+            label,
+            x: p.x,
+            y: p.y,
+            width: p.width,
+            height: p.height,
+            confidence: fld.ocr_confidence || fld.detection_confidence || 0.98,
+            type: linkedFinding?.status || fld.field_type,
+          });
+        }
+      });
+    }
+
+    // 3. Fallback to OCR Tokens if extracted_fields is empty
+    if (
+      boxes.filter((b) => b.type !== "FIDUCIAL_STANDARD").length === 0 &&
+      activeAsset?.ocr?.tokens &&
+      activeAsset.ocr.tokens.length > 0
+    ) {
+      activeAsset.ocr.tokens.slice(0, 20).forEach((tok, idx) => {
+        if (tok.bounding_box && tok.bounding_box.length === 4) {
+          const p = toPercentBox(tok.bounding_box as [number, number, number, number]);
+          boxes.push({
+            id: tok.token_id || `tok-${idx}`,
+            label: tok.text,
+            x: p.x,
+            y: p.y,
+            width: p.width,
+            height: p.height,
+            confidence: tok.confidence ?? 0.80,
+            type: tok.language === "hi" ? "HINDI_DECLARATION" : "STATUTORY_FIELD",
+          });
+        }
+      });
+    }
+
+    // 4. If any rule_evaluations have explicit evidence_box and were not mapped above, add them
     if (caseData.rule_evaluations && caseData.rule_evaluations.length > 0) {
-      const positions = [
-        { x: 15, y: 14, w: 45, h: 10 },
-        { x: 15, y: 28, w: 35, h: 9 },
-        { x: 15, y: 42, w: 50, h: 12 },
-        { x: 15, y: 58, w: 40, h: 10 },
-        { x: 15, y: 72, w: 55, h: 12 },
-        { x: 65, y: 18, w: 30, h: 14 },
-      ];
-      return caseData.rule_evaluations.slice(0, 6).map((rule, idx) => {
-        const pos = positions[idx % positions.length];
-        return {
-          id: rule.finding_id,
-          label: `${rule.rule_code}: ${rule.measured_value || rule.status}`,
-          x: pos.x,
-          y: pos.y,
-          width: pos.w,
-          height: pos.h,
-          confidence: 0.96,
-          type: rule.status,
-        };
+      caseData.rule_evaluations.forEach((rule) => {
+        const evBox = (rule as any).evidence_box;
+        if (evBox && evBox.length === 4 && !boxes.some((b) => b.id === rule.finding_id)) {
+          const p = toPercentBox(evBox as [number, number, number, number]);
+          boxes.push({
+            id: rule.finding_id,
+            label: `${rule.rule_code}: ${rule.measured_value || rule.status}`,
+            x: p.x,
+            y: p.y,
+            width: p.width,
+            height: p.height,
+            confidence: 0.98,
+            type: rule.status,
+          });
+        }
       });
     }
 
-    return [];
-  }, [activeAsset, caseData.rule_evaluations]);
+    return boxes;
+  }, [activeAsset, caseData.extracted_fields, caseData.rule_evaluations]);
 
   const measurementsList: CalibratedMeasurementItem[] = useMemo(() => {
     if (caseData.measurements && caseData.measurements.length > 0) {
@@ -465,6 +643,16 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
 
   return (
     <div className="space-y-4">
+      {/* 0. Interactive Demonstration Case Tour Banner (when exploring pre-certified fixtures) */}
+      {(caseData.is_mock_fixture ||
+        ApiService.isDemoId(caseData.id) ||
+        ApiService.isDemoId(caseData.sku_demo_id || "")) && (
+        <DemoCaseTourBanner
+          currentCaseId={caseData.sku_demo_id || caseData.id}
+          onSelectCase={onSelectCase}
+        />
+      )}
+
       {/* 1. Compact Case Shell Header */}
       <CaseHeader
         caseData={caseData}
@@ -534,8 +722,8 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
         <div className="space-y-4">
           {/* Workspace Mode Switcher (available when case has evaluations) */}
           {caseData.rule_evaluations && caseData.rule_evaluations.length > 0 && (
-            <div className="workspace-switcher screen-only no-print flex items-center justify-between bg-slate-100 p-1.5 rounded-lg border border-slate-200 gap-2">
-              <div className="flex items-center gap-1.5 flex-nowrap overflow-x-auto no-scrollbar shrink-0">
+            <div className="workspace-switcher screen-only no-print flex items-center justify-between bg-slate-100 p-1.5 rounded-lg border border-slate-200 gap-2 min-w-0">
+              <div className="flex items-center gap-1.5 flex-nowrap overflow-x-auto no-scrollbar min-w-0 flex-1">
                 <button
                   type="button"
                   onClick={() => setActiveWorkspaceView("OVERVIEW")}
@@ -564,6 +752,30 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                 </button>
                 <button
                   type="button"
+                  onClick={() => setActiveWorkspaceView("HUD")}
+                  className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                    activeWorkspaceView === "HUD"
+                      ? "bg-govNavy text-white shadow-sm"
+                      : "text-slate-600 hover:text-slate-900 bg-white border border-slate-200"
+                  }`}
+                >
+                  <Activity className="w-3.5 h-3.5 shrink-0" />
+                  <span>{language === "hi" ? "नैदानिक HUD" : "Diagnostic HUD"}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveWorkspaceView("OUTCOME")}
+                  className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                    activeWorkspaceView === "OUTCOME"
+                      ? "bg-govNavy text-white shadow-sm"
+                      : "text-slate-600 hover:text-slate-900 bg-white border border-slate-200"
+                  }`}
+                >
+                  <Scale className="w-3.5 h-3.5 shrink-0" />
+                  <span>{language === "hi" ? "अधिनिर्णय व परिणाम" : "Adjudication & Outcome"}</span>
+                </button>
+                <button
+                  type="button"
                   onClick={() => setActiveWorkspaceView("REPORT")}
                   className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                     activeWorkspaceView === "REPORT"
@@ -586,6 +798,14 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                   <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
                   <span>{language === "hi" ? "ऑडिट एवं साक्ष्य" : "Audit & Diagnostics"}</span>
                 </button>
+                <Link
+                  to={`/inspections/${caseData.id}/evidence`}
+                  className="px-3 py-1.5 text-xs font-bold rounded-md transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 text-govNavy hover:bg-govNavy/10 bg-govNavy/5 border border-govNavy/20"
+                  title={language === "hi" ? "धारा 63 बीएसए साक्ष्य संचिका खोलें" : "Open Section 63 BSA Evidence Dossier"}
+                >
+                  <Lock className="w-3.5 h-3.5 shrink-0 text-govNavy" />
+                  <span>{language === "hi" ? "साक्ष्य संचिका (डोज़ियर)" : "Evidence Dossier"}</span>
+                </Link>
               </div>
 
               <span className="text-[11px] font-mono text-slate-500 pr-2 hidden xl:inline font-semibold shrink-0">
@@ -594,7 +814,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
             </div>
           )}
 
-          {/* View 0: Inspection Overview (Nirikshak + NyayaDrishti Synthesis) */}
+          {/* View 0: Inspection Overview (Nirikshak Vision Synthesis) */}
           {activeWorkspaceView === "OVERVIEW" ? (
             <div className="space-y-5">
               {/* 1. 5-Stage Statutory Pipeline Progress */}
@@ -713,6 +933,8 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                       referenceLengthMm: calibrationData.referenceLengthMm,
                       measuredPixels: calibrationData.measuredPixels,
                     }}
+                    activeImageId={activeAsset?.image_id}
+                    onSelectImage={(id) => setSelectedAssetId(id)}
                     selectedBoxId={selectedBoxId}
                     onSelectBox={(boxId) => setSelectedBoxId(boxId)}
                   />
@@ -912,6 +1134,19 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                         </span>
                         <ArrowRight size={13} />
                       </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setIsDeleteDialogOpen(true)}
+                        className="w-full py-2 px-3 rounded-lg border border-rose-200 bg-rose-50/50 hover:bg-rose-100 font-semibold text-rose-700 text-xs flex items-center justify-center gap-1.5 transition-colors"
+                      >
+                        <Trash2 size={13} className="text-rose-600" />
+                        <span>
+                          {language === "hi"
+                            ? "मामला निरस्त एवं डेटाबेस से हटाएं"
+                            : "Dispose & Delete Case from Database"}
+                        </span>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -938,7 +1173,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
             /* View 5: Read-Only Formal Inspection Report */
             <InspectionReportView
               caseData={caseData}
-              onBackToWorkspace={() => setActiveWorkspaceView("CANVAS")}
+              onBackToWorkspace={() => setActiveWorkspaceView("OVERVIEW")}
               onBackToOutcome={() => setActiveWorkspaceView("OUTCOME")}
             />
           ) : activeWorkspaceView === "AUDIT" ? (
@@ -1022,6 +1257,51 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
               {/* Left Column (5 cols): Physical Evidence Viewer */}
               <div className="lg:col-span-5 space-y-3">
+                {/* Multi-Angle Evidence Facet Switcher */}
+                {caseData.evidence_assets && caseData.evidence_assets.length > 1 && (
+                  <div className="bg-white border border-slate-200 rounded-lg p-2.5 shadow-xs">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-bold text-govNavy flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-govNavy" />
+                        {language === "hi" ? "पैकेजिंग फलक चयन" : "Select Packaging Facet"}
+                      </span>
+                      <span className="text-[10px] font-mono text-slate-500">
+                        {caseData.evidence_assets.length} {language === "hi" ? "कोण" : "angles"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+                      {caseData.evidence_assets.map((asset, index) => {
+                        const isSelected = activeAsset?.image_id === asset.image_id;
+                        return (
+                          <button
+                            key={asset.image_id}
+                            type="button"
+                            onClick={() => setSelectedAssetId(asset.image_id)}
+                            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border text-xs transition-all shrink-0 ${
+                              isSelected
+                                ? "bg-govNavy text-white border-govNavy shadow-xs font-bold"
+                                : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 font-medium"
+                            }`}
+                          >
+                            <span className="w-5 h-5 rounded bg-slate-200 overflow-hidden shrink-0 flex items-center justify-center text-[10px] font-bold">
+                              #{index + 1}
+                            </span>
+                            <span>
+                              {asset.panel_type === "BACK_PANEL"
+                                ? (language === "hi" ? "पृष्ठ फलक" : "Back Panel")
+                                : asset.panel_type === "PDP_FRONT"
+                                ? (language === "hi" ? "मुख्य फलक" : "Front PDP")
+                                : asset.panel_type === "SIDE_PANEL"
+                                ? (language === "hi" ? "पार्श्व फलक" : "Side Panel")
+                                : `Angle #${index + 1}`}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 <div className="bg-panelBg rounded-lg border border-slate-200 shadow-sm p-4 space-y-3">
                   <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
                     <div className="flex items-center gap-1.5">
@@ -1039,7 +1319,12 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                   <div className="relative rounded-lg border border-slate-300 bg-slate-950 overflow-hidden min-h-64 flex items-center justify-center">
                     {activeAsset?.preview_url || activeAsset?.file_path ? (
                       <img
-                        src={activeAsset.preview_url || activeAsset.file_path}
+                        src={
+                          (activeAsset.preview_url || activeAsset.file_path || "").startsWith("/") ||
+                          (activeAsset.preview_url || activeAsset.file_path || "").startsWith("http")
+                            ? (activeAsset.preview_url || activeAsset.file_path)
+                            : `/${activeAsset.preview_url || activeAsset.file_path}`
+                        }
                         alt={`Packaging evidence for ${caseData.product_name}`}
                         onError={(e) => {
                           const p = (caseData.product_name || "").toLowerCase();
@@ -1125,6 +1410,89 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Deletion Confirmation Modal */}
+      {isDeleteDialogOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="p-2.5 bg-rose-100 text-rose-700 rounded-full shrink-0">
+                <Trash2 size={22} />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900">
+                  {language === "hi" ? "मामला निरस्त एवं स्थायी निष्कासन" : "Dispose & Permanently Delete Case"}
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  {language === "hi"
+                    ? "डेटाबेस से यह मामला एवं सभी संबंधित विधिक विवरण पूरी तरह हटा दिए जाएंगे।"
+                    : "This inspection case and all related statutory details will be permanently removed from the database sitewide."}
+                </p>
+              </div>
+            </div>
+
+            <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs space-y-1.5">
+              <div className="flex justify-between">
+                <span className="text-slate-500">{language === "hi" ? "केस संख्या:" : "Case Number:"}</span>
+                <span className="font-mono font-bold text-slate-800">{caseData.inspection_number}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">{language === "hi" ? "उत्पाद / वस्तु:" : "Product / Commodity:"}</span>
+                <span className="font-semibold text-slate-800 truncate max-w-[220px]">{caseData.product_name}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">{language === "hi" ? "दिनांक एवं समय:" : "Date & Time:"}</span>
+                <span className="font-mono text-slate-700">
+                  {new Date(caseData.created_at).toLocaleString("en-IN", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: true,
+                  })}
+                </span>
+              </div>
+            </div>
+
+            <p className="text-[11px] text-rose-700 bg-rose-50 p-2.5 rounded border border-rose-200">
+              <b>{language === "hi" ? "सांविधिक चेतावनी: " : "Statutory Warning: "}</b>
+              {language === "hi"
+                ? "यह कार्रवाई पूर्ववत नहीं की जा सकती। सभी साक्ष्य छवियां, बीओयू निर्देशांक, नियम निष्कर्ष एवं नोटिस स्थायी रूप से नष्ट हो जाएंगे।"
+                : "This action cannot be undone. All evidence photographs, bounding boxes, rule evaluations, and notice records will be purged."}
+            </p>
+
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                type="button"
+                disabled={isDeletingCase}
+                onClick={() => setIsDeleteDialogOpen(false)}
+                className="btn-secondary text-xs px-4 py-2"
+              >
+                {language === "hi" ? "रद्द करें" : "Cancel"}
+              </button>
+              <button
+                type="button"
+                disabled={isDeletingCase}
+                onClick={handleDeleteCase}
+                className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 disabled:opacity-50 rounded-lg flex items-center gap-1.5 transition-colors shadow-xs"
+              >
+                {isDeletingCase ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    <span>{language === "hi" ? "हटाया जा रहा है..." : "Deleting..."}</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 size={14} />
+                    <span>{language === "hi" ? "स्थायी रूप से हटाएं" : "Permanently Delete"}</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

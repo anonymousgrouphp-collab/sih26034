@@ -1,6 +1,6 @@
-# UI/UX Deep Architectural & Usability Review: NyayaDrishti-LM
+# UI/UX Deep Architectural & Usability Review: NIRIKSHAK
 
-**Product Name:** NyayaDrishti-LM (SIH26034)  
+**Product Name:** NIRIKSHAK (SIH26034)  
 **System Classification:** Legal Metrology Statutory Compliance Verification Platform (Augmented Diagnostic Assistant)  
 **Audience & Context:** Department of Consumer Affairs (DoCA), Government of India, State Legal Metrology Enforcement Directorates, District Legal Metrology Officers (LMOs), Controllers, and Appellate Authorities.  
 **Legal Framework:** Legal Metrology Act, 2009; Legal Metrology (Packaged Commodities) Rules, 2011 (LMPC Rules, 2011); Bharatiya Sakshya Adhiniyam, 2023 (Section 63); GIGW 3.0 (Guidelines for Indian Government Websites).  
@@ -11,7 +11,7 @@
 
 ## 1. Executive Summary
 
-A comprehensive multi-specialist UI/UX audit was conducted on the dual frontend architectures of the **NyayaDrishti-LM** platform (combining the Nirikshak Metrolens vision system and the NyayaDrishti statutory evidence workstation). The primary objective was to deliver a single, cohesive, government-service-grade inspection workstation tailored specifically for the real-world operational conditions of non-technical and semi-technical field inspection officers.
+A comprehensive multi-specialist UI/UX audit was conducted on the dual frontend architectures of the **NIRIKSHAK** platform (combining the Nirikshak Metrolens vision system and the NIRIKSHAK statutory evidence workstation). The primary objective was to deliver a single, cohesive, government-service-grade inspection workstation tailored specifically for the real-world operational conditions of non-technical and semi-technical field inspection officers.
 
 ### Core Audit Findings
 1. **Branding & Trust Alignment:** Previous versions featured misleading domain references (`.gov.in`) and sovereignty claims that violated statutory guardrails. The platform has been refactored to represent an honest, professional "Government-Service-Grade Legal Metrology Inspection Workstation" with full Section 63 BSA 2023 compliance framing.

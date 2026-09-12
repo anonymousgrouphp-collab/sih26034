@@ -124,12 +124,12 @@ export const StatutoryPipelineInfographic: React.FC = () => {
       icon: ShieldCheck,
       keySpecsEn: [
         { label: "Hash Protocol", value: "SHA-256 Merkle Proofs" },
-        { label: "Legal Status", value: "Court Admissible Evidence" },
+        { label: "Legal Status", value: "Section 63 BSA Certified Record" },
         { label: "Device Tamper Log", value: "Hardware Bound Key" },
       ],
       keySpecsHi: [
         { label: "हैश प्रोटोकॉल", value: "SHA-256 मर्कल प्रमाण" },
-        { label: "विधिक स्थिति", value: "अदालत में स्वीकार्य साक्ष्य" },
+        { label: "विधिक स्थिति", value: "धारा 63 बीएसए प्रमाणित रिकॉर्ड" },
         { label: "उपकरण छेड़छाड़ लॉग", value: "हार्डवेयर-बद्ध कुंजी" },
       ],
       descriptionEn:
@@ -374,8 +374,8 @@ export const StatutoryPipelineInfographic: React.FC = () => {
             src={language === "hi" ? "/assets/guidance/evidence_extraction_pipeline_hi.svg" : "/assets/guidance/evidence_extraction_pipeline.svg"}
             alt={
               language === "hi"
-                ? "न्यायदृष्टि-एलएम 5-चरणीय सांविधिक साक्ष्य निष्कर्षण पाइपलाइन वास्तुकला"
-                : "NyayaDrishti-LM 5-Stage Statutory Evidence Extraction Pipeline Architecture"
+                ? "निरीक्षक 5-चरणीय सांविधिक साक्ष्य निष्कर्षण पाइपलाइन वास्तुकला"
+                : "NIRIKSHAK 5-Stage Statutory Evidence Extraction Pipeline Architecture"
             }
             className="w-full max-w-4xl mx-auto h-auto object-contain min-w-[640px]"
           />

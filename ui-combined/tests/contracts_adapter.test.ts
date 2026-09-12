@@ -122,7 +122,7 @@ describe("Chunk 2: Contracts & API Adapter", () => {
 
       // Verify 4-point polygon geometry integrity
       assert.equal(hindiToken?.polygon.length, 4);
-      assert.deepEqual(hindiToken?.polygon[0], [200, 550]);
+      assert.deepEqual(hindiToken?.polygon[0], [840, 605]);
     });
   });
 

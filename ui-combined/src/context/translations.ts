@@ -19,8 +19,8 @@ export const DICTIONARY: Record<string, TranslationEntry> = {
     hi: "विधिक मापविज्ञान प्रभाग",
   },
   "govt.portal": {
-    en: "National Legal Metrology Portal",
-    hi: "राष्ट्रीय विधिक मापविज्ञान पोर्टल",
+    en: "National Inspection Portal",
+    hi: "राष्ट्रीय निरीक्षण पोर्टल",
   },
   "govt.compliance_badge": {
     en: "STATUTORY COMPLIANCE // LMO AUTHORISED",
@@ -52,14 +52,14 @@ export const DICTIONARY: Record<string, TranslationEntry> = {
   },
 
   // --- Portal Identity ---
-  "portal.title": { en: "NyayaDrishti-LM", hi: "न्यायदृष्टि-एलएम" },
+  "portal.title": { en: "NIRIKSHAK", hi: "निरीक्षक" },
   "portal.subtitle": {
-    en: "LMPC Rules, 2011 Workstation",
-    hi: "विधिक मापविज्ञान नियम, 2011 कार्यस्थान",
+    en: "Inspection Workstation",
+    hi: "निरीक्षण कार्यस्थान",
   },
   "portal.full_subtitle": {
-    en: "LMPC Rules, 2011 Statutory Compliance Workstation",
-    hi: "विधिक मापविज्ञान (पैकेज वस्तुएं) नियम, 2011 विधिक अनुपालन कार्यस्थान",
+    en: "Statutory Compliance Inspection Workstation",
+    hi: "विधिक अनुपालन निरीक्षण कार्यस्थान",
   },
   "portal.officer_workstation": {
     en: "Officer Workstation",

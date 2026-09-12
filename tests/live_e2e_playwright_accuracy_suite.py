@@ -39,8 +39,8 @@ if sys.platform == "win32":
     except Exception:
         pass
 
-VERCEL_URL = "https://sih26034.vercel.app"
-RENDER_URL = "https://nyayadrishti-backend.onrender.com"
+VERCEL_URL = os.getenv("FRONTEND_URL", "https://sih26034.vercel.app")
+RENDER_URL = os.getenv("BACKEND_URL", "https://nyayadrishti-backend.onrender.com")
 
 test_results = []
 

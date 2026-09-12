@@ -127,3 +127,16 @@ def test_save_evidence_document(storage_mgr):
     abs_path = storage_mgr.resolve_absolute_path(rel_path)
     assert abs_path.exists()
     assert abs_path.read_bytes() == pdf_bytes
+
+
+def test_lossless_archival_storage_roundtrip(storage_mgr):
+    """Verifies that archival storage compression produces zero pixel/data loss."""
+    raw_payload = b"\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00" + (b"UNCOMPRESSED_PIXEL_DATA_12345" * 100)
+    compressed = storage_mgr.compress_for_archival_lossless(raw_payload)
+    assert len(compressed) < len(raw_payload)
+
+    decompressed = storage_mgr.decompress_archival_lossless(compressed)
+    assert decompressed == raw_payload
+    import hashlib
+    assert hashlib.sha256(decompressed).hexdigest() == hashlib.sha256(raw_payload).hexdigest()
+

@@ -1,6 +1,6 @@
-# NyayaDrishti-LM UI/UX Redesign & Integration Changelog
+# NIRIKSHAK UI/UX Redesign & Integration Changelog
 
-**Product:** NyayaDrishti-LM (SIH26034)  
+**Product:** NIRIKSHAK (SIH26034)  
 **Release:** v2.0-combined  
 **Target Directory:** `ui-combined/`  
 **Date:** 11 September 2026  
@@ -17,9 +17,9 @@ This release represents a comprehensive overhaul and synthesis of the dual front
 ## 2. Detailed Changelog by Workstream
 
 ### 2.1 Institutional Branding & Statutory Guardrails
-* **`NyayaDrishtiBrandLogo.tsx`:**
+* **`NIRIKSHAKBrandLogo.tsx`:**
   - Removed misleading `.gov.in` domain and false national portal attribution.
-  - Replaced with compliant branding: `NyayaDrishti-LM — Legal Metrology Inspection Workstation`.
+  - Replaced with compliant branding: `NIRIKSHAK — Legal Metrology Inspection Workstation`.
   - Retained Ashoka Pillar state emblem and LMPC gold badge.
 * **`GovTopBar.tsx`:**
   - Replaced misleading `STATUTORY COMPLIANCE // LMO AUTHORISED` banner with legally accurate `EVIDENTIARY ASSISTANCE // SEC 63 BSA 2023`.

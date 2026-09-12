@@ -44,6 +44,8 @@ interface InspectionVisionCanvasProps {
     referenceLengthMm?: number;
     measuredPixels?: number;
   };
+  activeImageId?: string;
+  onSelectImage?: (imageId: string) => void;
   onSelectBox?: (boxId: string) => void;
   selectedBoxId?: string;
   className?: string;
@@ -53,17 +55,44 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
   images,
   boxes,
   calibration,
+  activeImageId,
+  onSelectImage,
   onSelectBox,
   selectedBoxId,
   className = "",
 }) => {
   const { language } = useLanguage();
-  const [selectedImageId, setSelectedImageId] = useState<string>(images[0]?.id || "");
+  const [selectedImageId, setSelectedImageId] = useState<string>(activeImageId || images[0]?.id || "");
+
+  React.useEffect(() => {
+    if (activeImageId && activeImageId !== selectedImageId) {
+      setSelectedImageId(activeImageId);
+    }
+  }, [activeImageId]);
+
+  const handleSelectImage = (id: string) => {
+    setSelectedImageId(id);
+    if (onSelectImage) {
+      onSelectImage(id);
+    }
+  };
+
   const [zoom, setZoom] = useState<number>(1);
   const [showBoxes, setShowBoxes] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<"image" | "annotations" | "calibration">("image");
+  const [naturalDimensions, setNaturalDimensions] = useState<{ width: number; height: number } | null>(null);
 
-  const activeImage = images.find((img) => img.id === selectedImageId) || images[0];
+  const activeImage = images.find((img) => img.id === (activeImageId || selectedImageId)) || images[0];
+
+  const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+      setNaturalDimensions({ width: img.naturalWidth, height: img.naturalHeight });
+    }
+  };
+
+  const effectiveWidth = naturalDimensions?.width || activeImage?.width || 1920;
+  const effectiveHeight = naturalDimensions?.height || activeImage?.height || 1080;
 
   const handleZoomIn = () => setZoom((v) => Math.min(2.5, Number((v + 0.15).toFixed(2))));
   const handleZoomOut = () => setZoom((v) => Math.max(0.5, Number((v - 0.15).toFixed(2))));
@@ -83,7 +112,7 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
             </h3>
             <p className="text-[10px] text-slate-400">
               {activeImage
-                ? `${activeImage.width} × ${activeImage.height}px · ${activeImage.type.replace(/_/g, " ")}`
+                ? `${effectiveWidth} × ${effectiveHeight}px · ${activeImage.type.replace(/_/g, " ")}`
                 : language === "hi"
                 ? "उच्च-रिज़ॉल्यूशन सेंसर साक्ष्य"
                 : "High-resolution sensor evidence"}
@@ -179,13 +208,14 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
           className="relative shrink-0 transition-transform duration-200 select-none shadow-2xl"
           style={{
             width: `${Math.min(640 * zoom, 1200)}px`,
-            aspectRatio: activeImage ? `${activeImage.width} / ${activeImage.height}` : "4 / 3",
+            aspectRatio: `${effectiveWidth} / ${effectiveHeight}`,
           }}
         >
           {activeImage ? (
             <img
               src={activeImage.url}
               alt={activeImage.filename}
+              onLoad={handleImageLoad}
               className="h-full w-full rounded-md object-contain pointer-events-none"
             />
           ) : (
@@ -199,8 +229,42 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
             <div className="absolute inset-0 pointer-events-none">
               {boxes.map((b) => {
                 const isSelected = selectedBoxId === b.id;
-                const isMrp = b.type === "MRP" || b.label.toLowerCase().includes("mrp");
+                const isFiducial = b.type === "FIDUCIAL_STANDARD" || b.label.toLowerCase().includes("aruco");
+                const isFail = b.type === "FAIL" || b.label.toLowerCase().includes("deficit") || b.label.toLowerCase().includes("missing");
+                const isReview = b.type === "REVIEW" || b.label.toLowerCase().includes("review") || b.label.toLowerCase().includes("borderline");
+                const isMrp = b.type === "MRP" || b.label.toLowerCase().includes("mrp") || b.label.toLowerCase().includes("usp");
                 const isNetQty = b.type === "NET_QUANTITY" || b.label.toLowerCase().includes("net");
+                const isPass = b.type === "PASS";
+
+                const borderClass = isSelected
+                  ? "border-amber-400 bg-amber-400/25 ring-4 ring-amber-400/40 z-30"
+                  : isFiducial
+                  ? "border-amber-400 border-dashed bg-amber-400/10 hover:bg-amber-400/20 z-10"
+                  : isFail
+                  ? "border-rose-500 bg-rose-500/20 hover:bg-rose-500/30 z-20"
+                  : isReview
+                  ? "border-amber-400 bg-amber-400/20 hover:bg-amber-400/30 z-20"
+                  : isMrp
+                  ? "border-sky-400 bg-sky-400/15 hover:bg-sky-400/30 z-10"
+                  : isNetQty || isPass
+                  ? "border-emerald-400 bg-emerald-400/15 hover:bg-emerald-400/30 z-10"
+                  : "border-indigo-400 bg-indigo-400/15 hover:bg-indigo-400/30 z-10";
+
+                const badgeClass = isSelected
+                  ? "bg-amber-500 text-slate-950 font-black"
+                  : isFiducial
+                  ? "bg-amber-900/90 text-amber-300 border border-amber-400/50"
+                  : isFail
+                  ? "bg-rose-700 text-white"
+                  : isReview
+                  ? "bg-amber-600 text-white"
+                  : isMrp
+                  ? "bg-sky-700 text-white"
+                  : isNetQty || isPass
+                  ? "bg-emerald-700 text-white"
+                  : "bg-indigo-700 text-white";
+
+                const displayLabel = b.label.length > 38 ? `${b.label.slice(0, 36)}…` : b.label;
 
                 return (
                   <button
@@ -208,15 +272,7 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
                     type="button"
                     onClick={() => onSelectBox?.(b.id)}
                     title={`${b.label} (${Math.round(b.confidence * 100)}% ${language === "hi" ? "विश्वसनीयता" : "confidence"})`}
-                    className={`absolute border-2 pointer-events-auto transition-all cursor-pointer ${
-                      isSelected
-                        ? "border-amber-400 bg-amber-400/25 ring-4 ring-amber-400/40 z-20"
-                        : isMrp
-                        ? "border-sky-400 bg-sky-400/15 hover:bg-sky-400/30"
-                        : isNetQty
-                        ? "border-emerald-400 bg-emerald-400/15 hover:bg-emerald-400/30"
-                        : "border-indigo-400 bg-indigo-400/15 hover:bg-indigo-400/30"
-                    }`}
+                    className={`absolute border-2 pointer-events-auto transition-all cursor-pointer ${borderClass}`}
                     style={{
                       left: `${b.x}%`,
                       top: `${b.y}%`,
@@ -225,17 +281,9 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
                     }}
                   >
                     <span
-                      className={`absolute -top-6 left-0 whitespace-nowrap rounded px-1.5 py-0.5 text-[9px] font-black shadow-md ${
-                        isSelected
-                          ? "bg-amber-500 text-slate-950"
-                          : isMrp
-                          ? "bg-sky-700 text-white"
-                          : isNetQty
-                          ? "bg-emerald-700 text-white"
-                          : "bg-indigo-700 text-white"
-                      }`}
+                      className={`absolute -top-6 left-0 whitespace-nowrap rounded px-1.5 py-0.5 text-[9px] font-black shadow-md ${badgeClass}`}
                     >
-                      {b.label} · {Math.round(b.confidence * 100)}%
+                      {displayLabel} · {Math.round(b.confidence * 100)}%
                     </span>
                   </button>
                 );
@@ -260,18 +308,31 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
               <div className="mt-3 rounded-lg bg-black/60 p-3 border border-white/10 font-mono text-[11px] text-amber-300 space-y-1">
                 <div>
                   {language === "hi" ? "संदर्भ मानक:" : "Reference Standard:"}{" "}
-                  {calibration?.referenceObject || "ArUco 4x4 (50.0mm)"}
+                  {calibration?.available
+                    ? calibration?.referenceObject || "ArUco 4x4 (50.0mm)"
+                    : language === "hi"
+                    ? "कोई वैध संदर्भ नहीं"
+                    : "No Valid Fiducial"}
                 </div>
                 <div>
                   {language === "hi" ? "समाधानित पैमाना:" : "Resolved Scale:"}{" "}
-                  {calibration?.scaleMmPerPixel
+                  {calibration?.available && calibration?.scaleMmPerPixel
                     ? `${calibration.scaleMmPerPixel.toFixed(4)} mm/px`
-                    : "0.2604 mm/px"}
+                    : calibration?.available
+                    ? "Calibrated via fiducial standard"
+                    : language === "hi"
+                    ? "अंशांकित नहीं (निरस्त/अनुपलब्ध)"
+                    : "Not Calibrated (Aborted/Unavailable)"}
                 </div>
                 <div>
-                  {language === "hi"
-                    ? "समतलीय होमोग्राफी: सत्यापित (झुकाव < 15°)"
-                    : "Planar Homography: Verified (Tilt < 15°)"}
+                  {language === "hi" ? "समतलीय होमोग्राफी:" : "Planar Homography:"}{" "}
+                  {calibration?.available
+                    ? language === "hi"
+                      ? "सत्यापित (झुकाव < 15°)"
+                      : "Verified (Tilt < 15°)"
+                    : language === "hi"
+                    ? "अस्वीकृत / अप्रयुक्त"
+                    : "Rejected / Inactive"}
                 </div>
               </div>
             </div>
@@ -313,7 +374,7 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
             <button
               key={img.id}
               type="button"
-              onClick={() => setSelectedImageId(img.id)}
+              onClick={() => handleSelectImage(img.id)}
               className={`group relative h-14 w-20 shrink-0 overflow-hidden rounded-lg border-2 transition-all cursor-pointer ${
                 img.id === activeImage?.id
                   ? "border-govNavy ring-2 ring-govNavy/30"

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useLanguage } from "../context/LanguageContext";
 import {
   Printer,
@@ -9,14 +9,62 @@ import {
   ShieldCheck,
   CheckCircle2,
   ExternalLink,
+  RefreshCw,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { ApiService } from "../services/api";
+import { InspectionSummary } from "../types/inspection";
 
 export const Reports: React.FC = () => {
   const { language } = useLanguage();
   const [period, setPeriod] = useState("SEPTEMBER_2026");
   const [division, setDivision] = useState("DL_SOUTH_01");
   const [downloadSuccess, setDownloadSuccess] = useState<string | null>(null);
+  const [cases, setCases] = useState<InspectionSummary[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    setIsLoading(true);
+    ApiService.listInspections({
+      circleId: division && division !== "ALL" ? division : undefined,
+    })
+      .then((res) => {
+        if (isMounted) {
+          setCases(res.items || []);
+          setIsLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (isMounted) {
+          console.error("Failed to load reports data:", err);
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [division]);
+
+  const metrics = useMemo(() => {
+    const total = cases.length;
+    const passed = cases.filter((c) => c.overall_status === "PASS").length;
+    const failed = cases.filter(
+      (c) => c.overall_status === "FAIL" || (c.violations_count !== undefined && c.violations_count > 0)
+    ).length;
+    const review = cases.filter((c) => c.overall_status === "REVIEW").length;
+    const unable = cases.filter(
+      (c) => c.overall_status === "UNABLE_TO_VERIFY" || c.workflow_status === "PENDING_REVIEW"
+    ).length;
+
+    const passPct = total > 0 ? Math.round((passed / total) * 100) : 0;
+    const failPct = total > 0 ? Math.round((failed / total) * 100) : 0;
+    const reviewPct = total > 0 ? Math.round((review / total) * 100) : 0;
+    const unablePct = total > 0 ? Math.round((unable / total) * 100) : 0;
+
+    return { total, passed, failed, review, unable, passPct, failPct, reviewPct, unablePct };
+  }, [cases]);
 
   const handleDownload = (reportName: string) => {
     setDownloadSuccess(
@@ -73,15 +121,16 @@ export const Reports: React.FC = () => {
       )}
 
       {/* Filter Row */}
-      <div className="card p-4 bg-white">
+      <form className="card p-4 bg-white" onSubmit={(e) => e.preventDefault()}>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
           <div>
-            <label className="block text-slate-600 font-bold mb-1">
+            <label htmlFor="reporting-period" className="block text-slate-600 font-bold mb-1">
               {language === "hi" ? "रिपोर्टिंग अवधि" : "Reporting Period"}
             </label>
             <div className="relative">
               <CalendarRange size={16} className="absolute left-3 top-2.5 text-slate-400" />
               <select
+                id="reporting-period"
                 value={period}
                 onChange={(e) => setPeriod(e.target.value)}
                 className="input pl-9 text-xs"
@@ -100,10 +149,11 @@ export const Reports: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-slate-600 font-bold mb-1">
+            <label htmlFor="enforcement-division" className="block text-slate-600 font-bold mb-1">
               {language === "hi" ? "प्रवर्तन प्रभाग / मंडल" : "Enforcement Division / Circle"}
             </label>
             <select
+              id="enforcement-division"
               value={division}
               onChange={(e) => setDivision(e.target.value)}
               className="input text-xs"
@@ -124,164 +174,174 @@ export const Reports: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-slate-600 font-bold mb-1">
+            <label htmlFor="document-classification" className="block text-slate-600 font-bold mb-1">
               {language === "hi" ? "दस्तावेज़ वर्गीकरण" : "Document Classification"}
             </label>
-            <select className="input text-xs">
+            <select id="document-classification" className="input text-xs">
               <option>{language === "hi" ? "सभी औपचारिक रिपोर्ट एवं नोटिस" : "All Formal Reports & Notices"}</option>
               <option>{language === "hi" ? "प्रपत्र-1 शमन नोटिस (धारा 36)" : "Form-1 Compounding Notices (Section 36)"}</option>
               <option>{language === "hi" ? "धारा 63 बीएसए डिजिटल प्रमाणपत्र" : "Section 63 BSA Digital Certificates"}</option>
             </select>
           </div>
         </div>
-      </div>
+      </form>
 
       {/* Two Column Section: Left Outcome Distribution, Right Generated Reports */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Outcome Breakdown Card */}
         <div className="card p-5 bg-white space-y-4">
-          <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-            <BarChart3 size={18} className="text-govNavy" />
-            <h3 className="section-title">
-              {language === "hi" ? "निरीक्षण परिणाम वितरण" : "Inspection Outcomes Distribution"}
-            </h3>
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div className="flex items-center gap-2">
+              <BarChart3 size={18} className="text-govNavy" />
+              <h3 className="section-title">
+                {language === "hi" ? "निरीक्षण परिणाम वितरण" : "Inspection Outcomes Distribution"}
+              </h3>
+            </div>
+            <span className="font-mono text-xs font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+              {metrics.total} {language === "hi" ? "मामले" : "Cases"}
+            </span>
           </div>
 
-          <div className="space-y-4 pt-1">
-            {[
-              {
-                label: language === "hi" ? "पूर्णतः अनुपालन (उत्तीर्ण - PASS)" : "Fully Compliant (PASS)",
-                count: 2,
-                percent: 40,
-                color: "bg-emerald-500",
-                text: "text-emerald-700",
-              },
-              {
-                label: language === "hi" ? "सांविधिक उल्लंघन (असफल - FAIL)" : "Statutory Violation (FAIL)",
-                count: 1,
-                percent: 20,
-                color: "bg-rose-500",
-                text: "text-rose-700",
-              },
-              {
-                label: language === "hi" ? "सीमावर्ती सेंसर समीक्षा (REVIEW)" : "Borderline Sensor Review (REVIEW)",
-                count: 1,
-                percent: 20,
-                color: "bg-amber-500",
-                text: "text-amber-700",
-              },
-              {
-                label: language === "hi" ? "निम्न गुणवत्ता साक्ष्य (सत्यापन असमर्थ)" : "Degraded Evidence (UNABLE_TO_VERIFY)",
-                count: 1,
-                percent: 20,
-                color: "bg-slate-500",
-                text: "text-slate-700",
-              },
-            ].map((item) => (
-              <div key={item.label} className="space-y-1 text-xs">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-slate-700">{item.label}</span>
-                  <span className={`font-bold font-mono ${item.text}`}>
-                    {item.count} {language === "hi" ? "मामले" : "case(s)"} ({item.percent}%)
-                  </span>
+          {isLoading ? (
+            <div className="p-8 text-center">
+              <RefreshCw className="w-5 h-5 animate-spin mx-auto text-govNavy" />
+              <p className="text-xs text-slate-400 mt-2 font-mono">
+                {language === "hi" ? "डेटा संकलित किया जा रहा है..." : "Compiling statistics..."}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4 pt-1">
+              {[
+                {
+                  label: language === "hi" ? "पूर्णतः अनुपालन (उत्तीर्ण - PASS)" : "Fully Compliant (PASS)",
+                  count: metrics.passed,
+                  percent: metrics.passPct,
+                  color: "bg-emerald-500",
+                  text: "text-emerald-700",
+                },
+                {
+                  label: language === "hi" ? "सांविधिक उल्लंघन (असफल - FAIL)" : "Statutory Violation (FAIL)",
+                  count: metrics.failed,
+                  percent: metrics.failPct,
+                  color: "bg-rose-500",
+                  text: "text-rose-700",
+                },
+                {
+                  label: language === "hi" ? "सीमावर्ती सेंसर समीक्षा (REVIEW)" : "Borderline Sensor Review (REVIEW)",
+                  count: metrics.review,
+                  percent: metrics.reviewPct,
+                  color: "bg-amber-500",
+                  text: "text-amber-700",
+                },
+                {
+                  label: language === "hi" ? "निम्न गुणवत्ता साक्ष्य (सत्यापन असमर्थ)" : "Degraded Evidence (UNABLE_TO_VERIFY)",
+                  count: metrics.unable,
+                  percent: metrics.unablePct,
+                  color: "bg-slate-500",
+                  text: "text-slate-700",
+                },
+              ].map((item) => (
+                <div key={item.label} className="space-y-1 text-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-slate-700">{item.label}</span>
+                    <span className={`font-bold font-mono ${item.text}`}>
+                      {item.count} {language === "hi" ? "मामले" : "case(s)"} ({item.percent}%)
+                    </span>
+                  </div>
+                  <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                    <div className={`h-full rounded-full ${item.color}`} style={{ width: `${item.percent}%` }} />
+                  </div>
                 </div>
-                <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
-                  <div className={`h-full rounded-full ${item.color}`} style={{ width: `${item.percent}%` }} />
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
           <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-600 flex items-center gap-2">
             <ShieldCheck size={16} className="text-emerald-600 shrink-0" />
             <span>
-              {language === "hi"
-                ? "सभी 5 सांविधिक मामलों का एलएमपीसी नियम 2011 तालिका-I फ़ॉन्ट अनुसूची के विरुद्ध सत्यापन किया गया।"
-                : "All 5 statutory cases verified against LMPC Rules 2011 Table-I font schedules."}
+              {metrics.total > 0
+                ? (language === "hi"
+                    ? `सभी ${metrics.total} सांविधिक मामलों का एलएमपीसी नियम 2011 तालिका-I फ़ॉन्ट अनुसूची के विरुद्ध सत्यापन किया गया।`
+                    : `All ${metrics.total} statutory cases verified against LMPC Rules 2011 Table-I font schedules.`)
+                : (language === "hi"
+                    ? "चयनित रिपोर्टिंग अवधि / क्षेत्राधिकार में कोई सांविधिक निरीक्षण मामला पंजीकृत नहीं है।"
+                    : "No statutory inspection cases registered in selected reporting period.")}
             </span>
           </div>
         </div>
 
         {/* Ready Generated Reports List */}
         <div className="card p-5 bg-white space-y-4">
-          <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-            <FileText size={18} className="text-govNavy" />
-            <h3 className="section-title">
-              {language === "hi" ? "आधिकारिक विभागीय रिपोर्ट एवं नोटिस" : "Official Departmental Reports & Notices"}
-            </h3>
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div className="flex items-center gap-2">
+              <FileText size={18} className="text-govNavy" />
+              <h3 className="section-title">
+                {language === "hi" ? "आधिकारिक विभागीय रिपोर्ट एवं नोटिस" : "Official Departmental Reports & Notices"}
+              </h3>
+            </div>
           </div>
 
-          <div className="space-y-2.5">
-            {[
-              {
-                title: language === "hi"
-                  ? "प्रपत्र-1 सांविधिक शमन नोटिस — फॉर्च्यून सनलाइट ऑयल"
-                  : "Form-1 Statutory Compounding Notice — Fortune Sunlite Oil",
-                subtitle: language === "hi"
-                  ? "नियम 6(1)(h) फ़ॉन्ट ऊंचाई उल्लंघन (संदर्भ: LMO/DL/SOUTH/2026/0842)"
-                  : "Rule 6(1)(h) Font Height Contravention (Ref: LMO/DL/SOUTH/2026/0842)",
-                link: "/inspections/demo-fortune-sunlite",
-                filename: "Form1_Notice_LMO_DL_2026_0842.pdf",
-              },
-              {
-                title: language === "hi"
-                  ? "धारा 63 बीएसए 2023 छेड़छाड़-रोधी साक्ष्य प्रमाणपत्र"
-                  : "Section 63 BSA 2023 Tamper-Evident Evidence Certificate",
-                subtitle: language === "hi"
-                  ? "क्रिप्टोग्राफ़िक SHA-256 मर्कल डीएजी कस्टडी-श्रृंखला ऑडिट"
-                  : "Cryptographic SHA-256 Merkle DAG chain-of-custody audit",
-                link: "/inspections/demo-fortune-sunlite/evidence",
-                filename: "Sec63_BSA_Certificate_DL_0842.pdf",
-              },
-              {
-                title: language === "hi"
-                  ? "दैनिक निगरानी रिपोर्ट — दक्षिण दिल्ली मंडल"
-                  : "Daily Surveillance Report — South Delhi Circle",
-                subtitle: language === "hi"
-                  ? "साकेत एवं कालकाजी बाजारों हेतु नियमित बाजार निगरानी सारांश"
-                  : "Routine market surveillance summary for Saket and Kalkaji markets",
-                filename: "Daily_Surveillance_Report_10Sep2026.pdf",
-              },
-              {
-                title: language === "hi"
-                  ? "तालिका-I फ़ॉन्ट अनुसूची प्रवर्तन खाता (वित्त वर्ष 2026)"
-                  : "Table-I Font Schedule Enforcement Ledger (FY 2026)",
-                subtitle: language === "hi"
-                  ? "सभी 5 पीडीपी क्षेत्रफल श्रेणियों में व्यापक अनुपालन ऑडिट"
-                  : "Comprehensive compliance audit across all 5 PDP area tiers",
-                filename: "Table_I_Font_Schedule_Audit_2026.pdf",
-              },
-            ].map((report) => (
-              <div
-                key={report.title}
-                className="p-3 rounded-lg border border-slate-200 bg-slate-50/60 hover:bg-slate-50 transition-colors flex items-center justify-between gap-3 text-xs"
-              >
-                <div className="min-w-0">
-                  <p className="font-bold text-slate-900 truncate">{report.title}</p>
-                  <p className="text-[11px] text-slate-500 truncate">{report.subtitle}</p>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  {report.link && (
+          {isLoading ? (
+            <div className="p-8 text-center">
+              <RefreshCw className="w-5 h-5 animate-spin mx-auto text-govNavy" />
+              <p className="text-xs text-slate-400 mt-2 font-mono">
+                {language === "hi" ? "रिपोर्ट लोड की जा रही हैं..." : "Loading reports..."}
+              </p>
+            </div>
+          ) : cases.length === 0 ? (
+            <div className="p-8 text-center text-slate-500 space-y-2 border border-dashed border-slate-200 rounded-lg">
+              <FileText className="w-8 h-8 mx-auto text-slate-400" />
+              <p className="font-bold text-xs text-slate-700">
+                {language === "hi" ? "कोई आधिकारिक रिपोर्ट या नोटिस उपलब्ध नहीं है" : "No Official Reports or Notices Generated"}
+              </p>
+              <p className="text-[11px] text-slate-400 max-w-xs mx-auto">
+                {language === "hi"
+                  ? "निरीक्षण पंजीकृत करें और प्रपत्र-1 विधिक नोटिस उत्पन्न करने के लिए अधिनिर्णय पूर्ण करें।"
+                  : "Register packaged commodity inspections and complete officer adjudication to generate statutory Form-1 notices."}
+              </p>
+              <div className="pt-2">
+                <Link to="/inspections/new" className="btn-primary text-xs px-3.5 py-1.5 inline-flex items-center gap-1 shadow-2xs">
+                  <span>{language === "hi" ? "नया निरीक्षण पंजीकृत करें" : "Register New Inspection"}</span>
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-2.5">
+              {cases.slice(0, 5).map((c) => (
+                <div
+                  key={c.id}
+                  className="p-3 rounded-lg border border-slate-200 bg-slate-50/60 hover:bg-slate-50 transition-colors flex items-center justify-between gap-3 text-xs"
+                >
+                  <div className="min-w-0">
+                    <p className="font-bold text-slate-900 truncate">
+                      {language === "hi"
+                        ? `प्रपत्र-1 सांविधिक नोटिस — ${c.product_name}`
+                        : `Form-1 Statutory Notice — ${c.product_name}`}
+                    </p>
+                    <p className="text-[11px] text-slate-500 truncate font-mono">
+                      {c.inspection_number} • {c.establishment_name || c.jurisdiction_id}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
                     <Link
-                      to={report.link}
+                      to={`/inspections/${c.id}`}
                       className="p-1.5 rounded text-govNavy hover:bg-govNavy/10"
                       title={language === "hi" ? "केस देखें" : "Inspect case"}
                     >
                       <ExternalLink size={15} />
                     </Link>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => handleDownload(report.filename)}
-                    className="p-1.5 rounded text-slate-600 hover:text-govNavy hover:bg-slate-200"
-                    title={language === "hi" ? "दस्तावेज़ डाउनलोड करें" : "Download document"}
-                  >
-                    <Download size={15} />
-                  </button>
+                    <Link
+                      to={`/inspections/${c.id}/evidence`}
+                      className="p-1.5 rounded text-slate-600 hover:text-govNavy hover:bg-slate-200"
+                      title={language === "hi" ? "साक्ष्य संचिका देखें" : "View evidence dossier"}
+                    >
+                      <Download size={15} />
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -306,8 +366,8 @@ export const Reports: React.FC = () => {
             </div>
             <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
               {language === "hi"
-                ? "न्यायदृष्टि-एलएम द्वारा तैयार प्रत्येक निरीक्षण डोजियर एवं प्रपत्र-1 नोटिस मूल ऑप्टिकल छवियों, अरूको मीट्रिक पैमानों और बहुभाषी ओसीआर टोकन को SHA-256 मर्कल डीएजी श्रृंखला में संरक्षित करता है।"
-                : "Every inspection dossier and Form-1 notice generated by NyayaDrishti-LM anchors raw optical captures, ArUco metric scaling factors, and multilingual OCR tokens into a SHA-256 Merkle DAG chain-of-custody."}
+                ? "निरीक्षक द्वारा तैयार प्रत्येक निरीक्षण डोजियर एवं प्रपत्र-1 नोटिस मूल ऑप्टिकल छवियों, अरूको मीट्रिक पैमानों और बहुभाषी ओसीआर टोकन को SHA-256 मर्कल डीएजी श्रृंखला में संरक्षित करता है।"
+                : "Every inspection dossier and Form-1 notice generated by NIRIKSHAK anchors raw optical captures, ArUco metric scaling factors, and multilingual OCR tokens into a SHA-256 Merkle DAG chain-of-custody."}
             </p>
           </div>
         </div>

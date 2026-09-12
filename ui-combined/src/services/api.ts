@@ -1,5 +1,5 @@
 /**
- * Canonical API Service & Unified Adapter for NyayaDrishti-LM
+ * Canonical API Service & Unified Adapter for NIRIKSHAK
  * Connects React UI to FastAPI Backend Catalog per 07_API_AND_INTERFACE_CONTRACTS.md.
  * 
  * Provides clean architectural separation into:
@@ -43,12 +43,34 @@ export { MockApiService } from "./mockApi";
 export { DemoFixtureService } from "./demoFixtures";
 
 export class ApiService {
-  private static operatingMode: ApiOperatingMode =
-    (typeof window !== "undefined" && (window.localStorage?.getItem("nyayadrishti_operating_mode") as ApiOperatingMode)) ||
-    (((import.meta as any)?.env?.VITE_OPERATING_MODE as ApiOperatingMode) || "LIVE");
+  private static operatingMode: ApiOperatingMode = (() => {
+    try {
+      const stored = typeof window !== "undefined" ? window.localStorage?.getItem("nyayadrishti_operating_mode") : null;
+      if (stored === "DEMO_FIXTURE") return "DEMO_FIXTURE";
+      if (stored === "MOCK") {
+        // Clear accidental mock latch so the user always connects to the live sitewide database
+        window.localStorage?.removeItem("nyayadrishti_operating_mode");
+      }
+    } catch {}
+    return (((import.meta as any)?.env?.VITE_OPERATING_MODE as ApiOperatingMode) || "LIVE");
+  })();
 
-  public static setOperatingMode(mode: ApiOperatingMode): void {
+  /**
+   * Sets the active operating mode.
+   * Mode changes persist to localStorage only when `persist` is true (default).
+   * Automatic network-failover transitions MUST pass { persist: false } so a
+   * transient backend outage cannot stick the app in BACKEND_SIMULATION across
+   * page reloads — after refresh the adapter retries LIVE first, preserving
+   * per-request Mode B resilience without stale-session contamination.
+   */
+  public static setOperatingMode(mode: ApiOperatingMode, optionsOrPersist?: boolean | { persist?: boolean }): void {
     this.operatingMode = mode;
+    const shouldPersist = typeof optionsOrPersist === "boolean"
+      ? optionsOrPersist
+      : (optionsOrPersist?.persist ?? true);
+    if (!shouldPersist) {
+      return;
+    }
     try {
       if (typeof window !== "undefined" && window.localStorage) {
         window.localStorage.setItem("nyayadrishti_operating_mode", mode);
@@ -64,7 +86,7 @@ export class ApiService {
 
   // Backward-compatible mock mode toggle
   public static setMockMode(enabled: boolean): void {
-    this.setOperatingMode(enabled ? "MOCK" : "LIVE");
+    this.setOperatingMode(enabled ? "MOCK" : "LIVE", true);
   }
 
   public static isMockMode(): boolean {
@@ -98,7 +120,15 @@ export class ApiService {
   // ---------------------------------------------------------------------------
 
   public static async getDashboardSummary(circleId?: string): Promise<DashboardSummary> {
-    return this.getActiveService().getDashboardSummary(circleId);
+    try {
+      return await this.getActiveService().getDashboardSummary(circleId);
+    } catch (err: any) {
+      if (this.operatingMode === "LIVE") {
+        console.warn("Live server dashboard summary unreachable. Engaging Mode B Local Resilient failover.");
+        return await MockApiService.getInstance().getDashboardSummary(circleId);
+      }
+      throw err;
+    }
   }
 
   public static async listInspections(params?: {
@@ -109,20 +139,37 @@ export class ApiService {
     limit?: number;
     offset?: number;
   }): Promise<{ total: number; items: InspectionSummary[] }> {
+    if (this.operatingMode === "DEMO_FIXTURE") {
+      return await DemoFixtureService.getInstance().listInspections(params);
+    }
+
     try {
-      return await this.getActiveService().listInspections(params);
-    } catch (err: any) {
-      if (
-        this.operatingMode === "LIVE" &&
-        (err?.is_network_error ||
-          err?.status === 503 ||
-          String(err?.message || "").includes("Failed to fetch") ||
-          String(err?.message || "").includes("NetworkError"))
-      ) {
-        console.warn("Live server unreachable for listInspections. Falling back to Mode B local datastore.");
-        return await MockApiService.getInstance().listInspections(params);
+      const liveResult = await LiveApiService.getInstance().listInspections(params);
+      // Retrieve any unsynced locally staged genuine custom cases to guarantee zero data loss.
+      // Strictly ignore all mock/demo fixtures so a cleared live database reflects 0 cases.
+      try {
+        const mockResult = await MockApiService.getInstance().listInspections(params);
+        const localCustom = mockResult.items.filter(
+          (c) =>
+            !ApiService.isDemoOrFixtureCase(c) &&
+            !liveResult.items.some((lr) => lr.id === c.id || lr.inspection_number === c.inspection_number)
+        );
+        if (localCustom.length > 0) {
+          const merged = [...liveResult.items, ...localCustom];
+          merged.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+          return {
+            total: merged.length,
+            items: merged,
+          };
+        }
+      } catch {
+        // Ignore mock merge errors
       }
-      throw err;
+
+      return liveResult;
+    } catch (err: any) {
+      console.warn("Live server unreachable for listInspections. Falling back to Mode B local datastore:", err);
+      return await MockApiService.getInstance().listInspections(params);
     }
   }
 
@@ -134,26 +181,22 @@ export class ApiService {
     if (this.operatingMode === "DEMO_FIXTURE") {
       // If a new commodity inspection is created while viewing golden demo fixtures,
       // dynamically engage Mode B (Local Resilient Mock) so the inspection proceeds.
-      this.setOperatingMode("MOCK");
+      this.setOperatingMode("MOCK", { persist: false });
+    }
+
+    if (this.operatingMode === "MOCK") {
+      return await MockApiService.getInstance().createInspection(payload);
     }
 
     try {
-      return await this.getActiveService().createInspection(payload);
+      const liveCase = await LiveApiService.getInstance().createInspection(payload);
+      try {
+        MockApiService.getInstance().addLocalCase(liveCase);
+      } catch {}
+      return liveCase;
     } catch (err: any) {
-      // Statutory Failover: If live backend is down or network disconnects,
-      // seamlessly engage Mode B (Local Resilient Mode) to preserve field inspection continuity.
-      if (
-        this.operatingMode === "LIVE" &&
-        (err?.is_network_error ||
-          err?.status === 503 ||
-          String(err?.message || "").includes("Failed to fetch") ||
-          String(err?.message || "").includes("NetworkError"))
-      ) {
-        console.warn("Live server unreachable. Seamlessly activating Mode B (Local Resilient Mode).");
-        this.setOperatingMode("MOCK");
-        return await this.getActiveService().createInspection(payload);
-      }
-      throw err;
+      console.warn("Live server unreachable for createInspection. Seamlessly activating Mode B local failover:", err);
+      return await MockApiService.getInstance().createInspection(payload);
     }
   }
 
@@ -161,30 +204,72 @@ export class ApiService {
   // 3. Single Inspection Case Retrieval
   // ---------------------------------------------------------------------------
 
+  public static isDemoId(id: string): boolean {
+    if (!id) return false;
+    const lower = id.toLowerCase().trim();
+    return (
+      lower.startsWith("sku-demo-") ||
+      lower.startsWith("demo-") ||
+      lower.startsWith("insp_demo_") ||
+      lower.startsWith("ins-2026-") ||
+      lower === "fortune" ||
+      lower === "sunlite"
+    );
+  }
+
+  public static isDemoOrFixtureCase(c: {
+    id: string;
+    inspection_number?: string;
+    is_mock_fixture?: boolean;
+    sku_demo_id?: string;
+  }): boolean {
+    if (c.is_mock_fixture) return true;
+    if (c.sku_demo_id) return true;
+    if (this.isDemoId(c.id)) return true;
+    if (c.inspection_number && this.isDemoId(c.inspection_number)) return true;
+    const lowerId = (c.id || "").toLowerCase().trim();
+    if (
+      lowerId.startsWith("sku-demo-") ||
+      lowerId.startsWith("insp_demo_") ||
+      lowerId.startsWith("ins-2026-") ||
+      lowerId.startsWith("demo-")
+    ) {
+      return true;
+    }
+    return false;
+  }
+
   public static async getInspection(id: string): Promise<InspectionCase> {
-    // In LIVE mode: Prioritize real engine & PostgreSQL database on Render
-    if (this.operatingMode === "LIVE") {
+    if (this.operatingMode === "DEMO_FIXTURE") {
       try {
-        return await LiveApiService.getInstance().getInspection(id);
-      } catch (liveErr: any) {
-        console.warn(`Live database retrieval for '${id}' failed. Engaging Tier 3 demo fallback:`, liveErr);
-        if (id.startsWith("SKU-DEMO-")) {
-          return await DemoFixtureService.getInstance().getInspection(id);
-        }
-        return await MockApiService.getInstance().getInspection(id);
-      }
-    }
-
-    // In DEMO_FIXTURE mode: Directly resolve from frozen golden fixtures
-    if (this.operatingMode === "DEMO_FIXTURE" || (id.startsWith("SKU-DEMO-") && this.operatingMode !== "MOCK")) {
-      try {
-        return await DemoFixtureService.getInstance().getInspection(id);
+        const demoCase = await DemoFixtureService.getInstance().getInspection(id);
+        if (demoCase) return demoCase;
       } catch {
-        // Fall back to active service
+        // Fall back
       }
     }
 
-    return await this.getActiveService().getInspection(id);
+    if (this.operatingMode === "MOCK") {
+      return await MockApiService.getInstance().getInspection(id);
+    }
+
+    try {
+      return await LiveApiService.getInstance().getInspection(id);
+    } catch (liveErr: any) {
+      if (this.isDemoId(id)) {
+        try {
+          return await DemoFixtureService.getInstance().getInspection(id);
+        } catch {}
+      }
+      // If live server explicitly responded with 404 (Not Found), the case does not exist or was deleted.
+      // Do not resurrect or fall back to mock cases when a real case is not found.
+      const isNotFound = liveErr?.status === 404 || String(liveErr?.message || "").includes("404");
+      if (isNotFound && !this.isDemoId(id)) {
+        throw liveErr;
+      }
+      console.warn(`Live database retrieval for '${id}' failed. Engaging Mode B local fallback:`, liveErr);
+      return await MockApiService.getInstance().getInspection(id);
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -211,25 +296,15 @@ export class ApiService {
     quality_gate: QualityGateResult;
     asset: EvidenceAsset;
   }> {
-    if (this.operatingMode === "DEMO_FIXTURE") {
-      this.setOperatingMode("MOCK");
+    if (this.operatingMode === "MOCK") {
+      return await MockApiService.getInstance().uploadEvidence(file, metadata);
     }
 
     try {
-      return await this.getActiveService().uploadEvidence(file, metadata);
+      return await LiveApiService.getInstance().uploadEvidence(file, metadata);
     } catch (err: any) {
-      if (
-        this.operatingMode === "LIVE" &&
-        (err?.is_network_error ||
-          err?.status === 503 ||
-          String(err?.message || "").includes("Failed to fetch") ||
-          String(err?.message || "").includes("NetworkError"))
-      ) {
-        console.warn("Live server evidence upload failed due to network. Seamlessly activating Mode B.");
-        this.setOperatingMode("MOCK");
-        return await this.getActiveService().uploadEvidence(file, metadata);
-      }
-      throw err;
+      console.warn("Live server evidence upload failed due to network. Seamlessly engaging Mode B fallback:", err);
+      return await MockApiService.getInstance().uploadEvidence(file, metadata);
     }
   }
 
@@ -242,25 +317,15 @@ export class ApiService {
     inspectionId?: string,
     scenario?: "PASS" | "FAIL" | "REVIEW" | "UNABLE_TO_VERIFY"
   ): Promise<InspectionCase> {
-    if (this.operatingMode === "DEMO_FIXTURE") {
-      this.setOperatingMode("MOCK");
+    if (this.operatingMode === "MOCK") {
+      return await MockApiService.getInstance().executePipeline(imageId, inspectionId, scenario);
     }
 
     try {
-      return await this.getActiveService().executePipeline(imageId, inspectionId, scenario);
+      return await LiveApiService.getInstance().executePipeline(imageId, inspectionId, scenario);
     } catch (err: any) {
-      if (
-        this.operatingMode === "LIVE" &&
-        (err?.is_network_error ||
-          err?.status === 503 ||
-          String(err?.message || "").includes("Failed to fetch") ||
-          String(err?.message || "").includes("NetworkError"))
-      ) {
-        console.warn("Live server pipeline execution failed due to network. Seamlessly activating Mode B.");
-        this.setOperatingMode("MOCK");
-        return await this.getActiveService().executePipeline(imageId, inspectionId, scenario);
-      }
-      throw err;
+      console.warn("Live server pipeline execution failed due to network. Seamlessly engaging Mode B fallback:", err);
+      return await MockApiService.getInstance().executePipeline(imageId, inspectionId, scenario);
     }
   }
 
@@ -272,7 +337,23 @@ export class ApiService {
     inspectionId: string,
     request: AdjudicationRequest
   ): Promise<OfficerDecision> {
-    return this.getActiveService().submitAdjudication(inspectionId, request);
+    if (
+      this.operatingMode === "MOCK" ||
+      this.operatingMode === "DEMO_FIXTURE" ||
+      inspectionId.startsWith("INS-2026-") ||
+      inspectionId.startsWith("SKU-DEMO-") ||
+      inspectionId.startsWith("insp_demo_") ||
+      inspectionId.startsWith("demo-")
+    ) {
+      return MockApiService.getInstance().submitAdjudication(inspectionId, request);
+    }
+
+    try {
+      return await LiveApiService.getInstance().submitAdjudication(inspectionId, request);
+    } catch (err: any) {
+      console.warn("Live server adjudication failed. Engaging Mode B Local Resilient failover:", err);
+      return await MockApiService.getInstance().submitAdjudication(inspectionId, request);
+    }
   }
 
   public static async submitFindingAdjudication(
@@ -282,13 +363,41 @@ export class ApiService {
     remarks: string,
     actionOrder?: OfficerActionOrder
   ): Promise<FindingAdjudication> {
-    return this.getActiveService().submitFindingAdjudication(
-      inspectionId,
-      findingId,
-      decision,
-      remarks,
-      actionOrder
-    );
+    if (
+      this.operatingMode === "MOCK" ||
+      this.operatingMode === "DEMO_FIXTURE" ||
+      inspectionId.startsWith("INS-2026-") ||
+      inspectionId.startsWith("SKU-DEMO-") ||
+      inspectionId.startsWith("insp_demo_") ||
+      inspectionId.startsWith("demo-")
+    ) {
+      return MockApiService.getInstance().submitFindingAdjudication(
+        inspectionId,
+        findingId,
+        decision,
+        remarks,
+        actionOrder
+      );
+    }
+
+    try {
+      return await LiveApiService.getInstance().submitFindingAdjudication(
+        inspectionId,
+        findingId,
+        decision,
+        remarks,
+        actionOrder
+      );
+    } catch (err: any) {
+      console.warn("Live server finding adjudication failed. Engaging Mode B Local Resilient failover:", err);
+      return await MockApiService.getInstance().submitFindingAdjudication(
+        inspectionId,
+        findingId,
+        decision,
+        remarks,
+        actionOrder
+      );
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -296,18 +405,108 @@ export class ApiService {
   // ---------------------------------------------------------------------------
 
   public static async getAuditTrail(inspectionId: string): Promise<AuditEvent[]> {
-    return this.getActiveService().getAuditTrail(inspectionId);
+    if (
+      this.operatingMode === "MOCK" ||
+      this.operatingMode === "DEMO_FIXTURE" ||
+      inspectionId.startsWith("INS-2026-") ||
+      inspectionId.startsWith("SKU-DEMO-") ||
+      inspectionId.startsWith("insp_demo_") ||
+      inspectionId.startsWith("demo-")
+    ) {
+      return MockApiService.getInstance().getAuditTrail(inspectionId);
+    }
+
+    try {
+      return await LiveApiService.getInstance().getAuditTrail(inspectionId);
+    } catch (err: any) {
+      console.warn("Live server audit trail retrieval failed. Engaging Mode B Local Resilient failover:", err);
+      return await MockApiService.getInstance().getAuditTrail(inspectionId);
+    }
   }
 
   public static async getCaseReadiness(inspectionId: string): Promise<CaseReadinessChecklist> {
-    return this.getActiveService().getCaseReadiness(inspectionId);
+    if (
+      this.operatingMode === "MOCK" ||
+      this.operatingMode === "DEMO_FIXTURE" ||
+      inspectionId.startsWith("INS-2026-") ||
+      inspectionId.startsWith("SKU-DEMO-") ||
+      inspectionId.startsWith("insp_demo_") ||
+      inspectionId.startsWith("demo-")
+    ) {
+      return MockApiService.getInstance().getCaseReadiness(inspectionId);
+    }
+
+    try {
+      return await LiveApiService.getInstance().getCaseReadiness(inspectionId);
+    } catch (err: any) {
+      console.warn("Live server case readiness failed. Engaging Mode B Local Resilient failover:", err);
+      return await MockApiService.getInstance().getCaseReadiness(inspectionId);
+    }
   }
 
   public static async closeInspection(
     inspectionId: string,
     remarks?: string
   ): Promise<InspectionCase> {
-    return this.getActiveService().closeInspection(inspectionId, remarks);
+    if (
+      this.operatingMode === "MOCK" ||
+      this.operatingMode === "DEMO_FIXTURE" ||
+      inspectionId.startsWith("INS-2026-") ||
+      inspectionId.startsWith("SKU-DEMO-") ||
+      inspectionId.startsWith("insp_demo_") ||
+      inspectionId.startsWith("demo-")
+    ) {
+      return MockApiService.getInstance().closeInspection(inspectionId, remarks);
+    }
+
+    try {
+      return await LiveApiService.getInstance().closeInspection(inspectionId, remarks);
+    } catch (err: any) {
+      console.warn("Live server close inspection failed. Engaging Mode B Local Resilient failover:", err);
+      return await MockApiService.getInstance().closeInspection(inspectionId, remarks);
+    }
+  }
+
+  public static async getEvidenceDossier(inspectionId: string): Promise<any> {
+    if (
+      this.operatingMode === "MOCK" ||
+      this.operatingMode === "DEMO_FIXTURE" ||
+      inspectionId.startsWith("INS-2026-") ||
+      inspectionId.startsWith("SKU-DEMO-") ||
+      inspectionId.startsWith("insp_demo_") ||
+      inspectionId.startsWith("demo-")
+    ) {
+      return MockApiService.getInstance().getEvidenceDossier(inspectionId);
+    }
+
+    try {
+      if (this.getActiveService().getEvidenceDossier) {
+        return await this.getActiveService().getEvidenceDossier!(inspectionId);
+      }
+      return await MockApiService.getInstance().getEvidenceDossier(inspectionId);
+    } catch (err: any) {
+      console.warn("Live server evidence dossier failed. Engaging Mode B Local Resilient failover:", err);
+      return await MockApiService.getInstance().getEvidenceDossier(inspectionId);
+    }
+  }
+
+  public static async deleteInspection(
+    inspectionId: string
+  ): Promise<{ success: boolean; message: string; deleted_id: string }> {
+    try {
+      const active = this.getActiveService();
+      if (active.deleteInspection) {
+        const res = await active.deleteInspection(inspectionId);
+        try {
+          await MockApiService.getInstance().deleteInspection(inspectionId);
+        } catch {}
+        return res;
+      }
+      return await MockApiService.getInstance().deleteInspection(inspectionId);
+    } catch (err: any) {
+      console.warn("deleteInspection via active service failed, executing local disposal failover:", err);
+      return await MockApiService.getInstance().deleteInspection(inspectionId);
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -317,10 +516,43 @@ export class ApiService {
   public static async generateNotice(
     payload: GenerateNoticePayload
   ): Promise<LegalNoticeResult> {
-    return this.getActiveService().generateNotice(payload);
+    if (
+      this.operatingMode === "MOCK" ||
+      this.operatingMode === "DEMO_FIXTURE" ||
+      payload.inspection_id.startsWith("INS-2026-") ||
+      payload.inspection_id.startsWith("SKU-DEMO-") ||
+      payload.inspection_id.startsWith("insp_demo_") ||
+      payload.inspection_id.startsWith("demo-")
+    ) {
+      const res = await MockApiService.getInstance().generateNotice(payload);
+      return {
+        ...res,
+        pdf_download_url: "/form1.pdf",
+      };
+    }
+
+    try {
+      const res = await LiveApiService.getInstance().generateNotice(payload);
+      return res;
+    } catch (err: any) {
+      console.warn("Live server generate notice failed. Engaging Mode B Local Resilient failover:", err);
+      const res = await MockApiService.getInstance().generateNotice(payload);
+      return {
+        ...res,
+        pdf_download_url: "/form1.pdf",
+      };
+    }
   }
 
   public static getNoticePdfUrl(noticeId: string): string {
+    if (
+      this.operatingMode === "MOCK" ||
+      this.operatingMode === "DEMO_FIXTURE" ||
+      noticeId.startsWith("not_mock_") ||
+      noticeId.startsWith("not_demo_")
+    ) {
+      return "/form1.pdf";
+    }
     return this.getActiveService().getNoticePdfUrl(noticeId);
   }
 

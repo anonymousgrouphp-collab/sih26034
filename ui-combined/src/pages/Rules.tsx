@@ -125,8 +125,8 @@ export const Rules: React.FC = () => {
           </h1>
           <p className="text-xs text-slate-500 mt-0.5 max-w-2xl">
             {language === "hi"
-              ? "विधिक मापविज्ञान (पैकेज्ड कमोडिटीज) नियम, 2011 और धारा 63 बीएसए 2023 के तहत न्यायदृष्टि-एलएम नियम इंजन द्वारा लागू किए गए प्राधिकृत विधिक प्रावधान।"
-              : "Authoritative legal schedules enforced by the NyayaDrishti-LM Rule Engine under the Legal Metrology (Packaged Commodities) Rules, 2011 and Section 63 BSA 2023."}
+              ? "विधिक मापविज्ञान (पैकेज्ड कमोडिटीज) नियम, 2011 और धारा 63 बीएसए 2023 के तहत निरीक्षक नियम इंजन द्वारा लागू किए गए प्राधिकृत विधिक प्रावधान।"
+              : "Authoritative legal schedules enforced by the NIRIKSHAK Rule Engine under the Legal Metrology (Packaged Commodities) Rules, 2011 and Section 63 BSA 2023."}
           </p>
         </div>
 

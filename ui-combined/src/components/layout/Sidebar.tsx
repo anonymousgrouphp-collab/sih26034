@@ -12,9 +12,11 @@ import {
   ShieldCheck,
   Scale,
   X,
+  Sparkles,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
+import { StateEmblem } from "../common/StateEmblem";
 
 interface SidebarProps {
   pendingCasesCount?: number;
@@ -59,9 +61,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
     return current === path || current.startsWith(path + "/");
   };
 
+  const lastCaseId =
+    typeof window !== "undefined"
+      ? window.localStorage?.getItem("nyayadrishti_last_case_id") || "demo-fortune-sunlite"
+      : "demo-fortune-sunlite";
+
   const navigation = [
     { label: t("nav.dashboard", "Executive Dashboard"), path: "/dashboard", icon: Home },
     { label: t("nav.register", "Inspection Register"), path: "/inspections", icon: SearchCheck },
+    {
+      label: language === "hi" ? "डेमो परिदृश्य (7)" : "Demo Scenarios (7)",
+      path: "/inspections/SKU-DEMO-01",
+      icon: Sparkles,
+      badge: "7 DEMOS",
+    },
     { label: t("nav.new", "New Inspection"), path: "/inspections/new", icon: ClipboardCheck },
     {
       label: t("nav.review", "Review Queue"),
@@ -70,7 +83,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       badge: pendingCasesCount > 0 ? pendingCasesCount : undefined,
     },
     { label: t("nav.rules", "Rules & Schedules"), path: "/rules", icon: GitBranch },
-    { label: t("nav.evidence", "Evidence Dossier"), path: "/inspections/demo-fortune-sunlite/evidence", icon: FileArchive },
+    { label: t("nav.evidence", "Evidence Dossier"), path: `/inspections/${lastCaseId}/evidence`, icon: FileArchive },
     { label: t("nav.reports", "Reports & Notices"), path: "/reports", icon: BarChart3 },
   ];
 
@@ -91,9 +104,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
       >
         {/* Mobile Header */}
         <div className="flex h-16 items-center justify-between border-b border-slate-200 px-4 lg:hidden bg-govNavy text-white">
-          <div className="flex items-center gap-2">
-            <Scale size={20} className="text-amber-400" />
-            <span className="font-bold text-sm">NyayaDrishti-LM</span>
+          <div className="flex items-center gap-2.5">
+            <StateEmblem size={22} tone="white" showMotto={true} className="shrink-0" />
+            <span className="font-bold text-sm tracking-tight">NIRIKSHAK</span>
           </div>
           <button
             type="button"
@@ -194,7 +207,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <span className="text-amber-700 font-bold">6.0 mm (ADL-01)</span>
             </div>
             <div className="pt-1.5 border-t border-slate-100 text-center text-[9.5px] text-slate-400">
-              NyayaDrishti-LM • v1.0.0-sih26034
+              NIRIKSHAK • v1.0.0-sih26034
             </div>
           </div>
         </div>

@@ -27,9 +27,7 @@ export const NotFound: React.FC = () => {
           <div className="bg-govNavy text-white p-6 sm:p-8 text-center relative overflow-hidden">
             <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px]" />
             <div className="relative z-10 flex flex-col items-center space-y-3">
-              <div className="p-2 bg-white/10 backdrop-blur-xs rounded-xl border border-white/20 shadow-inner">
-                <StateEmblem size={44} tone="white" showMotto={true} />
-              </div>
+              <StateEmblem size={44} tone="white" showMotto={true} />
               <div className="text-[11px] font-bold uppercase tracking-widest text-amber-400">
                 {language === "hi"
                   ? "भारत सरकार • उपभोक्ता मामले विभाग"
@@ -125,8 +123,8 @@ export const NotFound: React.FC = () => {
             {/* Support / Helpdesk Disclaimer */}
             <div className="pt-2 text-[11px] text-slate-400 font-mono">
               {language === "hi"
-                ? "राष्ट्रीय उपभोक्ता हेल्पलाइन: 1915 • ई-माप प्रवर्तन डेस्क • न्यायदृष्टि-एलएम"
-                : "National Consumer Helpline: 1915 • eMaap Enforcement Desk • NyayaDrishti-LM"}
+                ? "राष्ट्रीय उपभोक्ता हेल्पलाइन: 1915 • ई-माप प्रवर्तन डेस्क • निरीक्षक"
+                : "National Consumer Helpline: 1915 • eMaap Enforcement Desk • NIRIKSHAK"}
             </div>
           </div>
         </div>

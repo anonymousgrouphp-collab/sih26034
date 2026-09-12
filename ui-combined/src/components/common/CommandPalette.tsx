@@ -367,7 +367,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
             <span>{language === "hi" ? "ESC बंद करें" : "ESC Close"}</span>
           </div>
           <span className="text-govNavy font-semibold">
-            {language === "hi" ? "न्यायदृष्टि-LM कमांड पैलेट" : "NyayaDrishti-LM Command Palette"}
+            {language === "hi" ? "निरीक्षक कमांड पैलेट" : "NIRIKSHAK Command Palette"}
           </span>
         </div>
       </div>

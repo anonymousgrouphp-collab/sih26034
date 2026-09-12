@@ -1,0 +1,99 @@
+<svg viewBox="0 0 500 520" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="goldGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="50%" stop-color="#D97706"/>
+      <stop offset="100%" stop-color="#92400E"/>
+    </linearGradient>
+    <linearGradient id="greenGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#064E3B"/>
+    </linearGradient>
+    <radialGradient id="auraGold2" cx="30%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#FDE68A" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="auraEmerald2" cx="70%" cy="70%" r="70%">
+      <stop offset="0%" stop-color="#A7F3D0" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Ambient Backdrop Aura -->
+  <rect width="500" height="520" fill="#FAFAFA" rx="16"/>
+  <circle cx="120" cy="160" r="180" fill="url(#auraGold2)"/>
+  <circle cx="380" cy="360" r="180" fill="url(#auraEmerald2)"/>
+
+  <!-- Outer Halo Rings -->
+  <circle cx="250" cy="195" r="165" stroke="#E6B042" stroke-width="1.5" stroke-dasharray="6 6" opacity="0.6"/>
+  <circle cx="250" cy="195" r="150" stroke="#006A4E" stroke-width="2.5" opacity="0.8"/>
+  <circle cx="250" cy="195" r="135" stroke="#E6B042" stroke-width="1" opacity="0.4"/>
+
+  <!-- Crosshairs on Ring -->
+  <line x1="250" y1="35" x2="250" y2="355" stroke="#006A4E" stroke-width="1" stroke-dasharray="2 4" opacity="0.4"/>
+  <line x1="90" y1="195" x2="410" y2="195" stroke="#006A4E" stroke-width="1" stroke-dasharray="2 4" opacity="0.4"/>
+
+  <!-- The Pillar of Metrology (Center Fulcrum Stand) -->
+  <g transform="translate(250, 195)">
+    <!-- Base Pedestal -->
+    <path d="M -40 100 L 40 100 L 30 85 L -30 85 Z" fill="url(#goldGrad2)" stroke="#78350F" stroke-width="1.5"/>
+    <rect x="-18" y="80" width="36" height="5" fill="#B45309"/>
+    
+    <!-- Central Column -->
+    <path d="M -8 80 L -5 -40 L 5 -40 L 8 80 Z" fill="url(#goldGrad2)"/>
+    <circle cx="0" cy="10" r="12" fill="#D97706"/>
+
+    <!-- Fulcrum Crown / Top Finial -->
+    <path d="M 0 -75 L 12 -45 L -12 -45 Z" fill="url(#goldGrad2)" stroke="#78350F" stroke-width="1"/>
+    <circle cx="0" cy="-45" r="8" fill="#F59E0B" stroke="#92400E" stroke-width="1.5"/>
+
+    <!-- The Balance Beam -->
+    <path d="M -110 -40 C -60 -52 60 -52 110 -40 C 60 -35 -60 -35 -110 -40 Z" fill="url(#goldGrad2)" stroke="#78350F" stroke-width="1.5"/>
+
+    <!-- Left Scale Suspension & Pan -->
+    <g transform="translate(-105, -38)">
+      <line x1="0" y1="0" x2="-25" y2="60" stroke="#B45309" stroke-width="1.5"/>
+      <line x1="0" y1="0" x2="25" y2="60" stroke="#B45309" stroke-width="1.5"/>
+      <path d="M -32 60 C -32 78 32 78 32 60 Z" fill="url(#goldGrad2)" stroke="#78350F" stroke-width="1.5"/>
+      <circle cx="0" cy="62" r="12" fill="none" stroke="#006A4E" stroke-width="1" stroke-dasharray="2 2"/>
+      <text x="0" y="65" text-anchor="middle" font-size="8" font-family="monospace" font-weight="bold" fill="#006A4E">kg</text>
+    </g>
+
+    <!-- Right Scale Suspension & Pan -->
+    <g transform="translate(105, -38)">
+      <line x1="0" y1="0" x2="-25" y2="60" stroke="#B45309" stroke-width="1.5"/>
+      <line x1="0" y1="0" x2="25" y2="60" stroke="#B45309" stroke-width="1.5"/>
+      <path d="M -32 60 C -32 78 32 78 32 60 Z" fill="url(#goldGrad2)" stroke="#78350F" stroke-width="1.5"/>
+      <circle cx="0" cy="62" r="12" fill="none" stroke="#006A4E" stroke-width="1" stroke-dasharray="2 2"/>
+      <text x="0" y="65" text-anchor="middle" font-size="8" font-family="monospace" font-weight="bold" fill="#006A4E">L</text>
+    </g>
+
+    <!-- Fulcrum Eye of Verification -->
+    <g transform="translate(0, 10)">
+      <path d="M -42 0 C -25 -25 25 -25 42 0 C 25 25 -25 25 -42 0 Z" fill="#FFFFFF" stroke="#006A4E" stroke-width="3"/>
+      <circle cx="0" cy="0" r="16" fill="#064E3B" stroke="#E6B042" stroke-width="2"/>
+      <circle cx="0" cy="0" r="7" fill="#F59E0B"/>
+      <circle cx="-3" cy="-3" r="2.5" fill="#FFFFFF"/>
+    </g>
+  </g>
+
+  <!-- Wordmark: NIRIKSHAK -->
+  <text x="250" y="420" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="40" letter-spacing="4" fill="#0F172A">
+    NIRIKSHAK
+  </text>
+
+  <!-- Sweeping Indian Tricolor Ribbon Under Wordmark -->
+  <g transform="translate(150, 435)">
+    <path d="M 0 0 C 60 12 140 -8 200 6" stroke="#FF9933" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <path d="M 0 5 C 60 17 140 -3 200 11" stroke="#CBD5E1" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+    <path d="M 0 10 C 60 22 140 2 200 16" stroke="#138808" stroke-width="4" stroke-linecap="round" fill="none"/>
+  </g>
+
+  <!-- Subtitle -->
+  <text x="250" y="480" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="12" letter-spacing="2" fill="#006A4E">
+    STATUTORY VERIFICATION & CONSUMER SHIELD
+  </text>
+  <text x="250" y="500" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="600" font-size="11" fill="#64748B">
+    विधिक मापविज्ञान अधिनियम २००९ · धारा ६३ साक्ष्य अनुपालन
+  </text>
+</svg>

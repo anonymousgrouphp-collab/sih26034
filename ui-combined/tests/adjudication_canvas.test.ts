@@ -69,7 +69,7 @@ describe("Chunk 5: Flagship Split-View Adjudication Canvas", () => {
       // 3. OCR Token ---> Image Polygon
       assert.equal(primaryToken.polygon.length, 4, "Must have 4 polygon vertices");
       const svgPoints = polygonToSvgPoints(primaryToken.polygon);
-      assert.equal(svgPoints, "200,350 550,350 550,410 200,410");
+      assert.equal(svgPoints, "840,530 1050,530 1050,565 840,565");
 
       // 4. Evidence Asset reference preserved
       assert.equal(asset.image_id, "img_demo_01_pdp");

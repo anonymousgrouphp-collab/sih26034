@@ -23,6 +23,7 @@ import { ApiService } from "../services/api";
 import { GoldenSkuQuickSelector } from "../features/desk/GoldenSkuQuickSelector";
 import { PackagingType, InspectionType } from "../types/inspection";
 import { InspectionCameraModal } from "../components/camera";
+import { useCircle } from "../context/CircleContext";
 import { useLanguage } from "../context/LanguageContext";
 
 interface PipelineStepItem {
@@ -93,6 +94,7 @@ export const NewInspection: React.FC = () => {
 
   // Mode: Field Capture vs Benchmark Scenarios
   const [activeTab, setActiveTab] = useState<"FIELD_CAPTURE" | "BENCHMARK_SKUS">("FIELD_CAPTURE");
+  const { activeCircle } = useCircle();
 
   const [files, setFiles] = useState<File[]>([]);
   const [filePreviews, setFilePreviews] = useState<string[]>([]);
@@ -111,12 +113,80 @@ export const NewInspection: React.FC = () => {
   const [packageType, setPackageType] = useState<PackagingType>("RECTANGULAR");
   const [inspectionType, setInspectionType] = useState<InspectionType>("ROUTINE_MARKET_SURVEILLANCE");
 
+  const getPersistentPreview = (file: File, fallbackPreview?: string): Promise<string> => {
+    if (fallbackPreview && fallbackPreview.startsWith("data:image/")) {
+      return Promise.resolve(fallbackPreview);
+    }
+    return new Promise((resolve) => {
+      if (!file || !file.type.startsWith("image/")) {
+        resolve(fallbackPreview || URL.createObjectURL(file));
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        if (!dataUrl) {
+          resolve(fallbackPreview || URL.createObjectURL(file));
+          return;
+        }
+        const img = new Image();
+        img.onload = () => {
+          try {
+            const maxDim = 1024;
+            let { width, height } = img;
+            if (width > maxDim || height > maxDim) {
+              if (width > height) {
+                height = Math.round((height * maxDim) / width);
+                width = maxDim;
+              } else {
+                width = Math.round((width * maxDim) / height);
+                height = maxDim;
+              }
+            }
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d");
+            if (ctx) {
+              ctx.drawImage(img, 0, 0, width, height);
+              resolve(canvas.toDataURL("image/jpeg", 0.75));
+              return;
+            }
+          } catch {
+            // Fallback to dataUrl
+          }
+          resolve(dataUrl);
+        };
+        img.onerror = () => resolve(dataUrl);
+        img.src = dataUrl;
+      };
+      reader.onerror = () => resolve(fallbackPreview || URL.createObjectURL(file));
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleFilesSelected = (newFiles: FileList | null) => {
     if (!newFiles || newFiles.length === 0) return;
     const fileList = Array.from(newFiles);
+    const startIdx = files.length;
+    // Preserve original, uncompressed File objects in state for statutory analysis
     setFiles((prev) => [...prev, ...fileList]);
     const previews = fileList.map((f) => URL.createObjectURL(f));
     setFilePreviews((prev) => [...prev, ...previews]);
+
+    // Generate lightweight thumbnail previews for UI display without altering original File objects
+    fileList.forEach((f, idx) => {
+      getPersistentPreview(f).then((persistentUrl) => {
+        setFilePreviews((prev) => {
+          const next = [...prev];
+          const pos = startIdx + idx;
+          if (pos < next.length) {
+            next[pos] = persistentUrl;
+          }
+          return next;
+        });
+      });
+    });
   };
 
   const handleRemoveFile = (index: number) => {
@@ -142,33 +212,67 @@ export const NewInspection: React.FC = () => {
         category,
         package_type: packageType,
         inspection_type: inspectionType,
-        jurisdiction_circle_id: "CIRCLE_DL_SOUTH_01",
+        jurisdiction_circle_id: activeCircle || "CIRCLE_DL_SOUTH_01",
         declared_net_quantity: declaredNetQty.trim() || undefined,
       });
 
       // 3. Upload evidence files if provided (all selected photographs)
-      let uploadedImageId: string | null = null;
+      // STATUTORY REQUIREMENT: 1st time upload and analysis MUST run on original, non-compressed
+      // images at native sensor resolution to prevent ArUco scale and OCR token discrepancy.
+      const uploadedImageIds: string[] = [];
       if (files.length > 0) {
         for (let i = 0; i < files.length; i++) {
-          const file = files[i];
+          const rawFile = files[i];
+          let previewUrl = filePreviews[i];
+          let imgWidth = 1920;
+          let imgHeight = 1080;
+
+          try {
+            const dims = await new Promise<{ width: number; height: number }>((resolve) => {
+              const img = new Image();
+              const tempUrl = URL.createObjectURL(rawFile);
+              img.onload = () => {
+                const w = img.naturalWidth || 1920;
+                const h = img.naturalHeight || 1080;
+                URL.revokeObjectURL(tempUrl);
+                resolve({ width: w, height: h });
+              };
+              img.onerror = () => {
+                URL.revokeObjectURL(tempUrl);
+                resolve({ width: 1920, height: 1080 });
+              };
+              img.src = tempUrl;
+            });
+            imgWidth = dims.width;
+            imgHeight = dims.height;
+          } catch {
+            // Default fallback dimensions
+          }
+
+          if (!previewUrl) {
+            previewUrl = await getPersistentPreview(rawFile, filePreviews[i]);
+          }
+
           const panelType =
             i === 0
               ? "PDP_FRONT"
               : i === 1
-              ? "SIDE_PANEL"
-              : "BACK_PANEL";
-          const uploadResult = await ApiService.uploadEvidence(file, {
+              ? "BACK_PANEL"
+              : "SIDE_PANEL";
+
+          // Transmit untouched original image to uploadEvidence for pristine statutory analysis
+          const uploadResult = await ApiService.uploadEvidence(rawFile, {
             inspection_id: newCase.id,
             panel_type: panelType,
-            original_filename: file.name,
-            file_size_bytes: file.size,
-            mime_type: file.type || "image/jpeg",
-            image_width: 1920,
-            image_height: 1080,
-            preview_url: filePreviews[i] || URL.createObjectURL(file),
+            original_filename: rawFile.name,
+            file_size_bytes: rawFile.size,
+            mime_type: rawFile.type || "image/jpeg",
+            image_width: imgWidth,
+            image_height: imgHeight,
+            preview_url: previewUrl,
           });
-          if (i === 0 && uploadResult?.image_id) {
-            uploadedImageId = uploadResult.image_id;
+          if (uploadResult?.image_id) {
+            uploadedImageIds.push(uploadResult.image_id);
           }
         }
       }
@@ -182,10 +286,11 @@ export const NewInspection: React.FC = () => {
         await new Promise((r) => setTimeout(r, 220));
       }
 
-      // Final: Execute pipeline
-      const activeAssetId = uploadedImageId || newCase.evidence_assets[0]?.image_id;
-      if (activeAssetId) {
-        await ApiService.executePipeline(activeAssetId, newCase.id);
+      // Final: Execute pipeline on the primary packaging evidence asset
+      if (uploadedImageIds.length > 0) {
+        await ApiService.executePipeline(uploadedImageIds[0], newCase.id);
+      } else if (newCase.evidence_assets[0]?.image_id) {
+        await ApiService.executePipeline(newCase.evidence_assets[0].image_id, newCase.id);
       }
 
       // Navigate directly into the Adjudication Canvas for this case
@@ -219,17 +324,17 @@ export const NewInspection: React.FC = () => {
           >
             <ArrowLeft size={20} />
           </button>
-          <div>
-            <div className="flex items-center gap-2">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
               <span className="text-[10.5px] font-extrabold uppercase tracking-widest text-amber-700 font-mono">
-                {language === "hi" ? "विधिक मापविज्ञान प्रवर्तन" : "Legal Metrology Enforcement"}
+                {language === "hi" ? "वैधानिक प्रवर्तन" : "Statutory Enforcement"}
               </span>
               <span className="text-slate-300">•</span>
               <span className="text-[10.5px] font-bold text-slate-500">
                 {language === "hi" ? "नियम 6 एवं तालिका-I अधिग्रहण" : "Rule 6 & Table-I Intake"}
               </span>
             </div>
-            <h1 className="text-2xl font-black text-slate-900 leading-tight mt-0.5">
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight mt-0.5">
               {language === "hi" ? "नई वस्तु का विधिक निरीक्षण" : "New Commodity Inspection"}
             </h1>
           </div>
@@ -282,7 +387,7 @@ export const NewInspection: React.FC = () => {
           </span>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5">
           {steps.map((s, idx) => {
             const isCompleted = s.status === "completed";
             const isActive = s.status === "active";
@@ -402,19 +507,28 @@ export const NewInspection: React.FC = () => {
                         ? "मोबाइल गैलरी अथवा स्कैनर से JPEG, PNG, WEBP समर्थित"
                         : "Supports JPEG, PNG, WEBP from mobile gallery or external scanners"}
                     </p>
-                    <div className="mt-2 flex items-center gap-1.5 text-[10px] text-emerald-800 font-medium bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                      <ShieldCheck size={12} className="text-emerald-600" />
-                      <span>
-                        {language === "hi"
-                          ? "अधिग्रहण पर SHA-256 मर्कल साक्ष्य अखंडता सुरक्षित"
-                          : "SHA-256 Merkle Provenance Captured on Intake"}
-                      </span>
+                    <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
+                      <div className="flex items-center gap-1.5 text-[10px] text-emerald-800 font-medium bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                        <ShieldCheck size={12} className="text-emerald-600" />
+                        <span>
+                          {language === "hi"
+                            ? "अधिग्रहण पर SHA-256 मर्कल साक्ष्य अखंडता सुरक्षित"
+                            : "SHA-256 Merkle Provenance Captured on Intake"}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-[10px] text-blue-800 font-medium bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
+                        <Sparkles size={12} className="text-blue-600" />
+                        <span>
+                          {language === "hi"
+                            ? "विश्लेषण हेतु 100% मूल गैर-संपीड़ित छवि • शून्य डेटा हानि"
+                            : "Full-Fidelity Original Intake • Zero Precision Loss"}
+                        </span>
+                      </div>
                     </div>
                     <input
                       ref={fileInputRef}
                       type="file"
                       accept="image/*"
-                      capture="environment"
                       multiple
                       className="hidden"
                       onChange={(e) => handleFilesSelected(e.target.files)}
@@ -448,8 +562,10 @@ export const NewInspection: React.FC = () => {
                             )}
                             <div className="min-w-0">
                               <p className="font-bold text-slate-800 truncate">{file.name}</p>
-                              <p className="text-[10px] font-mono text-slate-500">
-                                {(file.size / 1024).toFixed(0)} KB • High-Res PDP
+                              <p className="text-[10px] font-mono text-emerald-700 font-semibold">
+                                {file.size >= 1024 * 1024
+                                  ? `${(file.size / (1024 * 1024)).toFixed(1)} MB`
+                                  : `${(file.size / 1024).toFixed(0)} KB`} • {language === "hi" ? "मूल गैर-संपीड़ित PDP" : "Original Uncompressed PDP"}
                               </p>
                             </div>
                           </div>
@@ -726,8 +842,8 @@ export const NewInspection: React.FC = () => {
               </div>
               <p className="text-[11.5px] leading-relaxed text-emerald-900/90">
                 {language === "hi"
-                  ? "न्यायदृष्टि-एलएम कभी भी स्वायत्त रूप से विधिक नोटिस या जुर्माना जारी नहीं करता है। धारा 63 बीएसए 2023 के तहत सभी निष्कर्ष अधिकृत अधिकारी की समीक्षा हेतु हैं।"
-                  : "NyayaDrishti-LM never issues legal notices, compounding orders, or fines autonomously. All findings are recommendations for human officer review under Section 63 BSA 2023."}
+                  ? "निरीक्षक कभी भी स्वायत्त रूप से विधिक नोटिस या जुर्माना जारी नहीं करता है। धारा 63 बीएसए 2023 के तहत सभी निष्कर्ष अधिकृत अधिकारी की समीक्षा हेतु हैं।"
+                  : "NIRIKSHAK never issues legal notices, compounding orders, or fines autonomously. All findings are recommendations for human officer review under Section 63 BSA 2023."}
               </p>
             </div>
           </aside>

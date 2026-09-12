@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 172" fill="none" role="img" aria-labelledby="wdTitle wdDesc">
+  <title id="wdTitle">NIRIKSHAK wordmark — binocular variant</title>
+  <desc id="wdDesc">NIRIKSHAK monoline wordmark with floating iris rings above both I letters — the inspector's paired eyes, two rings, one gaze.</desc>
+  <g stroke-width="13" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <g stroke="#0A192F">
+      <g transform="translate(0,50)"><path d="M8 100 L8 0 L56 100 L56 0"/></g>
+      <g transform="translate(64,50)"><path d="M8 0 L8 100"/></g>
+      <g transform="translate(90,50)"><path d="M8 100 L8 0 L26 0 A25 25 0 0 1 26 50 L8 50 M27 50 L56 100"/></g>
+    </g>
+    <g stroke="#1E3A8A">
+      <g transform="translate(156,50)"><path d="M8 0 L8 100"/></g>
+      <g transform="translate(182,50)"><path d="M8 0 L8 100 M54 0 L8 50 M22 35 L56 100"/></g>
+      <g transform="translate(246,50)"><path d="M48 14 C40 2 16 4 11 22 C6 40 28 45 37 51 C48 58 52 66 47 80 C41 96 14 96 8 82"/></g>
+      <g transform="translate(302,50)"><path d="M8 0 L8 100 M56 0 L56 100 M8 50 L56 50"/></g>
+      <g transform="translate(366,50)"><path d="M31 0 L6 100 M31 0 L56 100 M14 68 L48 68"/></g>
+      <g transform="translate(428,50)"><path d="M8 0 L8 100 M54 0 L8 50 M22 35 L56 100"/></g>
+    </g>
+  </g>
+  <!-- the seeing tittles: paired iris rings above both I letters -->
+  <circle cx="72" cy="27" r="7" stroke="#10B981" stroke-width="4.5"/>
+  <circle cx="72" cy="27" r="2.4" fill="#FF9933"/>
+  <circle cx="164" cy="27" r="7" stroke="#10B981" stroke-width="4.5"/>
+  <circle cx="164" cy="27" r="2.4" fill="#FF9933"/>
+</svg>

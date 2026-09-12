@@ -43,8 +43,23 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
   conflicts: propsConflicts,
 }) => {
   const { language } = useLanguage();
-  const activeAsset: EvidenceAsset | undefined =
-    caseData.evidence_assets[caseData.evidence_assets.length - 1];
+  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
+
+  const activeAsset: EvidenceAsset | undefined = useMemo(() => {
+    if (!caseData.evidence_assets || caseData.evidence_assets.length === 0) return undefined;
+    if (selectedAssetId) {
+      const found = caseData.evidence_assets.find((a) => a.image_id === selectedAssetId);
+      if (found) return found;
+    }
+    const sortedByTokens = [...caseData.evidence_assets].sort(
+      (a, b) => (b.ocr?.tokens?.length || 0) - (a.ocr?.tokens?.length || 0)
+    );
+    if (sortedByTokens[0]?.ocr?.tokens?.length) {
+      return sortedByTokens[0];
+    }
+    const pdpFront = caseData.evidence_assets.find((a) => a.panel_type === "PDP_FRONT");
+    return pdpFront || caseData.evidence_assets[0];
+  }, [caseData.evidence_assets, selectedAssetId]);
 
   const findings: RuleFinding[] = caseData.rule_evaluations || [];
   const fields: ExtractedField[] = caseData.extracted_fields || [];
@@ -76,9 +91,17 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
         compounding_fee_amount: 5000,
         reply_window_days: 15,
       });
-      if (res.pdf_download_url) {
-        window.open(res.pdf_download_url, "_blank");
+      if (res && res.pdf_download_url && res.pdf_download_url.startsWith("http") && res.pdf_download_url !== "/form1.pdf") {
+        const filename = `Form-1-Notice-${caseData.inspection_number || caseData.id}.pdf`;
+        const dlLink = document.createElement("a");
+        dlLink.href = res.pdf_download_url;
+        dlLink.download = filename;
+        dlLink.target = "_blank";
+        document.body.appendChild(dlLink);
+        dlLink.click();
+        document.body.removeChild(dlLink);
       }
+
       setNoticeResultMsg(`Form-1 Notice ${res.notice_reference_number} generated with Section 63 BSA certificate.`);
       setTimeout(() => setNoticeResultMsg(null), 6000);
     } catch (err: any) {
@@ -275,11 +298,9 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
       {/* 1. Sub-Header: Adjudication Workspace Mode Bar */}
       <div className="bg-panelBg border border-slate-200 rounded-lg p-3 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div className="flex items-center gap-2.5 flex-wrap">
-          <div className="p-1 bg-govNavy border border-govNavy-light rounded shadow-2xs flex items-center justify-center">
-            <StateEmblem size={20} tone="white" showMotto={false} />
-          </div>
+          <StateEmblem size={22} tone="navy" showMotto={true} className="shrink-0" />
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 min-w-0 flex-wrap">
               <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700">
                 {language === "hi" ? "उपभोक्ता मामले विभाग • राजपत्रित अधिकारी कार्यक्षेत्र" : "DoCA • Gazetted Officer Workstation"}
               </span>
@@ -288,12 +309,12 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
                 {language === "hi" ? "धारा 15 विधिक मापविज्ञान अधिनियम 2009" : "Sec 15 LM Act 2009"}
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-black text-govNavy">
+            <div className="flex items-center gap-2 min-w-0 flex-wrap">
+              <span className="text-xs font-black text-govNavy whitespace-nowrap">
                 {language === "hi" ? "प्रमुख विधिक अधिनिर्णय कार्यक्षेत्र (कैनवास)" : "Flagship Adjudication Canvas"}
               </span>
               <span className="text-slate-300">|</span>
-              <span className="text-xs text-slate-600 font-mono truncate max-w-[280px]">
+              <span className="text-xs text-slate-600 font-mono truncate max-w-[150px] sm:max-w-[280px] min-w-0">
                 {caseData.product_name}
               </span>
             </div>
@@ -364,7 +385,74 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
       {/* 2. Flagship Split-View Canvas */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
         {/* Left Column (6 cols): Calibrated Evidence Viewer with SVG Polygon Overlays */}
-        <div className="lg:col-span-6 h-full">
+        <div className="lg:col-span-6 h-full space-y-3">
+          {/* Multi-Angle Evidence Facet Switcher (Rule 6 Multi-Panel Coverage) */}
+          {caseData.evidence_assets && caseData.evidence_assets.length > 1 && (
+            <div className="bg-white border border-slate-200 rounded-lg p-2.5 shadow-xs">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-govNavy" />
+                  <span className="text-xs font-bold text-govNavy">
+                    {language === "hi" ? "बहु-कोणीय पैकेजिंग साक्ष्य" : "Multi-Angle Packaging Facets"}
+                  </span>
+                  <span className="text-[11px] font-mono text-slate-500 font-semibold">
+                    ({caseData.evidence_assets.length} {language === "hi" ? "फलक" : "facets"})
+                  </span>
+                </div>
+                <span className="text-[10px] text-slate-500 font-medium hidden sm:inline">
+                  {language === "hi" ? "सांविधिक चिह्नों का निरीक्षण करने हेतु किसी भी फलक का चयन करें" : "Select facet to inspect panel-specific markings"}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+                {caseData.evidence_assets.map((asset, index) => {
+                  const isSelected = activeAsset?.image_id === asset.image_id;
+                  const tokenCount = asset.ocr?.tokens?.length || 0;
+                  return (
+                    <button
+                      key={asset.image_id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedAssetId(asset.image_id);
+                        setSelectedTokenId(undefined);
+                      }}
+                      className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md border text-xs transition-all shrink-0 ${
+                        isSelected
+                          ? "bg-govNavy text-white border-govNavy shadow-xs font-bold"
+                          : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 font-medium"
+                      }`}
+                    >
+                      <div className="w-7 h-7 rounded bg-slate-200 overflow-hidden shrink-0 flex items-center justify-center border border-slate-300">
+                        {asset.preview_url || asset.file_path ? (
+                          <img
+                            src={asset.preview_url || asset.file_path}
+                            alt={`Facet ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-[10px] font-bold text-slate-500">#{index + 1}</span>
+                        )}
+                      </div>
+                      <div className="text-left">
+                        <div className="text-[11px] font-bold leading-tight">
+                          {asset.panel_type === "BACK_PANEL"
+                            ? (language === "hi" ? "पृष्ठ फलक" : "Back Panel")
+                            : asset.panel_type === "PDP_FRONT"
+                            ? (language === "hi" ? "मुख्य फलक (PDP)" : "Front PDP")
+                            : asset.panel_type === "SIDE_PANEL"
+                            ? (language === "hi" ? "पार्श्व फलक" : "Side Panel")
+                            : (language === "hi" ? `कोण #${index + 1}` : `Angle #${index + 1}`)}
+                        </div>
+                        <div className={`text-[10px] font-mono ${isSelected ? "text-slate-200" : "text-slate-500"}`}>
+                          {tokenCount} {language === "hi" ? "चिह्न" : "tokens"}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {activeAsset ? (
             <EvidenceViewer
               asset={activeAsset}

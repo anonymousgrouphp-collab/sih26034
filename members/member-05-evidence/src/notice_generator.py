@@ -100,6 +100,13 @@ class Form1NoticePDFGenerator:
         reply_window_days: int = 15,
         evidence_crop_bytes: Optional[bytes] = None,
         output_path: Optional[str] = None,
+        commodity_name: Optional[str] = None,
+        brand_name: Optional[str] = None,
+        batch_number: Optional[str] = None,
+        declared_net_qty: Optional[str] = None,
+        declared_mrp: Optional[str] = None,
+        package_type: Optional[str] = None,
+        pdp_area_cm2: Optional[float] = None,
     ) -> Tuple[bytes, LegalNoticeDTO]:
         """Generates archival Form-1 notice PDF bytes and corresponding LegalNoticeDTO."""
         start_time = time.perf_counter()
@@ -235,10 +242,45 @@ class Form1NoticePDFGenerator:
             f"for statutory compounding under Section 48 upon payment of the compounding sum indicated below."
         )
         story.append(Paragraph(narrative_text, style_body))
-        story.append(Spacer(1, 4 * mm))
+        story.append(Spacer(1, 3 * mm))
 
-        # 6. Violations Table
-        story.append(Paragraph("<b>SCHEDULE OF STATUTORY DEFICITS & VIOLATIONS:</b>", style_heading))
+        # 5.5 Schedule A: Particulars of Inspected Commodity
+        story.append(Paragraph("<b>SCHEDULE A: PARTICULARS OF INSPECTED PACKAGED COMMODITY:</b>", style_heading))
+        sched_a_data = [
+            [
+                Paragraph(f"<b>Commodity / Product:</b> {commodity_name or 'Packaged Commodity'}", style_body),
+                Paragraph(f"<b>Brand Name:</b> {brand_name or 'N/A'}", style_body),
+            ],
+            [
+                Paragraph(f"<b>Declared Net Qty:</b> {declared_net_qty or 'N/A'}", style_body),
+                Paragraph(f"<b>Retail Price (MRP):</b> {declared_mrp or 'N/A'}", style_body),
+            ],
+            [
+                Paragraph(f"<b>Batch / Lot No.:</b> {batch_number or 'N/A'}", style_body),
+                Paragraph(f"<b>Packaging Geometry:</b> {package_type or 'Standard Box / Pack'}", style_body),
+            ],
+        ]
+        if pdp_area_cm2:
+            sched_a_data.append([
+                Paragraph(f"<b>Measured PDP Area:</b> {pdp_area_cm2:.1f} cm²", style_body),
+                Paragraph(f"<b>Inspection Dossier ID:</b> {inspection_id}", style_body),
+            ])
+        sched_a_table = Table(sched_a_data, colWidths=[85 * mm, 80 * mm])
+        sched_a_table.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, -1), GRAY_BG),
+            ("BOX", (0, 0), (-1, -1), 0.5, GRAY_BORDER),
+            ("GRID", (0, 0), (-1, -1), 0.5, HexColor("#E2E8F0")),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("TOPPADDING", (0, 0), (-1, -1), 2.5),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 2.5),
+            ("LEFTPADDING", (0, 0), (-1, -1), 6),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+        ]))
+        story.append(sched_a_table)
+        story.append(Spacer(1, 3 * mm))
+
+        # 6. Violations Table (Schedule B)
+        story.append(Paragraph("<b>SCHEDULE B: STATUTORY DEFICITS & NON-COMPLIANCE FINDINGS:</b>", style_heading))
         v_headers = [
             Paragraph("<b>Rule Code</b>", style_body_bold),
             Paragraph("<b>Statutory Mandate</b>", style_body_bold),

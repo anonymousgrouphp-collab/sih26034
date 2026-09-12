@@ -148,11 +148,14 @@ class CalibrationEngine:
 
         if gray_or_bgr.ndim == 3:
             gray = cv2.cvtColor(gray_or_bgr, cv2.COLOR_BGR2GRAY)
+            hsv = cv2.cvtColor(gray_or_bgr, cv2.COLOR_BGR2HSV)
+            s_ch = hsv[:, :, 1]
         else:
             gray = gray_or_bgr
+            s_ch = None
 
         try:
-            # Multi-threshold adaptive Canny edge passes for robust edge extraction
+            # Multi-threshold adaptive Canny edge passes across intensity and chroma channels
             v = float(np.median(gray))
             lower_dyn = int(max(10, (1.0 - 0.50) * v))
             upper_dyn = int(min(240, (1.0 + 0.50) * v))
@@ -160,65 +163,110 @@ class CalibrationEngine:
             edge_passes = [
                 cv2.Canny(gray, 40, 140),
                 cv2.Canny(gray, 15, 60),
+                cv2.Canny(gray, 10, 30),
                 cv2.Canny(gray, lower_dyn, upper_dyn),
             ]
+            if s_ch is not None:
+                edge_passes.append(cv2.Canny(s_ch, 20, 70))
+                edge_passes.append(cv2.Canny(s_ch, 15, 45))
+
             kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
 
             target_aspect = card_w_mm / card_h_mm  # 1.5858
             best_candidate = None
-            min_aspect_diff = 0.15  # Tolerance on card aspect ratio (within 10%)
+            min_aspect_diff = 0.28  # Handheld perspective foreshortening tolerance (~17%)
 
             h_img, w_img = gray.shape[:2]
             min_card_area = (w_img * h_img) * 0.005  # At least 0.5% of total frame
-            max_card_area = (w_img * h_img) * 0.35   # At most 35% of total frame (distinguishes reference card from packaging)
+            max_card_area = (w_img * h_img) * 0.40   # At most 40% of total frame
 
             for edges in edge_passes:
-                edges_closed = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel)
+                edges_closed = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel, iterations=2)
                 contours, _ = cv2.findContours(edges_closed, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
                 for cnt in contours:
+                    hull = cv2.convexHull(cnt)
+                    hull_area = cv2.contourArea(hull)
+                    if not (min_card_area < hull_area < max_card_area):
+                        continue
+
+                    rect = cv2.minAreaRect(cnt)
+                    (rw, rh) = rect[1]
+                    if rw <= 0 or rh <= 0:
+                        continue
+                    rect_area = rw * rh
+                    rectangularity = hull_area / rect_area
+                    # Card standard requires high rectangularity (>=0.85) to reject trapezoids and organic shapes
+                    if rectangularity < 0.85:
+                        continue
+
+                    candidates_to_try = []
+
+                    # 1. Direct polygonal approximation
                     peri = cv2.arcLength(cnt, True)
                     approx = cv2.approxPolyDP(cnt, 0.025 * peri, True)
                     if len(approx) == 4 and cv2.isContourConvex(approx):
-                        area = cv2.contourArea(approx)
-                        if min_card_area < area < max_card_area:
-                            ordered = cls.order_corners(approx)
+                        candidates_to_try.append((cls.order_corners(approx), True))
 
-                            # Orthogonality check: interior angles must be approximately 90 deg (|cos| <= 0.35)
+                    # 2. Convex hull polygonal approximation (handles rounded corners r=3.18mm & chip lines)
+                    hull_peri = cv2.arcLength(hull, True)
+                    approx_hull = cv2.approxPolyDP(hull, 0.025 * hull_peri, True)
+                    if len(approx_hull) == 4 and cv2.isContourConvex(approx_hull):
+                        candidates_to_try.append((cls.order_corners(approx_hull), True))
+
+                    # 3. Minimum-area bounding rectangle fallback
+                    box = cv2.boxPoints(rect)
+                    candidates_to_try.append((cls.order_corners(box), False))
+
+                    for ordered, check_polygon in candidates_to_try:
+                        # Orthogonality check on polygon corners
+                        if check_polygon:
                             orthogonal = True
                             for i in range(4):
                                 v1 = ordered[(i - 1) % 4] - ordered[i]
                                 v2 = ordered[(i + 1) % 4] - ordered[i]
                                 n1, n2 = np.linalg.norm(v1), np.linalg.norm(v2)
                                 if n1 > 0 and n2 > 0:
-                                    if abs(float(np.dot(v1, v2) / (n1 * n2))) > 0.35:
+                                    cos_angle = abs(float(np.dot(v1, v2) / (n1 * n2)))
+                                    if cos_angle > 0.38:
                                         orthogonal = False
                                         break
                             if not orthogonal:
                                 continue
 
-                            w1 = np.linalg.norm(ordered[0] - ordered[1])
-                            w2 = np.linalg.norm(ordered[2] - ordered[3])
-                            h1 = np.linalg.norm(ordered[1] - ordered[2])
-                            h2 = np.linalg.norm(ordered[3] - ordered[0])
+                            w1 = float(np.linalg.norm(ordered[0] - ordered[1]))
+                            w2 = float(np.linalg.norm(ordered[2] - ordered[3]))
+                            h1 = float(np.linalg.norm(ordered[1] - ordered[2]))
+                            h2 = float(np.linalg.norm(ordered[3] - ordered[0]))
+
+                            # Perspective symmetry sanity check: opposite sides cannot differ wildly (ratio <= 1.35)
+                            if max(w1, w2) / max(1.0, min(w1, w2)) > 1.35 or max(h1, h2) / max(1.0, min(h1, h2)) > 1.35:
+                                continue
 
                             avg_w = (w1 + w2) / 2.0
                             avg_h = (h1 + h2) / 2.0
-                            if avg_h <= 1.0 or avg_w <= 1.0:
-                                continue
+                        else:
+                            avg_w = max(rw, rh)
+                            avg_h = min(rw, rh)
 
-                            long_side = max(avg_w, avg_h)
-                            short_side = min(avg_w, avg_h)
-                            aspect = long_side / short_side
+                        if avg_h <= 1.0 or avg_w <= 1.0:
+                            continue
 
-                            aspect_diff = abs(aspect - target_aspect)
-                            if aspect_diff < min_aspect_diff:
+                        long_side = max(avg_w, avg_h)
+                        short_side = min(avg_w, avg_h)
+                        aspect = long_side / short_side
+
+                        aspect_diff = abs(aspect - target_aspect)
+                        if aspect_diff < min_aspect_diff:
+                            px_to_mm = ((long_side / card_w_mm) + (short_side / card_h_mm)) / 2.0
+                            if 1.0 <= px_to_mm <= 35.0:
                                 min_aspect_diff = aspect_diff
                                 best_candidate = {
                                     "corners": ordered,
                                     "long_side_px": long_side,
                                     "short_side_px": short_side,
                                     "aspect_diff": aspect_diff,
+                                    "px_to_mm": px_to_mm,
                                 }
                 if best_candidate is not None and best_candidate["aspect_diff"] < 0.05:
                     break
@@ -227,18 +275,9 @@ class CalibrationEngine:
                 return None
 
             ordered = best_candidate["corners"]
-            px_to_mm = (
-                (best_candidate["long_side_px"] / card_w_mm)
-                + (best_candidate["short_side_px"] / card_h_mm)
-            ) / 2.0
-
-            # Scale sanity check: typical camera capture (30-60 cm) yields scale in [1.0, 35.0] px/mm
-            if not (1.0 <= px_to_mm <= 35.0):
-                return None
-
+            px_to_mm = best_candidate["px_to_mm"]
             margin_of_error_pct = float(best_candidate["aspect_diff"] / target_aspect * 100.0)
-            # Secondary standard confidence is capped at 0.85-0.90 per metrology hierarchy
-            confidence = max(0.0, min(0.90, 0.85 - (best_candidate["aspect_diff"] * 2.0)))
+            confidence = max(0.0, min(0.90, 0.88 - (best_candidate["aspect_diff"] * 1.5)))
 
             xmin = int(np.floor(np.min(ordered[:, 0])))
             xmax = int(np.ceil(np.max(ordered[:, 0])))

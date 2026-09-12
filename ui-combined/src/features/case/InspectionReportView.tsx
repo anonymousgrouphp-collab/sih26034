@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { InspectionCase, EvidenceAsset } from "../../types/inspection";
 import { computeCaseReadiness } from "../../services/mockData";
 import { findFieldForFinding } from "../adjudication/AdjudicationTraceability";
 import { StateEmblem } from "../../components/common/StateEmblem";
 import { GovStampSeal } from "../../components/common/GovStampSeal";
 import { useLanguage } from "../../context/LanguageContext";
+import { ApiService } from "../../services/api";
 
 interface InspectionReportViewProps {
   caseData: InspectionCase;
@@ -20,7 +21,7 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
   const { language } = useLanguage();
   const primaryAsset: EvidenceAsset | undefined =
     caseData.evidence_assets && caseData.evidence_assets.length > 0
-      ? caseData.evidence_assets[caseData.evidence_assets.length - 1]
+      ? caseData.evidence_assets.find((a) => a.panel_type === "PDP_FRONT") || caseData.evidence_assets[0]
       : undefined;
 
   const evaluations = caseData.rule_evaluations || [];
@@ -29,6 +30,43 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
   const auditTrail = caseData.audit_trail || [];
 
   const handlePrint = () => {
+    window.print();
+  };
+
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const handleDownloadPdf = async () => {
+    setIsDownloading(true);
+    try {
+      const res = await ApiService.generateNotice({
+        inspection_id: caseData.id,
+        recipient: {
+          type: "MANUFACTURER",
+          name: caseData.manufacturer_name || caseData.establishment_name || "Responsible Enterprise / Manufacturer",
+          address: caseData.premises_address || "Premises recorded during statutory inspection",
+        },
+        compounding_fee_amount: 5000,
+        reply_window_days: 15,
+      });
+
+      if (res && res.pdf_download_url && res.pdf_download_url.startsWith("http") && res.pdf_download_url !== "/form1.pdf") {
+        const filename = `Form-1-Notice-${caseData.inspection_number || caseData.id}.pdf`;
+        const dlLink = document.createElement("a");
+        dlLink.href = res.pdf_download_url;
+        dlLink.download = filename;
+        dlLink.target = "_blank";
+        document.body.appendChild(dlLink);
+        dlLink.click();
+        document.body.removeChild(dlLink);
+        return;
+      }
+    } catch (err) {
+      console.warn("Backend notice download unavailable, engaging high-fidelity Gazette Print/PDF view:", err);
+    } finally {
+      setIsDownloading(false);
+    }
+
+    // High-fidelity fallback: Browser native Print-to-PDF rendering the exact on-screen Gazette Form-1 Notice
     window.print();
   };
 
@@ -63,10 +101,11 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
         </div>
 
         <div className="flex items-center gap-2">
-          <a
-            href="/form1.pdf"
-            download="Form-1-Notice-LM-NOI-2026-000231.pdf"
-            className="px-3.5 py-1.5 text-xs font-bold text-amber-900 bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded transition-colors flex items-center gap-1.5 shadow-2xs"
+          <button
+            type="button"
+            onClick={handleDownloadPdf}
+            disabled={isDownloading}
+            className="px-3.5 py-1.5 text-xs font-bold text-amber-900 bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer disabled:opacity-50"
             title={
               language === "hi"
                 ? "धारा 63 बीएसए 2023 प्रमाण पत्र युक्त राजपत्र मानक प्रपत्र-1 पीडीएफ डाउनलोड करें"
@@ -76,8 +115,12 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
             <svg className="w-4 h-4 text-amber-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
-            <span>{language === "hi" ? "आधिकारिक प्रपत्र-1 (PDF/A) डाउनलोड करें" : "Download Official Form-1 (PDF/A)"}</span>
-          </a>
+            <span>
+              {isDownloading
+                ? (language === "hi" ? "नोटिस तैयार हो रहा है..." : "Generating Notice...")
+                : (language === "hi" ? "आधिकारिक प्रपत्र-1 (PDF/A) डाउनलोड करें" : "Download Official Form-1 (PDF/A)")}
+            </span>
+          </button>
 
           <button
             type="button"
@@ -97,9 +140,7 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
         {/* Official National Emblem & Gazette Formal Header */}
         <div className="border-b-2 border-slate-900 pb-5 text-center sm:text-left flex flex-col sm:flex-row items-center sm:items-start justify-between gap-5">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
-            <div className="p-2 bg-govNavy border border-govNavy-light rounded-lg shadow-2xs shrink-0 flex items-center justify-center">
-              <StateEmblem size={44} tone="white" showMotto={true} />
-            </div>
+            <StateEmblem size={46} tone="navy" showMotto={true} className="shrink-0" />
             <div>
               <div className="text-[11px] font-bold tracking-widest text-amber-700 uppercase">
                 {language === "hi"
@@ -560,7 +601,7 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
               </p>
             </div>
             <div className="text-right text-[10px] text-slate-400 font-mono">
-              {language === "hi" ? "न्यायदृष्टि-एलएम द्वारा जनरेटेड रिपोर्ट" : "Report Generated by NyayaDrishti-LM"}
+              {language === "hi" ? "निरीक्षक द्वारा जनरेटेड रिपोर्ट" : "Report Generated by NIRIKSHAK"}
               <br />
               {language === "hi" ? "उपभोक्ता मामले विभाग, भारत सरकार" : "Department of Consumer Affairs, GoI"}
             </div>

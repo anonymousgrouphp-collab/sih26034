@@ -183,7 +183,15 @@ class USPEvaluator:
         candidates.sort(key=lambda c: c[0])
         best_diff, best_total, best_calc_usp, unit_lbl = candidates[0]
 
-        is_pass = round(best_diff, 4) <= cls.TOLERANCE_INR
+        # Rule 6(1)(da) / G.S.R. 779(E): The unit sale price shall be calculated to the nearest two decimal places.
+        # When a commodity count (e.g. 60 tablets, 3 packs) has recurring division decimals, rounding USP to 2 decimal
+        # places incurs a theoretical statutory rounding slack of |round(best_calc_usp, 2) * q - p|.
+        theoretical_rounding_slack = abs(round(round(best_calc_usp, 2) * q, 4) - p)
+        is_statutory_rounding_match = (
+            round(usp, 2) == round(best_calc_usp, 2)
+            and round(abs(best_diff - theoretical_rounding_slack), 4) <= cls.TOLERANCE_INR
+        )
+        is_pass = (round(best_diff, 4) <= cls.TOLERANCE_INR) or is_statutory_rounding_match
         status = "PASS" if is_pass else "FAIL"
 
         unit_str = f" {unit_lbl}".rstrip()

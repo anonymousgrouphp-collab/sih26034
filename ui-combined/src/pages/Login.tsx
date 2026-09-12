@@ -23,7 +23,7 @@ export const Login: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [selectedRole, setSelectedRole] = useState<UserRole>("inspector");
-  const [email, setEmail] = useState("inspector@metrolens.gov.in");
+  const [email, setEmail] = useState("inspector@nirikshak.gov.in");
   const [password, setPassword] = useState("Demo@123");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,10 +54,10 @@ export const Login: React.FC = () => {
   const handleRoleSelect = (roleId: UserRole) => {
     setSelectedRole(roleId);
     const emails: Record<UserRole, string> = {
-      inspector: "inspector@metrolens.gov.in",
-      controller: "controller@metrolens.gov.in",
-      administrator: "admin@metrolens.gov.in",
-      auditor: "audit@metrolens.gov.in",
+      inspector: "inspector@nirikshak.gov.in",
+      controller: "controller@nirikshak.gov.in",
+      administrator: "admin@nirikshak.gov.in",
+      auditor: "audit@nirikshak.gov.in",
     };
     setEmail(emails[roleId]);
     setError(null);
@@ -111,16 +111,14 @@ export const Login: React.FC = () => {
           <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px]" />
 
           <div className="relative z-10">
-            <Link to="/" className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-xs border border-white/20 shadow-md flex items-center justify-center p-1.5 shrink-0">
-                <StateEmblem size={24} tone="white" showMotto={true} />
-              </div>
+            <Link to="/" className="flex items-center gap-3.5 group">
+              <StateEmblem size={32} tone="white" showMotto={true} className="transition-transform group-hover:scale-105" />
               <div>
                 <p className="text-[10.5px] font-bold uppercase tracking-widest text-amber-400">
                   भारत सरकार • Government of India
                 </p>
                 <h2 className="text-base font-black tracking-tight text-white">
-                  Department of Consumer Affairs • Legal Metrology
+                  Department of Consumer Affairs • Government of India
                 </h2>
               </div>
             </Link>
@@ -196,17 +194,15 @@ export const Login: React.FC = () => {
             </div>
 
             <div className="card p-6 sm:p-8 bg-white space-y-6 shadow-md border-slate-200">
-              <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
-                <div className="p-2 bg-govNavy border border-govNavy-light rounded-xl shrink-0 flex items-center justify-center shadow-xs">
-                  <StateEmblem size={24} tone="white" showMotto={true} />
-                </div>
+              <div className="flex items-center gap-3.5 border-b border-slate-200 pb-4">
+                <StateEmblem size={28} tone="navy" showMotto={true} className="shrink-0" />
                 <div>
                   <span className="text-[10px] font-bold uppercase tracking-widest text-amber-700 block">
                     Officer Authentication Gateway
                   </span>
                   <h2 className="text-xl font-black text-govNavy">Official Workstation Sign In</h2>
                   <p className="text-[11px] text-slate-500 mt-0.5">
-                    Legal Metrology Department • Government of India
+                    Department of Consumer Affairs • Government of India
                   </p>
                 </div>
               </div>

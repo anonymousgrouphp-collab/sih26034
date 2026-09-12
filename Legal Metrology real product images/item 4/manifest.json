@@ -1,0 +1,225 @@
+{
+  "dataset_name": "Nirikshak Physical Validation Dataset - SIH 2026",
+  "item_folder": "item 4",
+  "total_images": 8,
+  "product_details": {
+    "brand": "True Elements",
+    "commodity": "Raw Seeds CHIA",
+    "category": "Health Foods / Raw Edible Seeds",
+    "packaging_type": "Stand-up doypack pouch with resealable zip lock and transparent viewing window",
+    "barcode_ean13": "8906112661332",
+    "mrp": "₹ 350.00 (Incl. of all Taxes)",
+    "unit_sale_price_usp": "₹ 1.40 Per g",
+    "net_quantity": "250 g",
+    "batch_no": "26TE148",
+    "mfg_date": "28-05-2026",
+    "expiry_date": "27-05-2027",
+    "shelf_life_months": 12,
+    "marketed_by": "HW WELLNESS SOLUTIONS PVT. LTD., Grande Palladium, 175, CST Road, Kalina, Santacruz (East), Mumbai - 400 098, Maharashtra, India",
+    "manufacturer_traceability": "QR Code integrated for complete manufacturing facility address & licensing per FSSAI regulations",
+    "fssai_lic_no": "11521998000769",
+    "consumer_care_email": "care@true-elements.com",
+    "website": "www.true-elements.com",
+    "country_of_origin": "India",
+    "cpcb_epr_registration": "BO-22-000-07-AADCH3292H-22"
+  },
+  "physical_measurements": {
+    "pouch_height_mm": 215.0,
+    "pouch_width_mm": 160.0,
+    "gusset_depth_mm": 70.0,
+    "net_weight_g": 250.0,
+    "device": "Digital Vernier Caliper (0.01 mm Least Count) & Metric Reference Standard"
+  },
+  "reference_object": {
+    "type": "Government of India ₹10 Commemorative Coin (Azadi Ka Amrit Mahotsav)",
+    "standard": "RBI Bimetallic Coinage Standard",
+    "outer_diameter_mm": 27.0,
+    "thickness_mm": 2.15,
+    "calibrated_spatial_scale_px_per_mm": 20.59
+  },
+  "legal_metrology_compliance_status": {
+    "generic_name": "COMPLIANT (RAW SEEDS CHIA)",
+    "net_quantity": "COMPLIANT (250 g)",
+    "mrp": "COMPLIANT (₹ 350.00)",
+    "unit_sale_price": "COMPLIANT (₹ 1.40/g)",
+    "mfg_date": "COMPLIANT (28-05-2026)",
+    "expiry_date": "COMPLIANT (27-05-2027)",
+    "batch_no": "COMPLIANT (26TE148)",
+    "marketer_name_address": "COMPLIANT (HW Wellness Solutions Pvt. Ltd., Mumbai)",
+    "manufacturer_qr_traceability": "COMPLIANT (Dynamic QR Code Imprint)",
+    "consumer_care_details": "COMPLIANT (care@true-elements.com, Santacruz East, Mumbai)",
+    "fssai_licensing": "COMPLIANT (Lic. No. 11521998000769)",
+    "country_of_origin": "COMPLIANT (India)",
+    "overall_status": "100% STATUTORILY COMPLIANT"
+  },
+  "file_mapping": [
+    {
+      "index": 1,
+      "original_filename": "IMG_20260912_143437.jpg.jpeg",
+      "new_filename": "back_01.jpg",
+      "nomenclature_class": "Standard Guide #2",
+      "angle_description": "Overhead Planar (0°)",
+      "packaging_face": "Back Information Panel (BIP) - Horizontal Flat with Coin",
+      "dimensions_px": {
+        "width": 4640,
+        "height": 3472
+      },
+      "sha256": "160d7b95cdeef9c221b3a449d85310415992e86aa9c85559baad2d2c8725276f",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 1009,
+        "f_number": 1.89,
+        "exposure_time_s": 0.030002,
+        "datetime_original": "2026:09:12 14:34:37"
+      }
+    },
+    {
+      "index": 2,
+      "original_filename": "IMG_20260912_143445.jpg.jpeg",
+      "new_filename": "front_01.jpg",
+      "nomenclature_class": "Standard Guide #1",
+      "angle_description": "Overhead Planar (0°)",
+      "packaging_face": "Front Principal Display Panel (PDP) with Window & Coin",
+      "dimensions_px": {
+        "width": 4640,
+        "height": 3472
+      },
+      "sha256": "d24c006b3cce93836d51c549c42840b2ef5151c3dc43b6c5db0e16aba8ba30bb",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 1131,
+        "f_number": 1.89,
+        "exposure_time_s": 0.030002,
+        "datetime_original": "2026:09:12 14:34:45"
+      }
+    },
+    {
+      "index": 3,
+      "original_filename": "IMG_20260912_143449.jpg.jpeg",
+      "new_filename": "front_angle_01.jpg",
+      "nomenclature_class": "Standard Guide #7",
+      "angle_description": "30° Oblique Perspective",
+      "packaging_face": "Oblique Front Pouch Perspective with Zip Seal",
+      "dimensions_px": {
+        "width": 4640,
+        "height": 3472
+      },
+      "sha256": "57a93aeeb021b0907e167e489fbe73d25a97a64e23ebea62cf7ed71c8bce0bfd",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 1175,
+        "f_number": 1.89,
+        "exposure_time_s": 0.030002,
+        "datetime_original": "2026:09:12 14:34:49"
+      }
+    },
+    {
+      "index": 4,
+      "original_filename": "IMG_20260912_143453.jpg.jpeg",
+      "new_filename": "front_02.jpg",
+      "nomenclature_class": "Extension Guide (Variant)",
+      "angle_description": "Overhead Planar (0°)",
+      "packaging_face": "Front Display Panel Verification Framing Variant",
+      "dimensions_px": {
+        "width": 4640,
+        "height": 3472
+      },
+      "sha256": "7c2fda175af81b7f9f565fcad3d515c878f67b611bc906889bf67817b8b0b583",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 1106,
+        "f_number": 1.89,
+        "exposure_time_s": 0.030002,
+        "datetime_original": "2026:09:12 14:34:53"
+      }
+    },
+    {
+      "index": 5,
+      "original_filename": "IMG_20260912_143506.jpg.jpeg",
+      "new_filename": "back_angle_01.jpg",
+      "nomenclature_class": "Standard Guide #8",
+      "angle_description": "30° Oblique Perspective",
+      "packaging_face": "Oblique Back Panel Perspective with Barcode",
+      "dimensions_px": {
+        "width": 4640,
+        "height": 3472
+      },
+      "sha256": "a9baa83a7b72e83428cdb2d03b77d06f93aea1c89e6ab6d7ffae3ff34f94f67a",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 903,
+        "f_number": 1.89,
+        "exposure_time_s": 0.030002,
+        "datetime_original": "2026:09:12 14:35:06"
+      }
+    },
+    {
+      "index": 6,
+      "original_filename": "IMG_20260912_143509.jpg.jpeg",
+      "new_filename": "bottom_01.jpg",
+      "nomenclature_class": "Standard Guide #6",
+      "angle_description": "Base Axial Normal (90°)",
+      "packaging_face": "Stand-Up Pouch Bottom Expansion Gusset View",
+      "dimensions_px": {
+        "width": 3472,
+        "height": 4640
+      },
+      "sha256": "ac699f12a4ebfeb9b9c9d83613a2253706bf1672d9655b47d5d1cc59928cd575",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 1150,
+        "f_number": 1.89,
+        "exposure_time_s": 0.030002,
+        "datetime_original": "2026:09:12 14:35:09"
+      }
+    },
+    {
+      "index": 7,
+      "original_filename": "IMG_20260912_143513.jpg.jpeg",
+      "new_filename": "back_02.jpg",
+      "nomenclature_class": "Standard Guide #2 (Vertical)",
+      "angle_description": "Overhead Planar (0°)",
+      "packaging_face": "Back Information Panel - Vertical Ground Truth",
+      "dimensions_px": {
+        "width": 3472,
+        "height": 4640
+      },
+      "sha256": "37248f562cc433e4f427f6d1c64617ff730eb3a25a8123262a99131d84ec3e70",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 1291,
+        "f_number": 1.89,
+        "exposure_time_s": 0.030002,
+        "datetime_original": "2026:09:12 14:35:13"
+      }
+    },
+    {
+      "index": 8,
+      "original_filename": "IMG_20260912_143515.jpg.jpeg",
+      "new_filename": "far_01.jpg",
+      "nomenclature_class": "Extension Guide (Distance)",
+      "angle_description": "Far Field Context (~60 cm)",
+      "packaging_face": "Wide Environmental Staging Context with Coin",
+      "dimensions_px": {
+        "width": 4640,
+        "height": 3472
+      },
+      "sha256": "f48da4e6ec7b2688d5f509f45a5a89d2bdb9dee08666498163ad6027551b4ed3",
+      "exif_metadata": {
+        "camera_make": "Xiaomi",
+        "camera_model": "22041216I",
+        "iso": 1103,
+        "f_number": 1.89,
+        "exposure_time_s": 0.030002,
+        "datetime_original": "2026:09:12 14:35:15"
+      }
+    }
+  ]
+}

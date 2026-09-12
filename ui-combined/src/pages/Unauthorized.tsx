@@ -30,9 +30,7 @@ export const Unauthorized: React.FC = () => {
           <div className="bg-slate-900 text-white p-6 sm:p-8 text-center relative overflow-hidden">
             <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px]" />
             <div className="relative z-10 flex flex-col items-center space-y-3">
-              <div className="p-2 bg-red-500/10 backdrop-blur-xs rounded-xl border border-red-400/30 shadow-inner">
-                <StateEmblem size={44} tone="white" showMotto={true} />
-              </div>
+              <StateEmblem size={44} tone="white" showMotto={true} />
               <div className="text-[11px] font-bold uppercase tracking-widest text-amber-400">
                 {language === "hi"
                   ? "विधिक मापविज्ञान अधिनियम, 2009 • सुरक्षा प्रतिबंध"

@@ -240,6 +240,12 @@ class PolygonNormalizer:
             borderMode=cv2.BORDER_REPLICATE
         )
 
+        # If text crop is oriented vertically along the packaging, rotate 90 degrees clockwise
+        # so that downstream multilingual PP-OCR receives horizontal text lines
+        if max_height > max_width * 1.2:
+            crop = cv2.rotate(crop, cv2.ROTATE_90_CLOCKWISE)
+            max_width, max_height = max_height, max_width
+
         if target_height is not None and target_height > 0:
             aspect_ratio = max_width / max_height
             scaled_width = max(min(int(round(target_height * aspect_ratio)), 4096), 16)

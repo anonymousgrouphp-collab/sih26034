@@ -300,15 +300,27 @@ export const StatutoryDeclarationsCard: React.FC<StatutoryDeclarationsCardProps>
 
                     {/* Metadata & Officer Actions Footer */}
                     <div className="flex items-center justify-between pt-1 text-[11px] text-slate-500">
-                      <span className="font-mono text-[10px]">
-                        {language === "hi" ? "विश्वसनीयता" : "Confidence"}: {Math.round((field.ocr_confidence || 0.95) * 100)}%
-                        {field.measured_font_height_mm && (
-                          <span className="ml-2 font-bold text-govNavy">
-                            • {language === "hi" ? "फ़ॉन्ट" : "Font"}: {field.measured_font_height_mm.toFixed(2)}{" "}
-                            {language === "hi" ? "मिमी" : "mm"}
+                      {(() => {
+                        const confVal = field.ocr_confidence ?? field.detection_confidence ?? 0;
+                        const confPct = Math.round(confVal * 100);
+                        const isLowConf = confVal > 0 && confVal < 0.85;
+                        return (
+                          <span className={`font-mono text-[10px] ${isLowConf ? "text-amber-600 font-bold" : "text-slate-500"}`}>
+                            {language === "hi" ? "विश्वसनीयता" : "Confidence"}: {confPct > 0 ? `${confPct}%` : "N/A"}
+                            {isLowConf && (
+                              <span className="ml-1 text-[9px] bg-amber-100 text-amber-800 px-1 py-0.2 rounded font-sans">
+                                {language === "hi" ? "समीक्षा आवश्यक" : "Review Needed"}
+                              </span>
+                            )}
+                            {field.measured_font_height_mm && (
+                              <span className="ml-2 font-bold text-govNavy">
+                                • {language === "hi" ? "फ़ॉन्ट" : "Font"}: {field.measured_font_height_mm.toFixed(2)}{" "}
+                                {language === "hi" ? "मिमी" : "mm"}
+                              </span>
+                            )}
                           </span>
-                        )}
-                      </span>
+                        );
+                      })()}
 
                       <div className="flex items-center gap-1.5">
                         <button

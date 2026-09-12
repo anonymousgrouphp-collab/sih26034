@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { NyayaDrishtiBrandLogo } from "../common/NyayaDrishtiBrandLogo";
+import { NirikshakBrandLogo } from "../common/NirikshakBrandLogo";
 import { OfficerRole } from "../../types/inspection";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { ApiService } from "../../services/api";
-import { LogOut, Scale, ShieldCheck } from "lucide-react";
+import { LogOut, Scale, ShieldCheck, Sparkles, ChevronDown } from "lucide-react";
+import { DEMO_SCENARIOS } from "../../features/demo/demoCatalog";
 
 interface HeaderProps {
   activeCircle: string;
@@ -70,6 +71,8 @@ export const Header: React.FC<HeaderProps> = ({
     }
   });
 
+  const [demoMenuOpen, setDemoMenuOpen] = useState(false);
+
   const handleRoleToggle = (newRole: OfficerRole) => {
     switchOfficerRole(newRole);
   };
@@ -121,7 +124,7 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
             )}
 
-            <NyayaDrishtiBrandLogo tone="light" size="md" />
+            <NirikshakBrandLogo tone="light" size="md" />
           </div>
 
           {/* Quick Command Palette Search Trigger */}
@@ -130,14 +133,14 @@ export const Header: React.FC<HeaderProps> = ({
               type="button"
               onClick={onOpenCommandPalette}
               aria-label="Open universal command search palette (Ctrl+K)"
-              className="hidden lg:flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-govNavy-dark/80 hover:bg-govNavy-light border border-slate-700 text-slate-300 hover:text-white text-xs transition-colors shadow-2xs whitespace-nowrap shrink-0"
+              className="hidden lg:flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-govNavy-dark/80 hover:bg-govNavy-light border border-slate-700 text-slate-300 hover:text-white text-xs transition-colors shadow-2xs whitespace-nowrap min-w-0 overflow-hidden"
             >
               <svg className="w-3.5 h-3.5 text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
-              <span className="hidden 2xl:inline">{t("portal.command_search", "Quick Search Cases & Rules...")}</span>
-              <span className="inline 2xl:hidden">{t("portal.command_search_short", "Search Cases...")}</span>
-              <kbd className="hidden xl:inline-block ml-1 font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-amber-300 border border-slate-600">
+              <span className="hidden 2xl:inline truncate min-w-0">{t("portal.command_search", "Quick Search Cases & Rules...")}</span>
+              <span className="inline 2xl:hidden truncate min-w-0">{t("portal.command_search_short", "Search Cases...")}</span>
+              <kbd className="hidden 2xl:inline-block ml-1 font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-amber-300 border border-slate-600 shrink-0">
                 Ctrl K
               </kbd>
             </button>
@@ -145,6 +148,91 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Controls: Circle Selector, Connectivity, RBAC Toggle, Officer Profile */}
           <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
+            {/* Quick Demo Cases Dropdown Launcher */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setDemoMenuOpen(!demoMenuOpen)}
+                className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-black text-xs transition-all shadow-xs border border-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                title="Quick Access: Certified Statutory Demonstration Scenarios"
+                aria-haspopup="true"
+                aria-expanded={demoMenuOpen}
+              >
+                <Sparkles size={14} className="text-slate-950" />
+                <span className="hidden sm:inline">{language === "hi" ? "डेमो परिदृश्य" : "Demo Cases"}</span>
+                <span className="hidden sm:inline bg-slate-950 text-amber-300 text-[10px] font-mono font-black px-1.5 py-0.2 rounded-full">
+                  7
+                </span>
+                <ChevronDown size={13} className={`transition-transform duration-200 ${demoMenuOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              {demoMenuOpen && (
+                <div
+                  className="absolute right-0 mt-2 w-80 sm:w-88 rounded-xl bg-white text-slate-900 shadow-2xl border border-slate-200 p-2 z-50 animate-in fade-in zoom-in-95"
+                >
+                  <div className="px-3 py-2 border-b border-slate-100 flex items-center justify-between">
+                    <div>
+                      <p className="font-extrabold text-xs text-govNavy flex items-center gap-1.5">
+                        <Sparkles size={12} className="text-amber-500" />
+                        <span>{language === "hi" ? "सांविधिक प्रदर्शन परिदृश्य" : "Statutory Demo Suite"}</span>
+                      </p>
+                      <p className="text-[10px] text-slate-500">
+                        {language === "hi" ? "त्वरित सांविधिक जांच हेतु 1-क्लिक लोड" : "1-Click load for statutory audit"}
+                      </p>
+                    </div>
+                    <Link
+                      to="/dashboard#demo-showcase"
+                      onClick={() => setDemoMenuOpen(false)}
+                      className="text-[11px] font-bold text-amber-700 hover:underline"
+                    >
+                      {language === "hi" ? "सभी 7 देखें" : "View All"}
+                    </Link>
+                  </div>
+
+                  <div className="py-1 max-h-80 overflow-y-auto space-y-1">
+                    {DEMO_SCENARIOS.map((s) => (
+                      <button
+                        key={s.caseId}
+                        type="button"
+                        onClick={() => {
+                          setDemoMenuOpen(false);
+                          navigate(`/inspections/${s.caseId}`);
+                        }}
+                        className="w-full text-left p-2 rounded-lg hover:bg-slate-50 flex items-center justify-between gap-2 text-xs transition-colors group border border-transparent hover:border-slate-200"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-mono text-[9px] font-bold text-slate-500">
+                              #{s.scenarioNumber}
+                            </span>
+                            <span className="font-bold text-slate-900 group-hover:text-govNavy truncate">
+                              {language === "hi" && s.titleHi ? s.titleHi : s.title}
+                            </span>
+                          </div>
+                          <p className="text-[10.5px] text-slate-500 truncate mt-0.5">
+                            {language === "hi" && s.headlineViolationHi ? s.headlineViolationHi : s.headlineViolation}
+                          </p>
+                        </div>
+                        <span
+                          className={`text-[9.5px] font-black px-1.5 py-0.5 rounded border shrink-0 ${
+                            s.targetVerdict === "FAIL"
+                              ? "bg-rose-50 text-rose-700 border-rose-200"
+                              : s.targetVerdict === "PASS"
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                              : s.targetVerdict === "REVIEW"
+                              ? "bg-amber-50 text-amber-800 border-amber-200"
+                              : "bg-purple-50 text-purple-700 border-purple-200"
+                          }`}
+                        >
+                          {s.targetVerdict}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Jurisdiction Circle Selector */}
             <div className="hidden 2xl:flex items-center space-x-2 bg-govNavy-dark/70 px-3 py-1.5 rounded-lg border border-slate-700 shrink-0">
               <label htmlFor="circle-select" className="text-xs text-slate-300 whitespace-nowrap font-medium">
@@ -154,7 +242,7 @@ export const Header: React.FC<HeaderProps> = ({
                 id="circle-select"
                 value={activeCircle}
                 onChange={(e) => onCircleChange(e.target.value)}
-                className="bg-transparent text-xs text-amber-200 font-semibold focus:outline-none cursor-pointer pr-2 max-w-[200px] 2xl:max-w-[260px] truncate"
+                className="bg-transparent text-xs text-amber-200 font-semibold focus:outline-none cursor-pointer pr-2 max-w-[160px] 2xl:max-w-[220px] truncate"
               >
                 {JURISDICTION_CIRCLES.map((c) => (
                   <option key={c.id} value={c.id} className="bg-govNavy text-white">
@@ -245,7 +333,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             {/* Officer Profile Badge — Themed to Active Role (LMO Inspector vs Controller) */}
             <div
-              className={`flex items-center gap-2 px-2.5 py-1 rounded-lg border transition-all duration-200 shrink-0 ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-1.5 sm:px-2.5 py-1 rounded-lg border transition-all duration-200 shrink-0 ${
                 isController
                   ? "bg-govNavy-dark/90 border-purple-500/50 hover:border-purple-400/80 shadow-xs"
                   : "bg-govNavy-dark/90 border-amber-500/40 hover:border-amber-400/80 shadow-xs"

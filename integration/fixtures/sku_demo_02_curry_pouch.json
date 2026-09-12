@@ -19,26 +19,39 @@
   "calibration": {
     "method": "ARUCO_4X4_50",
     "px_to_mm": 12.10,
-    "confidence": 0.98
+    "confidence": 0.98,
+    "reference_bounding_box": [78, 78, 242, 242]
   },
   "extracted_entities": {
+    "brand_name": {
+      "text": "Kitchens of India Dal Makhani",
+      "bounding_box": [130, 780, 260, 1320]
+    },
     "net_quantity": {
       "magnitude": 300.0,
       "unit": "g",
-      "has_banned_unit": false
+      "has_banned_unit": false,
+      "bounding_box": [720, 780, 780, 1050]
     },
     "mrp": {
       "amount": 120.0,
       "currency": "INR",
-      "tax_inclusive": true
+      "tax_inclusive": true,
+      "bounding_box": [790, 780, 835, 1320]
     },
     "declared_usp": 0.55,
+    "declared_usp_entity": {
+      "price_per_unit": 0.55,
+      "unit": "g",
+      "bounding_box": [835, 780, 870, 1320]
+    },
     "measured_font_height_mm": 2.65,
     "consumer_care": {
       "has_email": false,
       "has_phone": true,
       "has_address": true,
-      "is_complete": false
+      "is_complete": false,
+      "bounding_box": [870, 780, 960, 1320]
     }
   },
   "expected_violations": [

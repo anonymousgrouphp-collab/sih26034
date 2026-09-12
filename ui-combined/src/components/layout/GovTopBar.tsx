@@ -43,13 +43,13 @@ export const GovTopBar: React.FC = () => {
 
             <div className="flex items-center space-x-2 text-[10.5px] sm:text-[11px] font-medium leading-none">
               <span className="font-bold text-white tracking-wide">
-                {language === "hi" ? "विधिक मापविज्ञान प्रभाग" : "Legal Metrology Division"}
+                {language === "hi" ? "उपभोक्ता मामले विभाग" : "Department of Consumer Affairs"}
               </span>
               <span className="text-slate-500">•</span>
               <span className="text-slate-300 hidden md:inline truncate max-w-sm">
                 {language === "hi"
-                  ? "निरीक्षण एवं साक्ष्य संकलन कार्यप्रणाली"
-                  : "Inspection Assistance & Evidentiary Verification Platform"}
+                  ? "साक्ष्य सत्यापन कार्यप्रणाली"
+                  : "Evidentiary Verification Platform"}
               </span>
             </div>
           </div>

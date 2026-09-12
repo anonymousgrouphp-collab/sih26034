@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { LanguageProvider } from "./context/LanguageContext";
+import { CircleProvider } from "./context/CircleContext";
 import { AppShell } from "./components/layout/AppShell";
 
 // Pages
@@ -33,7 +34,8 @@ export const App: React.FC = () => {
     <BrowserRouter>
       <LanguageProvider>
         <AuthProvider>
-          <Routes>
+          <CircleProvider>
+            <Routes>
           {/* Public Portal & Login */}
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
@@ -118,6 +120,7 @@ export const App: React.FC = () => {
           {/* Fallback 404 Not Found Page */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+          </CircleProvider>
       </AuthProvider>
     </LanguageProvider>
   </BrowserRouter>
