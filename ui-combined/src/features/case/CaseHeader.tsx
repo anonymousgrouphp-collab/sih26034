@@ -118,12 +118,13 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
             {caseData.jurisdiction_id}
           </div>
           <div className="text-[11px] text-slate-400 font-mono">
-            {new Date(caseData.created_at).toLocaleDateString(language === "hi" ? "hi-IN" : "en-IN", {
+            {new Date(caseData.created_at).toLocaleString(language === "hi" ? "hi-IN" : "en-IN", {
               day: "2-digit",
               month: "short",
               year: "numeric",
               hour: "2-digit",
               minute: "2-digit",
+              hour12: true,
             })}
           </div>
         </div>

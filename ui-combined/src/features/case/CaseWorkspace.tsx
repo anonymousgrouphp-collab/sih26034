@@ -1440,7 +1440,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
               <div className="flex justify-between">
                 <span className="text-slate-500">{language === "hi" ? "दिनांक एवं समय:" : "Date & Time:"}</span>
                 <span className="font-mono text-slate-700">
-                  {new Date(caseData.created_at).toLocaleDateString("en-IN", {
+                  {new Date(caseData.created_at).toLocaleString("en-IN", {
                     day: "2-digit",
                     month: "short",
                     year: "numeric",

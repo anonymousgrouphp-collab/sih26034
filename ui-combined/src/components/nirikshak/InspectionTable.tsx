@@ -37,7 +37,7 @@ export const InspectionTable: React.FC<InspectionTableProps> = ({ inspections, c
   const formatDateTime = (dateStr: string) => {
     try {
       const d = new Date(dateStr);
-      return d.toLocaleDateString("en-IN", {
+      return d.toLocaleString("en-IN", {
         day: "2-digit",
         month: "short",
         year: "numeric",
