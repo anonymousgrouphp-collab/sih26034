@@ -575,11 +575,37 @@ async def upload_inspection_image(
                     calib_ref = "MARKER-4X4-50MM" if "ARUCO" in calib_method else "ISO-7810-CARD"
                     px_to_mm = float(calib_res.calibration.px_to_mm)
                     calib_margin = float(calib_res.calibration.margin_of_error_pct) if calib_res.calibration.margin_of_error_pct else 1.2
+                    # Propagate calibration to any uncalibrated images already in this inspection
+                    prior_uncalibrated = db.execute(
+                        select(EvidenceImage).where(
+                            (EvidenceImage.inspection_id == inspection.id) &
+                            (EvidenceImage.calibration_method == "UNRESOLVED")
+                        )
+                    ).scalars().all()
+                    for uncal in prior_uncalibrated:
+                        uncal.calibration_method = calib_method
+                        uncal.calibration_reference_id = calib_ref
+                        uncal.px_to_mm_scale = px_to_mm
+                        uncal.calibration_error_margin_pct = calib_margin
                 else:
-                    calib_method = "UNRESOLVED"
-                    calib_ref = "ESTIMATED_DEFAULT"
-                    px_to_mm = 12.45
-                    calib_margin = 2.5
+                    # Inherit calibration if any sibling image in this inspection is already calibrated
+                    co_calib = db.execute(
+                        select(EvidenceImage).where(
+                            (EvidenceImage.inspection_id == inspection.id) &
+                            (EvidenceImage.px_to_mm_scale > 0) &
+                            (EvidenceImage.calibration_method != "UNRESOLVED")
+                        )
+                    ).scalars().first()
+                    if co_calib:
+                        calib_method = co_calib.calibration_method
+                        calib_ref = co_calib.calibration_reference_id
+                        px_to_mm = float(co_calib.px_to_mm_scale)
+                        calib_margin = float(co_calib.calibration_error_margin_pct or 1.2)
+                    else:
+                        calib_method = "UNRESOLVED"
+                        calib_ref = "ESTIMATED_DEFAULT"
+                        px_to_mm = 12.45
+                        calib_margin = 2.5
             except Exception:
                 pass
     except Exception:
@@ -1022,8 +1048,43 @@ def execute_pipeline(
                     try:
                         from calibration import CalibrationEngine
                         calib_res = CalibrationEngine.calibrate(img_bgr, package_type=inspection.package_type or "RECTANGULAR")
-                        px_to_mm = calib_res.calibration.px_to_mm if (calib_res and calib_res.is_calibrated and calib_res.calibration) else (ev_image.px_to_mm_scale or 12.45)
-                        pdp_area = calib_res.principal_display_panel.pdp_area_cm2 if (calib_res and calib_res.principal_display_panel) else 112.0
+                        if calib_res and calib_res.is_calibrated and calib_res.calibration:
+                            px_to_mm = float(calib_res.calibration.px_to_mm)
+                            pdp_area = calib_res.principal_display_panel.pdp_area_cm2 if calib_res.principal_display_panel else 112.0
+                            ev_image.px_to_mm_scale = px_to_mm
+                            ev_image.calibration_method = str(calib_res.calibration.method)
+                            ev_image.calibration_reference_id = "MARKER-4X4-50MM" if "ARUCO" in str(calib_res.calibration.method) else "ISO-7810-CARD"
+                            ev_image.calibration_error_margin_pct = float(calib_res.calibration.margin_of_error_pct or 1.2)
+                            # Propagate to any uncalibrated sibling images in this inspection
+                            db.query(EvidenceImage).filter(
+                                EvidenceImage.inspection_id == inspection.id,
+                                EvidenceImage.id != ev_image.id,
+                                (EvidenceImage.px_to_mm_scale == None) | (EvidenceImage.calibration_method == "UNRESOLVED")
+                            ).update({
+                                "px_to_mm_scale": px_to_mm,
+                                "calibration_method": ev_image.calibration_method,
+                                "calibration_reference_id": ev_image.calibration_reference_id,
+                                "calibration_error_margin_pct": ev_image.calibration_error_margin_pct,
+                            }, synchronize_session=False)
+                        else:
+                            # Inherit from any already calibrated sibling image in this inspection
+                            co_calib = db.execute(
+                                select(EvidenceImage).where(
+                                    (EvidenceImage.inspection_id == inspection.id) &
+                                    (EvidenceImage.px_to_mm_scale > 0) &
+                                    (EvidenceImage.calibration_method != "UNRESOLVED")
+                                )
+                            ).scalars().first()
+                            if co_calib:
+                                px_to_mm = float(co_calib.px_to_mm_scale)
+                                pdp_area = 112.0
+                                ev_image.px_to_mm_scale = px_to_mm
+                                ev_image.calibration_method = co_calib.calibration_method
+                                ev_image.calibration_reference_id = co_calib.calibration_reference_id
+                                ev_image.calibration_error_margin_pct = co_calib.calibration_error_margin_pct
+                            else:
+                                px_to_mm = ev_image.px_to_mm_scale or 12.45
+                                pdp_area = 112.0
                     except Exception:
                         calib_res = None
                         px_to_mm = ev_image.px_to_mm_scale or 12.45
@@ -1072,6 +1133,44 @@ def execute_pipeline(
                         if rf.measured_font_height_mm and rf.measured_font_height_mm > 0:
                             font_mm = rf.measured_font_height_mm
                             break
+
+                    # Multi-facet packaging aggregation: look across all sibling images for distributed declarations
+                    prev_bboxes = db.execute(
+                        select(BoundingBox).join(EvidenceImage).where(
+                            (EvidenceImage.inspection_id == inspection.id) &
+                            (BoundingBox.image_id != ev_image.id)
+                        )
+                    ).scalars().all()
+
+                    for pb in prev_bboxes:
+                        ft = pb.field_type
+                        parsed_val = None
+                        if pb.normalized_text:
+                            try:
+                                parsed_val = json.loads(pb.normalized_text)
+                            except Exception:
+                                parsed_val = pb.normalized_text
+
+                        if not net_q and ft == "NET_QUANTITY" and parsed_val:
+                            net_q = parsed_val if isinstance(parsed_val, dict) else {"magnitude": float(parsed_val), "unit": "g"}
+                        if not mrp_dict and ft == "MRP" and parsed_val:
+                            mrp_dict = parsed_val if isinstance(parsed_val, dict) else {"amount": float(parsed_val), "currency": "INR", "tax_inclusive": True}
+                        if not dec_usp and ft == "UNIT_SALE_PRICE" and parsed_val:
+                            dec_usp = float(parsed_val.get("price_per_unit", 0)) if isinstance(parsed_val, dict) else float(parsed_val)
+                        if not mfg_dict and ft == "MANUFACTURER" and parsed_val:
+                            mfg_dict = parsed_val if isinstance(parsed_val, dict) else {"name": str(parsed_val)}
+                        if not imp_dict and ft == "IMPORTER" and parsed_val:
+                            imp_dict = parsed_val if isinstance(parsed_val, dict) else {"name": str(parsed_val)}
+                        if not pkr_dict and ft == "PACKER" and parsed_val:
+                            pkr_dict = parsed_val if isinstance(parsed_val, dict) else {"name": str(parsed_val)}
+                        if not cc_dict and ft == "CONSUMER_CARE" and parsed_val:
+                            cc_dict = parsed_val if isinstance(parsed_val, dict) else {"email": str(parsed_val)}
+                        if not coo and ft == "COUNTRY_OF_ORIGIN" and parsed_val:
+                            coo = parsed_val if isinstance(parsed_val, str) else str(parsed_val)
+                        if not mfg_iso and ft == "MFG_DATE" and parsed_val:
+                            mfg_iso = str(parsed_val)
+                        if not font_mm and pb.measured_font_height_mm and pb.measured_font_height_mm > 0:
+                            font_mm = pb.measured_font_height_mm
                     # Zero guessing policy: if font height or PDP area cannot be measured, pass None to evaluate UNABLE_TO_VERIFY
 
                     eval_res = LegalMetrologyRuleEngine.evaluate_inspection(
@@ -1411,14 +1510,14 @@ def get_inspection_detail(
             "blur_variance": float(round(img.blur_laplacian_variance or 340.0, 2)),
             "glare_percentage": float(round(img.glare_pixel_percentage or 0.8, 2)),
             "skew_angle_deg": float(round(img.perspective_skew_angle_deg or 1.2, 2)),
-            "quality_passed": (img.blur_laplacian_variance or 0.0) > 100.0,
+            "quality_passed": (img.blur_laplacian_variance or 0.0) >= 100.0 and (img.glare_pixel_percentage or 0.0) <= 3.0,
             "calibration": {
-                "is_calibrated": (img.px_to_mm_scale or 0) > 0,
+                "is_calibrated": (img.px_to_mm_scale or 0) > 0 and img.calibration_method != "UNRESOLVED",
                 "method": img.calibration_method or "ARUCO_4X4_50",
                 "px_to_mm": float(img.px_to_mm_scale or 0.088),
                 "reference_id": img.calibration_reference_id or "ARUCO-4X4-50MM",
                 "margin_of_error_pct": float(img.calibration_error_margin_pct or 1.2),
-            } if img.px_to_mm_scale else None,
+            } if (img.px_to_mm_scale and img.calibration_method != "UNRESOLVED") else None,
             "ocr": {
                 "image_id": img.id,
                 "total_tokens": len(image_bboxes_map.get(img.id, [])),

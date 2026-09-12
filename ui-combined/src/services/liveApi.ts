@@ -453,17 +453,19 @@ export class LiveApiService implements IInspectionApiService {
         extracted_fields: (data.extracted_fields && data.extracted_fields.length > 0)
           ? data.extracted_fields
           : (cached?.extracted_fields || []),
-        rule_evaluations: (data.evaluations || []).map((e: any, index: number) => ({
-          finding_id: e.finding_id || `eval_${index}`,
-          rule_code: e.rule_code,
-          statutory_reference: e.statutory_reference,
-          status: e.status,
-          severity: e.severity || "CRITICAL",
-          required_value: e.expected || e.required_value || "Statutory threshold",
-          measured_value: e.actual || e.measured_value || "Observed value",
-          discrepancy: e.discrepancy,
-          legal_consequence: e.legal_consequence || "Section 36(1) LM Act 2009",
-        })),
+        rule_evaluations: (data.evaluations && data.evaluations.length > 0)
+          ? data.evaluations.map((e: any, index: number) => ({
+              finding_id: e.finding_id || `eval_${index}`,
+              rule_code: e.rule_code,
+              statutory_reference: e.statutory_reference,
+              status: e.status,
+              severity: e.severity || "CRITICAL",
+              required_value: e.expected || e.required_value || "Statutory threshold",
+              measured_value: e.actual || e.measured_value || "Observed value",
+              discrepancy: e.discrepancy,
+              legal_consequence: e.legal_consequence || "Section 36(1) LM Act 2009",
+            }))
+          : (cached?.rule_evaluations || []),
         audit_trail: (data.audit_trail || []).map((a: any, idx: number) => ({
           id: a.id || `audit_${idx}`,
           sequence_number: idx + 1,

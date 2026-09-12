@@ -601,6 +601,10 @@ class FieldInspectorCLI:
             consumer_care_dict = facts.consumer_care.model_dump() if facts.consumer_care else None
             country_of_origin = facts.country_of_origin if facts.country_of_origin else None
             ocr_tokens_list = [{"field": rf.field_type, "value": rf.normalized_value or rf.raw_ocr_text, "confidence": rf.detection_confidence, "lang": "en"} for rf in facts.raw_fields]
+            for rf in facts.raw_fields:
+                if rf.measured_font_height_mm and rf.measured_font_height_mm > 0:
+                    font_mm = rf.measured_font_height_mm
+                    break
 
         # Stage 4: Rule Engine
         rule_results = LegalMetrologyRuleEngine.evaluate_inspection(

@@ -257,8 +257,6 @@ export const NewInspection: React.FC = () => {
             i === 0
               ? "PDP_FRONT"
               : i === 1
-              ? "SIDE_PANEL"
-              : i === 2
               ? "BACK_PANEL"
               : "SIDE_PANEL";
 
