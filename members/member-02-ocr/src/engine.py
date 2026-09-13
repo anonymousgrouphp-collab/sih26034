@@ -177,12 +177,12 @@ class MultilingualOCREngine:
             # 3. Multilingual recognition (PP-OCRv4)
             p_text, p_conf, p_lang = self.recognizer.recognize(crop)
 
-            # Inversion probe: if initial confidence is low (< 0.60), check 180-degree flipped crop
-            if p_conf < 0.60 and crop is not None and crop.size > 0:
+            # Inversion probe: if initial confidence is sub-optimal (< 0.92), test 180-degree flipped crop
+            if crop is not None and crop.size > 0 and p_conf < 0.92:
                 try:
                     crop_180 = cv2.rotate(crop, cv2.ROTATE_180)
                     p_text_180, p_conf_180, p_lang_180 = self.recognizer.recognize(crop_180)
-                    if p_conf_180 > p_conf:
+                    if p_conf_180 > p_conf + 0.05 or (p_conf < 0.60 and p_conf_180 > p_conf):
                         p_text, p_conf, p_lang = p_text_180, p_conf_180, p_lang_180
                 except Exception:
                     pass

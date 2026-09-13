@@ -57,10 +57,23 @@ class CrossFacetSemanticFusionEngine:
     # Statutory panel precedence hierarchy
     PANEL_PRIORITY = {
         "PDP_FRONT": 10,
+        "FRONT_PDP": 10,
+        "FRONT": 10,
         "BACK_PANEL": 9,
-        "SIDE_PANEL": 6,
+        "BACK": 9,
+        "MACRO_CLOSE_UP": 8,
+        "CLOSE_UP": 8,
+        "STAMP": 8,
+        "SIDE_PANEL": 7,
+        "SIDE_PANEL_LEFT": 7,
+        "SIDE_PANEL_RIGHT": 7,
+        "LEFT_PANEL": 7,
+        "RIGHT_PANEL": 7,
+        "SIDE": 7,
+        "BOTTOM_BASE": 5,
+        "BOTTOM": 5,
         "TOP_LID": 4,
-        "BOTTOM_BASE": 2,
+        "TOP": 4,
         "UNKNOWN": 1,
     }
 

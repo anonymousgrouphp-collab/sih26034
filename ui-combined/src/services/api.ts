@@ -251,6 +251,7 @@ export class ApiService {
       lower.startsWith("demo-") ||
       lower.startsWith("insp_demo_") ||
       lower.startsWith("ins-2026-") ||
+      lower.startsWith("real-pkg-") ||
       lower === "fortune" ||
       lower === "sunlite"
     );
@@ -271,6 +272,7 @@ export class ApiService {
       lowerId.startsWith("sku-demo-") ||
       lowerId.startsWith("insp_demo_") ||
       lowerId.startsWith("ins-2026-") ||
+      lowerId.startsWith("real-pkg-") ||
       lowerId.startsWith("demo-")
     ) {
       return true;

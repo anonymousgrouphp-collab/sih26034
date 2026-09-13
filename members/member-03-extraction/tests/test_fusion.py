@@ -188,3 +188,62 @@ def test_empty_and_single_facet():
     ])
     assert single_res["total_facets_processed"] == 1
     assert single_res["unified_facts"]["mrp"]["amount"] == 50.0
+
+
+def test_real_packaging_tri_panel_fusion():
+    """Verify tri-panel packaging (Front PDP + Left Legal Metrology + Back Panel) fuses into compliant facts."""
+    front = {
+        "image_id": "img_front",
+        "panel_type": "FRONT_PDP",
+        "pdp_area_cm2": 95.0,
+        "facts": {
+            "generic_name": "Brahmi Mind Wellness (Bacopa)",
+        }
+    }
+    left = {
+        "image_id": "img_left",
+        "panel_type": "SIDE_PANEL_LEFT",
+        "primary_font_height_mm": 2.2,
+        "facts": {
+            "mrp": {"amount": 260.0, "currency": "INR", "tax_inclusive": True},
+            "net_quantity": {"magnitude": 60.0, "unit": "N", "has_banned_unit": False},
+            "unit_sale_price": {"price_per_unit": 4.33, "unit": "tablet"},
+            "mfg_date_month": 5,
+            "mfg_date_year": 2026,
+        }
+    }
+    back = {
+        "image_id": "img_back",
+        "panel_type": "BACK_PANEL",
+        "facts": {
+            "manufacturer": {
+                "name": "Himalaya Wellness Company",
+                "address_line": "Peenya Industrial Estate, Bengaluru",
+                "state": "Karnataka",
+                "pin_code": "560058",
+                "is_complete": True,
+            },
+            "consumer_care": {
+                "phone": "1-800-208-1930",
+                "email": "contactus@himalayawellness.com",
+            },
+            "country_of_origin": "India",
+        }
+    }
+
+    fused = CrossFacetSemanticFusionEngine.fuse_facets([front, left, back], inspection_id="insp_tri_panel_real")
+    facts = fused["unified_facts"]
+
+    assert facts["mrp"]["amount"] == 260.0
+    assert facts["net_quantity"]["magnitude"] == 60.0
+    assert facts["net_quantity"]["unit"] == "N"
+    assert facts["unit_sale_price"]["price_per_unit"] == 4.33
+    assert facts["mfg_date_month"] == 5
+    assert facts["mfg_date_year"] == 2026
+    assert facts["manufacturer"]["name"] == "Himalaya Wellness Company"
+    assert facts["country_of_origin"] == "India"
+    assert facts["consumer_care"]["phone"] == "1-800-208-1930"
+    assert facts["generic_name"] == "Brahmi Mind Wellness (Bacopa)"
+    assert fused["total_facets_processed"] == 3
+    assert fused["primary_pdp_area_cm2"] == 95.0
+

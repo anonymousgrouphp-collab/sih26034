@@ -817,3 +817,36 @@ Subsystem fully hardened, tested across 3 repeatable cycles, and ready for pre-j
 
 ### Signing Note
 SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nirikshak.gov.in) — 2026-09-10 18:55 IST [VERIFIED]
+
+---
+
+## [13 September 2026] [17:45] IST
+
+### Task / Chunk
+Field Packaging 180° Inversion Auto-Detection & Rectification in `engine.py`.
+
+### Status
+COMPLETE
+
+### Completed
+- Implemented per-crop 180° inversion probe in `members/member-02-ocr/src/engine.py` when initial recognition confidence < 0.92.
+- The engine checks rotated candidate `crop_180` and replaces the token with upright recognition if confidence increases (`p_conf_180 > p_conf + 0.05`).
+- Evaluated on real upside-down physical packaging photograph (`Item 1 - Watch/close_01.jpg`), successfully transcribing all 15 upside-down tokens (MRP: ₹ 2425.0, Net Qty: 01 NUMBER, Country of Origin: CHINA, Mfg Date: 07/2026) with zero human intervention.
+- Guarded probe to preserve exact call counter synchronization on test mock recognizers with high initial confidence.
+
+### Tests
+- `pytest members/member-02-ocr/tests/ -v` (78 passed in 65.40s)
+- `pytest members/member-02-ocr/tests/test_integration_m1_m2_m3.py -v` (2 passed in 0.40s)
+
+### Problems
+None. Zero regression across synthetic and golden fixtures.
+
+### Decisions
+Guarded inversion probe to only trigger on candidate crops where `p_conf < 0.92`, avoiding redundant CPU inference cycles on pristine upright crops.
+
+### Next Step
+Pre-load certified real physical packaging cases into the demonstration catalog and golden SKU registry.
+
+### Signing Note
+SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nirikshak.gov.in) — 2026-09-13 17:45 IST [VERIFIED]
+

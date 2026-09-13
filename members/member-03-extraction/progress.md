@@ -703,6 +703,42 @@ Synchronize git branch with `origin main` and `origin dev` and review live deplo
 ### Signing Note
 SIGNED OFF BY: Harsh Patel (anonymousgrouphp@gmail.com) — 2026-09-13 17:05 IST [VERIFIED]
 
+---
+
+## [13 September 2026] [17:46] IST
+
+### Task / Chunk
+Multi-Facet Semantic Fusion Calibration across All Packaging Panel Types (`fusion.py`).
+
+### Status
+COMPLETE
+
+### Completed
+- Expanded `PANEL_PRIORITY` hierarchy in `members/member-03-extraction/src/fusion.py` to cover all field packaging facets:
+  - `FRONT_PDP` / `PDP_FRONT`: Rank 100 (Primary declaration surface for commodity name, net quantity, brand).
+  - `SIDE_PANEL_LEFT` / `SIDE_PANEL_RIGHT` / `SIDE_PANEL`: Rank 80 (Side legal metrology panels for MRP, Net Qty, Dates).
+  - `MACRO_CLOSE_UP` / `CLOSE_UP`: Rank 75 (High-resolution batch code and MRP stamps).
+  - `STAMP`: Rank 70 (Inkjet / thermal batch coding).
+  - `BOTTOM_BASE`: Rank 65 (Bottom flap carton stamps).
+  - `BACK_PANEL`: Rank 60 (Manufacturer registered address, corporate details, customer care).
+- Added unit test `test_real_packaging_tri_panel_fusion()` in `members/member-03-extraction/tests/test_fusion.py` validating tri-panel aggregation where Net Qty/MRP reside on side LM panel and Manufacturer address resides on back panel (matching real Himalaya Brahmi topology).
+
+### Tests
+- `pytest members/member-03-extraction/tests/test_fusion.py -v` (6 passed in 0.15s)
+- `pytest members/member-03-extraction/tests/ -v` (76 passed in 1.45s)
+
+### Problems
+None. Zero regressions.
+
+### Decisions
+Side legal panels (`SIDE_PANEL_LEFT`, `SIDE_PANEL_RIGHT`) receive higher rank (80) than general back panels (60) for pricing and quantity declarations because specialized LM declaration panels contain dedicated high-contrast regulatory stamps.
+
+### Next Step
+Pre-load certified real physical packaging cases into the demonstration catalog and golden SKU registry.
+
+### Signing Note
+SIGNED OFF BY: Harsh Patel (anonymousgrouphp@gmail.com) — 2026-09-13 17:46 IST [VERIFIED]
+
 
 
 
