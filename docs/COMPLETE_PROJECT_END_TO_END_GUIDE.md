@@ -38,7 +38,7 @@ State **Legal Metrology Officers (LMOs)** inspecting shops, **Adjudicating Contr
 
 ### What Are We Building?
 
-We are building NyayaDrishti-LM, an **Online-First Web Application** built for the Department of Consumer Affairs (DoCA) to inspect packaged commodities under the Legal Metrology (Packaged Commodities) Rules, 2011. It operates across three distinct operational modes:
+We are building Nirikshak, an **Online-First Web Application** built for the Department of Consumer Affairs (DoCA) to inspect packaged commodities under the Legal Metrology (Packaged Commodities) Rules, 2011. It operates across three distinct operational modes:
 - **Mode A: Online Web Mode (Primary Production):** Centralized web application accessed via standard browsers (Chrome, Edge, Firefox). Features multi-user authentication (RBAC), centralized PostgreSQL 16+ datastore, server-side CPU INT8 ONNX inference, and national/state enforcement dashboards.
 - **Mode B: Optional Local Inspection Mode (Secondary Field Resiliency):** Lightweight standalone execution capability running on field laptops (localhost:8000) for officers operating in network-deprived circles. Uses embedded ONNX Runtime CPU inference and local encrypted SQLite (SQLCipher), queueing signed sync bundles for upload when connectivity is restored.
 - **Mode C: External Integrations (Future Roadmap):** Future national registry webhooks for eMaap, MCA21, and GSTN verification.
@@ -126,7 +126,7 @@ A production-ready **FastAPI backend** + **React 18 / Vite frontend SPA** runnin
 | Competition                  | Smart India Hackathon 2026                                          |
 | Ministry                     | Ministry of Consumer Affairs, Food & Public Distribution            |
 | Department                   | Department of Consumer Affairs (DoCA)                               |
-| Product Name                 | NyayaDrishti-LM (न्याय दृष्टि - Legal Metrology)                   |
+| Product Name                 | Nirikshak (निरीक्षक - Legal Metrology)                   |
 | Team Composition             | 6 Engineering Students (Multidisciplinary Roles)                    |
 | Current Date                 | 07 September 2026                                                   |
 | Hard Submission Deadline     | 13 September 2026 (23:59 IST)                                       |
@@ -499,7 +499,7 @@ The record is cryptographically hashed and saved in local encrypted storage, rea
 
 ```
 +----------------------------------------------------------------------------------------------------+
-| FEATURE / CAPABILITY         | TYPICAL HACKATHON PROJECT        | NYAYADRISHTI-LM (OUR SYSTEM)     |
+| FEATURE / CAPABILITY         | TYPICAL HACKATHON PROJECT        | NIRIKSHAK (OUR SYSTEM)     |
 +----------------------------------------------------------------------------------------------------+
 | Font Size Measurement        | Guesses from raw pixels (DPI)    | Calibrated Planar Homography     |
 |                              | (Scientifically invalid)         | (Real mm via ArUco reference)    |
@@ -597,7 +597,7 @@ The software **never guesses or invents numbers**. If no reference marker is det
 
 ## 12. RESULT STATES
 
-NyayaDrishti-LM uses **four mutually exclusive statutory states** (never a simplistic binary pass/fail):
+Nirikshak uses **four mutually exclusive statutory states** (never a simplistic binary pass/fail):
 
 ```
 +----------------------------------------------------------------------------------------------------+
@@ -634,11 +634,11 @@ When an officer issues an Improvement Notice or seizes non-compliant goods, the 
 On **1 July 2024**, the Indian Evidence Act, 1872 was repealed. Section 65B no longer exists.
 All electronic records submitted to Indian courts are now governed exclusively by **Section 63 of the BSA 2023**. To satisfy statutory requirements, the electronic record must be accompanied by a formal certificate identifying the device, certifying its lawful operation, and cryptographically proving that contents were not altered.
 
-NyayaDrishti-LM generates the complete Section 63 digital evidence certificate artifact with local monotonic UTC timestamps (`clock_source: LOCAL_DEVICE_MONOTONIC`), device telemetry, and officer Ed25519 cryptographic attestation. Final judicial admissibility remains the prerogative of the court under BSA 2023.
+Nirikshak generates the complete Section 63 digital evidence certificate artifact with local monotonic UTC timestamps (`clock_source: LOCAL_DEVICE_MONOTONIC`), device telemetry, and officer Ed25519 cryptographic attestation. Final judicial admissibility remains the prerogative of the court under BSA 2023.
 
 ### The SHA-256 Merkle Provenance Chain
 
-NyayaDrishti-LM builds a cryptographic chain linking every step of the inspection:
+Nirikshak builds a cryptographic chain linking every step of the inspection:
 
 ```
 [Raw Photo SHA-256] ──> [Calibration Matrix SHA-256] ──> [Rectified Image SHA-256]
@@ -1022,7 +1022,7 @@ The database schema uses an **Abstract Dialect Pattern** (runs seamlessly on SQL
 
 ## 26. GITHUB WORKFLOW
 
-- **Repository:** `sih26034-nyayadrishti`
+- **Repository:** `sih26034`
 - **Main Branch (`main`):** Demo-safe, production code. Pushing directly to `main` is strictly forbidden.
 - **Development Branch (`dev`):** Integration branch. All features merge here first.
 - **Feature Branches:** Named as `feat/m<number>-<name>` (e.g., `feat/m1-homography`, `feat/m4-rule-engine`).
@@ -1154,7 +1154,7 @@ $$
 
 ### The 3-Minute Live Judging Pitch Script
 
-- **0:00 - 1:00 (Leader):** Hold up real packaging. Explain the 8-minute manual inspection bottleneck and the scientific impossibility of measuring millimeters without a scale reference. Introduce NyayaDrishti-LM.
+- **0:00 - 1:00 (Leader):** Hold up real packaging. Explain the 8-minute manual inspection bottleneck and the scientific impossibility of measuring millimeters without a scale reference. Introduce Nirikshak.
 - **1:00 - 2:00 (Members 1 & 6):** Snap live photo with ArUco card. Show quality gate passing, ArUco detection, and live pipeline execution. Show detected violations: font deficit, banned `gms`, and USP math error.
 - **2:00 - 3:00 (Members 4 & 5):** Show officer review canvas. Explain why AI does not issue fines alone. Click "Confirm", show instant Section 63 BSA Merkle DAG generation, and display the official Form-1 Legal Notice PDF.
 
@@ -1198,7 +1198,7 @@ $$
 1. ❌ **NEVER SAY:** _"Our AI measures font millimeters directly from any normal photo."_
    - ✅ **SAY INSTEAD:** _"We derive physical millimeter scale using planar homography anchored to a coplanar reference target of known dimensions (ArUco marker or ₹5 coin)."_
 2. ❌ **NEVER SAY:** _"Our AI acts as a judge and automatically fines the shopkeeper."_
-   - ✅ **SAY INSTEAD:** _"NyayaDrishti-LM is an investigative decision-support tool that drafts statutory notices; final legal sign-off rests with the authorized officer."_
+   - ✅ **SAY INSTEAD:** _"Nirikshak is an investigative decision-support tool that drafts statutory notices; final legal sign-off rests with the authorized officer."_
 3. ❌ **NEVER SAY:** _"Our software detects if the package has less weight inside than declared."_
    - ✅ **SAY INSTEAD:** _"A camera sees surface ink, not mass. Short-weight detection requires physical weighing under Rule 24, which our workflow prompts when Net Quantity syntax is verified."_
 4. ❌ **NEVER SAY:** _"All products on Amazon must declare manufacturing date."_
@@ -1212,7 +1212,7 @@ $$
 8. ❌ **NEVER SAY:** _"Our report is guaranteed to win in court or legally infallible."_
    - ✅ **SAY INSTEAD:** _"We produce tamper-evident electronic evidence structured under Section 63 of the Bharatiya Sakshya Adhiniyam, 2023 with SHA-256 Merkle root verification; final admissibility is the sole prerogative of the court."_
 9. ❌ **NEVER SAY:** _"Our primary product is an offline desktop app, or that our entire website works without internet."_
-   - ✅ **SAY INSTEAD:** _"NyayaDrishti-LM is an online-first web application accessed via standard web browsers, with an optional local inspection capability (Mode B) for field officers in network-deprived circles."_
+   - ✅ **SAY INSTEAD:** _"Nirikshak is an online-first web application accessed via standard web browsers, with an optional local inspection capability (Mode B) for field officers in network-deprived circles."_
 10. ❌ **NEVER SAY:** _"We obtain network atomic time in field mode."_
     - ✅ **SAY INSTEAD:** _"We use local monotonic UTC hardware clocks (`time.monotonic_ns()`) for tamper-resistant field timing, with optional NTP synchronization when network connectivity is available."_
 11. ❌ **NEVER SAY:** _"Hardware GPS is guaranteed on all officer devices."_

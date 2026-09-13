@@ -14,9 +14,9 @@ Traditional government compliance portals suffer from one of two extremes:
 1. Archaic, unstyled forms with confusing dropdowns, zero visual feedback, and broken sessions.
 2. Generic SaaS dashboards overloaded with meaningless line charts, distracting animations, and consumer software patterns that fail to project institutional seriousness.
 
-### 1.2 MetroLens Solution & Mental Model
-MetroLens successfully strikes the ideal balance for a government enforcement workstation:
-- **Immediate Context:** The header immediately communicates identity (`METROLENS • DoCA LMPC Rules, 2011 Standards`), operational facility (`Legal Metrology Inspection Workstation Field Station`), active jurisdiction circle (`DL-SOUTH-01 • South Delhi Circle`), and network status (`ONLINE (MODE A)`).
+### 1.2 Nirikshak Solution & Mental Model
+Nirikshak successfully strikes the ideal balance for a government enforcement workstation:
+- **Immediate Context:** The header immediately communicates identity (`NIRIKSHAK • DoCA LMPC Rules, 2011 Standards`), operational facility (`Legal Metrology Inspection Workstation Field Station`), active jurisdiction circle (`DL-SOUTH-01 • South Delhi Circle`), and network status (`ONLINE (MODE A)`).
 - **Core Enforcement Paradigm:** The screen is built around an **Adjudication Canvas**. An officer is not looking at an abstract database row; they are looking at the seized physical packaging evidence with optical millimeter overlays.
 - **Natural Justice Principle:** Findings are explicitly separated between **Automated Inference** and **Officer Adjudication**. Automated AI findings never pretend to be final verdicts.
 
@@ -63,9 +63,9 @@ MetroLens successfully strikes the ideal balance for a government enforcement wo
 
 ## 3. State Completeness Audit
 
-Every production web application must handle all asynchronous lifecycles. We tested MetroLens across the standard state matrix:
+Every production web application must handle all asynchronous lifecycles. We tested Nirikshak across the standard state matrix:
 
-| State | Implementation in MetroLens | Audit Finding |
+| State | Implementation in Nirikshak | Audit Finding |
 | :--- | :--- | :---: |
 | **Idle State** | Displays placeholder inspection desk with clear "New Inspection Case" primary action | **PASS** |
 | **Loading State** | Skeleton loaders and progress indicators during pipeline execution | **PASS** |

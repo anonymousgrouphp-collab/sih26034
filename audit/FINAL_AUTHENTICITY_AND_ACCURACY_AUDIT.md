@@ -1,7 +1,7 @@
 # FINAL PRE-DEVELOPMENT AUTHENTICITY & ACCURACY AUDIT REPORT
 
 **Project ID:** SIH26034  
-**Product Name:** NyayaDrishti-LM  
+**Product Name:** Nirikshak
 **Auditing Entity:** Master Pre-Development Architecture & Feasibility Review Board  
 **Governing Authority:** Ministry of Consumer Affairs, Food & Public Distribution / Department of Consumer Affairs (DoCA)  
 **Evaluation Target:** Smart India Hackathon 2026  

@@ -1,7 +1,7 @@
 # FINAL PRODUCT REALITY REPORT
 ## Comprehensive Production Readiness, Field Usability, and Architectural Truth
 
-**Product:** NyayaDrishti-LM  
+**Product:** Nirikshak
 **Problem Statement:** SIH26034 — Legal Metrology Packaged Commodity Compliance Verification  
 **Target Beneficiary:** Department of Consumer Affairs (DoCA), Ministry of Consumer Affairs, Food & Public Distribution, Government of India  
 **Date:** 12 September 2026  
@@ -11,7 +11,7 @@
 
 ## 1. Executive Product Vision
 
-NyayaDrishti-LM is an AI-augmented diagnostic inspection workstation engineered for state and central Legal Metrology Officers (LMOs). Operating across **Mode A (Online Cloud Monolith)**, **Mode B (Local Resilient Field Runner)**, and **Mode C (Registry Integrations)**, it transforms complex packaging compliance verification from an error-prone, 20-minute manual measuring task into a sub-second, scientifically rigorous, and cryptographically tamper-evident digital procedure.
+Nirikshak is an AI-augmented diagnostic inspection workstation engineered for state and central Legal Metrology Officers (LMOs). Operating across **Mode A (Online Cloud Monolith)**, **Mode B (Local Resilient Field Runner)**, and **Mode C (Registry Integrations)**, it transforms complex packaging compliance verification from an error-prone, 20-minute manual measuring task into a sub-second, scientifically rigorous, and cryptographically tamper-evident digital procedure.
 
 ---
 
@@ -44,7 +44,7 @@ The system was evaluated against 76 physical packaging photographs across 8 FMCG
 ## 4. Human-in-the-Loop (HITL) Adjudication
 
 In accordance with Government of India statutory enforcement doctrine:
-- NyayaDrishti-LM functions strictly as an **Augmented Diagnostic Assistant**.
+- Nirikshak functions strictly as an **Augmented Diagnostic Assistant**.
 - The AI **never** issues unilateral compounding penalties or legal notices.
 - Qualified human enforcement officers make the final determination (`CONFIRM VIOLATION`, `OVERRIDE AI VERDICT`, or `ORDER PHYSICAL RETAKE`).
 - All officer decisions are immutably logged with digital signatures in the Section 63 BSA tamper-evident Merkle ledger.

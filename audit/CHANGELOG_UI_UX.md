@@ -11,7 +11,7 @@
 
 ## 1. Summary of Changes
 
-This release represents a comprehensive overhaul and synthesis of the dual frontend codebases (`nirikshak-metrolens-ai` and `ui-combined`). The redesign addresses critical field officer usability challenges, fixes canvas blackout bugs, corrects institutional branding to meet statutory guidelines, introduces dedicated Rule 6 statutory declaration review tools, and streamlines the information architecture into 4 intuitive inspection tabs.
+This release represents a comprehensive overhaul and synthesis of the dual frontend codebases (`nirikshak-ui` and `ui-combined`). The redesign addresses critical field officer usability challenges, fixes canvas blackout bugs, corrects institutional branding to meet statutory guidelines, introduces dedicated Rule 6 statutory declaration review tools, and streamlines the information architecture into 4 intuitive inspection tabs.
 
 ---
 

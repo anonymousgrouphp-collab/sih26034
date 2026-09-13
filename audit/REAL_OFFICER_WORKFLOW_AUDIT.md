@@ -1,7 +1,7 @@
 # REAL OFFICER WORKFLOW AUDIT & RE-DESIGN REPORT
 ## Legal Metrology Enforcement Field Usability & Operational Journey
 
-**System:** NyayaDrishti-LM (SIH26034)  
+**System:** Nirikshak (SIH26034)
 **Target User Persona:** Non-Technical Legal Metrology Inspection Officer (LMO) / District Inspector  
 **Operating Context:** Active retail premises, wholesale mandis, packaging warehouses, and e-commerce enforcement  
 **Environmental Constraints:** Variable illumination, cramped retail counter space, time pressure (< 60s per commodity), intermittent mobile connectivity (2G/4G blackouts)  
@@ -114,4 +114,4 @@ BSA Section 63 Cert     Confirm, Override,      Manufacturer checked against
 
 ## 6. Final Usability Verdict
 
-The redesigned NyayaDrishti-LM inspection workflow eliminates unnecessary developer artifacts and puts the Legal Metrology Officer in complete, confident control of the statutory inspection lifecycle.
+The redesigned Nirikshak inspection workflow eliminates unnecessary developer artifacts and puts the Legal Metrology Officer in complete, confident control of the statutory inspection lifecycle.

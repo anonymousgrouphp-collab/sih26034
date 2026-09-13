@@ -1,10 +1,10 @@
 # FINAL FRONTEND ↔ BACKEND ↔ DATABASE VALIDATION
 
 ## 1. Mission
-Execute a complete, autonomous full-stack frontend functionality, integration, database consistency, and UX reliability audit for NyayaDrishti-LM (SIH26034), focusing on end-to-end reliability and true application state without mock masking.
+Execute a complete, autonomous full-stack frontend functionality, integration, database consistency, and UX reliability audit for Nirikshak (SIH26034), focusing on end-to-end reliability and true application state without mock masking.
 
 ## 2. System Tested
-**NyayaDrishti-LM** (Frontend `ui-combined` & Backend Integration API Layer).
+**Nirikshak** (Frontend `ui-combined` & Backend Integration API Layer).
 Modes Examined:
 - Mode A (Live Online)
 - Mode B (Local Resilient / MOCK / Fallback Offline)

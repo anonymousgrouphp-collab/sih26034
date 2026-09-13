@@ -1,6 +1,6 @@
 # FINAL FRONTEND SYSTEM AUDIT & UI/UX VERIFICATION REPORT
 
-**Project ID:** SIH26034 — NyayaDrishti-LM  
+**Project ID:** SIH26034 — Nirikshak
 **Auditing Entity:** Master Autonomous Quality & Verification Engineering Board  
 **Target Application:** `ui-combined` (React 18.3.1 + Vite 5.4.21 + Tailwind CSS + Lucide React)  
 **Governing Authorities:** Department of Consumer Affairs (DoCA), Ministry of Consumer Affairs, Food & Public Distribution, Government of India  

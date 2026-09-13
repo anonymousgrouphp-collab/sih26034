@@ -6,7 +6,7 @@
 
 # FINAL END-TO-END SYSTEM CHANGELOG & DEFECT RESOLUTION RECORD
 
-**Project ID:** SIH26034 — NyayaDrishti-LM
+**Project ID:** SIH26034 — Nirikshak
 **Auditing Entity:** Master Autonomous Engineering Organization
 **Governing Authority:** Department of Consumer Affairs (DoCA), Ministry of Consumer Affairs, Food & Public Distribution, Government of India
 **Legal Framework:** Legal Metrology Act, 2009; Legal Metrology (Packaged Commodities) Rules, 2011; Section 63 Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)
@@ -17,7 +17,7 @@
 
 ## 1. Executive Summary
 
-This document records the definitive, chronological history of all structural defects, optical pipeline limitations, mathematical discrepancies, and statutory vulnerabilities discovered during the end-to-end audit and stress testing of NyayaDrishti-LM. Each issue is documented with its exact root cause, architectural fix, affected source files, and automated verification evidence.
+This document records the definitive, chronological history of all structural defects, optical pipeline limitations, mathematical discrepancies, and statutory vulnerabilities discovered during the end-to-end audit and stress testing of Nirikshak. Each issue is documented with its exact root cause, architectural fix, affected source files, and automated verification evidence.
 
 ---
 
@@ -148,7 +148,7 @@ Following all applied architectural resolutions:
 # FINAL ROOT CAUSE FIX LOG
 ## Comprehensive Engineering Defect Analysis, Root Causes & Verified Resolutions
 
-**Project:** NyayaDrishti-LM (SIH26034)
+**Project:** Nirikshak (SIH26034)
 **Verification Date:** 12 September 2026
 **Auditor:** Principal Full-Stack Architect & Autonomous Verification Team
 
@@ -189,7 +189,7 @@ Following all applied architectural resolutions:
 # ROOT CAUSE FIX CHANGELOG
 ## Definitive Record of Structural Engineering Defect Resolutions
 
-**Project:** NyayaDrishti-LM (SIH26034)
+**Project:** Nirikshak (SIH26034)
 **Date:** 12 September 2026
 
 ---

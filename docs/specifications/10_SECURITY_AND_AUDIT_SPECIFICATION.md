@@ -1,7 +1,7 @@
 # FINAL SECURITY AND AUDIT SPECIFICATION
 
 **Project ID:** SIH26034  
-**Product:** NyayaDrishti-LM  
+**Product:** Nirikshak
 **Governing Legal Standard:** Section 63 Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)  
 **Governing Privacy Standard:** Digital Personal Data Protection Act, 2023 (DPDP Act 2023)  
 **Status:** FROZEN  
@@ -10,7 +10,7 @@
 
 ### 1. Security Architecture & Threat Model
 
-NyayaDrishti-LM operates primarily as a centralized, online-first web application deployed within government cloud/server infrastructure, with an optional offline/local capability for field officers in network-deprived circles. The security architecture addresses both cloud/web vulnerability vectors and regulatory chain-of-custody requirements under three non-negotiable principles:
+Nirikshak operates primarily as a centralized, online-first web application deployed within government cloud/server infrastructure, with an optional offline/local capability for field officers in network-deprived circles. The security architecture addresses both cloud/web vulnerability vectors and regulatory chain-of-custody requirements under three non-negotiable principles:
 
 1. **Cryptographic Chain of Custody & Tamper Evidence:** Every inspection artifact (raw images, homography metrics, OCR bounding boxes, compliance deficits, and generated PDF dossiers) forms an immutable cryptographic DAG (Directed Acyclic Graph). Under Section 63 BSA 2023, mathematical integrity is verifiable by any court or adjudicating controller.
 2. **Strict Web Authentication & Role-Based Access Control (RBAC):** All administrative, supervisory, and enforcement endpoints are gated behind token-based authentication (JWT) with fine-grained role privileges.
@@ -92,7 +92,7 @@ graph TD
   - Authentication Login Endpoint: 5 attempts / minute / IP (exponential backoff after 3 failed attempts).
 
 #### 2.6 CORS & Cross-Site Protection
-- **Allowed Origins:** Explicit whitelist configured in FastAPI `CORSMiddleware` (e.g., `https://nyayadrishti.doca.gov.in` in production, `http://localhost:3000` in dev).
+- **Allowed Origins:** Explicit whitelist configured in FastAPI `CORSMiddleware` (e.g., `https://nirikshak.doca.gov.in` in production, `http://localhost:3000` in dev).
 - **Credentials:** `allow_credentials=True` allowed strictly for trusted origin domains. Wildcard `allow_origins=["*"]` is strictly prohibited in production.
 
 ---

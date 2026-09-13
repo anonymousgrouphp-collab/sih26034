@@ -1,7 +1,7 @@
 # ARCHITECTURAL & LEGAL DECISION LOG (ADL)
 
 **Project ID:** SIH26034  
-**Product:** NyayaDrishti-LM  
+**Product:** Nirikshak
 **Governing Standard:** Immutable After Architecture Freeze  
 **Last Updated:** 07 September 2026  
 **Status:** FROZEN  
@@ -117,7 +117,7 @@ This document logs every high-impact technical, legal, mathematical, architectur
 #### ADL-13: Primary Product Connectivity Model (Online Web App + Local Field Capability)
 - **Context:** Clarifying architectural intent and delivery scope for SIH 2026.
 - **Evidence:** The deliverable is an enterprise web application for the Ministry of Consumer Affairs, requiring centralized multi-user login, state-wide dashboard analytics, and persistent inspection history. Field officers in remote areas also require operational resilience when internet connectivity drops.
-- **Decision:** NyayaDrishti-LM is an **Online-First Web Application** (Mode A) accessible via web browser, backed by FastAPI, PostgreSQL 16+, and colocated ONNX CPU inference. It includes an **Optional Local Inspection Mode** (Mode B) for field resiliency, and external integration stubs (Mode C) for future government systems.
+- **Decision:** Nirikshak is an **Online-First Web Application** (Mode A) accessible via web browser, backed by FastAPI, PostgreSQL 16+, and colocated ONNX CPU inference. It includes an **Optional Local Inspection Mode** (Mode B) for field resiliency, and external integration stubs (Mode C) for future government systems.
 - **Impact:** Eliminates all architectural contradictions; provides an enterprise-ready, scalable web platform while maintaining field operational resilience.
 
 #### ADL-14: Timestamping & Clock Source Specification

@@ -1,6 +1,6 @@
 ---
 name: legal-metrology-semantic-invariants
-description: Statutory extraction invariants, evidentiary defense rules, and Python runtime guidelines for NyayaDrishti-LM
+description: Statutory extraction invariants, evidentiary defense rules, and Python runtime guidelines for Nirikshak
 trigger: always_on
 ---
 

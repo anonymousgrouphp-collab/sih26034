@@ -1,6 +1,6 @@
-# Contributing to NyayaDrishti-LM (SIH26034)
+# Contributing to Nirikshak (SIH26034)
 
-Thank you for contributing to **NyayaDrishti-LM**, an automated compliance inspection platform engineered for the **Department of Consumer Affairs (DoCA)**, Ministry of Consumer Affairs, Food & Public Distribution under **Smart India Hackathon 2026**.
+Thank you for contributing to **Nirikshak**, an automated compliance inspection platform engineered for the **Department of Consumer Affairs (DoCA)**, Ministry of Consumer Affairs, Food & Public Distribution under **Smart India Hackathon 2026**.
 
 To maintain deterministic reproducibility, strict legal compliance, and zero architectural drift, all contributions must strictly adhere to the engineering workflows detailed below.
 

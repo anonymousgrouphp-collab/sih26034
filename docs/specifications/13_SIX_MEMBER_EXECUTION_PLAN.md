@@ -1,7 +1,7 @@
 # FINAL SIX-MEMBER DEVELOPMENT WORKSTREAM SPECIFICATION
 
 **Project ID:** SIH26034
-**Product:** NyayaDrishti-LM
+**Product:** Nirikshak
 **Sprint Window:** 07 September 2026 to 13 September 2026 (6 Days)
 **Status:** FROZEN & ASSIGNED
 

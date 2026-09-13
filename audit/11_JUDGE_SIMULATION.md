@@ -12,7 +12,7 @@
 ### 1.1 The First 30 Seconds: The Hook & Core Problem
 > *"Good morning, respected judges. In India today, over 50 crore pre-packaged commodities are sold daily. Under the Legal Metrology Act, 2009 and LMPC Rules, 2011, every single package must carry mandatory declarations—net weight, MRP, manufacturer address, and minimum numeral font heights.  
 > Today, field officers inspect packages with handheld plastic rulers and paper gazette tables. It takes 15 minutes per product, human measurement error leads to courtroom dismissals, and e-commerce platforms routinely violate Country of Origin rules.  
-> We present **Nirikshak (NyayaDrishti-LM)**: an AI-augmented legal metrology compliance workstation that verifies packaging in under 2 seconds, calculates millimeter font heights to sub-millimeter precision, and produces tamper-evident show cause notices under Section 63 of the new Bharatiya Sakshya Adhiniyam, 2023."*
+> We present **Nirikshak**: an AI-augmented legal metrology compliance workstation that verifies packaging in under 2 seconds, calculates millimeter font heights to sub-millimeter precision, and produces tamper-evident show cause notices under Section 63 of the new Bharatiya Sakshya Adhiniyam, 2023."*
 
 ### 1.2 The 2-Minute Workflow Demonstration
 1. **Show the Workstation (`http://localhost:3000`):** Explain the dual-persona switch (Inspector vs Citizen).

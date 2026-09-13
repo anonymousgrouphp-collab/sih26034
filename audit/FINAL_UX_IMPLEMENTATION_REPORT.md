@@ -1,7 +1,7 @@
 # FINAL UX IMPLEMENTATION REPORT
 ## Design System, Accessibility Standards & Government Digital Quality
 
-**Product:** NyayaDrishti-LM (SIH26034)  
+**Product:** Nirikshak (SIH26034)
 **Implementation Target:** `ui-combined/`  
 **Quality Framework:** Government of India Digital Service Standards & W3C WCAG 2.2 AAA  
 **Date:** 12 September 2026  

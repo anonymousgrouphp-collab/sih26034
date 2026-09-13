@@ -1,7 +1,7 @@
 # CONNECTIVITY REQUIREMENTS SPECIFICATION
 
 **Project ID:** SIH26034  
-**Product Name:** NyayaDrishti-LM  
+**Product Name:** Nirikshak
 **Governing Standard:** Comprehensive Pre-Development Connectivity & Infrastructure Contract  
 **Current Date:** 07 September 2026  
 **Status:** AUTHORITATIVE & BINDING  
@@ -10,7 +10,7 @@
 
 ## 1. Core Architectural Connectivity Principle
 
-> **"NyayaDrishti-LM is an Online-First Web Application designed for central regulatory oversight, multi-user adjudication, and scalable compliance management. The core inspection processing components additionally maintain an optional, standalone local execution capability to ensure field resilience in areas with zero cellular connectivity."**
+> **"Nirikshak is an Online-First Web Application designed for central regulatory oversight, multi-user adjudication, and scalable compliance management. The core inspection processing components additionally maintain an optional, standalone local execution capability to ensure field resilience in areas with zero cellular connectivity."**
 
 All development workstreams, CI checks, and testing suites must adhere to the component dependency matrix and tier classifications below.
 

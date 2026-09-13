@@ -86,7 +86,7 @@ Preserved backward compatibility with `polygon_to_axis_aligned_box`, `normalize_
 Execute Chunk 2: DBNet++ Multi-Oriented Text Detection (`detector.py` and `test_detector.py`).
 
 ### Signing Note
-SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-08 23:35 IST [VERIFIED]
+SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nirikshak.gov.in) — 2026-09-08 23:35 IST [VERIFIED]
 
 ---
 
@@ -119,7 +119,7 @@ Standardized `box_thresh=0.6` and `unclip_ratio=1.5` per DBNet++ defaults. Added
 Execute Chunk 3: PP-OCRv4 Multilingual Recognition (`recognizer.py` and `test_recognizer.py`).
 
 ### Signing Note
-SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-08 23:40 IST [VERIFIED]
+SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nirikshak.gov.in) — 2026-09-08 23:40 IST [VERIFIED]
 
 ---
 
@@ -152,7 +152,7 @@ Preserved raw observed text without semantic correction (Rule 19). Character dic
 Execute Chunk 4: Tesseract v5 Fallback & Deterministic Consensus (`fallback.py` and `test_fallback.py`).
 
 ### Signing Note
-SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-08 23:45 IST [VERIFIED]
+SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nirikshak.gov.in) — 2026-09-08 23:45 IST [VERIFIED]
 
 ---
 
@@ -186,7 +186,7 @@ Secondary fallback strictly triggers when primary confidence $< 0.65$. Never bli
 Execute Chunk 5: Pipeline Assembly, DTO Contract Conformance & Member Integration (`engine.py`, `ocr_pipeline.py`, adapter, and integration tests).
 
 ### Signing Note
-SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-08 23:50 IST [VERIFIED]
+SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nirikshak.gov.in) — 2026-09-08 23:50 IST [VERIFIED]
 
 ---
 
@@ -220,7 +220,7 @@ Preserved both oriented 4-point polygons and axis-aligned bounding boxes in pixe
 Execute Chunk 6: CPU Optimization, Benchmarking, License Audit & Documentation.
 
 ### Signing Note
-SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-08 23:55 IST [VERIFIED]
+SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nirikshak.gov.in) — 2026-09-08 23:55 IST [VERIFIED]
 
 ---
 
@@ -258,7 +258,7 @@ Quantization targets INT8 with symmetric calibration to guarantee CPU latency un
 Prepare pull request for review and integration into `dev`.
 
 ### Signing Note
-SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-09 00:05 IST [VERIFIED]
+SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nirikshak.gov.in) — 2026-09-09 00:05 IST [VERIFIED]
 
 ---
 
@@ -303,7 +303,7 @@ COMPLETE
 Member 2 is 100% production-ready, fully verified with real neural weights, and ready for integration handoff to Member 3.
 
 ### Signing Note
-SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-09 00:30 IST [VERIFIED]
+SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nirikshak.gov.in) — 2026-09-09 00:30 IST [VERIFIED]
 
 ---
 
@@ -347,7 +347,7 @@ None remaining. All 10 pre-merge audit items addressed with verified empirical e
 Execute Chunk 4: Tesseract v5 Fallback & Deterministic Consensus (`fallback.py` and `test_fallback.py`).
 
 ### Signing Note
-SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-08 23:45 IST [VERIFIED]
+SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nirikshak.gov.in) — 2026-09-08 23:45 IST [VERIFIED]
 
 ---
 
@@ -381,7 +381,7 @@ Secondary fallback strictly triggers when primary confidence $< 0.65$. Never bli
 Execute Chunk 5: Pipeline Assembly, DTO Contract Conformance & Member Integration (`engine.py`, `ocr_pipeline.py`, adapter, and integration tests).
 
 ### Signing Note
-SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-08 23:50 IST [VERIFIED]
+SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nirikshak.gov.in) — 2026-09-08 23:50 IST [VERIFIED]
 
 ---
 
@@ -415,7 +415,7 @@ Preserved both oriented 4-point polygons and axis-aligned bounding boxes in pixe
 Execute Chunk 6: CPU Optimization, Benchmarking, License Audit & Documentation.
 
 ### Signing Note
-SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-08 23:55 IST [VERIFIED]
+SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nirikshak.gov.in) — 2026-09-08 23:55 IST [VERIFIED]
 
 ---
 
@@ -453,7 +453,7 @@ Quantization targets INT8 with symmetric calibration to guarantee CPU latency un
 Prepare pull request for review and integration into `dev`.
 
 ### Signing Note
-SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-09 00:05 IST [VERIFIED]
+SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nirikshak.gov.in) — 2026-09-09 00:05 IST [VERIFIED]
 
 ---
 
@@ -498,7 +498,7 @@ COMPLETE
 Member 2 is 100% production-ready, fully verified with real neural weights, and ready for integration handoff to Member 3.
 
 ### Signing Note
-SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-09 00:30 IST [VERIFIED]
+SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nirikshak.gov.in) — 2026-09-09 00:30 IST [VERIFIED]
 
 ---
 
@@ -545,7 +545,7 @@ Truthful, unassailable audit stance: report exact latencies and exact model arch
 Await Team Lead merge authorization to integrate `feat/m2-ocr` into `dev`.
 
 ### Signing Note
-SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-09 00:45 IST [VERIFIED]
+SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nirikshak.gov.in) — 2026-09-09 00:45 IST [VERIFIED]
 
 ---
 
@@ -600,7 +600,7 @@ Maintain absolute honesty: do not claim pass on 800 ms based on cool bursts or s
 Execute Chunk 10: Static INT8 Post-Training Quantization (PTQ) & Validation.
 
 ### Signing Note
-SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-09 00:50 IST [VERIFIED]
+SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nirikshak.gov.in) — 2026-09-09 00:50 IST [VERIFIED]
 
 ---
 
@@ -652,7 +652,7 @@ Formal rejection of INT8 PTQ for production deployment on pre-VNNI CPUs due to a
 Prepare final pre-merge acceptance report for Team Lead sign-off.
 
 ### Signing Note
-SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-09 01:15 IST [VERIFIED]
+SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nirikshak.gov.in) — 2026-09-09 01:15 IST [VERIFIED]
 
 ---
 
@@ -694,7 +694,7 @@ Temporary testing UI deployed exclusively in `integration/test_ui/` using zero-b
 Hand over temporary testing HUD URL (`http://localhost:8000/test-ui`) to team and field officers for testing.
 
 ### Signing Note
-SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-10 01:45 IST [VERIFIED]
+SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nirikshak.gov.in) — 2026-09-10 01:45 IST [VERIFIED]
 
 ---
 
@@ -735,7 +735,7 @@ Preserved zero-build HTML5/Tailwind/Vanilla JS architecture. Retained `feat/m6-u
 Testing HUD ready for demonstration, juror review, and pipeline verification.
 
 ### Signing Note
-SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-10 09:12 IST [VERIFIED]
+SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nirikshak.gov.in) — 2026-09-10 09:12 IST [VERIFIED]
 
 ---
 
@@ -774,7 +774,7 @@ Enforced hard 500-character truncation in Levenshtein distance to bound worst-ca
 Subsystem fully hardened and validated for final pre-jury integration and demonstration.
 
 ### Signing Note
-SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-10 18:25 IST [VERIFIED]
+SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nirikshak.gov.in) — 2026-09-10 18:25 IST [VERIFIED]
 
 ---
 
@@ -816,4 +816,4 @@ Clamped candidate string length in Levenshtein similarity to 256 characters with
 Subsystem fully hardened, tested across 3 repeatable cycles, and ready for pre-jury integration.
 
 ### Signing Note
-SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-10 18:55 IST [VERIFIED]
+SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nirikshak.gov.in) — 2026-09-10 18:55 IST [VERIFIED]

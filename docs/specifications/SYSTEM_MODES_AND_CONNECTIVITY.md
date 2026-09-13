@@ -1,7 +1,7 @@
 # SYSTEM MODES AND CONNECTIVITY ARCHITECTURE
 
 **Project ID:** SIH26034  
-**Product Name:** NyayaDrishti-LM  
+**Product Name:** Nirikshak
 **Governing Standard:** Authoritative Connectivity & System Modes Specification  
 **Current Date:** 07 September 2026  
 **Status:** AUTHORITATIVE & FROZEN  
@@ -10,7 +10,7 @@
 
 ## 1. Executive Definition: The Online-First Web Application Reality
 
-**NyayaDrishti-LM** is an **Online-First Web Application** engineered for the **Department of Consumer Affairs (DoCA)**, Ministry of Consumer Affairs, Food & Public Distribution, Government of India.
+**Nirikshak** is an **Online-First Web Application** engineered for the **Department of Consumer Affairs (DoCA)**, Ministry of Consumer Affairs, Food & Public Distribution, Government of India.
 
 To eliminate architectural ambiguity across all documentation, engineering workstreams, and jury evaluations:
 - **The Primary Product is an Online Web Application.** It is hosted on a central server/cloud environment and accessed by users through standard web browsers across desktop, laptop, and tablet devices.

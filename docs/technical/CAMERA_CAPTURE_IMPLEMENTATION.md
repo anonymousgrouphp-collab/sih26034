@@ -1,5 +1,5 @@
 # Camera Capture & Real-Time Inspection Intake Architecture
-## NyayaDrishti-LM (SIH26034) — Legal Metrology Compliance Platform
+## Nirikshak (SIH26034) — Legal Metrology Compliance Platform
 
 ---
 
@@ -7,7 +7,7 @@
 
 In digital legal metrology enforcement under the **Legal Metrology Act, 2009** and the **Legal Metrology (Packaged Commodities) Rules, 2011**, photographic evidence collected in the field by Legal Metrology Officers (LMOs) forms the evidentiary cornerstone for statutory compounding notices or court prosecution. Under **Section 63 of Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)**, electronic evidence must maintain strict mathematical provenance, chain-of-custody integrity, and zero sensor degradation.
 
-This document details the production-grade browser camera inspection intake subsystem developed for **NyayaDrishti-LM** within `ui-combined/src/components/camera/`. The subsystem turns standard field smartphones, rugged inspection tablets, and desktop webcams into calibrated statutory capture terminals without requiring native app installations.
+This document details the production-grade browser camera inspection intake subsystem developed for **Nirikshak** within `ui-combined/src/components/camera/`. The subsystem turns standard field smartphones, rugged inspection tablets, and desktop webcams into calibrated statutory capture terminals without requiring native app installations.
 
 ---
 

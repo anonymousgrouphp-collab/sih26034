@@ -1,7 +1,7 @@
 # FINAL RISK AND CONTINGENCY REGISTER (RED-TEAM AUDIT)
 
 **Project ID:** SIH26034  
-**Product:** NyayaDrishti-LM  
+**Product:** Nirikshak
 **Audience:** Entire Engineering Team  
 **Status:** FROZEN  
 

@@ -214,7 +214,7 @@ To ensure bulletproof reliability during the Smart India Hackathon 2026 evaluati
 
 ### 4. E-Commerce Pipeline Extension (Rule 6(10) & Rule 6(10A))
 
-NyayaDrishti-LM structures e-commerce compliance auditing into distinct operational tiers:
+Nirikshak structures e-commerce compliance auditing into distinct operational tiers:
 - **Mode A (Online Web Mode):** Single product listing URLs are fetched via server-side asynchronous HTTP client (`httpx`). Additionally supports direct officer upload of product listing screenshots and saved HTML DOM snapshot files (`.html` / `.mhtml`).
 - **Mode B (Optional Local Mode):** Uploaded product packaging images, listing screenshots, and pre-saved HTML DOM snapshot files are audited locally with zero network connectivity.
 - **P3 Non-Goal (Blacklisted):** Mass web crawling / spidering of commercial marketplaces is strictly prohibited.

@@ -1,6 +1,6 @@
 # FINAL END-TO-END SYSTEM ARCHITECTURE & VERIFICATION AUDIT
 
-**Project ID:** SIH26034 — NyayaDrishti-LM  
+**Project ID:** SIH26034 — Nirikshak
 **Auditing Entity:** Lead System Architecture & Evidentiary Verification Board  
 **Governing Authority:** Department of Consumer Affairs (DoCA), Ministry of Consumer Affairs, Food & Public Distribution, Government of India  
 **Legal Framework:** Legal Metrology Act, 2009; Legal Metrology (Packaged Commodities) Rules, 2011; Section 63 Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)  
@@ -11,7 +11,7 @@
 
 ## 1. System Architecture Overview
 
-NyayaDrishti-LM is an AI-augmented diagnostic platform engineered for Legal Metrology Officers (LMOs) to enforce packaging compliance under the LMPC Rules, 2011. The system strictly adheres to the **Human-in-the-Loop (HITL)** legal principle: it functions as an evidentiary copilot and diagnostic advisor, never issuing autonomous penalties or court summons without qualified officer adjudication.
+Nirikshak is an AI-augmented diagnostic platform engineered for Legal Metrology Officers (LMOs) to enforce packaging compliance under the LMPC Rules, 2011. The system strictly adheres to the **Human-in-the-Loop (HITL)** legal principle: it functions as an evidentiary copilot and diagnostic advisor, never issuing autonomous penalties or court summons without qualified officer adjudication.
 
 ```text
 +---------------------------------------------------------------------------------------+
@@ -61,7 +61,7 @@ NyayaDrishti-LM is an AI-augmented diagnostic platform engineered for Legal Metr
 
 ## 2. Complete 12-Stage Legal Metrology Pipeline Flow
 
-Every physical packaging sample and e-commerce listing processed by NyayaDrishti-LM executes through an immutable 12-stage deterministic pipeline:
+Every physical packaging sample and e-commerce listing processed by Nirikshak executes through an immutable 12-stage deterministic pipeline:
 
 ### Stage 1: Raw Asset Ingestion & Cryptographic Genesis
 - Captures raw image stream or multipart file upload.
@@ -168,7 +168,7 @@ The backend exposes a fully typed REST interface adhering to **07_API_AND_INTERF
 
 Under Section 63 of the Bharatiya Sakshya Adhiniyam, 2023, digital records are admissible in court only when their electronic integrity and lawful custody are proven.
 
-NyayaDrishti-LM provides mathematical evidentiary defense through:
+Nirikshak provides mathematical evidentiary defense through:
 1. **Immutable Ingestion:** Raw packaging photographs are immediately hashed (`SHA-256`) before any in-memory modification.
 2. **Intermediate Pipeline Hashing:** Every transformation (quality metrics, metric scale, OCR text tokens, AST rule verdicts) is serialized to canonical JSON and hashed.
 3. **Merkle DAG Tree Construction:** Leaf hashes are paired and hashed recursively to produce a single 256-bit Merkle Root.

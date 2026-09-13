@@ -1,6 +1,6 @@
-# ASSET_MANIFEST.md — NyayaDrishti-LM Visual Asset Manifest
+# ASSET_MANIFEST.md — Nirikshak Visual Asset Manifest
 
-**Product:** NyayaDrishti-LM (SIH26034) — Legal Metrology Packaged Commodity Compliance  
+**Product:** Nirikshak (SIH26034) — Legal Metrology Packaged Commodity Compliance
 **Authority:** Department of Consumer Affairs (DoCA), Ministry of Consumer Affairs, Food & Public Distribution, Government of India  
 **Date:** 11 September 2026  
 **Status:** FROZEN & AUDITED  
@@ -9,7 +9,7 @@
 
 ## 1. Executive Summary
 
-This document provides the authoritative, exhaustive registry of all visual and graphic assets deployed across the NyayaDrishti-LM frontend application (`ui-combined/public/assets/`). Every asset is classified by domain tier, format, resolution/viewBox, byte size, color token alignment, and functional UX purpose.
+This document provides the authoritative, exhaustive registry of all visual and graphic assets deployed across the Nirikshak frontend application (`ui-combined/public/assets/`). Every asset is classified by domain tier, format, resolution/viewBox, byte size, color token alignment, and functional UX purpose.
 
 All vector assets are authored in strict SVG format with proportional `viewBox` coordinates to guarantee pixel-perfect rendering from mobile viewports (360px) to ultra-high-definition field monitors (4K / 3840px) with zero layout shift (CLS = 0.00).
 
@@ -19,13 +19,13 @@ All vector assets are authored in strict SVG format with proportional `viewBox` 
 
 | Category | File Name | Format | Dimensions / ViewBox | File Size | Primary Color Tokens | Functional Purpose |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Brand** | `public/assets/brand/nyayadrishti_mark.svg` | SVG | `0 0 64 64` | 3.2 KB | Navy `#0A192F`, Gold `#F59E0B`, Emerald `#10B981` | Compact sovereign icon mark combining measurement vernier, reticle, and scales of justice. |
+| **Brand** | `public/assets/brand/nirikshak_mark.svg` | SVG | `0 0 64 64` | 3.2 KB | Navy `#0A192F`, Gold `#F59E0B`, Emerald `#10B981` | Compact sovereign icon mark combining measurement vernier, reticle, and scales of justice. |
 | **Sovereign** | `public/emblem_india_white.svg` / `.png` | SVG + PNG | `717 × 1209` (Ratio 1.686) | 1.4 MB SVG / 1.0 MB PNG | Pure White `#FFFFFF` on Transparent | Official State Emblem of India (Lion Capital with Satyameva Jayate) for dark mastheads. |
 | **Sovereign** | `public/emblem_india_navy.svg` / `.png` | SVG + PNG | `717 × 1209` (Ratio 1.686) | 1.4 MB SVG / 1.0 MB PNG | Deep Ashoka Navy `#1B365D` on Transparent | Official State Emblem of India for formal reports, white cards, and Form-1 notices. |
 | **Sovereign** | `public/emblem_india_gold.svg` / `.png` | SVG + PNG | `717 × 1209` (Ratio 1.686) | 1.4 MB SVG / 1.0 MB PNG | Sovereign Gold `#B45309` on Transparent | Official State Emblem of India for gazetted officer stamp seals and medals. |
 | **Brand** | `public/assets/brand/favicon.svg` | SVG | `0 0 32 32` | 1.8 KB | Navy `#0A192F`, Amber `#F59E0B` | Browser tab favicon for high-DPI desktop and mobile browser shells. |
-| **Brand** | `public/assets/brand/nyayadrishti_logo_primary.svg` | SVG | `0 0 360 64` | 5.1 KB | Navy `#0A192F`, Amber `#D97706`, Slate `#475569` | Primary horizontal brand header logo for light and tinted backgrounds. |
-| **Brand** | `public/assets/brand/nyayadrishti_logo_dark.svg` | SVG | `0 0 360 64` | 5.2 KB | Pure White `#FFFFFF`, Amber `#FBBF24`, Sky `#38BDF8` | Inverted horizontal brand header logo for dark navy sovereign mastheads. |
+| **Brand** | `public/assets/brand/nirikshak_logo_primary.svg` | SVG | `0 0 360 64` | 5.1 KB | Navy `#0A192F`, Amber `#D97706`, Slate `#475569` | Primary horizontal brand header logo for light and tinted backgrounds. |
+| **Brand** | `public/assets/brand/nirikshak_logo_dark.svg` | SVG | `0 0 360 64` | 5.2 KB | Pure White `#FFFFFF`, Amber `#FBBF24`, Sky `#38BDF8` | Inverted horizontal brand header logo for dark navy sovereign mastheads. |
 | **Guidance** | `public/assets/guidance/camera_framing_guide.svg` | SVG | `0 0 480 320` | 7.8 KB | Navy `#0B1E36`, Emerald `#10B981`, Amber `#F59E0B` | Field camera capture HUD visualizer demonstrating 90° planar alignment and ArUco 50mm placement. |
 | **Guidance** | `public/assets/guidance/calibration_scale_guide.svg` | SVG | `0 0 460 200` | 5.9 KB | Navy `#0F172A`, Cyan `#06B6D4`, Emerald `#10B981` | Geometric infographic detailing ArUco 50mm $\rightarrow$ 420px $\rightarrow$ 0.119 mm/px $\rightarrow$ Table-I font verification. |
 | **Guidance** | `public/assets/guidance/evidence_extraction_pipeline.svg` | SVG | `0 0 880 220` | 9.4 KB | Navy `#0F172A`, Blue `#2563EB`, Emerald `#059669`, Amber `#D97706` | 5-Stage statutory dataflow architecture (Evidence $\rightarrow$ Calibration $\rightarrow$ OCR $\rightarrow$ AST Rules $\rightarrow$ Section 63 BSA). |
@@ -48,9 +48,9 @@ ui-combined/public/
 ├── form1.pdf
 └── assets/
     ├── brand/
-    │   ├── nyayadrishti_mark.svg
-    │   ├── nyayadrishti_logo_primary.svg
-    │   ├── nyayadrishti_logo_dark.svg
+    │   ├── nirikshak_mark.svg
+    │   ├── nirikshak_logo_primary.svg
+    │   ├── nirikshak_logo_dark.svg
     │   └── favicon.svg
     ├── guidance/
     │   ├── camera_framing_guide.svg

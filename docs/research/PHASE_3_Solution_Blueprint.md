@@ -34,7 +34,7 @@ Every pre-packaged commodity sold in the Republic of India is governed by the **
 
 Under the current manual inspection regime, an officer spends 5 to 8 minutes per product manually inspecting fine print with handheld magnifying loupes, calculating PDP areas, performing unit price mental arithmetic, drafting handwritten _panchnamas_ (inspection memos) with two independent witnesses, and logging paper registers. Consequently, **less than 0.1% of circulating packaged inventory is ever inspected**. Furthermore, in e-commerce, millions of dynamic marketplace listings routinely violate Rule 6(10) by omitting Country of Origin and Unit Sale Price.
 
-### 1.2 The Core Technical-Legal Breakthrough: NyayaDrishti-LM
+### 1.2 The Core Technical-Legal Breakthrough: Nirikshak
 
 A catastrophic misconception in amateur hackathon systems is the belief that one can "pass an image to a Vision-Language Model (VLM) or generic OCR, prompt it to check the law, and output a legal penalty."
 As proven in Phase 1 and Phase 2:
@@ -43,7 +43,7 @@ As proven in Phase 1 and Phase 2:
 2. **AI Cannot Issue Legal Decrees:** Section 18 and Section 36 of the Legal Metrology Act, 2009 (as amended by the Jan Vishwas Act, 2023) demand quasi-judicial administrative authority. An AI system cannot act as judge, jury, and prosecutor; it must act as an **admissible investigative decision-support and inspection triage copilot**.
 3. **Electronic Evidence Rigor:** Under Section 63 of the **Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)**, digital evidence presented before an adjudicating officer or court must possess cryptographic provenance, tamper-evident SHA-256 Merkle chaining, and verified device metadata.
 
-To solve this, our 6-member engineering team introduces **NyayaDrishti-LM** (न्याय दृष्टि - Legal Metrology), an **Evidence-First, Hybrid Perception-Verification Architecture**:
+To solve this, our 6-member engineering team introduces **Nirikshak** (निरीक्षक - Legal Metrology), an **Evidence-First, Hybrid Perception-Verification Architecture**:
 
 - **Perception Layer (Probabilistic AI & Computer Vision):** Restricted strictly to visual observation—real-time optical quality gating (blur/glare rejection), coplanar planar homography ($H$) using an ArUco fiducial or standard ISO/IEC 7810 ID-1 card (driving sub-millimeter $\text{mm/pixel}$ scale calibration), arbitrary-shape polygonal text detection via **DBNet++**, and high-speed multilingual scene text recognition via **PaddleOCR PP-OCRv4 (SVTR)** supporting English and Devanagari Hindi.
 - **Verification Layer (Deterministic Statutory Rule Engine):** Evaluates extracted facts against an **Abstract Syntax Tree (AST) of Temporal Statutory Snapshots**. It applies exact Gazette GSR rules (2011 Base, 2017 Font Amendment, 2021 USP Amendment, 2023 Jan Vishwas Decriminalization) matched to the package's manufacturing date.
@@ -58,7 +58,7 @@ Our hard deadline is **13 September 2026**. This Phase 3 blueprint defines a mod
 
 ## 02. Inputs from Phase 1 & Phase 2
 
-The design of NyayaDrishti-LM directly synthesizes and operationalizes the empirical, legal, and technological baselines established in Phase 1 (Domain Dossier) and Phase 2 (Technical Research Report).
+The design of Nirikshak directly synthesizes and operationalizes the empirical, legal, and technological baselines established in Phase 1 (Domain Dossier) and Phase 2 (Technical Research Report).
 
 ### 2.1 Synthesis of Confirmed Baselines
 
@@ -73,7 +73,7 @@ The design of NyayaDrishti-LM directly synthesizes and operationalizes the empir
 | **2026 Filter Mandate** | Rule 6(10A) requires e-commerce platforms to provide searchable/sortable Country of Origin filters from July 2026.                                                      | E-commerce ingestion module must audit digital listing metadata for Country of Origin searchability.                            | 2026 LMPC Amendment          |
 | **Legal Admissibility** | Section 63 Bharatiya Sakshya Adhiniyam, 2023 mandates cryptographic hash, metadata, and certificate for electronic evidence.                                            | Raw images and inspection findings must be cryptographically hashed (SHA-256) into a Merkle DAG and exported to signed PDF.     | BSA 2023, Section 63         |
 | **Projective Geometry** | Monocular single-camera 2D images suffer from scale ambiguity; millimeter font measurement is mathematically impossible uncalibrated.                                   | System must enforce Planar Homography ($H$) via an ArUco target or ISO 7810 card to derive physical $\text{mm/pixel}$ scale.    | Hartley & Zisserman (2004)   |
-| **Government Void**     | National eMaap portal (`emaap.gov.in`) handles only online licensing; zero scanning, OCR, or vision capability exists.                                                  | NyayaDrishti-LM fills an absolute government capability vacuum; outputs structured JSON ready for eMaap integration.            | Phase 2 Portal Audit         |
+| **Government Void**     | National eMaap portal (`emaap.gov.in`) handles only online licensing; zero scanning, OCR, or vision capability exists.                                                  | Nirikshak fills an absolute government capability vacuum; outputs structured JSON ready for eMaap integration.            | Phase 2 Portal Audit         |
 | **Licensing Integrity** | Ultralytics YOLOv8/v11 models use viral GNU AGPL-3.0, posing legal risks for government deployment.                                                                     | **Strictly prohibited.** Core architecture relies on Apache-2.0 / BSD / MIT permissive components (DBNet++, PaddleOCR, OpenCV). | Open-Source Audit            |
 | **Edge Feasibility**    | LMOs inspect rural mandis, basements, and warehouses lacking continuous 4G/5G mobile connectivity.                                                                      | 100% offline edge capability via INT8 CPU ONNX Runtime; zero cloud API dependency during field scanning.                        | Field Officer Workflow Audit |
 
@@ -185,7 +185,7 @@ The following Master Requirements Specification (MRS) converts all Phase 1 and P
 sequenceDiagram
     autonumber
     actor LMO as Legal Metrology Officer
-    participant App as NyayaDrishti-LM (Edge UI)
+    participant App as Nirikshak (Edge UI)
     participant QGate as Optical Quality Gate
     participant Vision as Perception Engine (Homography + OCR)
     participant Rules as Deterministic Rule Engine
@@ -224,7 +224,7 @@ sequenceDiagram
 
 ### 4.3 Detailed Operational Comparison: Current Manual vs Proposed Digital
 
-| Inspection Metric                       | Current Manual Inspection (On-the-Ground Reality)                           | Proposed Digital Workflow (NyayaDrishti-LM)                                    |           Quantified Improvement           |
+| Inspection Metric                       | Current Manual Inspection (On-the-Ground Reality)                           | Proposed Digital Workflow (Nirikshak)                                    |           Quantified Improvement           |
 | :-------------------------------------- | :-------------------------------------------------------------------------- | :----------------------------------------------------------------------------- | :----------------------------------------: |
 | **Inspection Time per Product**         | 5 to 8 minutes (visual scrutiny, ruler math, manual checks)                 | **25 to 45 seconds** (guided capture, instant extraction, auto-math)           |   **$10\times$ Speedup (90% reduction)**   |
 | **PDP Area & Table-I Verification**     | Tedious manual calculation ($L \times W$); looked up in paper table         | **Instant automated computation** and exact Table-I row lookup                 |    **100% automated; zero mental math**    |
@@ -241,7 +241,7 @@ sequenceDiagram
 
 In a regulatory enforcement context, **confusing probabilistic AI predictions with statutory legal truth is catastrophic**. If software flags a compliant manufacturer as illegal based on an OCR typo, the Department faces litigation, commercial backlash, and judicial reprimand.
 
-NyayaDrishti-LM introduces a rigid **6-Level Trust Ladder** and a **4-State Epistemic Verdict System** to ensure total transparency.
+Nirikshak introduces a rigid **6-Level Trust Ladder** and a **4-State Epistemic Verdict System** to ensure total transparency.
 
 ### 5.1 The 6-Level Trust Ladder
 
@@ -259,7 +259,7 @@ graph BT
 
 ### 5.2 The 4-State Epistemic Verdict System
 
-Rather than forcing a simplistic, dangerous binary `PASS / FAIL` on ambiguous inputs, NyayaDrishti-LM operates on four mutually exclusive statutory states:
+Rather than forcing a simplistic, dangerous binary `PASS / FAIL` on ambiguous inputs, Nirikshak operates on four mutually exclusive statutory states:
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -338,7 +338,7 @@ To prevent cognitive bias, three distinct architectural concepts were designed f
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
 │                                  CANDIDATE SOLUTION CONCEPTS                                     │
 ├────────────────────────────────┬────────────────────────────────┬────────────────────────────────┤
-│ CONCEPT A: NyayaDrishti-LM     │ CONCEPT B: Cloud-Centric       │ CONCEPT C: Hardware-Integrated │
+│ CONCEPT A: Nirikshak     │ CONCEPT B: Cloud-Centric       │ CONCEPT C: Hardware-Integrated │
 │ (Evidence-First Edge Hybrid)   │ Foundation VLM Pipeline        │ Smart Scanning Station         │
 ├────────────────────────────────┼────────────────────────────────┼────────────────────────────────┤
 │ • Edge CPU pipeline (ONNX INT8)│ • Mobile capture uploads to    │ • Custom mechanical turntable, │
@@ -350,7 +350,7 @@ To prevent cognitive bias, three distinct architectural concepts were designed f
 └────────────────────────────────┴────────────────────────────────┴────────────────────────────────┘
 ```
 
-### 6.1 Concept A: Evidence-First Edge Hybrid Assistant (NyayaDrishti-LM)
+### 6.1 Concept A: Evidence-First Edge Hybrid Assistant (Nirikshak)
 
 - **Core Idea:** A lightweight, offline-first edge application running on commodity field laptops or tablets. Decouples deep learning perception (DBNet++ text detection, PP-OCRv4 recognition, ArUco metric rectification) from a deterministic statutory AST rule engine.
 - **Workflow:** Guided multi-panel camera intake $ o$ Pre-inference blur/glare filter $ o$ ArUco planar rectification $ o$ Multilingual OCR $ o$ Deterministic regex/NER extraction $ o$ Temporal rule evaluation $ o$ Side-by-side officer review HUD $ o$ Signed Section 63 BSA PDF dossier.
@@ -380,7 +380,7 @@ To prevent cognitive bias, three distinct architectural concepts were designed f
 
 A rigorous Multi-Criteria Decision Analysis (MCDA) was conducted across 16 weighted parameters representing legal, technical, operational, and competition priorities.
 
-| Evaluation Criterion                    | Weight (%) | Concept A: NyayaDrishti (Edge Hybrid) | Concept B: Cloud VLM Pipeline | Concept C: Hardware Kiosk | Strongest Architectural Rationale                                                               |
+| Evaluation Criterion                    | Weight (%) | Concept A: Nirikshak (Edge Hybrid) | Concept B: Cloud VLM Pipeline | Concept C: Hardware Kiosk | Strongest Architectural Rationale                                                               |
 | :-------------------------------------- | :--------: | :-----------------------------------: | :---------------------------: | :-----------------------: | :---------------------------------------------------------------------------------------------- |
 | **Problem Statement Alignment**         |     8%     |              **9 / 10**               |            6 / 10             |          7 / 10           | Concept A solves scanning, extraction, font checks, and reporting natively.                     |
 | **Legal Defensibility & Admissibility** |    10%     |              **10 / 10**              |            2 / 10             |          8 / 10           | Concept A's deterministic rule engine + Section 63 BSA Merkle DAG is court-ready.               |
@@ -406,7 +406,7 @@ A rigorous Multi-Criteria Decision Analysis (MCDA) was conducted across 16 weigh
 
 ### Product Identity & Master Branding
 
-- **System Name:** **NyayaDrishti-LM** (न्याय दृष्टि - Legal Metrology)
+- **System Name:** **Nirikshak** (निरीक्षक - Legal Metrology)
 - **Subtitle:** _AI-Assisted Field Inspection, Metric Verification & Evidentiary Dossier Platform_
 - **Target Agency:** Department of Consumer Affairs (DoCA), Ministry of Consumer Affairs, Food & Public Distribution, Government of India.
 
@@ -445,27 +445,27 @@ A cross-platform, offline-first field inspection software suite running on stand
 
 ### One-Sentence Product Definition
 
-> **"NyayaDrishti-LM is an offline-capable, evidence-first field inspection system that combines planar optical calibration, multilingual OCR, and a deterministic temporal rule engine to instantly verify packaged commodity compliance under the Legal Metrology Rules, 2011, and generate court-admissible, tamper-evident statutory violation dossiers."**
+> **"Nirikshak is an offline-capable, evidence-first field inspection system that combines planar optical calibration, multilingual OCR, and a deterministic temporal rule engine to instantly verify packaged commodity compliance under the Legal Metrology Rules, 2011, and generate court-admissible, tamper-evident statutory violation dossiers."**
 
 ### Thirty-Second Elevator Pitch
 
-> _"In India, over 3,000 Legal Metrology inspectors must regulate billions of packaged goods using handheld magnifying loupes and manual arithmetic. NyayaDrishti-LM transforms this bottleneck into a 30-second digital workflow. By placing a standard reference card alongside any package, the inspector captures the product facets; our offline system corrects perspective, measures physical font heights in millimeters against statutory Table-I schedules, verifies Unit Sale Price math, detects missing mandatory declarations, and auto-generates a tamper-evident, court-ready Inspection Dossier compliant with Section 63 of the Bharatiya Sakshya Adhiniyam, 2023. It replaces subjective human guesswork with certified mathematical metrology."_
+> _"In India, over 3,000 Legal Metrology inspectors must regulate billions of packaged goods using handheld magnifying loupes and manual arithmetic. Nirikshak transforms this bottleneck into a 30-second digital workflow. By placing a standard reference card alongside any package, the inspector captures the product facets; our offline system corrects perspective, measures physical font heights in millimeters against statutory Table-I schedules, verifies Unit Sale Price math, detects missing mandatory declarations, and auto-generates a tamper-evident, court-ready Inspection Dossier compliant with Section 63 of the Bharatiya Sakshya Adhiniyam, 2023. It replaces subjective human guesswork with certified mathematical metrology."_
 
 ### Two-Minute Comprehensive Technical Briefing
 
 > _"Problem Statement SIH26034 addresses an acute regulatory enforcement challenge: ensuring that pre-packaged commodities comply with the Legal Metrology (Packaged Commodities) Rules, 2011. While amateur approaches attempt to prompt cloud-based generative AI to 'judge' labels, that approach is legally inadmissible, fails in offline field conditions, and cannot measure physical font sizes._
 >
-> _NyayaDrishti-LM is built on a strictly defensible Hybrid Perception-Verification Architecture. We mathematically resolve the monocular scale ambiguity of smartphone cameras using planar homography anchored to a standard coplanar fiducial target (such as an ArUco marker or any standard credit card size reference), establishing a certified millimeter-per-pixel ratio with sub-0.15mm precision._
+> _Nirikshak is built on a strictly defensible Hybrid Perception-Verification Architecture. We mathematically resolve the monocular scale ambiguity of smartphone cameras using planar homography anchored to a standard coplanar fiducial target (such as an ArUco marker or any standard credit card size reference), establishing a certified millimeter-per-pixel ratio with sub-0.15mm precision._
 >
 > _Our perceptual pipeline uses DBNet++ for arbitrary-shape scene text localization and PaddleOCR PP-OCRv4 for high-speed multilingual recognition across English and Devanagari Hindi. The extracted text is normalized and fed into an immutable, deterministic Abstract Syntax Tree rule engine. This engine automatically matches the product's manufacturing date to the exact Gazette GSR notifications in effect at that time—evaluating Table-I font schedules, Unit Sale Price mathematical consistency, banned metric units like 'gms', and complete consumer care disclosures._
 >
-> _Crucially, every single finding is backed by an explicit visual evidence crop, exact coordinate polygons, and a SHA-256 Merkle provenance hash, satisfying Section 63 of the Bharatiya Sakshya Adhiniyam, 2023 for electronic court admissibility. Operating 100% offline on standard CPU hardware via INT8 ONNX Runtime, NyayaDrishti-LM delivers a complete inspection memo in under 45 seconds, ready for national integration with the Department's eMaap portal."_
+> _Crucially, every single finding is backed by an explicit visual evidence crop, exact coordinate polygons, and a SHA-256 Merkle provenance hash, satisfying Section 63 of the Bharatiya Sakshya Adhiniyam, 2023 for electronic court admissibility. Operating 100% offline on standard CPU hardware via INT8 ONNX Runtime, Nirikshak delivers a complete inspection memo in under 45 seconds, ready for national integration with the Department's eMaap portal."_
 
 ---
 
 ## 10. End-to-End System Design
 
-NyayaDrishti-LM is engineered as a **12-Stage Linear-Feedback Pipeline**. Every stage has clearly defined input/output contracts, fallback behaviors, and latency budgets.
+Nirikshak is engineered as a **12-Stage Linear-Feedback Pipeline**. Every stage has clearly defined input/output contracts, fallback behaviors, and latency budgets.
 
 ```mermaid
 flowchart TD
@@ -554,7 +554,7 @@ To prevent architectural drift and legal liabilities, the boundary between Proba
 
 ## 12. Compliance Reasoning Architecture
 
-The Compliance Reasoning Layer is the cognitive core of NyayaDrishti-LM. It translates the statutory requirements of the Legal Metrology Act, 2009 and the LMPC Rules, 2011 into a formal, deterministic computational logic system.
+The Compliance Reasoning Layer is the cognitive core of Nirikshak. It translates the statutory requirements of the Legal Metrology Act, 2009 and the LMPC Rules, 2011 into a formal, deterministic computational logic system.
 
 ```mermaid
 flowchart TD
@@ -679,7 +679,7 @@ _(Note: If the pack is blown, moulded, embossed, or perforated, the statutory th
 
 ### 12.2 Immutable Temporal Rule Versioning Engine
 
-To strictly satisfy Article 20(1) of the Constitution of India (prohibition of retrospective penal law), NyayaDrishti-LM never evaluates all products against a single static code branch.
+To strictly satisfy Article 20(1) of the Constitution of India (prohibition of retrospective penal law), Nirikshak never evaluates all products against a single static code branch.
 
 ```python
 # Conceptual Temporal Epoch Dispatcher
@@ -723,7 +723,7 @@ graph TD
 ```json
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "NyayaDrishtiEvidenceObject",
+  "title": "NirikshakEvidenceObject",
   "type": "object",
   "required": [
     "session_id",
@@ -842,7 +842,7 @@ graph TD
 
 ### 15.2 The Three-Tier Measurement Architecture
 
-NyayaDrishti-LM adopts an honest, mathematically sound 3-tier measurement hierarchy:
+Nirikshak adopts an honest, mathematically sound 3-tier measurement hierarchy:
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -911,9 +911,9 @@ flowchart TD
 
 ## 17. Real-World Packaging Robustness
 
-Retail packaging presents hostile optical environments. NyayaDrishti-LM explicitly addresses 6 real-world failure modes:
+Retail packaging presents hostile optical environments. Nirikshak explicitly addresses 6 real-world failure modes:
 
-| Packaging Challenge                  | Physical Mechanism                                                                           | Technical Counter-Measure in NyayaDrishti-LM                                                                            | Fallback Behavior if Processing Fails                                                     |
+| Packaging Challenge                  | Physical Mechanism                                                                           | Technical Counter-Measure in Nirikshak                                                                            | Fallback Behavior if Processing Fails                                                     |
 | :----------------------------------- | :------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------- |
 | **Specular Glare on Foil Pouches**   | Metallized polyester laminates act as mirrors, causing CMOS saturation.                      | Multi-exposure bracketing or HSV saturation masking ($V > 245, S < 15$). UI prompts operator to tilt camera $15^\circ$. | System marks occluded field `UNABLE_TO_VERIFY` and prompts immediate retake.              |
 | **Cylindrical Bottles & Cans**       | Curvature compresses text horizontally near horizons ($x_{\text{proj}} = R \sin(x/R)$).      | Restrict font-height measurement to vertical axis (which remains undistorted); apply parametric cylindrical dewarping.  | Restrict verification to declaration presence; flag font height for physical loupe check. |
@@ -956,7 +956,7 @@ graph LR
 
 ## 19. Product / Package / Listing Strategy
 
-Problem Statement SIH26034 mentions "scanning products, images, and labels" as well as e-commerce considerations. NyayaDrishti-LM structures this as a **Unified Multi-Channel Compliance Architecture** that respects the distinct legal regimes of physical packaging vs digital listings.
+Problem Statement SIH26034 mentions "scanning products, images, and labels" as well as e-commerce considerations. Nirikshak structures this as a **Unified Multi-Channel Compliance Architecture** that respects the distinct legal regimes of physical packaging vs digital listings.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -975,7 +975,7 @@ Problem Statement SIH26034 mentions "scanning products, images, and labels" as w
 
 ### Cross-Channel Discrepancy Verification (The Anti-Deception Engine)
 
-When an enforcement officer possesses both an e-commerce listing snapshot and the delivered physical package, NyayaDrishti-LM executes a **Cross-Channel Discrepancy Audit**:
+When an enforcement officer possesses both an e-commerce listing snapshot and the delivered physical package, Nirikshak executes a **Cross-Channel Discrepancy Audit**:
 
 1. **Country of Origin Misrepresentation:** Listing claims `India`; physical pack reveals `Made in China` $\implies$ Severe deceptive trade violation under Consumer Protection Act, 2019 & CCPA Guidelines.
 2. **MRP Overcharging Fraud:** Listing shows discounted price ₹399 against an alleged MRP of ₹499; physical pack bears printed MRP of ₹349 $\implies$ Direct violation of Rule 18(2) (overcharging above actual printed MRP).
@@ -992,7 +992,7 @@ As established in Phase 2, **no public dataset exists linking packaging photogra
 ### 20.2 The Four-Tier Data Strategy
 
 ```mermaid
-pie title NyayaDrishti Data Strategy Allocation (%)
+pie title Nirikshak Data Strategy Allocation (%)
     "Tier 1: Procedural Synthetic Math Labels (DS-SYNTH-001)" : 45
     "Tier 2: Calibrated Physical Retail Pilot (DS-RETAIL-PILOT-001)" : 25
     "Tier 3: Filtered Public Indic Benchmarks (BSTD / IndicSTR12)" : 20
@@ -1009,7 +1009,7 @@ pie title NyayaDrishti Data Strategy Allocation (%)
 
 ## 21. Training / Model Strategy
 
-In a short-timeline hackathon sprint, attempting to pre-train large foundation models from scratch is an engineering anti-pattern that leads to project failure. NyayaDrishti-LM adopts a disciplined **Pretrained Inference + Permissive Adaptation Strategy**:
+In a short-timeline hackathon sprint, attempting to pre-train large foundation models from scratch is an engineering anti-pattern that leads to project failure. Nirikshak adopts a disciplined **Pretrained Inference + Permissive Adaptation Strategy**:
 
 | Subsystem Task             | Strategy Selected                     | Model Architecture               |       Training Compute Required        | Rationale & Justification                                                                                |
 | :------------------------- | :------------------------------------ | :------------------------------- | :------------------------------------: | :------------------------------------------------------------------------------------------------------- |
@@ -1058,7 +1058,7 @@ Every selected technology is justified against explicit alternatives, licensing 
 
 ## 23. Final System Architecture
 
-NyayaDrishti-LM is structured as a modular, decoupled **Four-Tier Hybrid Architecture**: Client Perception Tier, Edge Processing Tier, Evidentiary Data Tier, and Central Governance Tier.
+Nirikshak is structured as a modular, decoupled **Four-Tier Hybrid Architecture**: Client Perception Tier, Edge Processing Tier, Evidentiary Data Tier, and Central Governance Tier.
 
 ```mermaid
 graph TD
@@ -1123,7 +1123,7 @@ graph TD
 
 ## 24. Database Design
 
-NyayaDrishti-LM uses a fully normalized relational schema designed for SQLite at the edge and PostgreSQL in the central cloud.
+Nirikshak uses a fully normalized relational schema designed for SQLite at the edge and PostgreSQL in the central cloud.
 
 ```mermaid
 erDiagram
@@ -1375,7 +1375,7 @@ graph LR
 
 ## 26. UI / UX Design
 
-NyayaDrishti-LM features an **12-Screen Purpose-Built Workflow Interface** designed specifically for rugged field utility under direct sunlight and high-stress market inspections.
+Nirikshak features an **12-Screen Purpose-Built Workflow Interface** designed specifically for rugged field utility under direct sunlight and high-stress market inspections.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -1470,7 +1470,7 @@ NyayaDrishti-LM features an **12-Screen Purpose-Built Workflow Interface** desig
 
 ## 27. Live Demo Experience (The Winning Scenario)
 
-To guarantee maximum impact before SIH judges, NyayaDrishti-LM features a **Zero-Mock, Real-World Master Live Demo Script** using actual retail commodities.
+To guarantee maximum impact before SIH judges, Nirikshak features a **Zero-Mock, Real-World Master Live Demo Script** using actual retail commodities.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -1508,7 +1508,7 @@ To guarantee maximum impact before SIH judges, NyayaDrishti-LM features a **Zero
 
 ## 28. Judge-Proof Demo Design (Handling Random Judge Inputs)
 
-A common point of failure in hackathons is when a skeptical judge pulls an unfamiliar product from their pocket and says: _"Test it on this."_ NyayaDrishti-LM is explicitly engineered to handle random, uncurated judge inputs gracefully.
+A common point of failure in hackathons is when a skeptical judge pulls an unfamiliar product from their pocket and says: _"Test it on this."_ Nirikshak is explicitly engineered to handle random, uncurated judge inputs gracefully.
 
 ```mermaid
 flowchart TD
@@ -1533,7 +1533,7 @@ flowchart TD
 
 ## 29. Comprehensive Red-Team Analysis
 
-NyayaDrishti-LM was subjected to aggressive adversarial attacks across 10 critical technical, legal, and operational vectors.
+Nirikshak was subjected to aggressive adversarial attacks across 10 critical technical, legal, and operational vectors.
 
 | Attack Vector / Challenge             | Hostile Question / Failure Scenario                                                                                     | Engineering & Legal Defense                                                                                                                                                                                                                                                       |                 Residual Risk                  |
 | :------------------------------------ | :---------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------: |
@@ -1541,7 +1541,7 @@ NyayaDrishti-LM was subjected to aggressive adversarial attacks across 10 critic
 | **2. The Legal Authority Attack**     | _"Under Section 15 of the Act, only an authorized officer can seize goods. Your AI cannot issue a legal notice."_       | The system never issues autonomous penalties. It generates a **Draft Inspection Dossier** for human adjudication. The authorized officer reviews evidence crops, exercises discretion, and signs with digital credentials.                                                        |      Requires officer active engagement.       |
 | **3. The OCR Hallucination Attack**   | _"What if PaddleOCR misreads a '3' as an '8' on the MRP and wrongly flags a price violation?"_                          | We implement dual-engine consensus on low-confidence digits. Furthermore, every extracted value displays a confidence score; if $< 0.85$, the finding defaults to `REQUIRES_HUMAN_REVIEW` with side-by-side visual crop verification.                                             |    Manual check needed on degraded prints.     |
 | **4. The Retroactive Law Attack**     | _"You cited the 2021 USP rule, but this product was manufactured in 2019. Your notice is illegal under Article 20(1)."_ | Our system features an **Immutable Temporal Epoch Router**. It parses the package manufacturing date (`10/2019`) and evaluates it strictly against the 2017 Gazette snapshot, automatically exempting USP.                                                                        |   Missing mfg date defaults to current date.   |
-| **5. The Internet Outage Attack**     | _"We are in a rural mandi basement with zero cellular reception. Your cloud AI fails."_                                 | NyayaDrishti-LM is **100% offline edge software**. DBNet++, PaddleOCR, OpenCV, and SQLite execute entirely on local CPU via INT8 ONNX Runtime. Zero internet packets required.                                                                                                    |     Local database syncs when back online.     |
+| **5. The Internet Outage Attack**     | _"We are in a rural mandi basement with zero cellular reception. Your cloud AI fails."_                                 | Nirikshak is **100% offline edge software**. DBNet++, PaddleOCR, OpenCV, and SQLite execute entirely on local CPU via INT8 ONNX Runtime. Zero internet packets required.                                                                                                    |     Local database syncs when back online.     |
 | **6. The Court Admissibility Attack** | _"The defense lawyer claims the digital photo was edited in Photoshop before generating the PDF."_                      | Every raw frame is cryptographically hashed with SHA-256 at capture time and locked into a Merkle DAG bound to device GPS and timestamp. Any pixel edit invalidates the cryptographic certificate under Section 63 BSA 2023.                                                      |   Tamper-proof as long as private key safe.    |
 | **7. The Banned Unit Defense Attack** | _"The manufacturer argues that 'gms' is universally understood as grams and is just a harmless abbreviation."_          | Section 11 of the Legal Metrology Act, 2009 explicitly makes using non-standard units an offense. High Courts across India have repeatedly upheld compounding penalties for 'gms' and 'ML'.                                                                                       |   Legally settled; zero judicial ambiguity.    |
 | **8. The Thermal Inkjet Dot Attack**  | _"The expiry date is printed in faint dot-matrix inkjet dots. Standard OCR returns garbage."_                           | We apply morphological elliptical dilation filters to bridge separated ink dots prior to OCR recognition, supplemented by regex date syntax priors (`MM/YYYY`).                                                                                                                   | Extremely faint ink requires officer touchup.  |
@@ -1552,7 +1552,7 @@ NyayaDrishti-LM was subjected to aggressive adversarial attacks across 10 critic
 
 ## 30. Competitive Moat
 
-Against commercial solutions and typical hackathon submissions, NyayaDrishti-LM establishes **Five Defensible Competitive Moats**:
+Against commercial solutions and typical hackathon submissions, Nirikshak establishes **Five Defensible Competitive Moats**:
 
 ```mermaid
 graph TD
@@ -1639,7 +1639,7 @@ To ensure seamless field utility on standard quad-core inspector laptops (e.g., 
 
 ```mermaid
 gantt
-    title NyayaDrishti-LM Edge Processing Latency Budget (Target: < 1500 ms)
+    title Nirikshak Edge Processing Latency Budget (Target: < 1500 ms)
     dateFormat X
     axisFormat %s ms
     section Pre-Processing
@@ -1682,7 +1682,7 @@ gantt
 
 ## 35. Accuracy & Validation Strategy
 
-To maintain scientific integrity, NyayaDrishti-LM rejects meaningless aggregate claims like "99% AI Accuracy." Because an inspection pipeline involves multiple distinct error sources, evaluation is decomposed into component-level and end-to-end metrics.
+To maintain scientific integrity, Nirikshak rejects meaningless aggregate claims like "99% AI Accuracy." Because an inspection pipeline involves multiple distinct error sources, evaluation is decomposed into component-level and end-to-end metrics.
 
 ```mermaid
 graph TD
@@ -1718,7 +1718,7 @@ graph TD
 
 ## 36. Error Budget & Error Propagation Model
 
-In a multi-stage pipeline, small upstream errors can cascade into severe downstream failures. NyayaDrishti-LM explicitly models error propagation and introduces **Validation Firewalls** to prevent cascading errors.
+In a multi-stage pipeline, small upstream errors can cascade into severe downstream failures. Nirikshak explicitly models error propagation and introduces **Validation Firewalls** to prevent cascading errors.
 
 ```mermaid
 flowchart TD
@@ -1767,7 +1767,7 @@ In an enforcement application generating legal evidence for potential court pros
 
 ```mermaid
 graph TD
-    subgraph SecurityControls["NyayaDrishti Security & Integrity Architecture"]
+    subgraph SecurityControls["Nirikshak Security & Integrity Architecture"]
         RBAC["1. Role-Based Access Control (RBAC)<br/>• Field Inspector (LMO): Create & sign inspections<br/>• Assistant Controller: Review & compound cases<br/>• Central DoCA Admin: Read-only national analytics"]
         JWT["2. Cryptographic Session Authentication<br/>• Short-lived JWT bearer tokens (12h expiration)<br/>• Scoped jurisdiction claims (Circle / State code)"]
         SHA["3. Section 63 BSA Tamper-Proofing<br/>• Immediate on-capture SHA-256 image hashing<br/>• Immutably chained Merkle DAG evidence tree"]
@@ -1780,7 +1780,7 @@ graph TD
 
 ## 39. Comprehensive Auditability & Chain of Custody
 
-To guarantee that an auto-generated violation report withstands aggressive cross-examination by defense counsel in a court of law, NyayaDrishti-LM records an **Unbroken Chain of Custody**:
+To guarantee that an auto-generated violation report withstands aggressive cross-examination by defense counsel in a court of law, Nirikshak records an **Unbroken Chain of Custody**:
 
 $$\text{Chain of Custody Provenance Sequence:}$$
 $$\text{Officer}_{\text{ID}} \xrightarrow{\text{Auth}} \text{Session}_{\text{UUID}} \xrightarrow{\text{Sensor}} \text{RawImage}_{\text{SHA256}} \xrightarrow{\text{Calib}} H_{\text{Matrix}} \xrightarrow{\text{Perception}} \text{Tokens}_{\text{Polygons}} \xrightarrow{\text{Rule}} \text{Deficit}_{\text{Statute}} \xrightarrow{\text{Adjudicate}} \text{Verdict}_{\text{Signed}} \xrightarrow{\text{Seal}} \text{PDF}_{\text{Merkle}}$$
@@ -1791,7 +1791,7 @@ Every step records the operator ID, atomic network timestamp, GPS coordinates, h
 
 ## 40. Deployment Strategy
 
-NyayaDrishti-LM prioritizes the simplest, most reliable deployment architecture that satisfies the core field operational requirements.
+Nirikshak prioritizes the simplest, most reliable deployment architecture that satisfies the core field operational requirements.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -1979,7 +1979,7 @@ class RuleFindingsDTO(BaseModel):
 To avoid submodule synchronization headaches, the team maintains a single, clean monorepo:
 
 ```
-sih26034-nyayadrishti/
+sih26034/
 ├── .github/workflows/          # CI/CD Smoke Test Actions
 │   └── test-pipeline.yml
 ├── docs/                       # Research, Gazette GSRs & Architecture Specs
@@ -2055,7 +2055,7 @@ Our hard submission deadline is **13 September 2026**. This 7-day sprint plan al
 
 ```mermaid
 gantt
-    title NyayaDrishti-LM 7-Day Sprint Roadmap to Submission (Sept 7 - Sept 13, 2026)
+    title Nirikshak 7-Day Sprint Roadmap to Submission (Sept 7 - Sept 13, 2026)
     dateFormat YYYY-MM-DD
     section Day 1: Contracts
     Interface Freeze & Monorepo Setup    :2026-09-07, 1d
@@ -2209,7 +2209,7 @@ To eliminate ambiguity and prevent half-baked features from entering the main br
 
 ## 47. Incremental Integration Strategy
 
-NyayaDrishti-LM strictly rejects the high-risk "Big Bang Integration" anti-pattern (where six engineers write code independently for days and attempt to merge on the final night). Instead, it enforces a **Three-Stage Incremental Integration Rhythm**:
+Nirikshak strictly rejects the high-risk "Big Bang Integration" anti-pattern (where six engineers write code independently for days and attempt to merge on the final night). Instead, it enforces a **Three-Stage Incremental Integration Rhythm**:
 
 ```mermaid
 graph TD
@@ -2270,7 +2270,7 @@ To make every inspection mathematically reproducible and legally auditable over 
 ├──────────────────────────┬──────────────────────────┬────────────────────────────────────────────┤
 │ COMPONENT                │ VERSIONING SCHEME        │ EXAMPLE IDENTIFIER                         │
 ├──────────────────────────┼──────────────────────────┼────────────────────────────────────────────┤
-│ 1. Application Software  │ Semantic Versioning      │ NyayaDrishti v1.0.0-sih2026                │
+│ 1. Application Software  │ Semantic Versioning      │ Nirikshak v1.0.0-sih2026                │
 ├──────────────────────────┼──────────────────────────┼────────────────────────────────────────────┤
 │ 2. Neural Models (ONNX)  │ Architecture + Epoch     │ DBNet++_r18_int8_v1.2, SVTR_indic_v1.0     │
 ├──────────────────────────┼──────────────────────────┼────────────────────────────────────────────┤
@@ -2284,7 +2284,7 @@ To make every inspection mathematically reproducible and legally auditable over 
 
 ## 50. Observability & Logging Architecture
 
-NyayaDrishti-LM implements structured, machine-readable JSON logging across all backend services. Sensitive commercial brand names and private personal contact information are sanitized, while operational latencies, confidence scores, and rule verdicts are comprehensively tracked.
+Nirikshak implements structured, machine-readable JSON logging across all backend services. Sensitive commercial brand names and private personal contact information are sanitized, while operational latencies, confidence scores, and rule verdicts are comprehensively tracked.
 
 ```json
 {
@@ -2480,7 +2480,7 @@ To maintain absolute credibility before government evaluators, the team adheres 
 A disciplined engineering strategy maximizes custom engineering where domain differentiation matters, while reusing battle-tested open-source libraries for commodity infrastructure.
 
 ```mermaid
-pie title NyayaDrishti Code Composition (%)
+pie title Nirikshak Code Composition (%)
     "Custom Built: Domain Rules, Homography Metrology & BSA Graph" : 45
     "Reused & Quantized Open-Source: PaddleOCR & DBNet++" : 30
     "Standard Commodity Libraries: FastAPI, React, SQLite, OpenCV" : 25
@@ -2503,7 +2503,7 @@ pie title NyayaDrishti Code Composition (%)
 
 ## 56. Comprehensive Cost Analysis
 
-A critical criterion in government technology procurement is Total Cost of Ownership (TCO). NyayaDrishti-LM is engineered to achieve **Zero Recurring Operational Cost** for the SIH prototype, and ultra-low per-inspection economics at national production scale.
+A critical criterion in government technology procurement is Total Cost of Ownership (TCO). Nirikshak is engineered to achieve **Zero Recurring Operational Cost** for the SIH prototype, and ultra-low per-inspection economics at national production scale.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -2527,7 +2527,7 @@ A critical criterion in government technology procurement is Total Cost of Owner
 └──────────────────────────┴──────────────────────────┴────────────────────────────────────────────┘
 ```
 
-_Financial Comparison vs Cloud VLM Approach:_ An end-to-end cloud VLM architecture (Concept B) ingesting 4 high-resolution packaging images per inspection at current API prices ($0.03/image) would cost **₹10.00 per scan**. Across 500,000 national inspections annually, that imposes a recurring taxpayer burden of **₹50,00,000 per year**. NyayaDrishti-LM completely eliminates this cost by executing on local CPU hardware.
+_Financial Comparison vs Cloud VLM Approach:_ An end-to-end cloud VLM architecture (Concept B) ingesting 4 high-resolution packaging images per inspection at current API prices ($0.03/image) would cost **₹10.00 per scan**. Across 500,000 national inspections annually, that imposes a recurring taxpayer burden of **₹50,00,000 per year**. Nirikshak completely eliminates this cost by executing on local CPU hardware.
 
 ---
 
@@ -2559,7 +2559,7 @@ graph TD
 
 ## 58. Final Optimized Architecture Summary
 
-NyayaDrishti-LM delivers a complete, harmonious fusion of computer vision, optical metrology, Indic OCR, and statutory administrative law.
+Nirikshak delivers a complete, harmonious fusion of computer vision, optical metrology, Indic OCR, and statutory administrative law.
 
 ```mermaid
 graph LR
@@ -2762,7 +2762,7 @@ Twelve formal Architectural Decision Records document the decisive rationale beh
 
 ## 64. Why This Solution Can Win SIH 2026
 
-NyayaDrishti-LM is not another generic "student AI project that wraps ChatGPT around an image." It is a **production-grade, domain-hardened regulatory engineering system**.
+Nirikshak is not another generic "student AI project that wraps ChatGPT around an image." It is a **production-grade, domain-hardened regulatory engineering system**.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -2821,7 +2821,7 @@ NyayaDrishti-LM is not another generic "student AI project that wraps ChatGPT ar
 
 ### The Three Strongest Reasons This System Will Succeed
 
-1. **Fills an Absolute Government Enforcement Vacuum:** The national `eMaap` portal handles administrative licensing but possesses zero scanning or label auditing technology. NyayaDrishti-LM delivers the exact tool DoCA needs.
+1. **Fills an Absolute Government Enforcement Vacuum:** The national `eMaap` portal handles administrative licensing but possesses zero scanning or label auditing technology. Nirikshak delivers the exact tool DoCA needs.
 2. **Mathematically & Legally Airtight:** By separating probabilistic perception from deterministic AST rules and anchoring evidence in Section 63 BSA Merkle DAGs, the system generates legally defensible evidence.
 3. **Engineering Realism & Independence:** Zero cloud dependencies, zero recurring API fees, permissive open-source licensing (anti-AGPL), and sub-second CPU latency ensure real-world deployability across India.
 

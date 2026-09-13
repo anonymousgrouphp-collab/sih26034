@@ -1,7 +1,7 @@
 # LEGAL METROLOGY FRONTEND RESEARCH NOTE (SECTION 46)
 
 **Project ID:** SIH26034
-**Product:** NyayaDrishti-LM
+**Product:** Nirikshak
 **Author:** Member 6 Workstream (Urvashi Rajput / Antigravity Takeover)
 **Date:** 10 September 2026
 **Status:** COMPLETE & VERIFIED

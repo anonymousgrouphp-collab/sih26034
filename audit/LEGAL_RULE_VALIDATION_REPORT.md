@@ -1,7 +1,7 @@
 # LEGAL RULE VALIDATION REPORT
 ## Statutory Mapping, Rule Engine Accuracy, and Judicial Defensibility
 
-**Project:** NyayaDrishti-LM (SIH26034)  
+**Project:** Nirikshak (SIH26034)
 **Legal Framework:** Legal Metrology Act, 2009 | Legal Metrology (Packaged Commodities) Rules, 2011 | Jan Vishwas (Amendment of Provisions) Act, 2023 | Section 63 Bharatiya Sakshya Adhiniyam, 2023  
 **Date:** 12 September 2026  
 
@@ -9,7 +9,7 @@
 
 ## 1. Statutory Rule Engine Implementation
 
-NyayaDrishti-LM encodes the mandatory statutory rules of the LMPC Rules, 2011 into an Abstract Syntax Tree (AST) evaluation engine with zero heuristic guessing or hallucinated provisions.
+Nirikshak encodes the mandatory statutory rules of the LMPC Rules, 2011 into an Abstract Syntax Tree (AST) evaluation engine with zero heuristic guessing or hallucinated provisions.
 
 ### Statutory Rule Verification Matrix
 

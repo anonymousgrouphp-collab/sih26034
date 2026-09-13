@@ -1,7 +1,7 @@
 # FINAL TESTING AND VALIDATION PLAN
 
 **Project ID:** SIH26034  
-**Product:** NyayaDrishti-LM  
+**Product:** Nirikshak
 **Audience:** Entire Engineering Team & Quality Assurance  
 **Status:** FROZEN  
 

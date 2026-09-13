@@ -1,5 +1,5 @@
 # Camera & Field Inspection Mobile UX Audit
-## NyayaDrishti-LM (SIH26034) — Field Enforcement Verification
+## Nirikshak (SIH26034) — Field Enforcement Verification
 
 ---
 

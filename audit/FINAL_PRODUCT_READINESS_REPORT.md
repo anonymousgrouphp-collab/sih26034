@@ -1,7 +1,7 @@
 # FINAL PRODUCT READINESS & SUBMISSION REPORT
 
 **Project ID:** SIH26034  
-**Product Name:** NyayaDrishti-LM  
+**Product Name:** Nirikshak
 **Governing Authority:** Department of Consumer Affairs (DoCA), Ministry of Consumer Affairs, Food & Public Distribution, Government of India  
 **Target Event:** Smart India Hackathon 2026 Grand Finale  
 **Evaluation Date:** 12 September 2026  
@@ -11,7 +11,7 @@
 
 ## 1. Executive Summary
 
-NyayaDrishti-LM is an AI-augmented diagnostic workstation engineered for the Department of Consumer Affairs (DoCA) to streamline, accelerate, and mathematically ground statutory packaging compliance verification under the **Legal Metrology (Packaged Commodities) Rules, 2011** and the **Legal Metrology Act, 2009**.
+Nirikshak is an AI-augmented diagnostic workstation engineered for the Department of Consumer Affairs (DoCA) to streamline, accelerate, and mathematically ground statutory packaging compliance verification under the **Legal Metrology (Packaged Commodities) Rules, 2011** and the **Legal Metrology Act, 2009**.
 
 The product has been developed, hardened, and empirically validated across all six engineering workstreams:
 - **Optical Quality & Calibration:** Sub-millimeter planar homography via ArUco and ISO 7810 fiducials; real-time Laplacian blur ($\ge 150$) and specular glare ($\le 3\%$) gates.
@@ -100,7 +100,7 @@ In compliance with `CLAIMS_WE_MUST_NOT_MAKE.md`, the codebase and documentation 
 
 | Prohibited Statement / Concept | System Implementation Standard | Conformance Status |
 | :--- | :--- | :--- |
-| **"100% Autonomous Judicial Action"** | NyayaDrishti-LM is strictly an **Augmented Diagnostic Assistant**. Only a qualified human officer can review, sign, and issue notices. | **COMPLIANT** |
+| **"100% Autonomous Judicial Action"** | Nirikshak is strictly an **Augmented Diagnostic Assistant**. Only a qualified human officer can review, sign, and issue notices. | **COMPLIANT** |
 | **"Guaranteed Court Admissibility"** | System guarantees **technical electronic integrity** under Section 63 BSA 2023; ultimate legal admissibility rests with the presiding court. | **COMPLIANT** |
 | **"100% OCR Accuracy Everywhere"** | Target Character Error Rate $\le 3.0\%$ on clean statutory text; degraded images trigger `UNABLE_TO_VERIFY`. | **COMPLIANT** |
 | **"Section 65B Indian Evidence Act"** | Indian Evidence Act was repealed 1 July 2024. All schemas and certificates cite strictly **Section 63 BSA 2023**. | **COMPLIANT** |

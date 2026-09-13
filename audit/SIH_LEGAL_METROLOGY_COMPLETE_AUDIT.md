@@ -1,6 +1,6 @@
 # SIH LEGAL METROLOGY — COMPLETE AUTONOMOUS PROJECT AUDIT, VERIFICATION & GRAND FINALE READINESS REPORT
 
-**Product Name:** NyayaDrishti-LM / MetroLens  
+**Product Name:** Nirikshak
 **Official Problem Statement ID:** **SIH26034** *(Recorded as SIH26304 in initial prompt header)*  
 **Target Ministry:** Ministry of Consumer Affairs, Food & Public Distribution  
 **Governing Department:** Department of Consumer Affairs (DoCA), Government of India  
@@ -13,7 +13,7 @@
 
 # EXECUTIVE SUMMARY & VERDICT
 
-MetroLens (NyayaDrishti-LM) is an advanced, production-grade legal metrology compliance verification web platform built to automate packaged commodity inspections under the **Legal Metrology Act, 2009** and the **Legal Metrology (Packaged Commodities) Rules, 2011 (LMPC Rules, 2011)**.
+Nirikshak is an advanced, production-grade legal metrology compliance verification web platform built to automate packaged commodity inspections under the **Legal Metrology Act, 2009** and the **Legal Metrology (Packaged Commodities) Rules, 2011 (LMPC Rules, 2011)**.
 
 Following an exhaustive, autonomous, adversarial audit spanning all source code, live browser interfaces, deep neural network checkpoints, database schemas, REST APIs, and 570 automated tests, our verdict is:
 
@@ -40,7 +40,7 @@ Following an exhaustive, autonomous, adversarial audit spanning all source code,
 
 # 2. SYSTEM ARCHITECTURE & TOPOLOGY
 
-MetroLens is structured as an **Online-First Monolith Application (Mode A)** with an **Integrated Local Field Resilience Engine (Mode B)** and **Open Statutory Integration Payloads (Mode C)**.
+Nirikshak is structured as an **Online-First Monolith Application (Mode A)** with an **Integrated Local Field Resilience Engine (Mode B)** and **Open Statutory Integration Payloads (Mode C)**.
 
 ```
                                   +------------------------------------------------------+
@@ -113,7 +113,7 @@ MetroLens is structured as an **Online-First Monolith Application (Mode A)** wit
 
 ```
 ================================================================================
-                    METROLENS TEST EXECUTION AUDIT SUMMARY
+                    NIRIKSHAK TEST EXECUTION AUDIT SUMMARY
 ================================================================================
 Subsystem / Workstream               | Tests Run | Passed | Failed | Skipped | Runtime
 --------------------------------------------------------------------------------------
@@ -189,7 +189,7 @@ TOTAL AUTOMATED TEST VERIFICATIONS   |   570     |  569   |   0    |    1    | 2
 
 ```
 ======================================================================================================
-                                  METROLENS WEIGHTED PROGRESS SCORECARD
+                                  NIRIKSHAK WEIGHTED PROGRESS SCORECARD
 ======================================================================================================
 Category                                     | Max Weight | Score Awarded | Percentage | Confidence
 ------------------------------------------------------------------------------------------------------
@@ -234,7 +234,7 @@ TOTAL COMPOSITE PROGRESS SCORE               |  100.0%    |     87.5 / 100|   87
 
 ### The 30-Second Elevator Pitch
 > *"Over 50 crore packaged commodities are sold daily across India. Today, enforcement officers inspect packaging with plastic rulers and paper gazettes—taking 15 minutes per product.  
-> We present **Nirikshak (NyayaDrishti-LM)**: an AI-augmented compliance workstation that verifies packaging in under 2 seconds, measures font heights to sub-millimeter precision using ArUco and ISO card homography, and produces tamper-evident show cause notices under Section 63 of the new Bharatiya Sakshya Adhiniyam, 2023."*
+> We present **Nirikshak**: an AI-augmented compliance workstation that verifies packaging in under 2 seconds, measures font heights to sub-millimeter precision using ArUco and ISO card homography, and produces tamper-evident show cause notices under Section 63 of the new Bharatiya Sakshya Adhiniyam, 2023."*
 
 ### Key Hostile Attack Defenses
 1. *"Are you just wrapping ChatGPT?"* -> **No.** DBNet++ and PP-OCRv4 INT8 models run 100% locally on CPU with zero internet traffic; all legal rules are deterministic AST code.

@@ -1,6 +1,6 @@
 # FINAL COMPLETE PROJECT DIAGNOSTIC REPORT
 
-**Project:** NyayaDrishti-LM (SIH26034) — Legal Metrology Packaged Commodity Compliance
+**Project:** Nirikshak (SIH26034) — Legal Metrology Packaged Commodity Compliance
 **Audit type:** Forensic diagnostic — DISCOVER → REPRODUCE → TRACE → DOCUMENT. **No permanent fixes applied.**
 **Audit window:** 2026-09-12, 21:13–23:00 IST
 **Branch:** `kunal-testing-branch` @ `9689734` (7 pre-existing uncommitted modifications preserved untouched)

@@ -1,6 +1,6 @@
-# VISUAL_IDENTITY_GUIDE.md — NyayaDrishti-LM Design System & Visual Identity
+# VISUAL_IDENTITY_GUIDE.md — Nirikshak Design System & Visual Identity
 
-**Product:** NyayaDrishti-LM (SIH26034) — Legal Metrology Compliance Workstation  
+**Product:** Nirikshak (SIH26034) — Legal Metrology Compliance Workstation
 **Design System Level:** Government of India Institutional Service Grade (GIGW 3.0 Aligned)  
 **Date:** 11 September 2026  
 **Status:** CANONICAL DESIGN SPECIFICATION  
@@ -9,7 +9,7 @@
 
 ## 1. Visual Philosophy & Core Pillars
 
-NyayaDrishti-LM's visual identity expresses three non-negotiable values:
+Nirikshak's visual identity expresses three non-negotiable values:
 1. **Sovereign Trust & Authority:** Evoking the dignity of the Department of Consumer Affairs, Government of India, through disciplined structure, authentic state emblems, and refined color harmony.
 2. **Metrological Rigor & Precision:** Technical precision inspired by optical vernier calipers, laboratory reticles, homography calibration grids, and cryptographic SHA-256 Merkle proofs.
 3. **Field Usability & Calm Clarity:** Zero visual clutter, legible typography, high contrast under bright sunlight, touch-friendly tap targets ($\ge 48\text{px}$), and clear epistemic color coding.

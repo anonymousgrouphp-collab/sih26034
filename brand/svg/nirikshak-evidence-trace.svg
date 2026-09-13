@@ -1,0 +1,100 @@
+<svg viewBox="0 0 1200 420" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Nirikshak bidirectional evidence traceability from finding through source image, extracted field, rule evaluation, officer decision and preserved dossier">
+  <defs>
+    <pattern id="gridTR" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0L0 0 0 32" fill="none" stroke="#fff" stroke-opacity=".045"/>
+    </pattern>
+    <linearGradient id="traceTR" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6366f1"/>
+      <stop offset=".5" stop-color="#a78bfa"/>
+      <stop offset="1" stop-color="#7ee787"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="420" fill="#0d1117"/>
+  <rect width="1200" height="420" fill="url(#gridTR)"/>
+
+  <text x="42" y="48" font-family="Consolas,monospace" font-size="12"
+        letter-spacing="2.5" font-weight="700" fill="#a78bfa">BIDIRECTIONAL TRACEABILITY</text>
+  <line x1="285" y1="43" x2="1158" y2="43" stroke="#263140"/>
+
+  <text x="42" y="84" font-family="Inter,Segoe UI,Arial,sans-serif"
+        font-size="23" font-weight="700" fill="#f0f6fc">
+    Every finding has a visible path back to evidence.
+  </text>
+
+  <line x1="92" y1="224" x2="1112" y2="224" stroke="url(#traceTR)" stroke-width="2" opacity=".45"/>
+
+  <g font-family="Inter,Segoe UI,Arial,sans-serif">
+    <!-- cards -->
+    <g transform="translate(32 145)">
+      <rect width="160" height="158" rx="14" fill="#11161d" stroke="#333a50"/>
+      <text x="20" y="34" font-family="Consolas,monospace" font-size="10" letter-spacing="1.5" fill="#71717a">01 / FINDING</text>
+      <text x="20" y="70" font-size="15" font-weight="700" fill="#c4b5fd">Font deficit</text>
+      <text x="20" y="96" font-size="12" fill="#8b949e">Diagnostic result</text>
+      <text x="20" y="118" font-size="12" fill="#8b949e">raised by analysis</text>
+      <circle cx="140" cy="29" r="4" fill="#a78bfa"/>
+    </g>
+
+    <g transform="translate(216 145)">
+      <rect width="160" height="158" rx="14" fill="#11161d" stroke="#21414a"/>
+      <text x="20" y="34" font-family="Consolas,monospace" font-size="10" letter-spacing="1.5" fill="#71717a">02 / EVIDENCE</text>
+      <text x="20" y="70" font-size="15" font-weight="700" fill="#67e8f9">Image polygon</text>
+      <text x="20" y="96" font-size="12" fill="#8b949e">Exact source region</text>
+      <text x="20" y="118" font-size="12" fill="#8b949e">on original photo</text>
+      <circle cx="140" cy="29" r="4" fill="#22d3ee"/>
+    </g>
+
+    <g transform="translate(400 145)">
+      <rect width="160" height="158" rx="14" fill="#11161d" stroke="#2e3e46"/>
+      <text x="20" y="34" font-family="Consolas,monospace" font-size="10" letter-spacing="1.5" fill="#71717a">03 / EXTRACTION</text>
+      <text x="20" y="70" font-size="15" font-weight="700" fill="#7dd3fc">Structured field</text>
+      <text x="20" y="96" font-size="12" fill="#8b949e">OCR token mapped</text>
+      <text x="20" y="118" font-size="12" fill="#8b949e">to inspection fact</text>
+      <circle cx="140" cy="29" r="4" fill="#38bdf8"/>
+    </g>
+
+    <g transform="translate(584 145)">
+      <rect width="160" height="158" rx="14" fill="#11161d" stroke="#3a3150"/>
+      <text x="20" y="34" font-family="Consolas,monospace" font-size="10" letter-spacing="1.5" fill="#71717a">04 / RULE</text>
+      <text x="20" y="70" font-size="15" font-weight="700" fill="#c4b5fd">Why flagged?</text>
+      <text x="20" y="96" font-size="12" fill="#8b949e">Statutory schedule</text>
+      <text x="20" y="118" font-size="12" fill="#8b949e">and legal threshold</text>
+      <circle cx="140" cy="29" r="4" fill="#a78bfa"/>
+    </g>
+
+    <g transform="translate(768 145)">
+      <rect width="160" height="158" rx="14" fill="#111a16" stroke="#285036"/>
+      <rect width="160" height="4" rx="2" fill="#22c55e"/>
+      <text x="20" y="34" font-family="Consolas,monospace" font-size="10" letter-spacing="1.5" fill="#71717a">05 / OFFICER</text>
+      <text x="20" y="70" font-size="15" font-weight="700" fill="#7ee787">Officer action</text>
+      <text x="20" y="96" font-size="12" fill="#a1a1aa">Confirm or override</text>
+      <text x="20" y="118" font-size="12" fill="#a1a1aa">with justification</text>
+      <circle cx="140" cy="29" r="4" fill="#7ee787"/>
+    </g>
+
+    <g transform="translate(952 145)">
+      <rect width="200" height="158" rx="14" fill="#11161d" stroke="#3d3530"/>
+      <text x="20" y="34" font-family="Consolas,monospace" font-size="10" letter-spacing="1.5" fill="#71717a">06 / PRESERVED</text>
+      <text x="20" y="70" font-size="15" font-weight="700" fill="#f0f6fc">Evidence dossier</text>
+      <text x="20" y="96" font-size="12" fill="#8b949e">Permanent hash log</text>
+      <text x="20" y="118" font-size="12" fill="#8b949e">and Form-1 notice</text>
+      <circle cx="176" cy="29" r="4" fill="#f59e0b"/>
+    </g>
+  </g>
+
+  <!-- moving trace point -->
+  <circle r="4" fill="#7ee787">
+    <animateMotion dur="5s" repeatCount="indefinite"
+      path="M95 224 L1125 224"/>
+  </circle>
+
+  <text x="600" y="350" text-anchor="middle"
+        font-family="Consolas,monospace" font-size="12" fill="#8b949e">
+    FINDING → SOURCE EVIDENCE → RULE → OFFICER ACTION → DOSSIER
+  </text>
+  <text x="600" y="375" text-anchor="middle"
+        font-family="Inter,Segoe UI,Arial,sans-serif" font-size="13" fill="#71717a">
+    Every recommendation is anchored to raw evidence. The officer makes the final adjudication.
+  </text>
+</svg>

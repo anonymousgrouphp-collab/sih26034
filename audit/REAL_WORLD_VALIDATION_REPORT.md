@@ -1,7 +1,7 @@
 # REAL WORLD VALIDATION REPORT
 ## End-to-End Field Reliability & Statutory Defensibility on Physical Packaging
 
-**Project:** NyayaDrishti-LM (SIH26034)  
+**Project:** Nirikshak (SIH26034)
 **Authority:** Department of Consumer Affairs (DoCA), Government of India  
 **Date:** 12 September 2026  
 **Status:** VALIDATED & COMPLIANT WITH SECTION 63 BSA 2023  
@@ -10,7 +10,7 @@
 
 ## 1. Scope of Validation
 
-This report documents the rigorous, end-to-end empirical testing of NyayaDrishti-LM on genuine consumer packaging photographs captured across multiple angles, illumination regimes, and material finishes (corrugated cardboard, metallized foil, soft plastic tubes, glass and plastic bottles).
+This report documents the rigorous, end-to-end empirical testing of Nirikshak on genuine consumer packaging photographs captured across multiple angles, illumination regimes, and material finishes (corrugated cardboard, metallized foil, soft plastic tubes, glass and plastic bottles).
 
 The testing was conducted directly against the real dataset stored in:
 `Legal Metrology real product images`
@@ -77,4 +77,4 @@ To verify that the system is free from hardcoded shortcuts:
 
 ## 4. Conclusion
 
-NyayaDrishti-LM has successfully completed real-world packaging validation. It is robust, deterministic, defensible under Section 63 of Bharatiya Sakshya Adhiniyam, 2023, and fully prepared for field deployment and Hackathon Grand Finale demonstration.
+Nirikshak has successfully completed real-world packaging validation. It is robust, deterministic, defensible under Section 63 of Bharatiya Sakshya Adhiniyam, 2023, and fully prepared for field deployment and Hackathon Grand Finale demonstration.

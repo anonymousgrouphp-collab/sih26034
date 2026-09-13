@@ -1,7 +1,7 @@
 # FINAL GITHUB & ENGINEERING WORKFLOW SPECIFICATION
 
 **Project ID:** SIH26034  
-**Product:** NyayaDrishti-LM  
+**Product:** Nirikshak
 **Governing Rule:** Simplicity • Determinism • Zero Drift  
 **Status:** FROZEN  
 
@@ -10,7 +10,7 @@
 ### 1. Repository Structure
 
 ```
-sih26034-nyayadrishti/
+sih26034/
 ├── .github/workflows/          # CI/CD pipelines (lint, unit tests, schema validation, license audit)
 ├── docs/                       # Authoritative architectural and requirements specifications
 ├── data/

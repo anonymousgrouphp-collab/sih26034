@@ -1,7 +1,7 @@
 # RESULT PROVENANCE MATRIX
 ## Provenance, Source of Truth, and Data Flow Traceability
 
-**System:** NyayaDrishti-LM (SIH26034)  
+**System:** Nirikshak (SIH26034)
 **Standard:** Section 63 BSA 2023 Digital Evidence Admissibility  
 **Date:** 12 September 2026  
 
@@ -9,7 +9,7 @@
 
 ## 1. System Provenance Architecture
 
-In statutory metrology enforcement, every number and text field must trace back to verifiable electronic evidence. The table below documents the exact mathematical and algorithmic provenance for every output field rendered in NyayaDrishti-LM.
+In statutory metrology enforcement, every number and text field must trace back to verifiable electronic evidence. The table below documents the exact mathematical and algorithmic provenance for every output field rendered in Nirikshak.
 
 | Output Field | Pipeline Source | Algorithm / Engine | Provenance Verification | Storage Location |
 | :--- | :--- | :--- | :--- | :--- |

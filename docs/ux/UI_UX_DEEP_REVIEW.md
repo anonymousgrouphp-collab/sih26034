@@ -11,7 +11,7 @@
 
 ## 1. Executive Summary
 
-A comprehensive multi-specialist UI/UX audit was conducted on the dual frontend architectures of the **NIRIKSHAK** platform (combining the Nirikshak Metrolens vision system and the NIRIKSHAK statutory evidence workstation). The primary objective was to deliver a single, cohesive, government-service-grade inspection workstation tailored specifically for the real-world operational conditions of non-technical and semi-technical field inspection officers.
+A comprehensive multi-specialist UI/UX audit was conducted on the dual frontend architectures of the **NIRIKSHAK** platform (combining the Nirikshak vision system and the NIRIKSHAK statutory evidence workstation). The primary objective was to deliver a single, cohesive, government-service-grade inspection workstation tailored specifically for the real-world operational conditions of non-technical and semi-technical field inspection officers.
 
 ### Core Audit Findings
 1. **Branding & Trust Alignment:** Previous versions featured misleading domain references (`.gov.in`) and sovereignty claims that violated statutory guardrails. The platform has been refactored to represent an honest, professional "Government-Service-Grade Legal Metrology Inspection Workstation" with full Section 63 BSA 2023 compliance framing.

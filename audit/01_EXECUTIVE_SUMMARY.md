@@ -1,7 +1,7 @@
-# 01 — EXECUTIVE SUMMARY: METROLENS (NYAYADRISHTI-LM)
+# 01 — EXECUTIVE SUMMARY: NIRIKSHAK
 
 **Project Identifier:** SIH26034 (Recorded as SIH26304 in initial prompt query)  
-**Product Name:** NyayaDrishti-LM / Nirikshak
+**Product Name:** Nirikshak
 **Ministry:** Ministry of Consumer Affairs, Food & Public Distribution  
 **Governing Department:** Department of Consumer Affairs (DoCA), Government of India  
 **Target Competition:** Smart India Hackathon (SIH) 2026  
@@ -13,7 +13,7 @@
 
 ## 1. Executive Verdict & Bottom-Line Status
 
-Nirikshak (NyayaDrishti-LM) is an advanced, production-grade legal metrology compliance verification web platform built to automate packaged commodity inspections under the **Legal Metrology Act, 2009** and the **Legal Metrology (Packaged Commodities) Rules, 2011 (LMPC Rules, 2011)**.
+Nirikshak is an advanced, production-grade legal metrology compliance verification web platform built to automate packaged commodity inspections under the **Legal Metrology Act, 2009** and the **Legal Metrology (Packaged Commodities) Rules, 2011 (LMPC Rules, 2011)**.
 
 Following an exhaustive, autonomous, adversarial audit spanning all source code, live browser interfaces, deep neural network checkpoints, database schemas, REST APIs, and 570 automated tests, our verdict is:
 
@@ -67,7 +67,7 @@ Following an exhaustive, autonomous, adversarial audit spanning all source code,
 
 ```
 ================================================================================
-                    METROLENS AUDIT TEST EXECUTION SUMMARY
+                    NIRIKSHAK AUDIT TEST EXECUTION SUMMARY
 ================================================================================
 Test Suite Area                              | Tests Run | Passed | Failed | Skipped
 --------------------------------------------------------------------------------

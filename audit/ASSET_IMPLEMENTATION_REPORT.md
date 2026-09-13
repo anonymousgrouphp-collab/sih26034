@@ -1,6 +1,6 @@
 # ASSET_IMPLEMENTATION_REPORT.md — Multi-Disciplinary Digital Product Delivery Report
 
-**Product:** NyayaDrishti-LM (SIH26034) — Legal Metrology Compliance Workstation  
+**Product:** Nirikshak (SIH26034) — Legal Metrology Compliance Workstation
 **Project:** Smart India Hackathon (SIH 2024 / 2026) — Problem Statement SIH26034  
 **Authority:** Department of Consumer Affairs (DoCA), Ministry of Consumer Affairs, Food & Public Distribution, Government of India  
 **Date:** 11 September 2026  
@@ -10,7 +10,7 @@
 
 ## 1. Executive Summary
 
-As a coordinated multi-disciplinary digital product engineering team, we have completed the end-to-end audit, visual asset creation, brand identity refinement, and contextual placement across the entire NyayaDrishti-LM frontend application (`ui-combined/`).
+As a coordinated multi-disciplinary digital product engineering team, we have completed the end-to-end audit, visual asset creation, brand identity refinement, and contextual placement across the entire Nirikshak frontend application (`ui-combined/`).
 
 Prior to this intervention, the application relied on generic placeholder boxes, unstyled empty states, and standard Lucide icons that did not fully convey the statutory gravitas and metrological precision of a Government of India enforcement portal. 
 
@@ -47,10 +47,10 @@ Through this initiative, we engineered an authentic, cohesive visual system comp
 
 ### A. Asset Creations (`ui-combined/public/assets/`)
 1. **Brand:**
-   - `public/assets/brand/nyayadrishti_mark.svg`
+   - `public/assets/brand/nirikshak_mark.svg`
    - `public/assets/brand/favicon.svg` (and root `public/favicon.svg`)
-   - `public/assets/brand/nyayadrishti_logo_primary.svg`
-   - `public/assets/brand/nyayadrishti_logo_dark.svg`
+   - `public/assets/brand/nirikshak_logo_primary.svg`
+   - `public/assets/brand/nirikshak_logo_dark.svg`
 2. **Field Guidance & Education:**
    - `public/assets/guidance/camera_framing_guide.svg`
    - `public/assets/guidance/calibration_scale_guide.svg`
@@ -92,7 +92,7 @@ Through this initiative, we engineered an authentic, cohesive visual system comp
 
 ### Build Validation
 ```bash
-> nyayadrishti-combined-ui@1.0.0 build
+> nirikshak-combined-ui@1.0.0 build
 > tsc -b && vite build
 
 vite v6.4.3 building for production...

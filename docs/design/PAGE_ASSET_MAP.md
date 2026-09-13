@@ -1,6 +1,6 @@
-# PAGE_ASSET_MAP.md — NyayaDrishti-LM Page-by-Page Visual Asset Mapping
+# PAGE_ASSET_MAP.md — Nirikshak Page-by-Page Visual Asset Mapping
 
-**Product:** NyayaDrishti-LM (SIH26034)  
+**Product:** Nirikshak (SIH26034)
 **Authority:** Department of Consumer Affairs (DoCA), Government of India  
 **Date:** 11 September 2026  
 **Status:** COMPLETE & AUDITED  
@@ -9,7 +9,7 @@
 
 ## 1. Overview
 
-This document maps every primary route and major feature component across the NyayaDrishti-LM frontend (`ui-combined/`) to the specific visual assets embedded within it. Each mapping defines the route path, component name, asset file path, render trigger, layout position, and accessibility metadata.
+This document maps every primary route and major feature component across the Nirikshak frontend (`ui-combined/`) to the specific visual assets embedded within it. Each mapping defines the route path, component name, asset file path, render trigger, layout position, and accessibility metadata.
 
 ---
 
@@ -17,10 +17,10 @@ This document maps every primary route and major feature component across the Ny
 
 | Route Path | React Component | Asset Embedded | Trigger / State | Layout Placement | Accessibility Alt Text |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| `/` | `Landing.tsx` | `public/assets/brand/nyayadrishti_logo_primary.svg` | Always | Sticky Portal Header | "NyayaDrishti-LM Official Brand Logo" |
+| `/` | `Landing.tsx` | `public/assets/brand/nirikshak_logo_primary.svg` | Always | Sticky Portal Header | "Nirikshak Official Brand Logo" |
 | `/` | `Landing.tsx` | `IndiaGateHeroBackdrop.tsx` | Always | Hero Section Background | Sovereign architectural backdrop |
 | `/` | `Landing.tsx` | `public/assets/goi_metrology_inspection_hero.jpg` | Always | Lab Inspection Showcase | "Legal Metrology Officer Conducting Verified Packaging Adjudication" |
-| `/` | `StatutoryPipelineInfographic.tsx` | `public/assets/guidance/evidence_extraction_pipeline.svg` | Always | Architecture Showcase Panel | "NyayaDrishti-LM 5-Stage Statutory Evidence Extraction Pipeline Architecture" |
+| `/` | `StatutoryPipelineInfographic.tsx` | `public/assets/guidance/evidence_extraction_pipeline.svg` | Always | Architecture Showcase Panel | "Nirikshak 5-Stage Statutory Evidence Extraction Pipeline Architecture" |
 | `/login` | `Login.tsx` | `public/assets/photography/officer_field_inspection.jpg` | Always | Left Hero Authentication Card | "Indian Legal Metrology Officer conducting retail packaging inspection with tablet" |
 | `/login` | `Login.tsx` | `StateEmblem.tsx` | Always | Authentication Masthead | "State Emblem of India - Satyameva Jayate" |
 | `/dashboard` | `Dashboard.tsx` | `StateEmblem.tsx` | Always | Global Header Bar | "State Emblem of India" |

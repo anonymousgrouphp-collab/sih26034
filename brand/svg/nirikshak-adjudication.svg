@@ -1,0 +1,84 @@
+<svg viewBox="0 0 1200 500" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Nirikshak human-in-the-loop adjudication canvas showing source image, highlighted finding, findings ledger and officer override workflow">
+  <defs>
+    <pattern id="gridAD" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0L0 0 0 32" fill="none" stroke="#fff" stroke-opacity=".045"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="500" fill="#0d1117"/>
+  <rect width="1200" height="500" fill="url(#gridAD)"/>
+
+  <text x="42" y="46" font-family="Consolas,monospace" font-size="12"
+        letter-spacing="2.5" font-weight="700" fill="#7ee787">HUMAN-IN-THE-LOOP</text>
+  <line x1="250" y1="41" x2="1158" y2="41" stroke="#263140"/>
+
+  <text x="42" y="82" font-family="Inter,Segoe UI,Arial,sans-serif"
+        font-size="23" font-weight="700" fill="#f0f6fc">
+    AI proposes. The officer decides.
+  </text>
+
+  <!-- application shell -->
+  <rect x="42" y="112" width="1116" height="296" rx="16"
+        fill="#0f141b" stroke="#303846"/>
+
+  <!-- left image panel -->
+  <rect x="62" y="132" width="650" height="256" rx="10"
+        fill="#171d26" stroke="#27303c"/>
+  <text x="82" y="157" font-family="Consolas,monospace" font-size="10"
+        letter-spacing="1.5" fill="#71717a">ORIGINAL EVIDENCE · SIDE A</text>
+
+  <!-- fake package -->
+  <rect x="190" y="178" width="350" height="175" rx="9"
+        fill="#e7e5e4" fill-opacity=".10" stroke="#6b7280"/>
+  <rect x="218" y="203" width="294" height="24" rx="4" fill="#f0f6fc" fill-opacity=".08"/>
+  <rect x="218" y="240" width="205" height="14" rx="3" fill="#f0f6fc" fill-opacity=".08"/>
+  <rect x="218" y="265" width="255" height="14" rx="3" fill="#f0f6fc" fill-opacity=".08"/>
+  <rect x="218" y="290" width="132" height="14" rx="3" fill="#f0f6fc" fill-opacity=".08"/>
+
+  <!-- highlighted OCR polygon -->
+  <polygon points="350,238 474,238 466,286 342,286"
+           fill="#f59e0b" fill-opacity=".12" stroke="#f59e0b" stroke-width="2"/>
+  <circle cx="358" cy="242" r="4" fill="#f59e0b"/>
+  <text x="358" y="229" font-family="Consolas,monospace" font-size="9"
+        fill="#f59e0b">FINDING #03</text>
+
+  <!-- right ledger -->
+  <rect x="730" y="132" width="408" height="256" rx="10"
+        fill="#11161d" stroke="#27303c"/>
+  <text x="750" y="157" font-family="Consolas,monospace" font-size="10"
+        letter-spacing="1.5" fill="#71717a">FINDINGS LEDGER</text>
+
+  <g font-family="Inter,Segoe UI,Arial,sans-serif">
+    <text x="750" y="190" font-size="12" fill="#8b949e">MRP</text>
+    <text x="1078" y="190" text-anchor="end" font-size="12" font-weight="700" fill="#7ee787">PASS</text>
+
+    <text x="750" y="221" font-size="12" fill="#8b949e">Net Quantity</text>
+    <text x="1078" y="221" text-anchor="end" font-size="12" font-weight="700" fill="#7ee787">PASS</text>
+
+    <rect x="746" y="236" width="376" height="52" rx="8" fill="#f59e0b" fill-opacity=".07" stroke="#f59e0b" stroke-opacity=".55"/>
+    <text x="760" y="258" font-size="12" font-weight="700" fill="#f59e0b">Font Height</text>
+    <text x="760" y="277" font-size="11" fill="#a1a1aa">2.48 mm · threshold 2.50 mm</text>
+    <text x="1078" y="258" text-anchor="end" font-size="12" font-weight="800" fill="#f59e0b">REVIEW</text>
+
+    <text x="750" y="315" font-size="12" fill="#8b949e">USP</text>
+    <text x="1078" y="315" text-anchor="end" font-size="12" font-weight="700" fill="#7ee787">PASS</text>
+
+    <line x1="750" y1="333" x2="1110" y2="333" stroke="#263140"/>
+
+    <rect x="750" y="347" width="160" height="26" rx="7" fill="#22c55e" fill-opacity=".08" stroke="#22c55e" stroke-opacity=".4"/>
+    <text x="830" y="365" text-anchor="middle" font-family="Consolas,monospace" font-size="10" font-weight="700" fill="#7ee787">ACCEPT FINDING</text>
+
+    <rect x="922" y="347" width="160" height="26" rx="7" fill="#a78bfa" fill-opacity=".08" stroke="#a78bfa" stroke-opacity=".4"/>
+    <text x="1002" y="365" text-anchor="middle" font-family="Consolas,monospace" font-size="10" font-weight="700" fill="#c4b5fd">OVERRIDE + REMARK</text>
+  </g>
+
+  <text x="600" y="447" text-anchor="middle"
+        font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15"
+        font-weight="700" fill="#f0f6fc">
+    Image evidence <tspan fill="#667085">+</tspan>
+    finding <tspan fill="#667085">+</tspan>
+    rule context <tspan fill="#667085">+</tspan>
+    officer action
+  </text>
+</svg>

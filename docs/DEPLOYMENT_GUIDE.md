@@ -42,11 +42,11 @@ Because all underlying Computer Vision, Multilingual OCR (DBNet++ / PP-OCRv4 / P
 2. Click **New +** $\rightarrow$ **Blueprint**.
 3. Connect your GitHub repository: `https://github.com/anonymousgrouphp-collab/sih26034`.
 4. Select the `main` branch. Render will automatically detect [`render.yaml`](../render.yaml) and create:
-   - A managed **PostgreSQL 16** database (`nyayadrishti-db`).
-   - A containerized **FastAPI Web Service** (`nyayadrishti-backend`) built from the root [`Dockerfile`](../Dockerfile).
+   - A managed **PostgreSQL 16** database (`nirikshak-db`).
+   - A containerized **FastAPI Web Service** (`nirikshak-backend`) built from the root [`Dockerfile`](../Dockerfile).
 5. Click **Apply**.
 6. Once deployed, note your live backend URL:
-   `https://nyayadrishti-backend.onrender.com`
+   `https://nirikshak-backend.onrender.com`
 
 > **Note on Railway Alternative:** If using Railway, simply click **New Project** $\rightarrow$ **Deploy from GitHub Repo**, add a PostgreSQL database service, and set `DATABASE_URL=${{Postgres.DATABASE_URL}}`.
 
@@ -63,11 +63,11 @@ Because all underlying Computer Vision, Multilingual OCR (DBNet++ / PP-OCRv4 / P
    - **Build Command:** `npm run build`
    - **Output Directory:** `dist`
 5. Set Environment Variables under **Environment Variables**:
-   - `VITE_API_BASE_URL`: `https://nyayadrishti-backend.onrender.com/api/v1`
+   - `VITE_API_BASE_URL`: `https://nirikshak-backend.onrender.com/api/v1`
    - `VITE_OPERATING_MODE`: `LIVE`
 6. Click **Deploy**.
 7. Vercel will build and assign an edge-cached domain:
-   `https://nyayadrishti-lm.vercel.app`
+   `https://nirikshak.vercel.app`
 
 ---
 
@@ -76,7 +76,7 @@ Because all underlying Computer Vision, Multilingual OCR (DBNet++ / PP-OCRv4 / P
 Hugging Face Spaces provides a **free 2-vCPU / 16GB RAM CPU container** with free permanent HTTPS:
 
 1. Create a new Space at [huggingface.co/spaces](https://huggingface.co/spaces).
-2. Set Space Name: `nyayadrishti-api`.
+2. Set Space Name: `nirikshak-api`.
 3. Select SDK: **Docker** (Blank).
 4. Set Space Hardware: **CPU Basic • 2 vCPU • 16GB RAM • Free**.
 5. Push the repo to the Hugging Face Space Git remote (or configure GitHub Actions sync).

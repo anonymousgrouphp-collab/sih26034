@@ -1,7 +1,7 @@
 # REAL PRODUCT PIPELINE VALIDATION REPORT
 ## Comprehensive Empirical Testing Across 63 Physical Indian Packaging Samples
 
-**Project ID:** SIH26034 — NyayaDrishti-LM  
+**Project ID:** SIH26034 — Nirikshak
 **Auditing Entity:** Lead System Architecture & Computer Vision Evaluation Team  
 **Governing Authority:** Department of Consumer Affairs (DoCA), Ministry of Consumer Affairs, Food & Public Distribution, Government of India  
 **Legal Standard:** Legal Metrology (Packaged Commodities) Rules, 2011; Section 63 Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)  
@@ -13,7 +13,7 @@
 
 ## 1. Executive Summary
 
-To satisfy the statutory evidentiary threshold of the **Department of Consumer Affairs (DoCA)** and eliminate synthetic simulation bias, NyayaDrishti-LM was executed against a comprehensive corpus of **63 real-world physical packaged commodity photographs**. The dataset reflects actual market surveillance conditions encountered by field Legal Metrology Officers across India, featuring 12–16 megapixel captures, complex multi-lingual typography, shiny metallic foil reflections, curved surfaces, and orientation variances.
+To satisfy the statutory evidentiary threshold of the **Department of Consumer Affairs (DoCA)** and eliminate synthetic simulation bias, Nirikshak was executed against a comprehensive corpus of **63 real-world physical packaged commodity photographs**. The dataset reflects actual market surveillance conditions encountered by field Legal Metrology Officers across India, featuring 12–16 megapixel captures, complex multi-lingual typography, shiny metallic foil reflections, curved surfaces, and orientation variances.
 
 ### High-Level Benchmark Statistics
 - **Total Physical Packaging Photographs:** 63 images across 6 distinct FMCG/commodity categories.
@@ -112,7 +112,7 @@ For every one of the 63 evaluated images:
 
 ## 6. Conclusion & Recommendations
 
-The empirical validation on 63 real Indian packaging photographs confirms that NyayaDrishti-LM is robust against real-world optical noise, multilingual typography, and varying packaging geometries. The system adheres strictly to the **0.0% false accusation invariant** under Section 63 BSA 2023 by triaging degraded captures into `UNABLE_TO_VERIFY` and borderline measurements into `REVIEW`.
+The empirical validation on 63 real Indian packaging photographs confirms that Nirikshak is robust against real-world optical noise, multilingual typography, and varying packaging geometries. The system adheres strictly to the **0.0% false accusation invariant** under Section 63 BSA 2023 by triaging degraded captures into `UNABLE_TO_VERIFY` and borderline measurements into `REVIEW`.
 
 ---
 *Signed off by Autonomous Principal Verification Engineer — 12 September 2026 [VERIFIED]*

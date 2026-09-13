@@ -1,6 +1,6 @@
 # Member 1 Handoff — Computer Vision, Optics & Metrology
 
-**Subsystem:** NyayaDrishti-LM — Member 1 (CV, Optics & Metrology)  
+**Subsystem:** Nirikshak — Member 1 (CV, Optics & Metrology)
 **Assigned Engineer:** Kunal Raj ([@kunal-raj-dev](https://github.com/kunal-raj-dev))  
 **Branch:** `feat/m1-cv-metrology`  
 **Repository:** `SIH26034 - Legal Metrology`  
@@ -12,7 +12,7 @@
 
 ## 1. Subsystem Overview
 
-Member 1 provides the foundational computer vision, optical quality screening, metric scale calibration, perspective rectification, and Principal Display Panel (PDP) surface area measurement for NyayaDrishti-LM. It operates at Stages 2 through 5 of the 12-stage pipeline.
+Member 1 provides the foundational computer vision, optical quality screening, metric scale calibration, perspective rectification, and Principal Display Panel (PDP) surface area measurement for Nirikshak. It operates at Stages 2 through 5 of the 12-stage pipeline.
 
 ```
 +-----------------------------------------------------------------------------+
@@ -319,4 +319,4 @@ print(f"Calibration DTO: {calib_dto.model_dump_json(indent=2)}")
 
 ---
 
-*NyayaDrishti-LM — Confidential & Statutory Enforcement Baseline — Department of Consumer Affairs (DoCA)*
+*Nirikshak — Confidential & Statutory Enforcement Baseline — Department of Consumer Affairs (DoCA)*

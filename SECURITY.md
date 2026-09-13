@@ -2,7 +2,7 @@
 
 ## 🏛️ Security Philosophy & Evidentiary Integrity
 
-**NyayaDrishti-LM** processes physical packaged commodity scans and digital e-commerce declarations to generate statutory enforcement notices under Section 36(1) of the Legal Metrology Act, 2009. 
+**Nirikshak** processes physical packaged commodity scans and digital e-commerce declarations to generate statutory enforcement notices under Section 36(1) of the Legal Metrology Act, 2009.
 
 Maintaining cryptographic chain of custody, data confidentiality, and system integrity is critical to preserving admissibility under **Section 63 of the Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)**.
 

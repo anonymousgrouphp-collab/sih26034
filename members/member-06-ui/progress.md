@@ -696,7 +696,7 @@ SIGNED OFF BY: Parmarth Kumar (parmarthk26@gmail.com) — 2026-09-10 20:10 IST [
 ## [10 September 2026] [21:00] IST
 
 ### Task / Chunk
-Multi-Agent Integration Loop: Standout UI/UX & Diagnostic Capabilities Porting from Urvashi's UI (`nirikshak-metrolens-ai`) into React 18 SPA (`members/member-06-ui`).
+Multi-Agent Integration Loop: Standout UI/UX & Diagnostic Capabilities Porting from Urvashi's UI (`nirikshak-ui`) into React 18 SPA (`members/member-06-ui`).
 
 ### Status
 COMPLETE
@@ -919,7 +919,7 @@ COMPLETE
 
 ### Completed
 - **Institutional Branding & Legal Guardrails**:
-  - Refactored `NyayaDrishtiBrandLogo.tsx`, `GovTopBar.tsx`, and `Landing.tsx` to strictly observe government-service-grade branding without deceptive `.gov.in` claims.
+  - Refactored `NirikshakBrandLogo.tsx`, `GovTopBar.tsx`, and `Landing.tsx` to strictly observe government-service-grade branding without deceptive `.gov.in` claims.
   - Preserved full GIGW 3.0 accessibility utilities (live IST clock, font scale A-/A/A+, high contrast toggle, Hindi translation).
 - **Redesigned Field Package Capture (`NewInspection.tsx`)**:
   - Implemented dual-mode tabbed intake (Field Package Capture vs Benchmark Test Cases).
@@ -970,14 +970,14 @@ SIGNED OFF BY: Harsh Patel (anonymousgrouphp-collab@users.noreply.github.com) �
 ## [11 September 2026] [21:28] IST
 
 ### Task / Chunk
-Frontend Synthesis & Unification: Merging Institutional Legal Metrology Workstation with Nirikshak MetroLens AI into `ui-combined`.
+Frontend Synthesis & Unification: Merging Institutional Legal Metrology Workstation with Nirikshak into `ui-combined`.
 
 ### Status
 COMPLETE
 
 ### Completed
 - **Architecture & Component Synthesis**:
-  - Researched both existing frontends (`members/member-06-ui` institutional portal & `nirikshak-metrolens-ai` field inspector UI).
+  - Researched both existing frontends (`members/member-06-ui` institutional portal & `nirikshak-ui` field inspector UI).
   - Built unified workstation in `ui-combined/` combining GIGW 3.0 institutional governance, Section 63 BSA 2023 evidentiary standards, Table-I font schedule, and Nirikshak's clean 5-stage pipeline and photogrammetric vision canvas.
   - Implemented modular component suite under `ui-combined/src/components/nirikshak`:
     - `PipelineStepper.tsx`: 5-stage interactive pipeline progress breadcrumb (`Capture` ➔ `OCR` ➔ `Calibration` ➔ `Rules` ➔ `Adjudication`).
@@ -1039,7 +1039,7 @@ COMPLETE
   - Added `whitespace-nowrap shrink-0` to all workspace tab buttons (`Overview`, `Split-Canvas`, `Formal Report`, `Audit & Diagnostics`).
   - Added responsive labels to all tabs so they never wrap into two awkward rows on standard 1024px–1440px desktop screens.
   - Made audit sub-navigation bar similarly shrink-proof with responsive text (`Section 63 BSA` / `12-Stage Pipeline`).
-- **Brand Logo & Shell Overflow Prevention (`NyayaDrishtiBrandLogo.tsx` & `AppShell.tsx`)**:
+- **Brand Logo & Shell Overflow Prevention (`NirikshakBrandLogo.tsx` & `AppShell.tsx`)**:
   - Made brand subtitle responsive (`hidden xl:block`) and added `shrink-0` to prevent logo from pushing out header controls.
   - Added `overflow-x-hidden` and `min-w-0` to `AppShell.tsx` and flex containers to eliminate document-level horizontal scrollbar and protect sticky header positioning.
 - **Translations (`translations.ts`)**:
@@ -1134,7 +1134,7 @@ Header Emblem Hover Protrusion Resolution, Operational Mode Switcher Interactive
 COMPLETE
 
 ### Completed
-- **Emblem Hover Protrusion Resolution (`NyayaDrishtiBrandLogo.tsx`)**:
+- **Emblem Hover Protrusion Resolution (`NirikshakBrandLogo.tsx`)**:
   - Rescaled medium State Emblem width from `36px` to `24px` (`height ~ 41px`), giving $10.7\text{px}$ clearance above and $8.2\text{px}$ below within the $64\text{px}$ header bar.
   - Removed `group-hover:scale-105` on the emblem frosted container, completely eliminating the top frosted box protruding over the orange accent line.
   - Replaced scaling with subtle, elegant sovereign border/background highlights (`group-hover:border-white/40 group-hover:bg-white/15 transition-colors`).
@@ -1280,7 +1280,7 @@ COMPLETE
 
 ### Completed
 - **Bespoke Sovereign & Institutional Asset Generation**:
-  - Engineered 4 Brand assets: `nyayadrishti_mark.svg`, `nyayadrishti_logo_primary.svg`, `nyayadrishti_logo_dark.svg`, `favicon.svg`.
+  - Engineered 4 Brand assets: `nirikshak_mark.svg`, `nirikshak_logo_primary.svg`, `nirikshak_logo_dark.svg`, `favicon.svg`.
   - Engineered 3 Metrological Instructional Guidance assets: `camera_framing_guide.svg` (90° planar angle, ArUco 50mm placement, diffuse glare prevention), `calibration_scale_guide.svg` (ArUco 50mm $\rightarrow$ 420px $\rightarrow$ 0.119 mm/px $\rightarrow$ Table-I font verification), `evidence_extraction_pipeline.svg` (5-Stage statutory dataflow architecture).
   - Engineered 3 Empty State vectors: `empty_search.svg`, `empty_review_queue.svg`, `empty_dossiers.svg`.
   - Engineered 2 Administrative Error vectors: `error_404_dossier.svg` (404 NOT FOUND dossier), `error_403_restricted.svg` (RBAC clearance boundary).
@@ -1346,7 +1346,7 @@ COMPLETE
   - `emblem_india_black.png` & `state_emblem_of_india.svg` (Deep slate `#0F172A` on transparent, for standard gazette printing).
 - **Universal Component Integration**:
   - Refactored `StateEmblem.tsx` to dynamically resolve `tone` (`white`, `navy`, `gold`, `monochrome`) and enforce the authentic $717 \times 1209$ aspect ratio ($\text{ratio} \approx 1.686$).
-  - Propagated across `Header.tsx`, `NyayaDrishtiBrandLogo.tsx`, `Login.tsx`, `NotFound.tsx`, `Unauthorized.tsx`, `InspectionReportView.tsx`, `GovFooter.tsx`, `GovStampSeal.tsx`, and `AdjudicationCanvas.tsx`.
+  - Propagated across `Header.tsx`, `NirikshakBrandLogo.tsx`, `Login.tsx`, `NotFound.tsx`, `Unauthorized.tsx`, `InspectionReportView.tsx`, `GovFooter.tsx`, `GovStampSeal.tsx`, and `AdjudicationCanvas.tsx`.
 - **Regenerated Gazette Form-1 PDF (`form1.pdf`)**:
   - Re-executed `build_form1.py` with ReportLab using the ultra-high-definition transparent emblem asset.
   - Deployed to `ui-combined/public/form1.pdf` and `dist/form1.pdf`.
@@ -1384,10 +1384,10 @@ COMPLETE
 
 ### Completed
 - **100% Comprehensive Hindi Localization**:
-  - Eliminated all English text leaks when `language === "hi"` across the entire NyayaDrishti-LM web platform.
+  - Eliminated all English text leaks when `language === "hi"` across the entire Nirikshak web platform.
   - Implemented authentic Government of India Gazette legal metrology terminology conforming to LMPC Rules, 2011, Section 63 BSA 2023, and Section 15 LM Act 2009.
 - **Components & Features Localized**:
-  - **Core Layout & Navigation**: `Header.tsx`, `Sidebar.tsx`, `GovTopBar.tsx`, `GovFooter.tsx`, `NationalLeadershipBanner.tsx`, `NyayaDrishtiBrandLogo.tsx`, `StatutoryOmnibox.tsx`, `StatutorySurveillanceTicker.tsx`, `StatutoryPipelineInfographic.tsx`, `AppShell.tsx` (skip link, registration notifications).
+  - **Core Layout & Navigation**: `Header.tsx`, `Sidebar.tsx`, `GovTopBar.tsx`, `GovFooter.tsx`, `NationalLeadershipBanner.tsx`, `NirikshakBrandLogo.tsx`, `StatutoryOmnibox.tsx`, `StatutorySurveillanceTicker.tsx`, `StatutoryPipelineInfographic.tsx`, `AppShell.tsx` (skip link, registration notifications).
   - **All Pages**: `Landing.tsx`, `Login.tsx`, `Dashboard.tsx`, `Inspections.tsx`, `NewInspection.tsx`, `InspectionDetails.tsx`, `EvidenceDossier.tsx`, `ReviewQueue.tsx`, `Rules.tsx`, `Reports.tsx`, `Settings.tsx`, `NotFound.tsx`, `Unauthorized.tsx`.
   - **Adjudication & Findings**: `AdjudicationCanvas.tsx`, `OfficerAdjudicationModal.tsx`, `ConflictResolutionCard.tsx`, `FindingsLedger.tsx`, `FieldDetailPanel.tsx`, `EvidenceViewer.tsx`.
   - **Case Lifecycle & Reports**: `CaseHeader.tsx`, `CaseWorkspace.tsx`, `InspectionOutcome.tsx`, `CaseClosureModal.tsx`, `InspectionReportView.tsx`, `AnalysisHUD.tsx`, `EvidenceIntake.tsx`.
@@ -1767,8 +1767,8 @@ COMPLETE
   - Generated and deployed pure vectors for `emblem_india_white.svg` (pure white `#FFFFFF`), `emblem_india_navy.svg` (deep Ashoka Navy `#1B365D`), `emblem_india_gold.svg` (`#B45309`), `emblem_india_black.svg` (`#0F172A`), and `state_emblem_of_india.svg` (`fill="currentColor"`).
   - Synchronized assets across `ui-combined/public/`, `ui-combined/dist/`, `dist/`, and `members/member-06-ui/dist/`.
 - **Portal-Wide Harmonization & Single-Color Consistency**:
-  - `NyayaDrishtiBrandLogo.tsx`: Removed the enclosing box container; emblem renders unboxed and independent beside typography hierarchy.
-  - `Landing.tsx`: Harmonized navbar to sovereign dark navy (`bg-[#0B1727]` / `bg-govNavy` with tricolor line) with `<NyayaDrishtiBrandLogo tone="light" />` for 100% portal-wide brand unity.
+  - `NirikshakBrandLogo.tsx`: Removed the enclosing box container; emblem renders unboxed and independent beside typography hierarchy.
+  - `Landing.tsx`: Harmonized navbar to sovereign dark navy (`bg-[#0B1727]` / `bg-govNavy` with tricolor line) with `<NirikshakBrandLogo tone="light" />` for 100% portal-wide brand unity.
   - `Login.tsx`: Removed boxed tiles from both left hero masthead (unboxed pure white emblem) and right officer gateway card (unboxed deep navy emblem).
   - `GovFooter.tsx`: Removed enclosing box; unboxed white emblem anchored with Ministry and Department attribution.
   - `InspectionReportView.tsx`: Form-1 statutory report notice header now displays unboxed deep navy emblem directly on white paper.
@@ -1817,7 +1817,7 @@ COMPLETE
 - **`Landing.tsx` Sovereign Hero Overhaul**:
   - Replaced generic boxed scale container with centered, majestic, unboxed State Emblem of India (`<StateEmblem size={58} tone="white" showMotto={true} />`).
   - Implemented authentic sovereign portal brand typography directly below the emblem:
-    - `nyayadrishti.gov.in`
+    - `nirikshak.gov.in`
     - `NATIONAL LEGAL METROLOGY PORTAL`
     - `DEPARTMENT OF CONSUMER AFFAIRS • GOVERNMENT OF INDIA`
 - **`Dashboard.tsx` Executive Inspection Control Centre Elevation**:
@@ -1840,7 +1840,7 @@ None.
 
 ### Decisions
 1. Emerald green (`#146337`) search CTA button perfectly captures the sovereign National Portal of India palette, creating harmony with the national tricolor and avoiding alarming red tones.
-2. Centering the unboxed white Ashoka Lion Capital directly above `nyayadrishti.gov.in` gives the portal unquestioned official authority matching `india.gov.in`.
+2. Centering the unboxed white Ashoka Lion Capital directly above `nirikshak.gov.in` gives the portal unquestioned official authority matching `india.gov.in`.
 
 ### Next Step
 Prepare final live demo walkthrough and pitch presentation materials.
@@ -2375,7 +2375,7 @@ COMPLETE
   - Converts typical 4 MB – 15 MB smartphone photos into crisp ~60 KB – 90 KB payloads, eliminating HTTP 413 errors and network timeouts.
   - Wired into `NewInspection.tsx` (`handleFilesSelected` and `handleStartAnalysis`) and `LiveApiService.uploadEvidence()`.
 - **Sitewide Central Database Persistence (`api.ts` & `liveApi.ts`):**
-  - All commodity inspections, field photographs, and pipeline findings are saved to the live PostgreSQL database hosted on Render (`https://nyayadrishti-backend.onrender.com`).
+  - All commodity inspections, field photographs, and pipeline findings are saved to the live PostgreSQL database hosted on Render (`https://nirikshak-backend.onrender.com`).
   - Removed accidental permanent latching of `"MOCK"` into `localStorage` on transient network errors.
   - Default operating mode is strictly `LIVE`, auto-sanitizing any legacy `MOCK` string from `localStorage`.
   - `ApiService.listInspections` loads central cases from Render PostgreSQL and merges any unsynced local drafts, sorting descending by date so new cases appear immediately at the top of the Inspection Desk and Dashboard across all devices.
@@ -2418,7 +2418,7 @@ COMPLETE
 ### Completed
 - **Eliminated Hardcoded `/form1.pdf` Links:** Replaced the hardcoded `<a href="/form1.pdf">` in `InspectionReportView.tsx` with dynamic `handleDownloadPdf`. If backend PDF generation is available, it downloads the exact commodity PDF from Render. If running locally or offline, it triggers the high-fidelity browser Print-to-PDF engine with Section 63 BSA 2023 seal, never serving a mismatched product.
 - **Removed Silent Fallbacks in `CaseWorkspace.tsx` and `AdjudicationCanvas.tsx`:** When generating notice, if a backend URL is unavailable, officers are redirected to the on-screen Form-1 Report View (`setActiveWorkspaceView("REPORT")`), rendering the exact commodity particulars (Boult Earbuds, etc.) instead of downloading "FizzUp Lemon Drink".
-- **Absolute Backend Origin Resolution (`liveApi.ts`):** Fixed `pdf_download_url` resolution so relative `/api/v1/notices/{id}/pdf` paths prepend the live backend origin (`https://nyayadrishti-backend.onrender.com`), resolving Vercel 404 errors.
+- **Absolute Backend Origin Resolution (`liveApi.ts`):** Fixed `pdf_download_url` resolution so relative `/api/v1/notices/{id}/pdf` paths prepend the live backend origin (`https://nirikshak-backend.onrender.com`), resolving Vercel 404 errors.
 - **Overhauled Static Specimen (`public/form1.pdf`):** Regenerated `public/form1.pdf` using Python ReportLab to serve a neutral, official Government of India Model Statutory Specimen Notice with zero reference to "FizzUp Lemon Drink".
 
 ### Tests
@@ -2565,7 +2565,7 @@ None. All tests and static asset routes verified cleanly.
 Commit and push changes to `main` and `dev` so Vercel and Render deploy the verified multi-angle asset bundle.
 
 ### Signing Note
-SIGNED OFF BY: Parmarth Kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-13 03:22 IST [VERIFIED]
+SIGNED OFF BY: Parmarth Kumar (parmarth.kumar@nirikshak.gov.in) — 2026-09-13 03:22 IST [VERIFIED]
 
 
 

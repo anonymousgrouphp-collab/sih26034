@@ -1,7 +1,7 @@
 # FINAL COMPREHENSIVE LIVE DEMONSTRATION PLAN
 
 **Project ID:** SIH26034  
-**Product:** NyayaDrishti-LM  
+**Product:** Nirikshak
 **Audience:** Smart India Hackathon 2026 Evaluation Jury (DoCA & Domain Experts)  
 **Status:** FROZEN  
 
@@ -9,7 +9,7 @@
 
 ### 1. The Three-Tier Demo Safety Architecture
 
-To guarantee that the live hackathon evaluation proceeds flawlessly regardless of venue network volatility, hardware glitches, or podium lighting constraints, NyayaDrishti-LM implements a **3-Tier Demo Architecture**:
+To guarantee that the live hackathon evaluation proceeds flawlessly regardless of venue network volatility, hardware glitches, or podium lighting constraints, Nirikshak implements a **3-Tier Demo Architecture**:
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -35,13 +35,13 @@ To guarantee that the live hackathon evaluation proceeds flawlessly regardless o
 #### MINUTE 1: The Problem & The Scientific Litmus Test (0:00 - 1:00)
 
 - **Speaker:** Team Leader
-- **Action:** Hold up a physical biscuit carton alongside an open laptop displaying the NyayaDrishti-LM web portal login.
+- **Action:** Hold up a physical biscuit carton alongside an open laptop displaying the Nirikshak web portal login.
 - **Pitch:**
   > _"Respected Judges, India has approximately 3,000 Legal Metrology officers regulating billions of pre-packaged commodities across 12 million retail shops. Today, an officer spends 8 minutes per pack using a manual magnifying loupe, a handheld ruler, and manual arithmetic. Less than 0.1% of packages are ever inspected._
   >
   > _Amateur teams attempt to point a smartphone camera and prompt an ungrounded LLM to 'judge' the label. But as metrology and legal experts know, a 2D camera sees only uncalibrated pixels, not physical millimeters. Claiming to measure font height without optical scale calibration violates projective geometry._
   >
-  > _We present **NyayaDrishti-LM**: an online-first web enforcement platform built for the Department of Consumer Affairs, featuring an optional local inspection capability for field officers in network-deprived circles. It solves the millimeter problem with mathematical rigor and enforces the Legal Metrology (Packaged Commodities) Rules, 2011 deterministically."_
+  > _We present **Nirikshak**: an online-first web enforcement platform built for the Department of Consumer Affairs, featuring an optional local inspection capability for field officers in network-deprived circles. It solves the millimeter problem with mathematical rigor and enforces the Legal Metrology (Packaged Commodities) Rules, 2011 deterministically."_
 
 #### MINUTE 2: Live Web Ingestion, Metric Calibration & Violation Detection (1:00 - 2:00)
 
@@ -66,9 +66,9 @@ To guarantee that the live hackathon evaluation proceeds flawlessly regardless o
   >
   > _Instantly, our platform compiles an immutable SHA-256 Merkle DAG conforming to Section 63 of the Bharatiya Sakshya Adhiniyam, 2023, and produces a court-ready, tamper-evident Inspection Dossier citing exact Gazette GSR notifications._
   >
-  > _All inspection records, metrics, and evidence files are centrally persisted in our PostgreSQL datastore, giving State Controllers real-time enforcement analytics. And if an officer is deployed in a remote circle with zero connectivity, NyayaDrishti-LM provides a local offline inspection mode that executes the exact same inspection pipeline locally on standard laptop CPUs, securely queueing signed sync bundles for upload._
+  > _All inspection records, metrics, and evidence files are centrally persisted in our PostgreSQL datastore, giving State Controllers real-time enforcement analytics. And if an officer is deployed in a remote circle with zero connectivity, Nirikshak provides a local offline inspection mode that executes the exact same inspection pipeline locally on standard laptop CPUs, securely queueing signed sync bundles for upload._
   >
-  > _NyayaDrishti-LM is not an ungrounded research toy; it is an online, scalable, legally defensible enforcement system for the Ministry of Consumer Affairs."_
+  > _Nirikshak is not an ungrounded research toy; it is an online, scalable, legally defensible enforcement system for the Ministry of Consumer Affairs."_
 
 ---
 

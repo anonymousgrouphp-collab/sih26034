@@ -1,7 +1,7 @@
 # FINAL TRUTH VALIDATION REPORT
 ## System Authenticity, Mock Isolation, and Empirical Evidentiary Verification
 
-**System:** NyayaDrishti-LM (SIH26034)  
+**System:** Nirikshak (SIH26034)
 **Standard:** Section 63 Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)  
 **Verification Date:** 12 September 2026  
 **Auditor:** Principal Software Engineer, Computer Vision Architect & Skeptical Technical Reviewer  

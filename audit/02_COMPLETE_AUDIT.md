@@ -1,4 +1,4 @@
-# 02 — COMPLETE DETAILED AUDIT REPORT: METROLENS (SIH26034)
+# 02 — COMPLETE DETAILED AUDIT REPORT: NIRIKSHAK (SIH26034)
 
 **Document Classification:** Comprehensive Multi-Perspective Technical & Statutory Audit  
 **Project Identifier:** SIH26034  

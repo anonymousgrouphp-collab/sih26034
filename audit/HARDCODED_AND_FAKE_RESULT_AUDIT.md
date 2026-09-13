@@ -1,7 +1,7 @@
 # HARDCODED AND FAKE RESULT AUDIT
 ## Comprehensive Audit of Mock Bypasses, Hardcoded Shortcuts, and Remediation Actions
 
-**Project:** NyayaDrishti-LM (SIH26034)  
+**Project:** Nirikshak (SIH26034)
 **Verification Date:** 12 September 2026  
 **Auditor:** Skeptical Principal Systems Auditor & Anti-Tamper Specialist  
 
