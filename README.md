@@ -117,12 +117,14 @@ Administrative authority is strictly separated via role-based access control (RB
 - **Multi-Source Ingestion:** Supports live camera captures, high-resolution multi-facet photos, and Rule 6(10) e-commerce URLs.
 
 ### 2. Physical Measurement & Metric Calibration
-- **Scale Calibration:** Computes physical millimeter scale from standard reference cards or ArUco markers on standard camera hardware.
+- **Scale Calibration:** Computes physical millimeter scale from standard ISO-7810 debit/credit cards ($85.60\text{ mm} \times 53.98\text{ mm}$) or ArUco markers ($50.0\text{ mm}$) on standard smartphone/camera hardware.
 - **PDP Surface Area:** Determines physical packaging face area across rectangular, cylindrical, and flexible packages.
 - **Numeral Font Measurement:** Measures physical millimeter numeral height to verify compliance against statutory minimums.
 
-### 3. Multilingual Declaration Extraction
+### 3. Multilingual Declaration Extraction & Vision Probing
 - **Bilingual Scene Text:** Transcribes packaging declarations across English and Devanagari Hindi text.
+- **180° Inversion Auto-Detection:** Automatically probes inverted 180° orientation on low-confidence crops ($p_{\text{conf}} < 0.92$), transcribing upside-down physical packaging labels with $> 0.98$ confidence.
+- **Multi-Facet Cross-Panel Fusion:** Fuses declarations across multiple package panels (`FRONT_PDP`, `SIDE_PANEL`, `MACRO_CLOSE_UP`, `STAMP`, `BOTTOM_BASE`, `BACK_PANEL`) into a unified statutory record.
 - **Statutory Entity Parsing:** Extracts mandatory declarations: MRP, Net Quantity, Unit Sale Price, Dates, Consumer Care, and Origin.
 - **Prohibited Unit Detection:** Flags non-standard metric abbreviations (`gms`, `gm`, `ML`, `ltrs`) prohibited under Section 11.
 
@@ -136,9 +138,10 @@ Administrative authority is strictly separated via role-based access control (RB
 - **Audit-Logged Overrides:** Requires mandatory written justification remarks whenever an officer overrides a recommendation.
 - **Case State Lifecycle:** Enforces structured case progression from initial registration to final administrative disposition.
 
-### 6. Cryptographic Evidence Trail
+### 6. Cryptographic Evidence Trail & Cloud Datastore
 - **Section 63 BSA Support:** Generates evidentiary metadata and audit logs supporting Section 63 BSA 2023 digital evidence workflows.
 - **Merkle Chain of Custody:** Anchors source images, extracted tokens, and officer decisions in a tamper-evident SHA-256 hash tree.
+- **Supabase Cloud Storage & PostgreSQL:** Provides persistent cloud object storage (`evidence-images` bucket) and PostgreSQL 16 datastore with complete cryptographic disposal linking.
 - **Form-1 Statutory Notice PDF:** Compiles formal inspection memos with evidence crops, cryptographic digests, and signature blocks.
 
 ### 7. Offline Field Resilience (Mode B)
@@ -182,9 +185,9 @@ Nirikshak is backed by empirical testing on real retail commodities and automate
 </p>
 
 ### Golden Demonstration SKUs
-Seven representative reference commodities are packaged directly into the workspace for instant demonstration:
+Thirteen representative reference commodities (7 statutory edge cases + 6 certified real physical packaging cases) are packaged directly into the workspace and catalog for instant demonstration:
 
-| SKU | Scenario | Result | Key Diagnostic Observation |
+| SKU / ID | Scenario | Result | Key Diagnostic Observation & Legal Basis |
 |:---|:---|:---:|:---|
 | **DEMO-01** | Sunfeast Butter Cookies 200g | `FAIL` | Table-I font deficit ($2.8\text{ mm} < 4.0\text{ mm}$); prohibited unit `gms` |
 | **DEMO-02** | Everest Garam Masala 100g | `FAIL` | USP mismatch ($\text{Rs } 0.45/\text{g}$ declared vs $\text{Rs } 0.52/\text{g}$ computed) |
@@ -193,6 +196,13 @@ Seven representative reference commodities are packaged directly into the worksp
 | **DEMO-05** | Kurkure Masala Munch 90g | `UNABLE_TO_VERIFY` | Specular glare bloom obscuring net quantity panel; routes to recapture |
 | **DEMO-06** | Royal Delight Almonds 500g | `FAIL` | E-Commerce: missing Country of Origin declaration; exempts Mfg Date |
 | **DEMO-07** | Fortune Sunlite Oil 1L | `FAIL` | Indic Hindi Devanagari Net Qty numeral font deficit ($2.9\text{ mm} < 4.0\text{ mm}$) |
+| **REAL-PKG-WATCH** | Fastrack Wristwatch (`Item 1`) | `PASS` | Single unit count (`01 NUMBER` $\rightarrow$ `1 N`) exempt from USP under Rule 6(1)(da) Second Proviso; 180° inverted label auto-rectified |
+| **REAL-PKG-BRAHMI** | Himalaya Brahmi 60T (`Item 2`) | `PASS` | Tri-panel fusion: Front PDP, Side LM panel with rate `Rs. 4.33/TAB.`, Back panel registered office Bangalore `560058` |
+| **REAL-PKG-FACEWASH** | Dot & Key Face Wash 100ml (`Item 3`) | `PASS` | Dual corporate entity decoupling (Mfg Solan HP vs Mkt Kolkata WB); volume rate `₹2.49/ml` verified |
+| **REAL-PKG-PERFUME** | Bella Vita Perfume 20ml (`Item 4`) | `PASS` | Base panel batch stamp fusion; volume rate `₹19.95/ml`; Gurugram Haryana manufacturing entity |
+| **REAL-PKG-NAMKEEN** | Haldiram's Namkeen 400g (`Item 5`) | `PASS` | Clean SI unit symbol `400 g` (0 prohibited `gms` flags); mass rate `Rs. 0.25/g` verified |
+| **REAL-PKG-CHIA** | True Elements Chia 250g (`Item 6`) | `PASS` | Nutritional declaration isolation; rate `₹1.40/g`; Pune Maharashtra address & consumer care verified |
+
 
 ---
 

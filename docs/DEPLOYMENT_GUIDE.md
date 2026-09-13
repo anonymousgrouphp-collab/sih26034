@@ -18,8 +18,10 @@ Because all underlying Computer Vision, Multilingual OCR (DBNet++ / PP-OCRv4 / P
 | :--- | :--- | :--- | :--- |
 | **Frontend Workstation** (React 18 + Vite) | **Vercel** (Global Edge CDN) | Netlify / Cloudflare Pages | Nginx / FastAPI static mount |
 | **Backend API & ML Pipeline** (FastAPI) | **Render** (Docker Web Service) | **Railway** / **Hugging Face Spaces** | `python main.py` on `localhost:8000` |
-| **Relational Datastore** (Mode A) | **Render Managed PostgreSQL** | Supabase / Neon Serverless Postgres | `postgres:16-alpine` in Docker |
+| **Relational Datastore** (Mode A) | **Supabase PostgreSQL 16** | Render Managed PostgreSQL / Neon | `postgres:16-alpine` in Docker |
+| **Evidence Object Storage** (Mode A) | **Supabase Cloud Storage** (`evidence-images`) | AWS S3 / Cloudflare R2 | Local File System (`uploads/`) |
 | **Resilient Datastore** (Mode B) | Embedded SQLite 3.45+ | Embedded SQLite 3.45+ | Embedded `legal_metrology.db` |
+
 
 ---
 
@@ -140,10 +142,16 @@ Open browser at:
 | :--- | :--- | :--- |
 | `DATABASE_URL` | `sqlite:///legal_metrology.db` | PostgreSQL connection string (Mode A) or SQLite URI (Mode B). Auto-normalizes `postgres://` to `postgresql://`. |
 | `NYAYADRISHTI_SECRET_KEY` | *(Internal Default Salt)* | Cryptographic key used to sign JWT auth tokens per Section 63 BSA 2023. |
+| `SUPABASE_URL` | `None` | Supabase Cloud project URL (e.g. `https://ihqhfusgkullpbjfmjiy.supabase.co`). |
+| `SUPABASE_SERVICE_ROLE_KEY` | `None` | Backend service-role secret key for uploading/deleting evidence in Supabase Storage bucket. |
+| `SUPABASE_BUCKET_NAME` | `evidence-images` | Supabase Object Storage bucket name for persistent packaging evidence. |
 | `PORT` | `8000` | Port for the Uvicorn web server. |
 | `HOST` | `0.0.0.0` | Bind host address. |
 | `VITE_API_BASE_URL` | `/api/v1` | Base URL used by the React client to contact the API (e.g. `https://api.example.com/api/v1`). |
 | `VITE_OPERATING_MODE` | `MOCK` | Default UI operating mode (`LIVE`, `MOCK`, or `DEMO_FIXTURE`). Can be toggled at runtime in the UI. |
+| `VITE_SUPABASE_URL` | `None` | Public Supabase URL configured in Vercel for frontend asset resolution. |
+| `VITE_SUPABASE_ANON_KEY` | `None` | Public anonymous publishable key configured in Vercel. |
+
 
 ---
 

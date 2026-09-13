@@ -85,3 +85,30 @@ Your module is complete when:
 - You must NOT depend on generative LLM APIs.
 - You must NOT evaluate final legal penalties (that belongs to Member 4).
 Your module runs completely on local OCR fixtures!
+
+---
+
+## 11. Multi-Facet Cross-Panel Semantic Fusion (`fusion.py`)
+
+Physical retail packaging frequently distributes statutory declarations across multiple faces of a 3D container. The extraction engine supports multi-angle cross-panel hierarchical fusion:
+- **`PANEL_PRIORITY` Hierarchy:**
+  - `FRONT_PDP` / `PDP_FRONT`: Rank 100 (Primary declaration surface: commodity name, brand, net quantity).
+  - `SIDE_PANEL_LEFT` / `SIDE_PANEL_RIGHT` / `SIDE_PANEL`: Rank 80 (Side legal metrology panels: MRP, Unit Sale Price, dates).
+  - `MACRO_CLOSE_UP` / `CLOSE_UP`: Rank 75 (High-resolution batch and date stamps).
+  - `STAMP`: Rank 70 (Thermal / inkjet manufacturing marks).
+  - `BOTTOM_BASE`: Rank 65 (Base flap carton declarations).
+  - `BACK_PANEL`: Rank 60 (Manufacturer registered factory, corporate entities, consumer care).
+- Aggregates facts without losing source token bounding polygon provenance and panel IDs for Section 63 BSA 2023 evidentiary auditing.
+
+---
+
+## 12. Real Physical Packaging Benchmark Suite
+
+The module is verified against real retail commercial packaging datasets (`tests/test_physical_dataset_benchmark.py`):
+1. **Fastrack Wristwatch (`REAL-PKG-WATCH`):** Single-unit count normalization (`01 NUMBER` -> `1 N`), exempt from Unit Sale Price under Rule 6(1)(da) Second Proviso.
+2. **Himalaya Brahmi 60T (`REAL-PKG-BRAHMI`):** Multi-facet tri-panel fusion, inverted unit rate (`Rs. 4.33/TAB.`), 6-digit factory PIN `560058`.
+3. **Dot & Key Face Wash (`REAL-PKG-FACEWASH`):** Dual corporate entity decoupling (Manufacturer in Himachal Pradesh vs Marketer in West Bengal), volume unit rate (`₹2.49/ml`).
+4. **Bella Vita Perfume (`REAL-PKG-PERFUME`):** Base panel batch stamp fusion, rate parsing (`₹19.95/ml`).
+5. **Haldiram's Namkeen (`REAL-PKG-NAMKEEN`):** Strict SI metric symbol verification (`400 g` passes with 0 prohibited units), rate math (`Rs. 0.25/g`).
+6. **True Elements Chia Seeds (`REAL-PKG-CHIA`):** Nutritional facts isolation, alphanumeric customer care phone/email verification.
+

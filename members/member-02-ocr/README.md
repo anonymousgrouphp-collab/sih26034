@@ -132,6 +132,9 @@ Member 1 (Rectified Image)
 
 5. **`engine.py` (`MultilingualOCREngine`)**:
    - End-to-end orchestrator outputting validated `OCROutput` DTOs conforming to `contracts/ocr/ocr_dto.py` and `contracts/ocr/ocr_schema.json`.
+   - **180° Inversion Auto-Detection & Rectification**: Conditional per-crop orientation probe triggered when initial recognition confidence $< 0.92$. Automatically evaluates 180° inverted candidate `crop_180` and replaces tokens if confidence improves by $\Delta_{\text{conf}} > 0.05$. Fully verified on real upside-down physical packaging photograph (`Item 1 - Watch/close_01.jpg`), extracting all 15 tokens upright with 0.98 confidence.
+   - Selectable execution provider modes: `FP32` (authoritative AVX2 production default) and `INT8` (PTQ static quantization).
+
 
 ---
 
