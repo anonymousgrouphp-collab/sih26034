@@ -471,11 +471,18 @@ export class LiveApiService implements IInspectionApiService {
             resolvedPath = "/storage/uploads/REAL-PKG-06_8901262010016.jpg";
           } else if (rawLower.includes("real-pkg-07")) {
             resolvedPath = "/storage/uploads/REAL-PKG-07_7622202334009.jpg";
-          } else if (rawLower.includes("real-pkg-08")) {
-            resolvedPath = "/storage/uploads/REAL-PKG-08_9556001137722.jpg";
+          } else if (rawLower.includes("real_products")) {
+            resolvedPath = rawPath.startsWith("/") ? rawPath : `/${rawPath}`;
+          } else if (img.image_url && (img.image_url.startsWith("http://") || img.image_url.startsWith("https://"))) {
+            resolvedPath = img.image_url;
+          } else if (img.supabase_url) {
+            resolvedPath = img.supabase_url;
+          } else if (img.id) {
+            // Canonical live evidence streaming route from backend
+            resolvedPath = `${this.baseUrl}/evidence/image/${img.id}`;
           } else if (rawPath.startsWith("uploads/") || rawPath.startsWith("storage/uploads/") || rawPath.startsWith("/uploads/")) {
             const cleanPath = rawPath.replace(/^\/?(storage\/)?/, "");
-            resolvedPath = `/storage/${cleanPath}`;
+            resolvedPath = `https://ihqhfusgkullpbjfmjiy.supabase.co/storage/v1/object/public/evidence-images/${cleanPath}`;
           } else if (rawPath.startsWith("storage/")) {
             resolvedPath = `/${rawPath}`;
           } else if (rawPath.length > 0) {
@@ -496,7 +503,7 @@ export class LiveApiService implements IInspectionApiService {
             image_id: img.id,
             inspection_id: insp.id,
             file_path: resolvedPath,
-            preview_url: imgCache?.preview_url || (resolvedPath.startsWith("http") || resolvedPath.startsWith("blob:") ? resolvedPath : undefined),
+            preview_url: imgCache?.preview_url || resolvedPath,
             raw_sha256: img.sha256,
             panel_type: panelType,
             image_width: img.image_width || 1920,

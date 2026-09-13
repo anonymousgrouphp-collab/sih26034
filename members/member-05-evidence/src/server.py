@@ -812,10 +812,15 @@ def get_evidence_image(
                     break
 
     if not file_path or not file_path.exists():
+        # Check in-memory LRU cache
+        cached_bytes = _IMAGE_MEMORY_CACHE.get(image_id) or (_IMAGE_MEMORY_CACHE.get(ev_image.raw_sha256) if ev_image.raw_sha256 else None)
+        if cached_bytes:
+            return Response(content=cached_bytes, media_type="image/jpeg")
         raise HTTPException(status_code=404, detail="Physical packaging image file not found on disk.")
 
     media_type = "image/png" if str(file_path).lower().endswith(".png") else "image/jpeg"
     return FileResponse(path=str(file_path), media_type=media_type)
+
 
 
 @app.post(
@@ -2011,9 +2016,19 @@ def get_inspection_detail(
                 elif isinstance(raw_box, (list, dict)):
                     ref_box = raw_box
 
+            img_public_url = None
+            if storage_manager.supabase and storage_manager.supabase.is_configured and img.file_path:
+                try:
+                    img_public_url = storage_manager.supabase.get_public_url(img.file_path)
+                except Exception:
+                    pass
+
             evidence_images_data.append({
                 "id": img.id,
                 "file_path": img.file_path,
+                "image_url": img_public_url or f"/api/v1/evidence/image/{img.id}",
+                "preview_url": img_public_url or f"/api/v1/evidence/image/{img.id}",
+                "supabase_url": img_public_url,
                 "sha256": img.raw_sha256,
                 "panel_type": img.panel_type,
                 "image_width": img.image_width or 1920,

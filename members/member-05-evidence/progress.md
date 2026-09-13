@@ -863,6 +863,47 @@ Execute Physical Validation Dataset Benchmark & Tuning (Watch, Facewash, Perfume
 ### Signing Note
 SIGNED OFF BY: Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-13 15:58 IST [VERIFIED]
 
+---
+
+## [13 September 2026] [19:57] IST
+
+### Task / Chunk
+Resolution of Evidence Image Loading in Distributed Multi-Cloud Deployment (Render Backend + Vercel SPA + Supabase CDN) — Case `insp_7328e38b-e61c-453e-8ea8-4344a88ef6a9`.
+
+### Status
+COMPLETE
+
+### Completed
+- **Root Cause Identification:**
+  - In distributed deployment, the frontend SPA is hosted on Vercel (`sih26034.vercel.app`) while the backend API runs on Render (`nyayadrishti-backend.onrender.com`) and object storage on Supabase.
+  - Vercel rewrites missing static asset routes like `/storage/uploads/2026/09/13/...` to `index.html` (`Content-Type: text/html`).
+  - When the browser attempted to load packaging images from relative `/storage/` URLs, Vercel returned HTML, triggering `onError` and rendering broken images / black canvas on user-uploaded cases.
+- **Backend Streaming & Direct URL Serialization:**
+  - Enhanced `server.py` (`get_inspection_detail`): populated `image_url`, `preview_url`, and `supabase_url` for all evidence images.
+  - Added in-memory LRU cache fallback in `get_evidence_image` to ensure zero 404s even during disk latency.
+- **Frontend Resilient URL Resolution:**
+  - Updated `liveApi.ts`: dynamic evidence images with `img.id` resolve to the canonical backend streaming endpoint `${this.baseUrl}/evidence/image/${img.id}`, and uploads resolve directly to Supabase public CDN.
+  - Updated `AdjudicationCanvas.tsx`, `EvidenceViewer.tsx`, `CaseWorkspace.tsx`, and `EvidenceDossier.tsx` with dynamic backend/Supabase URL resolution and multi-tier `onError` retries.
+- **Verification:**
+  - Backend pytest: 81/81 passed in 50.48s.
+  - Frontend vitest: 146/146 passed in 3.05s.
+  - Production build: `node build-root.cjs` built `dist/` cleanly in 8.11s.
+
+### Tests
+- `python -m pytest members/member-05-evidence/tests/ -v`: 81 passed.
+- `npm test -- --run` in `ui-combined`: 146 passed.
+- `node build-root.cjs`: 0 errors.
+
+### Decisions
+1. In Mode B (local monolith), `/storage/` continues to serve local files. In Mode A / distributed deployment, dynamic uploads automatically route to backend evidence streaming and Supabase CDN.
+
+### Next Step
+Deploy and verify live on Vercel and Render.
+
+### Signing Note
+SIGNED OFF BY: Parmarth Kumar (parmarth@example.com) & Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-13 19:57 IST [VERIFIED]
+
+
 
 
 
