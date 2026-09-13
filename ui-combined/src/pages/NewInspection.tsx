@@ -196,6 +196,16 @@ export const NewInspection: React.FC = () => {
 
   const handleStartAnalysis = async () => {
     setErrorMessage(null);
+
+    if (files.length === 0) {
+      setErrorMessage(
+        language === "hi"
+          ? "विधिक अनुपालन विश्लेषण शुरू करने हेतु कम से कम एक पैकेजिंग फोटोग्राफ (मुख्य PDP या बैक पैनल) संलग्न करना अनिवार्य है।"
+          : "At least one packaging photograph (Front PDP or Back Panel) is required before statutory compliance analysis can be initiated."
+      );
+      return;
+    }
+
     setIsProcessing(true);
 
     try {
@@ -755,17 +765,22 @@ export const NewInspection: React.FC = () => {
 
               {/* Action Button */}
               <div className="pt-3 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <p className="text-xs text-slate-500">
+                <p className={`text-xs font-semibold ${files.length === 0 ? "text-amber-700" : "text-emerald-700"}`}>
                   {files.length === 0
-                    ? (language === "hi" ? "सुझाव: फोटोग्राफ अपलोड करने से स्वचालित ऑप्टिकल गुणवत्ता एवं फॉन्ट सत्यापन सक्षम हो जाता है।" : "Tip: Uploading a photograph enables automated optical quality and font verification.")
-                    : (language === "hi" ? `${files.length} तस्वीर(एं) विश्लेषण हेतु तैयार हैं।` : `${files.length} photograph(s) ready for analysis.`)}
+                    ? (language === "hi" ? "⚠️ आवश्यक: विधिक विश्लेषण शुरू करने के लिए कम से कम 1 पैकेजिंग फोटो अपलोड करें।" : "⚠️ Required: Upload at least 1 packaging photograph to start statutory analysis.")
+                    : (language === "hi" ? `✓ ${files.length} तस्वीर(एं) विश्लेषण हेतु तैयार हैं।` : `✓ ${files.length} photograph(s) ready for statutory analysis.`)}
                 </p>
 
                 <button
                   type="button"
                   onClick={handleStartAnalysis}
-                  disabled={isProcessing}
-                  className="btn-primary w-full sm:w-auto py-2.5 px-6 shadow-md"
+                  disabled={isProcessing || files.length === 0}
+                  className={`w-full sm:w-auto py-2.5 px-6 shadow-md flex items-center justify-center gap-2 rounded-xl font-bold text-sm transition-all ${
+                    files.length === 0
+                      ? "bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300"
+                      : "btn-primary"
+                  }`}
+                  title={files.length === 0 ? "Upload at least 1 packaging photo to begin" : ""}
                 >
                   {isProcessing ? (
                     <>

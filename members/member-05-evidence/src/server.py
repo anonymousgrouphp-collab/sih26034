@@ -8,13 +8,16 @@ from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 import hashlib
 import json
+import logging
 import os
 from pathlib import Path
 import sys
 import time
-
 from typing import Any, Dict, List, Optional
 import uuid
+
+logger = logging.getLogger("nyayadrishti_server")
+
 
 from fastapi import (
     Depends,
@@ -664,6 +667,37 @@ async def upload_inspection_image(
     }
 
 
+@app.post(
+    "/api/v1/inspections/{inspection_id}/evidence",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_role("INSPECTOR", "CONTROLLER"))],
+)
+async def upload_inspection_evidence_alias(
+    inspection_id: str,
+    image: UploadFile = File(...),
+    metadata: Optional[str] = Form(None),
+    user: UserContext = Depends(get_current_user),
+    db: Session = Depends(get_db_session),
+    headers: RequestHeaders = Depends(extract_request_headers),
+):
+    """Subresource route alias for uploading packaging evidence image into an existing inspection."""
+    meta_dict = {}
+    if metadata:
+        try:
+            meta_dict = json.loads(metadata)
+        except Exception:
+            pass
+    meta_dict["inspection_id"] = inspection_id
+    return await upload_inspection_image(
+        image=image,
+        metadata=json.dumps(meta_dict),
+        user=user,
+        db=db,
+        headers=headers,
+    )
+
+
+
 @app.get("/api/v1/evidence/image/{image_id}", response_class=FileResponse)
 def get_evidence_image(
     image_id: str,
@@ -1111,12 +1145,21 @@ def execute_pipeline(
                             OCREngineClass = getattr(m2_mod, "MultilingualOCREngine", None)
                         else:
                             OCREngineClass = None
-                    except Exception:
+                    except Exception as ocr_import_err:
+                        logger.error(f"MultilingualOCREngine isolated import failed: {ocr_import_err}")
                         OCREngineClass = None
 
                     if OCREngineClass is not None:
-                        ocr_engine = OCREngineClass(allow_classical_fallback=True)
-                        ocr_output = ocr_engine.process_image(img_bgr, image_id=ev_image.id)
+                        try:
+                            int8_det = REPO_ROOT / "members" / "member-02-ocr" / "models" / "int8" / "ch_PP-OCRv4_det_int8.onnx"
+                            exec_mode = "INT8" if int8_det.exists() else "FP32"
+                            ocr_engine = OCREngineClass(execution_mode=exec_mode, allow_classical_fallback=True)
+                            ocr_output = ocr_engine.process_image(img_bgr, image_id=ev_image.id)
+                            logger.info(f"Multilingual OCR processed {len(ocr_output.tokens)} tokens using {exec_mode}")
+                        except Exception as ocr_proc_err:
+                            logger.error(f"OCR process_image failed: {ocr_proc_err}")
+                            from contracts.ocr.ocr_dto import OCROutput
+                            ocr_output = OCROutput(image_id=ev_image.id, tokens=[], primary_language="en")
                     else:
                         from contracts.ocr.ocr_dto import OCROutput
                         ocr_output = OCROutput(image_id=ev_image.id, tokens=[], primary_language="en")

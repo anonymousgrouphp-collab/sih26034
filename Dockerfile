@@ -50,6 +50,10 @@ COPY members/ ./members/
 COPY integration/ ./integration/
 COPY main.py .
 
+# Verify or provision OCR neural models during container build
+RUN python members/member-02-ocr/scripts/download_models.py --verify || python members/member-02-ocr/scripts/download_models.py || true
+
+
 # Copy built React frontend assets into destination served by main.py
 COPY --from=frontend-builder /app/frontend/dist ./ui-combined/dist
 

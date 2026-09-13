@@ -65,9 +65,12 @@ class TesseractFallback:
             "models"
         )
         hin_traineddata = os.path.join(models_dir, "hin.traineddata")
+        eng_traineddata = os.path.join(models_dir, "eng.traineddata")
         config = f"--psm {self.psm} --oem {self.oem} -l {self.lang}"
-        if os.path.exists(hin_traineddata):
-            config = f"--tessdata-dir {models_dir} " + config
+        # Only override --tessdata-dir if models_dir contains both eng and hin models
+        # Otherwise, default to system tessdata where tesseract-ocr-hin is installed
+        if os.path.exists(hin_traineddata) and os.path.exists(eng_traineddata):
+            config = f"--tessdata-dir \"{models_dir}\" " + config
         return config
 
     def is_available(self) -> bool:
