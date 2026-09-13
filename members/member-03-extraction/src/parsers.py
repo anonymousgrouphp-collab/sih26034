@@ -234,7 +234,7 @@ RECOGNIZED_VALID_UNITS: Set[str] = {
     "square metre", "square metres", "square meter", "square meters", "square centimetre", "square centimetres", "square centimeter", "square centimeters",
     # Count / Units (LMPC Second Schedule)
     "n", "u", "units", "unit", "pcs", "piece", "pieces", "nos", "nos.", "no", "no.", "items", "item",
-    "sachets", "sachet", "tablets", "tablet", "capsules", "capsule", "packs", "pack",
+    "number", "numbers", "sachets", "sachet", "tablets", "tablet", "capsules", "capsule", "packs", "pack",
     "pair", "pairs", "sheet", "sheets", "wipe", "wipes", "set", "sets", "roll", "rolls",
     # Hindi Devanagari units
     "ग्राम", "ग्रा", "ग्रा.", "किग्रा", "कि.ग्रा.", "कि.ग्रा", "किलोग्राम", "मिली", "मि.ली.", "मि.ली", "मिलीलीटर", "लीटर", "ली", "ली.", "मीटर", "मी", "मी.", "सेंटीमीटर", "सेमी", "से.मी.", "से.मी", "नग", "इकाई"
@@ -576,7 +576,7 @@ class StatutoryDeclarationParser:
                 clean_unit = "sq mm"
             elif u_lower in (
                 "n", "u", "units", "unit", "pcs", "piece", "pieces", "nos", "nos.", "no", "no.",
-                "items", "item", "sachets", "sachet", "tablets", "tablet", "capsules", "capsule",
+                "number", "numbers", "items", "item", "sachets", "sachet", "tablets", "tablet", "capsules", "capsule",
                 "packs", "pack", "pair", "pairs", "sheet", "sheets", "wipe", "wipes", "set", "sets", "roll", "rolls",
                 "नग", "इकाई"
             ):
@@ -640,9 +640,9 @@ class StatutoryDeclarationParser:
             except ValueError:
                 pass
 
-        # Pattern 1: Explicit MRP prefix, with optional intervening tax clause or currency
+        # Pattern 1: Explicit MRP prefix, with optional intervening tax clause, currency, or colon/dash
         p1 = re.compile(
-            rf"{mrp_prefix}\s*(?:{tax_clause_group})?\s*[:\-]?\s*(?:{tax_clause_group})?\s*(?:{curr})?\s*[:\-]?\s*(?:{tax_clause_group})?\s*{amount_re}\s*(?:/-)?",
+            rf"{mrp_prefix}\s*(?:{tax_clause_group})?\s*[:\-]?\s*(?:{curr})?\s*[:\-]?\s*(?:{tax_clause_group})?\s*[:\-]?\s*(?:{curr})?\s*[:\-]?\s*(?:{tax_clause_group})?\s*[:\-]?\s*{amount_re}\s*(?:/-)?",
             re.IGNORECASE
         )
         match = p1.search(norm_text)
@@ -652,10 +652,22 @@ class StatutoryDeclarationParser:
             if re.match(unit_den_re, after_amount, re.IGNORECASE):
                 match = None
 
+        # Pattern 1c: Amount preceding parenthetical or trailing MRP clause (e.g. 'RS. 260. 00 (MRP Rs. Incl. of all taxes...)')
+        if not match:
+            p1c = re.compile(
+                rf"{curr}\s*[:\-]?\s*{amount_re}\s*(?:/-)?\s*(?:\([^)]*(?:MRP|Maximum\s*Retail\s*Price|अ\.वि\.मू|अधिकतम\s*खुदरा\s*मूल्य)[^)]*\)|(?:MRP|Maximum\s*Retail\s*Price)\b)",
+                re.IGNORECASE
+            )
+            match = p1c.search(norm_text)
+            if match:
+                after_amount = norm_text[match.end():min(len(norm_text), match.end() + 20)]
+                if re.match(unit_den_re, after_amount, re.IGNORECASE):
+                    match = None
+
         # Pattern 2: Standalone currency symbol followed by amount (ONLY if NOT part of a USP declaration or discount)
         if not match:
-            # Reject if string is explicitly marked as USP or contains unit denominator (/g, /ml, per unit)
-            is_usp = bool(re.search(rf"(?:USP|Unit\s*Sale\s*Price|{unit_den_re})", norm_text, re.IGNORECASE))
+            # Reject if string is explicitly marked as USP rate or contains unit denominator (/g, /ml, per unit)
+            is_usp = bool(re.search(rf"(?:(?:USP|Unit\s*Sale\s*Price)\s*[:\-]?\s*(?:{curr})?\s*[0-9]+|{unit_den_re})", norm_text, re.IGNORECASE))
             is_discount = bool(re.search(r"\b(?:save|discount|off|cashback|deal\s*price|selling\s*price|offer\s*price|special\s*price|our\s*price|now)\b", norm_text, re.IGNORECASE))
 
             if not is_usp and not is_discount:
@@ -706,18 +718,28 @@ class StatutoryDeclarationParser:
         # Restrict denominator strictly to recognized statutory metric and count units (with Unicode-safe word boundary for Indic matras)
         denom_re = r"((?:100\s*)?(?:g|kg|mg|ml|l|cl|m|cm|mm|sq\s*m|sq\s*cm|sq\s*mm|n|u|pieces?|pcs|units?|items?|nos?|tablets?|tabs?\.?|tae\.?|capsules?|caps?\.?|sachets?|packs?|ग्राम|किग्रा|मिली|लीटर|मीटर|नग|इकाई))(?!\w|[\u0900-\u097F])"
 
-        # Pattern 1: Explicit USP prefix
+        # Pattern 1a: Explicit USP prefix with price before unit (e.g. 'USP: Rs. 0.40/g' or '₹ 2.49/ml')
         p1 = re.compile(
             rf"{usp_prefix}\s*[:\-]?\s*{curr}\s*{amount_re}\s*(?:/|per|प्रति)\s*{denom_re}",
             re.IGNORECASE
         )
         match = p1.search(norm_text)
 
+        # Pattern 1b: Inverted USP rate notation with unit before price (e.g. 'USP ₹/ml : 19.95', 'USP Rs./g : 0.25')
+        p1_inv = re.compile(
+            rf"{usp_prefix}\s*[:\-]?\s*{curr}\s*(?:/|per|प्रति)?\s*{denom_re}\s*[:\-]\s*{curr}\s*{amount_re}",
+            re.IGNORECASE
+        )
+        m_inv = p1_inv.search(norm_text) if not match else None
+
         price_str = None
         unit_raw = None
 
         if match:
             price_str, unit_raw = match.groups()
+        elif m_inv:
+            match = m_inv
+            unit_raw, price_str = m_inv.groups()
         elif not re.search(r"(?:MRP|Maximum\s*Retail\s*Price|अ\.वि\.मू)", norm_text, re.IGNORECASE):
             p2 = re.compile(
                 rf"(?:Rs\.?|INR|₹|रु\.?|रू\.?|रुपये)\s*{amount_re}\s*(?:/|per|प्रति|\s*)\s*{denom_re}",
@@ -1119,7 +1141,7 @@ class StatutoryDeclarationParser:
         # Approach B: Fallback to corporate suffix pattern (English & Hindi) - Linear ReDoS-free extraction
         if not entity_name:
             corp_suffix_re = re.compile(
-                r"\b(?:Pvt\.?\s*Ltd\.?|Private\s*Limited|Ltd\.?|Limited|LLP|Inc\.?|Corp\.?|Cooperative|लिमिटेड|प्राइवेट\s*लिमिटेड)(?:\.|\b)",
+                r"\b(?:Company\s+(?:Limited|Ltd\.?)|Co\.\s*(?:Limited|Ltd\.?)|Private\s*Limited|Pvt\.?\s*Ltd\.?|Ltd\.?|Limited|LLP|Inc\.?|Corp\.?|Company|Co\.?|Cooperative|लिमिटेड|प्राइवेट\s*लिमिटेड)(?:\.|\b)",
                 re.IGNORECASE
             )
             suffix_match = corp_suffix_re.search(norm_text)
