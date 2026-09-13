@@ -823,6 +823,7 @@ class StatutoryDeclarationParser:
             r"(?:Manufactured(?:\s*Date)?|Mfg(?:\s*Date)?|Mfg\.?|Mfd(?:\s*Date)?|Mfd\.?|"
             r"Packed(?:\s*Date)?|Pkd(?:\s*Date)?|Packaging(?:\s*Date)?|Packing(?:\s*Date)?|"
             r"Date\s*of\s*(?:Mfg|Mfd|Manufacture|Packaging|Packing|Pkg\.?|Pkd\.?)|"
+            r"Month\s*(?:&|and)?\s*Year\s*of\s*(?:Mfg|Mfd|Manufacture|Manufacturing|Packaging|Packing|Pkg\.?|Pkd\.?)|"
             r"उत्पादन\s*(?:तिथि|माह(?:\s*एवं\s*वर्ष)?|का\s*महीना)?|पैकिंग\s*(?:तिथि|माह)?|निर्माण\s*तिथि)"
         )
         exp_prefix = (
@@ -902,7 +903,9 @@ class StatutoryDeclarationParser:
         if m_mfg and y_mfg and 2000 <= y_mfg <= 2030:
             result["mfg_month"] = m_mfg
             result["mfg_year"] = y_mfg
+            result["has_mfg_prefix"] = True
         else:
+            result["has_mfg_prefix"] = False
             # Standalone fallback date check (e.g. '03/2024', '03 / 2024', '04.2024', '2024-04', '03/2O26')
             sa_re = re.compile(r"(?<![0-9])(0[1-9]|1[0-2])\s*[\/\-\.]\s*(2[0O][2-3][0-9OolI]|[2-3][0-9])(?![0-9])")
             m_sa = sa_re.search(norm_text)
@@ -1090,6 +1093,7 @@ class StatutoryDeclarationParser:
         # Approach A: Extract entity anchored to address prefix (e.g. "Manufactured by: Krishna Dairy, ...", "Manufactured in India by: ABC Ltd")
         pref_anchor_re = re.compile(
             r"(?:Manufactured\s*(?:,|&|and)?\s*Packed\s*(?:&|and)?\s*Marketed\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
+            r"Manufactured\s*(?:&|and)?\s*Marketed\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
             r"Manufactured\s*(?:&|and)?\s*Packed\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
             r"Manufactured\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Manufacturer\s*[:\-]|Mfd\.?\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|Mfg\.?\s*(?:in\s+[a-zA-Z\u0900-\u097F]+\s*)?by|"
             r"Processed\s*(?:&|and)?\s*Packed\s*by|Formulated\s*(?:&|and)?\s*Packed\s*by|"
@@ -1105,6 +1109,8 @@ class StatutoryDeclarationParser:
         if anchor_match:
             cand_name = anchor_match.group(1).strip()
             cand_name = re.sub(r"COUNTRY\s*OF\s*ORIGIN\s*:\s*[A-Za-z]+", "", cand_name, flags=re.IGNORECASE).strip(" ,-:")
+            # Strip trailing plot/building/street prefixes attached after corporate suffix (e.g. 'Exotic Mile Pvt Ltd 8-67' -> 'Exotic Mile Pvt Ltd')
+            cand_name = re.sub(r"(\b(?:Ltd\.?|Limited|LLP|Inc\.?|Corp\.?))\s+[A-Za-z0-9]+-[0-9]+.*$", r"\1", cand_name, flags=re.IGNORECASE).strip(" ,-:")
             # Clean trailing periods or dashes
             cand_name = cand_name.strip("- :")
             if len(cand_name) >= 3 and not cand_name.isdigit():

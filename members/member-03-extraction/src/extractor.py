@@ -181,7 +181,11 @@ class CommodityFactExtractor:
         # Sanitize any raw tokens provided to ensure clean string text and valid 4-element bboxes
         tokens: List[Dict[str, Any]] = []
         for t in raw_tokens:
-            if not isinstance(t, dict):
+            if hasattr(t, "model_dump"):
+                t = t.model_dump()
+            elif hasattr(t, "dict"):
+                t = t.dict()
+            elif not isinstance(t, dict):
                 continue
             t_text = str(t.get("text") or "").strip()
             t_bbox = t.get("bounding_box")
@@ -483,7 +487,11 @@ class CommodityFactExtractor:
 
             if has_starter or is_corp_starter:
                 # Determine statutory entity role
-                if any(k in line_lower for k in ["manufactured & packed", "mfg & pkd", "mfd & pkd", "manufactured and packed", "निर्माता एवं पैकर"]):
+                if any(k in line_lower for k in [
+                    "manufactured & packed", "mfg & pkd", "mfd & pkd", "manufactured and packed",
+                    "manufactured & marketed", "manufactured and marketed", "mfg & marketed",
+                    "निर्माता एवं पैकर"
+                ]):
                     role = "MANUFACTURER_AND_PACKER"
                 elif any(k in line_lower for k in ["pack", "pkd", "पैकर"]) and not any(m in line_lower for m in ["mfd", "mfg", "manufactur"]):
                     role = "PACKER"
@@ -678,25 +686,34 @@ class CommodityFactExtractor:
                 break
 
         # 4. MANUFACTURING & EXPIRY DATES
+        extracted_mfg_has_prefix = False
         for unit in text_units:
             text = unit["text"]
             parsed_dates = self.parser.parse_mfg_and_expiry_dates(text)
             font_mm, font_conf = compute_font_height(unit["bounding_box"])
-            if (parsed_dates.get("mfg_month") or parsed_dates.get("mfg_year")) and extracted_mfg_month is None:
-                extracted_mfg_month = parsed_dates.get("mfg_month")
-                extracted_mfg_year = parsed_dates.get("mfg_year")
-                raw_fields.append(
-                    ExtractedFieldDTO(
-                        field_type="DATE_OF_MANUFACTURE",
-                        raw_ocr_text=text,
-                        normalized_value=parsed_dates,
-                        detection_confidence=0.95,
-                        ocr_confidence=unit["confidence"],
-                        bounding_box=unit["bounding_box"],
-                        measured_font_height_mm=font_mm,
-                        measurement_confidence=font_conf,
+            has_mfg = bool(parsed_dates.get("mfg_month") or parsed_dates.get("mfg_year"))
+            is_prefixed = bool(parsed_dates.get("has_mfg_prefix", False))
+
+            if has_mfg:
+                # Priority: If we have no date yet, OR the current candidate has an explicit statutory prefix while the prior one was a standalone guess
+                if extracted_mfg_month is None or (is_prefixed and not extracted_mfg_has_prefix):
+                    extracted_mfg_month = parsed_dates.get("mfg_month")
+                    extracted_mfg_year = parsed_dates.get("mfg_year")
+                    extracted_mfg_has_prefix = is_prefixed
+                    # Remove any previously registered lower-priority DATE_OF_MANUFACTURE
+                    raw_fields = [f for f in raw_fields if f.field_type != "DATE_OF_MANUFACTURE"]
+                    raw_fields.append(
+                        ExtractedFieldDTO(
+                            field_type="DATE_OF_MANUFACTURE",
+                            raw_ocr_text=text,
+                            normalized_value=parsed_dates,
+                            detection_confidence=0.98 if is_prefixed else 0.85,
+                            ocr_confidence=unit["confidence"],
+                            bounding_box=unit["bounding_box"],
+                            measured_font_height_mm=font_mm,
+                            measurement_confidence=font_conf,
+                        )
                     )
-                )
             if (parsed_dates.get("exp_month") or parsed_dates.get("exp_year")) and not any(f.field_type == "DATE_OF_EXPIRY" for f in raw_fields):
                 raw_fields.append(
                     ExtractedFieldDTO(
@@ -909,12 +926,26 @@ class CommodityFactExtractor:
                             )
 
         # Priority C: Scan remaining composite lines for PIN code and State if manufacturer is still incomplete
-        if extracted_mfg is None and extracted_importer is None and extracted_packer is None:
+        if (extracted_mfg is None or not extracted_mfg.pin_code) and extracted_importer is None and extracted_packer is None:
             for unit in composite_lines:
                 text = unit["text"]
                 parsed_addr = self.parser.parse_address(text)
                 if parsed_addr and (parsed_addr.get("pin_code") or parsed_addr.get("is_complete") or (parsed_addr.get("state") and parsed_addr.get("name"))):
-                    extracted_mfg = AddressValue(**parsed_addr)
+                    if extracted_mfg is None:
+                        extracted_mfg = AddressValue(**parsed_addr)
+                    else:
+                        # Prevent a bare address line from erasing an existing corporate name
+                        if parsed_addr.get("name"):
+                            extracted_mfg = AddressValue(**parsed_addr)
+                        else:
+                            # Enrich existing manufacturer with address details without erasing name
+                            mfg_dict = extracted_mfg.model_dump()
+                            for k in ["address_line", "city", "state", "pin_code", "district"]:
+                                if not mfg_dict.get(k) and parsed_addr.get(k):
+                                    mfg_dict[k] = parsed_addr[k]
+                            if parsed_addr.get("is_complete"):
+                                mfg_dict["is_complete"] = True
+                            extracted_mfg = AddressValue(**mfg_dict)
                     font_mm, font_conf = compute_font_height(unit["bounding_box"])
                     raw_fields.append(
                         ExtractedFieldDTO(

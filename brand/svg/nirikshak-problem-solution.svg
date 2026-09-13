@@ -1,0 +1,79 @@
+<svg viewBox="0 0 1200 520" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Nirikshak transforms fragmented packaging inspection into one traceable digital workflow">
+  <defs>
+    <pattern id="gridPS" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0L0 0 0 32" fill="none" stroke="#fff" stroke-opacity=".045"/>
+    </pattern>
+    <radialGradient id="glowPS" cx="72%" cy="18%" r="58%">
+      <stop offset="0" stop-color="#6366f1" stop-opacity=".10"/>
+      <stop offset=".6" stop-color="#22c55e" stop-opacity=".035"/>
+      <stop offset="1" stop-color="#6366f1" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="accentPS" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f59e0b"/>
+      <stop offset="1" stop-color="#22c55e"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="520" fill="#0d1117"/>
+  <rect width="1200" height="520" fill="url(#gridPS)"/>
+  <rect width="1200" height="520" fill="url(#glowPS)"/>
+
+  <text x="42" y="48" font-family="Consolas,monospace" font-size="12"
+        letter-spacing="2.5" font-weight="700" fill="#f59e0b">WHY NIRIKSHAK</text>
+  <line x1="195" y1="43" x2="1158" y2="43" stroke="#263140"/>
+
+  <text x="42" y="84" font-family="Inter,Segoe UI,Arial,sans-serif"
+        font-size="24" font-weight="700" fill="#f0f6fc">
+    From <tspan fill="#f87171">fragmented inspection</tspan> to
+    <tspan fill="#7ee787"> one traceable case</tspan>.
+  </text>
+
+  <!-- Left -->
+  <rect x="42" y="125" width="500" height="330" rx="16"
+        fill="#11161d" stroke="#3a252b"/>
+  <text x="72" y="160" font-family="Consolas,monospace" font-size="12"
+        letter-spacing="2" font-weight="700" fill="#f87171">TODAY</text>
+  <text x="72" y="187" font-family="Inter,Segoe UI,Arial,sans-serif"
+        font-size="14" fill="#8b949e">The inspection is spread across disconnected steps.</text>
+
+  <g font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15" fill="#c9d1d9">
+    <text x="78" y="230">📷 Loose package photos</text>
+    <text x="78" y="270">📝 Paper notes &amp; transcription</text>
+    <text x="78" y="310">📏 Manual physical measurements</text>
+    <text x="78" y="350">⚖ Isolated rule checks</text>
+    <text x="78" y="390">📑 Fragmented records</text>
+  </g>
+
+  <!-- arrows -->
+  <g stroke="#f59e0b" stroke-width="2" fill="none" stroke-linecap="round">
+    <path d="M558 245H628"/>
+    <path d="M618 235L628 245L618 255"/>
+  </g>
+  <circle cx="593" cy="245" r="7" fill="#f59e0b" opacity=".7">
+    <animate attributeName="opacity" values=".25;.9;.25" dur="2s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Right -->
+  <rect x="658" y="125" width="500" height="330" rx="16"
+        fill="#111a16" stroke="#285036"/>
+  <rect x="658" y="125" width="500" height="5" rx="2.5" fill="url(#accentPS)"/>
+  <text x="688" y="160" font-family="Consolas,monospace" font-size="12"
+        letter-spacing="2" font-weight="700" fill="#7ee787">NIRIKSHAK</text>
+  <text x="688" y="187" font-family="Inter,Segoe UI,Arial,sans-serif"
+        font-size="14" fill="#8b949e">One case connects evidence, analysis and action.</text>
+
+  <g font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15" fill="#c9d1d9">
+    <text x="694" y="230"><tspan fill="#7ee787">✓</tspan> Case-linked evidence</text>
+    <text x="694" y="270"><tspan fill="#7ee787">✓</tspan> Assisted multilingual extraction</text>
+    <text x="694" y="310"><tspan fill="#7ee787">✓</tspan> Calibrated physical measurement</text>
+    <text x="694" y="350"><tspan fill="#7ee787">✓</tspan> Deterministic rule evaluation</text>
+    <text x="694" y="390"><tspan fill="#7ee787">✓</tspan> Officer-visible findings &amp; dossier</text>
+  </g>
+
+  <line x1="42" y1="480" x2="1158" y2="480" stroke="#263140"/>
+  <text x="600" y="505" text-anchor="middle"
+        font-family="Consolas,monospace" font-size="12" fill="#8b949e">
+    Traceable • Officer-Reviewed • Evidence-Linked • BSA Workflow Support
+  </text>
+</svg>

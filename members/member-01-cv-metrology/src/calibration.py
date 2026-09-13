@@ -155,20 +155,24 @@ class CalibrationEngine:
             s_ch = None
 
         try:
+            pad = 32
+            gray_padded = cv2.copyMakeBorder(gray, pad, pad, pad, pad, cv2.BORDER_CONSTANT, value=0)
+            s_ch_padded = cv2.copyMakeBorder(s_ch, pad, pad, pad, pad, cv2.BORDER_CONSTANT, value=0) if s_ch is not None else None
+
             # Multi-threshold adaptive Canny edge passes across intensity and chroma channels
-            v = float(np.median(gray))
+            v = float(np.median(gray_padded))
             lower_dyn = int(max(10, (1.0 - 0.50) * v))
             upper_dyn = int(min(240, (1.0 + 0.50) * v))
 
             edge_passes = [
-                cv2.Canny(gray, 40, 140),
-                cv2.Canny(gray, 15, 60),
-                cv2.Canny(gray, 10, 30),
-                cv2.Canny(gray, lower_dyn, upper_dyn),
+                cv2.Canny(gray_padded, 40, 140),
+                cv2.Canny(gray_padded, 15, 60),
+                cv2.Canny(gray_padded, 10, 30),
+                cv2.Canny(gray_padded, lower_dyn, upper_dyn),
             ]
-            if s_ch is not None:
-                edge_passes.append(cv2.Canny(s_ch, 20, 70))
-                edge_passes.append(cv2.Canny(s_ch, 15, 45))
+            if s_ch_padded is not None:
+                edge_passes.append(cv2.Canny(s_ch_padded, 20, 70))
+                edge_passes.append(cv2.Canny(s_ch_padded, 15, 45))
 
             kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
 
@@ -177,7 +181,7 @@ class CalibrationEngine:
             min_aspect_diff = 0.28  # Handheld perspective foreshortening tolerance (~17%)
 
             h_img, w_img = gray.shape[:2]
-            min_card_area = (w_img * h_img) * 0.005  # At least 0.5% of total frame
+            min_card_area = (w_img * h_img) * 0.015  # At least 1.5% of total frame (>11,000 px)
             max_card_area = (w_img * h_img) * 0.40   # At most 40% of total frame
 
             for edges in edge_passes:
@@ -218,13 +222,13 @@ class CalibrationEngine:
                     box = cv2.boxPoints(rect)
                     candidates_to_try.append((cls.order_corners(box), False))
 
-                    for ordered, check_polygon in candidates_to_try:
+                    for ordered_pad, check_polygon in candidates_to_try:
                         # Orthogonality check on polygon corners
                         if check_polygon:
                             orthogonal = True
                             for i in range(4):
-                                v1 = ordered[(i - 1) % 4] - ordered[i]
-                                v2 = ordered[(i + 1) % 4] - ordered[i]
+                                v1 = ordered_pad[(i - 1) % 4] - ordered_pad[i]
+                                v2 = ordered_pad[(i + 1) % 4] - ordered_pad[i]
                                 n1, n2 = np.linalg.norm(v1), np.linalg.norm(v2)
                                 if n1 > 0 and n2 > 0:
                                     cos_angle = abs(float(np.dot(v1, v2) / (n1 * n2)))
@@ -234,10 +238,10 @@ class CalibrationEngine:
                             if not orthogonal:
                                 continue
 
-                            w1 = float(np.linalg.norm(ordered[0] - ordered[1]))
-                            w2 = float(np.linalg.norm(ordered[2] - ordered[3]))
-                            h1 = float(np.linalg.norm(ordered[1] - ordered[2]))
-                            h2 = float(np.linalg.norm(ordered[3] - ordered[0]))
+                            w1 = float(np.linalg.norm(ordered_pad[0] - ordered_pad[1]))
+                            w2 = float(np.linalg.norm(ordered_pad[2] - ordered_pad[3]))
+                            h1 = float(np.linalg.norm(ordered_pad[1] - ordered_pad[2]))
+                            h2 = float(np.linalg.norm(ordered_pad[3] - ordered_pad[0]))
 
                             # Perspective symmetry sanity check: opposite sides cannot differ wildly (ratio <= 1.35)
                             if max(w1, w2) / max(1.0, min(w1, w2)) > 1.35 or max(h1, h2) / max(1.0, min(h1, h2)) > 1.35:
@@ -260,16 +264,25 @@ class CalibrationEngine:
                         if aspect_diff < min_aspect_diff:
                             px_to_mm = ((long_side / card_w_mm) + (short_side / card_h_mm)) / 2.0
                             if 1.0 <= px_to_mm <= 35.0:
-                                min_aspect_diff = aspect_diff
-                                best_candidate = {
-                                    "corners": ordered,
-                                    "long_side_px": long_side,
-                                    "short_side_px": short_side,
-                                    "aspect_diff": aspect_diff,
-                                    "px_to_mm": px_to_mm,
-                                }
-                if best_candidate is not None and best_candidate["aspect_diff"] < 0.05:
-                    break
+                                # Convert corners back to original unpadded frame coordinates
+                                ordered_orig = ordered_pad.copy()
+                                ordered_orig[:, 0] = np.clip(ordered_orig[:, 0] - pad, 0, w_img)
+                                ordered_orig[:, 1] = np.clip(ordered_orig[:, 1] - pad, 0, h_img)
+
+                                # Score candidate combining area and aspect fidelity (prefer larger cards over tiny icons)
+                                cand_area = float(long_side * short_side)
+                                aspect_fidelity = max(0.0, 1.0 - (aspect_diff / 0.28))
+                                cand_score = cand_area * (aspect_fidelity ** 1.5)
+
+                                if best_candidate is None or cand_score > best_candidate.get("score", 0.0):
+                                    best_candidate = {
+                                        "corners": ordered_orig,
+                                        "long_side_px": long_side,
+                                        "short_side_px": short_side,
+                                        "aspect_diff": aspect_diff,
+                                        "px_to_mm": px_to_mm,
+                                        "score": cand_score,
+                                    }
 
             if best_candidate is None:
                 return None

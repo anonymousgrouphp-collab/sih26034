@@ -269,7 +269,7 @@ COMPLETE
 - **Inspection Detail Resolution (`server.py`):**
   - Updated `get_inspection_detail` query to resolve inspections by UUID, inspection number, or product name pattern.
 - **Render PostgreSQL Seeding Script (`scripts/seed_render_db.py`):**
-  - Executed end-to-end against live Render backend (`https://nyayadrishti-backend.onrender.com`).
+  - Executed end-to-end against live Render backend (`https://nirikshak-backend.onrender.com`).
   - Successfully authenticated, uploaded physical evidence, and executed full 12-stage AI pipeline for all Golden Demonstration SKUs (`SKU-DEMO-01` through `06`).
   - Verified 100% database persistence across findings, bounding boxes, OCR tokens, and Section 63 BSA certificates.
 
@@ -543,4 +543,49 @@ Push verified updates to `main`.
 
 ### Signing Note
 SIGNED OFF BY: Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-13 01:40 IST [VERIFIED]
+
+---
+
+## [13 September 2026] [10:30] IST
+
+### Task / Chunk
+Backend Calibration Reference Box Persistence, Multi-Facet Intake Execution, and Adjudication Canvas Overlay Integrity.
+
+### Status
+COMPLETE
+
+### Completed
+- **Reference Bounding Box Persistence (`database.py` & `server.py`):**
+  - Added `calibration_reference_box` column to `EvidenceImage` table with SQLite schema migration.
+  - Persisted the true reference standard bounding box (`[ymin, xmin, ymax, xmax]`) from Member 1 calibration results.
+  - Returned `reference_bounding_box` in `asset.calibration` dictionary across `POST /pipeline/execute/{image_id}` and `GET /inspections/{id}`.
+- **Multi-Facet Ingestion Pipeline Execution (`server.py` & `NewInspection.tsx`):**
+  - Updated intake submission in `NewInspection.tsx` to execute the statutory analysis pipeline across all uploaded packaging facets.
+  - Updated `analyze_inspection_case` in `server.py` to evaluate sibling packaging facets so that declarations across Front PDP and Back Panel aggregate into a unified compliant commodity record.
+- **Phantom Fiducial Elimination (`CaseWorkspace.tsx` & `EvidenceViewer.tsx`):**
+  - Removed static hardcoded `[78, 78, 242, 242]` ArUco bounding box fallback in `CaseWorkspace.tsx`.
+  - In `EvidenceViewer.tsx`, rendered authentic detected fiducial standard (ISO 7810 Card or ArUco 4x4) directly from `asset.calibration.reference_bounding_box`.
+
+### Tests
+- `& "C:\Users\ceoha\AppData\Local\Programs\Python\Python314\python.exe" -m pytest members/member-05-evidence/tests/ -v` (71 passed in 31.19s)
+- `npm test -- --run` in `ui-combined` (142 passed in 3.29s)
+- `npm run build` in `ui-combined` (Clean build in 25.53s)
+- Full end-to-end Python pipeline test on real packaging image `media_1789250888882.jpg`:
+  - Calibration: `ISO_7810_CARD` detected at `[636, 501, 786, 756]` (scale 2.810 px/mm)
+  - Fact extraction: MRP ₹1,999.00, Net Qty 1.0 N, Mfg Date 04/2026, Exotic Mile Pvt Ltd, India, Consumer Care complete
+  - Rule Engine: Evaluates overall verdict as PASS (7/7 statutory rules compliant)
+
+### Problems
+None. Zero regressions, 100% test pass rate across all modules.
+
+### Decisions
+1. Calibrated reference bounding boxes must represent empirical photogrammetric detection, never static canvas coordinates.
+2. Ingestion pipelines must evaluate all captured facets of a packaged commodity to respect LMPC multi-panel statutory declaration rights.
+
+### Next Step
+Commit and push verified baseline to `origin main` and `origin dev`.
+
+### Signing Note
+SIGNED OFF BY: Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-13 10:30 IST [VERIFIED]
+
 

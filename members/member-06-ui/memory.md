@@ -247,7 +247,7 @@ ACTIVE
 Found that packaging inspection metrics and contradictory label markings without step-by-step formula derivations and explicit Expected vs Observed badges hinders rapid adjudication by field officers and weakens judicial admissibility under Section 63 BSA 2023. Displaying transparent mathematical derivations (`scale = reference_length_mm / marker_edge_px`) and explicit dual-MRP / USP conflict resolution cards provides immediate, legally defensible clarity during officer hearings. Furthermore, integrating quick triage filters (All, Conflicts, Evidence Gaps) in the Inspection Desk streamlines high-throughput field inspection workflows.
 
 ### Evidence
-- Urvashi's UI inspection (`nirikshak-metrolens-ai` inspection desk, conflict card, and calibration formulas).
+- Urvashi's UI inspection (`nirikshak-ui` inspection desk, conflict card, and calibration formulas).
 - Section 63 BSA 2023 evidentiary traceability and audit requirements.
 - Playwright E2E visual verification and 104 automated unit tests in `members/member-06-ui`.
 

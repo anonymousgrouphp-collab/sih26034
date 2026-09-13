@@ -286,11 +286,17 @@ export const NewInspection: React.FC = () => {
         await new Promise((r) => setTimeout(r, 220));
       }
 
-      // Final: Execute pipeline on the primary packaging evidence asset
+      // Final: Execute pipeline on all uploaded packaging evidence assets for multi-facet aggregation
       if (uploadedImageIds.length > 0) {
-        await ApiService.executePipeline(uploadedImageIds[0], newCase.id);
-      } else if (newCase.evidence_assets[0]?.image_id) {
-        await ApiService.executePipeline(newCase.evidence_assets[0].image_id, newCase.id);
+        for (const imgId of uploadedImageIds) {
+          await ApiService.executePipeline(imgId, newCase.id);
+        }
+      } else if (newCase.evidence_assets && newCase.evidence_assets.length > 0) {
+        for (const asset of newCase.evidence_assets) {
+          if (asset.image_id) {
+            await ApiService.executePipeline(asset.image_id, newCase.id);
+          }
+        }
       }
 
       // Navigate directly into the Adjudication Canvas for this case

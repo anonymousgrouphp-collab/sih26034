@@ -357,7 +357,18 @@ class PPOCRv4Recognizer:
         if en_text:
             return en_text, en_conf, self.detect_language(en_text)
 
-        # Fallback if no sessions
+        # Fallback if no ONNX sessions are available
+        if self.en_session is None and self.hi_session is None:
+            try:
+                from fallback import TesseractFallback
+                tb = TesseractFallback()
+                if tb.is_available():
+                    res = tb.recognize(crop)
+                    if res and res[0].strip():
+                        return res[0], res[1], self.detect_language(res[0])
+            except Exception:
+                pass
+
         return "", 0.0, "en"
 
     def recognize_batch(self, crops: List[np.ndarray], lang: str = "auto") -> List[Tuple[str, float, str]]:

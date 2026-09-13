@@ -95,5 +95,5 @@ To ensure zero flakiness and full determinism under sustained execution, the 23-
 ## 5. Sign-Off
 
 ```text
-SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nyayadrishti.gov.in) — 2026-09-10 18:55 IST [VERIFIED]
+SIGNED OFF BY: parmarth-kumar (parmarth.kumar@nirikshak.gov.in) — 2026-09-10 18:55 IST [VERIFIED]
 ```

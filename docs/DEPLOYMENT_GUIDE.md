@@ -1,4 +1,4 @@
-# NyayaDrishti-LM (SIH26034) — Cloud & Container Deployment Runbook
+# Nirikshak (SIH26034) — Cloud & Container Deployment Runbook
 
 **Authoritative Hosting & Operations Guide for Team Lead, DevOps, and Hackathon Evaluators**  
 **Governed by Section 63 Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)**  
@@ -8,9 +8,9 @@
 
 ## 1. Executive Summary & Hosting Strategy
 
-NyayaDrishti-LM is an AI-powered legal metrology compliance verification web platform built for the **Department of Consumer Affairs (DoCA)**, Government of India.
+Nirikshak is an AI-powered legal metrology compliance verification web platform built for the **Department of Consumer Affairs (DoCA)**, Government of India.
 
-Because all underlying Computer Vision, Multilingual OCR (DBNet++ / PP-OCRv4 / PP-OCRv3), and AST rule evaluation engines are optimized with **ONNX INT8 quantization for standard CPU execution (ADR-05)**, **expensive GPU infrastructure is NOT required**. A modest 2-vCPU / 4GB RAM environment effortlessly serves both live inference and court-ready Form-1 notice generation.
+Because all underlying Computer Vision, Multilingual OCR (DBNet++ / PP-OCRv4 / PP-OCRv3), and AST rule evaluation engines are optimized with **ONNX INT8 quantization for standard CPU execution (ADR-05)**, **expensive GPU infrastructure is NOT required**. A modest 2-vCPU / 4GB RAM environment effortlessly serves both live inference and tamper-evident Form-1 notice generation.
 
 ### Target Platforms Matrix
 
@@ -41,12 +41,12 @@ Because all underlying Computer Vision, Multilingual OCR (DBNet++ / PP-OCRv4 / P
 1. Log in to [Render Dashboard](https://dashboard.render.com/).
 2. Click **New +** $\rightarrow$ **Blueprint**.
 3. Connect your GitHub repository: `https://github.com/anonymousgrouphp-collab/sih26034`.
-4. Select the `main` branch. Render will automatically detect [`render.yaml`](file:///c:/Users/ceoha/OneDrive/Desktop/sih26034/render.yaml) and create:
-   - A managed **PostgreSQL 16** database (`nyayadrishti-db`).
-   - A containerized **FastAPI Web Service** (`nyayadrishti-backend`) built from the root [`Dockerfile`](file:///c:/Users/ceoha/OneDrive/Desktop/sih26034/Dockerfile).
+4. Select the `main` branch. Render will automatically detect [`render.yaml`](../render.yaml) and create:
+   - A managed **PostgreSQL 16** database (`nirikshak-db`).
+   - A containerized **FastAPI Web Service** (`nirikshak-backend`) built from the root [`Dockerfile`](../Dockerfile).
 5. Click **Apply**.
 6. Once deployed, note your live backend URL:
-   `https://nyayadrishti-backend.onrender.com`
+   `https://nirikshak-backend.onrender.com`
 
 > **Note on Railway Alternative:** If using Railway, simply click **New Project** $\rightarrow$ **Deploy from GitHub Repo**, add a PostgreSQL database service, and set `DATABASE_URL=${{Postgres.DATABASE_URL}}`.
 
@@ -59,15 +59,15 @@ Because all underlying Computer Vision, Multilingual OCR (DBNet++ / PP-OCRv4 / P
 3. Import the GitHub repository: `anonymousgrouphp-collab/sih26034`.
 4. Configure Project Settings:
    - **Framework Preset:** `Vite`
-   - **Root Directory:** Leave as repository root (recommended; root [`vercel.json`](file:///c:/Users/ceoha/OneDrive/Desktop/sih26034/vercel.json) handles building `ui-combined`), or select `ui-combined`.
+   - **Root Directory:** Leave as repository root (recommended; root [`vercel.json`](../vercel.json) handles building `ui-combined`), or select `ui-combined`.
    - **Build Command:** `npm run build`
    - **Output Directory:** `dist`
 5. Set Environment Variables under **Environment Variables**:
-   - `VITE_API_BASE_URL`: `https://nyayadrishti-backend.onrender.com/api/v1`
+   - `VITE_API_BASE_URL`: `https://nirikshak-backend.onrender.com/api/v1`
    - `VITE_OPERATING_MODE`: `LIVE`
 6. Click **Deploy**.
 7. Vercel will build and assign an edge-cached domain:
-   `https://nyayadrishti-lm.vercel.app`
+   `https://nirikshak.vercel.app`
 
 ---
 
@@ -76,11 +76,11 @@ Because all underlying Computer Vision, Multilingual OCR (DBNet++ / PP-OCRv4 / P
 Hugging Face Spaces provides a **free 2-vCPU / 16GB RAM CPU container** with free permanent HTTPS:
 
 1. Create a new Space at [huggingface.co/spaces](https://huggingface.co/spaces).
-2. Set Space Name: `nyayadrishti-api`.
+2. Set Space Name: `nirikshak-api`.
 3. Select SDK: **Docker** (Blank).
 4. Set Space Hardware: **CPU Basic • 2 vCPU • 16GB RAM • Free**.
 5. Push the repo to the Hugging Face Space Git remote (or configure GitHub Actions sync).
-6. The root [`Dockerfile`](file:///c:/Users/ceoha/OneDrive/Desktop/sih26034/Dockerfile) will build and launch the API and UI automatically on port 8000!
+6. The root [`Dockerfile`](../Dockerfile) will build and launch the API and UI automatically on port 8000!
 
 ---
 

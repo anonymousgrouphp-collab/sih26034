@@ -1,0 +1,129 @@
+<svg viewBox="0 0 1200 520" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Nirikshak flagship inspector workflow from evidence intake to officer adjudication and dossier generation">
+  <defs>
+    <pattern id="gridWF" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0L0 0 0 32" fill="none" stroke="#fff" stroke-opacity=".045"/>
+    </pattern>
+    <linearGradient id="flowWF" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f59e0b"/>
+      <stop offset=".5" stop-color="#6366f1"/>
+      <stop offset="1" stop-color="#22c55e"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="520" fill="#0d1117"/>
+  <rect width="1200" height="520" fill="url(#gridWF)"/>
+
+  <text x="42" y="48" font-family="Consolas,monospace" font-size="12"
+        letter-spacing="2.5" font-weight="700" fill="#a78bfa">FLAGSHIP INSPECTOR WORKFLOW</text>
+  <line x1="315" y1="43" x2="1158" y2="43" stroke="#263140"/>
+
+  <text x="42" y="82" font-family="Inter,Segoe UI,Arial,sans-serif"
+        font-size="24" font-weight="700" fill="#f0f6fc">
+    One inspection. One evidence chain.
+  </text>
+
+  <line x1="90" y1="260" x2="1110" y2="260" stroke="#263140" stroke-width="3"/>
+  <rect x="90" y="258" width="1020" height="4" rx="2" fill="url(#flowWF)" opacity=".38"/>
+
+  <!-- cards -->
+  <g font-family="Inter,Segoe UI,Arial,sans-serif">
+    <!-- 01 -->
+    <g transform="translate(42 145)">
+      <rect width="160" height="225" rx="14" fill="#11161d" stroke="#3b3030"/>
+      <circle cx="28" cy="30" r="14" fill="#f59e0b" fill-opacity=".12" stroke="#f59e0b" stroke-opacity=".6"/>
+      <text x="28" y="35" text-anchor="middle" font-family="Consolas,monospace" font-size="11" font-weight="700" fill="#f59e0b">01</text>
+      <text x="20" y="72" font-size="15" font-weight="700" fill="#f0f6fc">Evidence</text>
+      <text x="20" y="92" font-size="15" font-weight="700" fill="#f0f6fc">Intake</text>
+      <text x="20" y="126" font-size="12.5" fill="#8b949e">Camera</text>
+      <text x="20" y="146" font-size="12.5" fill="#8b949e">Photo upload</text>
+      <text x="20" y="166" font-size="12.5" fill="#8b949e">E-commerce URL</text>
+      <text x="20" y="202" font-family="Consolas,monospace" font-size="10" font-weight="600" fill="#f59e0b">CASE-LINKED</text>
+    </g>
+
+    <!-- 02 -->
+    <g transform="translate(222 145)">
+      <rect width="160" height="225" rx="14" fill="#11161d" stroke="#2c3150"/>
+      <circle cx="28" cy="30" r="14" fill="#6366f1" fill-opacity=".12" stroke="#818cf8" stroke-opacity=".6"/>
+      <text x="28" y="35" text-anchor="middle" font-family="Consolas,monospace" font-size="11" font-weight="700" fill="#a78bfa">02</text>
+      <text x="20" y="72" font-size="15" font-weight="700" fill="#f0f6fc">Quality &amp;</text>
+      <text x="20" y="92" font-size="15" font-weight="700" fill="#f0f6fc">Scale</text>
+      <text x="20" y="126" font-size="12.5" fill="#8b949e">Blur / glare screen</text>
+      <text x="20" y="146" font-size="12.5" fill="#8b949e">Planar homography</text>
+      <text x="20" y="166" font-size="12.5" fill="#8b949e">Millimeter calibration</text>
+      <text x="20" y="202" font-family="Consolas,monospace" font-size="10" font-weight="600" fill="#818cf8">CALIBRATED</text>
+    </g>
+
+    <!-- 03 -->
+    <g transform="translate(402 145)">
+      <rect width="160" height="225" rx="14" fill="#11161d" stroke="#21414a"/>
+      <circle cx="28" cy="30" r="14" fill="#06b6d4" fill-opacity=".12" stroke="#22d3ee" stroke-opacity=".6"/>
+      <text x="28" y="35" text-anchor="middle" font-family="Consolas,monospace" font-size="11" font-weight="700" fill="#67e8f9">03</text>
+      <text x="20" y="72" font-size="15" font-weight="700" fill="#f0f6fc">Extract</text>
+      <text x="20" y="92" font-size="15" font-weight="700" fill="#f0f6fc">Fields</text>
+      <text x="20" y="126" font-size="12.5" fill="#8b949e">English + Hindi</text>
+      <text x="20" y="146" font-size="12.5" fill="#8b949e">Bounding polygons</text>
+      <text x="20" y="166" font-size="12.5" fill="#8b949e">Statutory entities</text>
+      <text x="20" y="202" font-family="Consolas,monospace" font-size="10" font-weight="600" fill="#22d3ee">STRUCTURED</text>
+    </g>
+
+    <!-- 04 -->
+    <g transform="translate(582 145)">
+      <rect width="160" height="225" rx="14" fill="#11161d" stroke="#3a3150"/>
+      <circle cx="28" cy="30" r="14" fill="#8b5cf6" fill-opacity=".12" stroke="#a78bfa" stroke-opacity=".6"/>
+      <text x="28" y="35" text-anchor="middle" font-family="Consolas,monospace" font-size="11" font-weight="700" fill="#c4b5fd">04</text>
+      <text x="20" y="72" font-size="15" font-weight="700" fill="#f0f6fc">Check</text>
+      <text x="20" y="92" font-size="15" font-weight="700" fill="#f0f6fc">Rules</text>
+      <text x="20" y="126" font-size="12.5" fill="#8b949e">Table-I font schedule</text>
+      <text x="20" y="146" font-size="12.5" fill="#8b949e">USP calculations</text>
+      <text x="20" y="166" font-size="12.5" fill="#8b949e">Prohibited units</text>
+      <text x="20" y="202" font-family="Consolas,monospace" font-size="10" font-weight="600" fill="#a78bfa">DETERMINISTIC</text>
+    </g>
+
+    <!-- 05 (Highlight) -->
+    <g transform="translate(762 135)">
+      <rect width="160" height="245" rx="15" fill="#111a16" stroke="#22c55e" stroke-opacity=".72" stroke-width="1.5"/>
+      <rect width="160" height="5" rx="2.5" fill="#22c55e"/>
+      <circle cx="28" cy="32" r="14" fill="#22c55e" fill-opacity=".13" stroke="#7ee787" stroke-opacity=".7"/>
+      <text x="28" y="37" text-anchor="middle" font-family="Consolas,monospace" font-size="11" font-weight="700" fill="#7ee787">05</text>
+      <text x="20" y="74" font-size="15" font-weight="800" fill="#f0f6fc">Officer</text>
+      <text x="20" y="94" font-size="15" font-weight="800" fill="#f0f6fc">Adjudication</text>
+      <text x="20" y="128" font-size="12.5" fill="#a1a1aa">Split-view review</text>
+      <text x="20" y="148" font-size="12.5" fill="#a1a1aa">Confirm or override</text>
+      <text x="20" y="168" font-size="12.5" fill="#a1a1aa">Mandatory remarks</text>
+      <text x="20" y="210" font-family="Consolas,monospace" font-size="10" font-weight="700" fill="#7ee787">HUMAN IN CONTROL</text>
+    </g>
+
+    <!-- 06 -->
+    <g transform="translate(942 145)">
+      <rect width="160" height="225" rx="14" fill="#11161d" stroke="#3b3430"/>
+      <circle cx="28" cy="30" r="14" fill="#f59e0b" fill-opacity=".12" stroke="#f59e0b" stroke-opacity=".6"/>
+      <text x="28" y="35" text-anchor="middle" font-family="Consolas,monospace" font-size="11" font-weight="700" fill="#f59e0b">06</text>
+      <text x="20" y="72" font-size="15" font-weight="700" fill="#f0f6fc">Inspection</text>
+      <text x="20" y="92" font-size="15" font-weight="700" fill="#f0f6fc">Dossier</text>
+      <text x="20" y="126" font-size="12.5" fill="#8b949e">SHA-256 Merkle tree</text>
+      <text x="20" y="146" font-size="12.5" fill="#8b949e">Form-1 notice PDF</text>
+      <text x="20" y="166" font-size="12.5" fill="#8b949e">Officer signatures</text>
+      <text x="20" y="202" font-family="Consolas,monospace" font-size="10" font-weight="600" fill="#f59e0b">AUDIT-READY</text>
+    </g>
+  </g>
+
+  <text x="600" y="440" text-anchor="middle"
+        font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16"
+        font-weight="700" fill="#f0f6fc">
+    Capture <tspan fill="#667085">→</tspan>
+    Analyze <tspan fill="#667085">→</tspan>
+    Verify <tspan fill="#667085">→</tspan>
+    Adjudicate <tspan fill="#667085">→</tspan>
+    Preserve
+  </text>
+
+  <text x="600" y="468" text-anchor="middle"
+        font-family="Consolas,monospace" font-size="11" fill="#71717a">
+    The system assists the investigation. The authorized officer remains the decision maker.
+  </text>
+
+  <circle cx="1120" cy="78" r="4" fill="#7ee787">
+    <animate attributeName="opacity" values=".2;1;.2" dur="2s" repeatCount="indefinite"/>
+  </circle>
+</svg>

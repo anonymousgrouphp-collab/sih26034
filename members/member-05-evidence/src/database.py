@@ -139,6 +139,7 @@ class EvidenceImage(Base):
     calibration_reference_id: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
     px_to_mm_scale: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     calibration_error_margin_pct: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    calibration_reference_box: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     blur_laplacian_variance: Mapped[float] = mapped_column(Float, nullable=False)
     glare_pixel_percentage: Mapped[float] = mapped_column(Float, nullable=False)
     perspective_skew_angle_deg: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
@@ -388,8 +389,16 @@ def get_database_engine(url: Optional[str] = None):
 
 
 def init_database(engine):
-    """Initializes all database tables."""
+    """Initializes all database tables and ensures schema migrations."""
     Base.metadata.create_all(bind=engine)
+    try:
+        with engine.connect() as conn:
+            cols = [row[1] for row in conn.exec_driver_sql("PRAGMA table_info(evidence_images)").fetchall()]
+            if cols and "calibration_reference_box" not in cols:
+                conn.exec_driver_sql("ALTER TABLE evidence_images ADD COLUMN calibration_reference_box TEXT")
+                conn.commit()
+    except Exception:
+        pass
 
 
 def seed_default_platform_data(session: Session):

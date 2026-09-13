@@ -1,7 +1,7 @@
 # CLAIMS WE MUST NOT MAKE (THE 'NEVER CLAIM' BLACKLIST)
 
 **Project ID:** SIH26034  
-**Product:** NyayaDrishti-LM  
+**Product:** Nirikshak
 **Audience:** All 6 Team Members, Presentation Decks, Pitch Scripts, Code Documentation  
 **Status:** FROZEN & NON-NEGOTIABLE  
 
@@ -28,7 +28,7 @@ In high-stakes judging (Department of Consumer Affairs and Legal Metrology exper
 
 | ❌ What We Must NEVER Say | Why It Is Dangerous & Factually False | ✅ What We Must Say Instead |
 | :--- | :--- | :--- |
-| _"Our AI acts as an autonomous legal judge and issues fines/penalties."_ | **Violates Administrative Law:** Under Sections 15 & 36 of the Legal Metrology Act, 2009 and the Jan Vishwas Act, 2023, statutory power rests exclusively with gazetted Legal Metrology Officers. AI has zero legal standing. | _"NyayaDrishti-LM is an AI-assisted investigative decision-support tool. It prepares draft inspection memos citing exact Gazette clauses; final statutory sign-off rests with the authorized officer."_ |
+| _"Our AI acts as an autonomous legal judge and issues fines/penalties."_ | **Violates Administrative Law:** Under Sections 15 & 36 of the Legal Metrology Act, 2009 and the Jan Vishwas Act, 2023, statutory power rests exclusively with gazetted Legal Metrology Officers. AI has zero legal standing. | _"Nirikshak is an AI-assisted investigative decision-support tool. It prepares draft inspection memos citing exact Gazette clauses; final statutory sign-off rests with the authorized officer."_ |
 | _"Our inspection report is automatically guaranteed to win in court."_ | **Judicial Discretion:** Courts evaluate the complete chain of custody, panchnama witnesses, and defense arguments. Software cannot guarantee judicial outcomes. | _"We generate court-admissible electronic evidence structured under Section 63 of the Bharatiya Sakshya Adhiniyam, 2023, using SHA-256 Merkle provenance hashing and officer digital credentials."_ |
 | _"All packages on Amazon or Flipkart must declare the manufacturing date."_ | **Direct Legal Ignorance:** Rule 6(10) of the LMPC Rules explicitly exempts e-commerce listings from declaring the month and year of manufacture/packing. | _"Our e-commerce engine audits Rule 6(10) mandatory declarations—including Country of Origin and Unit Sale Price—while strictly respecting the statutory exemption for manufacturing date."_ |
 | _"We apply the latest 2026 rules to all products inspected."_ | **Violates Constitutional Non-Retroactivity (Article 20(1)):** A product manufactured in 2022 cannot be penalized for rules enacted in 2023 or 2026. | _"Our Temporal Statutory Epoch Dispatcher matches the package's manufacturing date to the exact Gazette GSR notifications in effect at that time."_ |
@@ -52,15 +52,15 @@ In high-stakes judging (Department of Consumer Affairs and Legal Metrology exper
 
 | ❌ What We Must NEVER Say | Why It Is Dangerous & Factually False | ✅ What We Must Say Instead |
 | :--- | :--- | :--- |
-| _"Our primary product is a 100% offline desktop application."_ | **Contradicts Deliverable Requirements:** The authoritative product requested by DoCA is an enterprise online web application with multi-user RBAC, centralized history, and state-wide analytics. | _"NyayaDrishti-LM is an online-first web application accessed via standard web browsers, with an optional local inspection capability for field officers in network-deprived circles."_ |
+| _"Our primary product is a 100% offline desktop application."_ | **Contradicts Deliverable Requirements:** The authoritative product requested by DoCA is an enterprise online web application with multi-user RBAC, centralized history, and state-wide analytics. | _"Nirikshak is an online-first web application accessed via standard web browsers, with an optional local inspection capability for field officers in network-deprived circles."_ |
 | _"Our entire website works without internet."_ | **Technically Impossible:** A web browser cannot load web assets from a remote server without an active network connection. | _"The web application runs on standard web connectivity. When field officers operate in dead zones, our optional local engine (Mode B) allows standalone offline inspection on local hardware."_ |
 | _"Our backend is completely offline."_ | **Architectural Absurdity:** The primary backend is a FastAPI server connected to a centralized PostgreSQL datastore serving web clients over HTTPS. | _"Our primary production backend runs as an online service. For field resiliency, the core inspection pipeline can also execute locally via an embedded CPU runner."_ |
 | _"Zero internet dependency across the entire system."_ | **Factually Untrue:** Centralized reporting, user authentication, multi-inspector audits, and e-commerce URL fetching inherently depend on network connectivity. | _"The system is designed with an Online-First Web Architecture, backed by local execution resiliency for core optical inspection when field networks drop."_ |
-| _"No server is required to use NyayaDrishti-LM."_ | **False for Enterprise Operations:** Centralized compliance monitoring, user administration, and state-level audit trails mandate a centralized server. | _"The primary system deploys on server infrastructure with PostgreSQL. A lightweight local runner is available for disconnected field inspections."_ |
+| _"No server is required to use Nirikshak."_ | **False for Enterprise Operations:** Centralized compliance monitoring, user administration, and state-level audit trails mandate a centralized server. | _"The primary system deploys on server infrastructure with PostgreSQL. A lightweight local runner is available for disconnected field inspections."_ |
 | _"Users access the web app without connectivity."_ | **Nonsensical Web Semantics:** Accessing a remote web URL requires connectivity. | _"Users access the web portal over HTTPS. Cached offline sessions and local mode instances provide operational continuity when network access is severed."_ |
 
 ---
 
 ### 5. Summary: The Golden Rule of Demo Presentation
 
-> **"NyayaDrishti-LM is an online-first web enforcement application built for the Ministry of Consumer Affairs, backed by an optional local inspection capability for field officers in remote circles. Computer vision accurately observes packaging, deterministic mathematics verifies statutory rules, cryptographic hashing seals electronic evidence under Section 63 BSA 2023, and authorized Legal Metrology Officers make all legal enforcement decisions."**
+> **"Nirikshak is an online-first web enforcement application built for the Ministry of Consumer Affairs, backed by an optional local inspection capability for field officers in remote circles. Computer vision accurately observes packaging, deterministic mathematics verifies statutory rules, cryptographic hashing seals electronic evidence under Section 63 BSA 2023, and authorized Legal Metrology Officers make all legal enforcement decisions."**

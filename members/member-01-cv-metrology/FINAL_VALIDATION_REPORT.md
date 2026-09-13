@@ -1,5 +1,5 @@
 # MEMBER 1 FINAL VALIDATION REPORT
-**Project:** NyayaDrishti-LM (SIH26034) — Legal Metrology Compliance Verification  
+**Project:** Nirikshak (SIH26034) — Legal Metrology Compliance Verification
 **Subsystem:** Member 1 — Computer Vision, Optics & Metrology  
 **Assigned Engineer:** Kunal Raj ([@kunal-raj-dev](https://github.com/kunal-raj-dev))  
 **Auditor / Mode:** Antigravity Red-Team & Hardening Auditor  

@@ -548,6 +548,7 @@ async def upload_inspection_image(
     qg_passed, blur_val, glare_val, skew_val, qg_advice = True, 342.18, 0.84, 1.45, None
     calib_method, calib_ref, px_to_mm, calib_margin = "ARUCO_4X4_50", "MARKER-4X4-50MM", 12.45, 1.2
 
+    calib_ref_box = None
     try:
         import cv2
         import numpy as np
@@ -575,6 +576,7 @@ async def upload_inspection_image(
                     calib_ref = "MARKER-4X4-50MM" if "ARUCO" in calib_method else "ISO-7810-CARD"
                     px_to_mm = float(calib_res.calibration.px_to_mm)
                     calib_margin = float(calib_res.calibration.margin_of_error_pct) if calib_res.calibration.margin_of_error_pct else 1.2
+                    calib_ref_box = json.dumps(calib_res.calibration.reference_bounding_box) if calib_res.calibration.reference_bounding_box else None
                     # Propagate calibration to any uncalibrated images already in this inspection
                     prior_uncalibrated = db.execute(
                         select(EvidenceImage).where(
@@ -587,6 +589,7 @@ async def upload_inspection_image(
                         uncal.calibration_reference_id = calib_ref
                         uncal.px_to_mm_scale = px_to_mm
                         uncal.calibration_error_margin_pct = calib_margin
+                        uncal.calibration_reference_box = calib_ref_box
                 else:
                     # Inherit calibration if any sibling image in this inspection is already calibrated
                     co_calib = db.execute(
@@ -601,6 +604,7 @@ async def upload_inspection_image(
                         calib_ref = co_calib.calibration_reference_id
                         px_to_mm = float(co_calib.px_to_mm_scale)
                         calib_margin = float(co_calib.calibration_error_margin_pct or 1.2)
+                        calib_ref_box = getattr(co_calib, "calibration_reference_box", None)
                     else:
                         calib_method = "UNRESOLVED"
                         calib_ref = "ESTIMATED_DEFAULT"
@@ -625,6 +629,7 @@ async def upload_inspection_image(
         calibration_reference_id=calib_ref,
         px_to_mm_scale=px_to_mm,
         calibration_error_margin_pct=calib_margin,
+        calibration_reference_box=calib_ref_box,
         blur_laplacian_variance=blur_val,
         glare_pixel_percentage=glare_val,
         perspective_skew_angle_deg=skew_val,
@@ -1055,6 +1060,7 @@ def execute_pipeline(
                             ev_image.calibration_method = str(calib_res.calibration.method)
                             ev_image.calibration_reference_id = "MARKER-4X4-50MM" if "ARUCO" in str(calib_res.calibration.method) else "ISO-7810-CARD"
                             ev_image.calibration_error_margin_pct = float(calib_res.calibration.margin_of_error_pct or 1.2)
+                            ev_image.calibration_reference_box = json.dumps(calib_res.calibration.reference_bounding_box) if calib_res.calibration.reference_bounding_box else None
                             # Propagate to any uncalibrated sibling images in this inspection
                             db.query(EvidenceImage).filter(
                                 EvidenceImage.inspection_id == inspection.id,
@@ -1065,6 +1071,7 @@ def execute_pipeline(
                                 "calibration_method": ev_image.calibration_method,
                                 "calibration_reference_id": ev_image.calibration_reference_id,
                                 "calibration_error_margin_pct": ev_image.calibration_error_margin_pct,
+                                "calibration_reference_box": ev_image.calibration_reference_box,
                             }, synchronize_session=False)
                         else:
                             # Inherit from any already calibrated sibling image in this inspection
@@ -1082,6 +1089,7 @@ def execute_pipeline(
                                 ev_image.calibration_method = co_calib.calibration_method
                                 ev_image.calibration_reference_id = co_calib.calibration_reference_id
                                 ev_image.calibration_error_margin_pct = co_calib.calibration_error_margin_pct
+                                ev_image.calibration_reference_box = getattr(co_calib, "calibration_reference_box", None)
                             else:
                                 px_to_mm = ev_image.px_to_mm_scale or 12.45
                                 pdp_area = 112.0
@@ -1151,24 +1159,27 @@ def execute_pipeline(
                             except Exception:
                                 parsed_val = pb.normalized_text
 
-                        if not net_q and ft == "NET_QUANTITY" and parsed_val:
+                        if not net_q and ft in ("NET_QUANTITY", "NET_WEIGHT") and parsed_val:
                             net_q = parsed_val if isinstance(parsed_val, dict) else {"magnitude": float(parsed_val), "unit": "g"}
                         if not mrp_dict and ft == "MRP" and parsed_val:
                             mrp_dict = parsed_val if isinstance(parsed_val, dict) else {"amount": float(parsed_val), "currency": "INR", "tax_inclusive": True}
-                        if not dec_usp and ft == "UNIT_SALE_PRICE" and parsed_val:
+                        if not dec_usp and ft in ("UNIT_SALE_PRICE", "USP") and parsed_val:
                             dec_usp = float(parsed_val.get("price_per_unit", 0)) if isinstance(parsed_val, dict) else float(parsed_val)
-                        if not mfg_dict and ft == "MANUFACTURER" and parsed_val:
+                        if not mfg_dict and ft in ("MANUFACTURER", "MANUFACTURER_ADDRESS", "MANUFACTURER_AND_PACKER") and parsed_val:
                             mfg_dict = parsed_val if isinstance(parsed_val, dict) else {"name": str(parsed_val)}
-                        if not imp_dict and ft == "IMPORTER" and parsed_val:
+                        if not imp_dict and ft in ("IMPORTER", "IMPORTER_ADDRESS") and parsed_val:
                             imp_dict = parsed_val if isinstance(parsed_val, dict) else {"name": str(parsed_val)}
-                        if not pkr_dict and ft == "PACKER" and parsed_val:
+                        if not pkr_dict and ft in ("PACKER", "PACKER_ADDRESS") and parsed_val:
                             pkr_dict = parsed_val if isinstance(parsed_val, dict) else {"name": str(parsed_val)}
-                        if not cc_dict and ft == "CONSUMER_CARE" and parsed_val:
+                        if not cc_dict and ft in ("CONSUMER_CARE", "CONSUMER_CARE_CONTACT") and parsed_val:
                             cc_dict = parsed_val if isinstance(parsed_val, dict) else {"email": str(parsed_val)}
-                        if not coo and ft == "COUNTRY_OF_ORIGIN" and parsed_val:
+                        if not coo and ft in ("COUNTRY_OF_ORIGIN", "ORIGIN") and parsed_val:
                             coo = parsed_val if isinstance(parsed_val, str) else str(parsed_val)
-                        if not mfg_iso and ft == "MFG_DATE" and parsed_val:
-                            mfg_iso = str(parsed_val)
+                        if not mfg_iso and ft in ("MFG_DATE", "DATE_OF_MANUFACTURE") and parsed_val:
+                            if isinstance(parsed_val, dict) and parsed_val.get("mfg_year") and parsed_val.get("mfg_month"):
+                                mfg_iso = f"{parsed_val['mfg_year']:04d}-{parsed_val['mfg_month']:02d}-01"
+                            else:
+                                mfg_iso = str(parsed_val)
                         if not font_mm and pb.measured_font_height_mm and pb.measured_font_height_mm > 0:
                             font_mm = pb.measured_font_height_mm
                     # Zero guessing policy: if font height or PDP area cannot be measured, pass None to evaluate UNABLE_TO_VERIFY
@@ -1195,6 +1206,7 @@ def execute_pipeline(
                     extracted_fields = []
                     for rf in facts.raw_fields:
                         extracted_fields.append({
+                            "image_id": ev_image.id,
                             "field_type": rf.field_type,
                             "raw_ocr_text": rf.raw_ocr_text,
                             "normalized_value": rf.normalized_value,
@@ -1333,6 +1345,7 @@ def execute_pipeline(
             "method": ev_image.calibration_method or "ARUCO_4X4_50",
             "px_to_mm": ev_image.px_to_mm_scale or 12.45,
             "margin_of_error_pct": ev_image.calibration_error_margin_pct or 1.2,
+            "reference_bounding_box": json.loads(ev_image.calibration_reference_box) if getattr(ev_image, "calibration_reference_box", None) else None,
         },
         "principal_display_panel": {
             "package_area_cm2": 280.0,
@@ -1519,6 +1532,7 @@ def get_inspection_detail(
                 "px_to_mm": float(img.px_to_mm_scale or 0.088),
                 "reference_id": img.calibration_reference_id or "ARUCO-4X4-50MM",
                 "margin_of_error_pct": float(img.calibration_error_margin_pct or 1.2),
+                "reference_bounding_box": json.loads(img.calibration_reference_box) if getattr(img, "calibration_reference_box", None) else None,
             } if (img.px_to_mm_scale and img.calibration_method != "UNRESOLVED") else None,
             "ocr": {
                 "image_id": img.id,
@@ -1738,8 +1752,8 @@ def analyze_inspection_case(
     if not insp:
         raise HTTPException(status_code=404, detail="Inspection record not found.")
 
-    ev_image = db.execute(select(EvidenceImage).where(EvidenceImage.inspection_id == insp.id)).scalars().first()
-    if not ev_image:
+    ev_images = db.execute(select(EvidenceImage).where(EvidenceImage.inspection_id == insp.id).order_by(EvidenceImage.created_at.asc())).scalars().all()
+    if not ev_images:
         # Create default evidence image record if none attached
         ev_image = EvidenceImage(
             id=f"img_{uuid.uuid4()}",
@@ -1754,8 +1768,14 @@ def analyze_inspection_case(
         )
         db.add(ev_image)
         db.commit()
+        ev_images = [ev_image]
 
-    return execute_pipeline(image_id=ev_image.id, user=user, db=db, headers=headers)
+    # Execute pipeline across all uploaded facets so that declarations (e.g. Back Panel, Front PDP) are aggregated
+    last_res = None
+    for img in ev_images:
+        last_res = execute_pipeline(image_id=img.id, user=user, db=db, headers=headers)
+
+    return last_res
 
 
 @app.post(

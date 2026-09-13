@@ -9,7 +9,7 @@
 
 ## 1. Executive Security Evaluation
 
-The security architecture of MetroLens (NyayaDrishti-LM) was audited across authentication, role-based access control (RBAC), storage security, cryptographic evidence chain-of-custody, and API protection.
+The security architecture of Nirikshak was audited across authentication, role-based access control (RBAC), storage security, cryptographic evidence chain-of-custody, and API protection.
 
 ### **OVERALL SECURITY POSTURE: ROBUST & PRODUCTION-GRADE (GRADE: A-)**
 
@@ -62,7 +62,7 @@ On 1 July 2024, the Indian Evidence Act, 1872 (including Section 65B) was repeal
 - Electronic records are admissible only when accompanied by technical proof that the device producing the record was in lawful custody and operating properly.
 - Any alteration of digital evidence invalidates the prosecution.
 
-### 4.2 MetroLens Evidentiary Architecture
+### 4.2 Nirikshak Evidentiary Architecture
 
 ```
 [Camera Sensor Capture]
@@ -116,7 +116,7 @@ The file storage subsystem in `members/member-05-evidence/src/storage.py` was au
 
 ## 6. OWASP Top 10 Vulnerability Matrix
 
-| OWASP Vulnerability | Risk in MetroLens | Mitigating Architecture | Residual Risk |
+| OWASP Vulnerability | Risk in Nirikshak | Mitigating Architecture | Residual Risk |
 | :--- | :--- | :--- | :---: |
 | **A01: Broken Access Control** | High | Strict JWT role decorators on all endpoints (`require_role`) | Low |
 | **A02: Cryptographic Failures** | Medium | SHA-256 hashing, PBKDF2 password derivation, Ed25519 signatures | Low |
