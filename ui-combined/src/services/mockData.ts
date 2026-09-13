@@ -2045,25 +2045,34 @@ export const MOCK_DASHBOARD_SUMMARY: DashboardSummary = {
 export const USER_CASES_STORAGE_KEY = "nyayadrishti_persisted_cases_v2";
 export const DELETED_CASES_STORAGE_KEY = "nyayadrishti_deleted_case_ids_v1";
 
+const inMemoryDeletedIds = new Set<string>();
+
 export function getDeletedCaseIds(): Set<string> {
+  const result = new Set<string>(inMemoryDeletedIds);
   try {
     const storage = getStorage();
-    if (!storage) return new Set();
-    const raw = storage.getItem(DELETED_CASES_STORAGE_KEY);
-    if (!raw) return new Set();
-    const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed)) return new Set(parsed);
+    if (storage) {
+      const raw = storage.getItem(DELETED_CASES_STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          parsed.forEach((id) => result.add(id));
+        }
+      }
+    }
   } catch {}
-  return new Set();
+  return result;
 }
 
 export function saveDeletedCaseId(id: string): void {
+  if (!id) return;
+  inMemoryDeletedIds.add(id);
   try {
     const storage = getStorage();
-    if (!storage) return;
-    const ids = getDeletedCaseIds();
-    ids.add(id);
-    storage.setItem(DELETED_CASES_STORAGE_KEY, JSON.stringify(Array.from(ids)));
+    if (storage) {
+      const ids = getDeletedCaseIds();
+      storage.setItem(DELETED_CASES_STORAGE_KEY, JSON.stringify(Array.from(ids)));
+    }
   } catch {}
 }
 
@@ -2388,7 +2397,12 @@ export function getMockCases(): Record<string, InspectionCase> {
   const deletedIds = getDeletedCaseIds();
   const persisted = loadPersistedCases();
   Object.entries(persisted).forEach(([k, v]) => {
-    if (deletedIds.has(k) || (v.id && deletedIds.has(v.id)) || (v.inspection_number && deletedIds.has(v.inspection_number))) {
+    if (
+      deletedIds.has(k) ||
+      (v.id && deletedIds.has(v.id)) ||
+      (v.inspection_number && deletedIds.has(v.inspection_number)) ||
+      (v.sku_demo_id && deletedIds.has(v.sku_demo_id))
+    ) {
       return;
     }
     if (!dynamicCases.has(k) || JSON.stringify(dynamicCases.get(k)?.adjudication) !== JSON.stringify(v.adjudication)) {
@@ -2401,7 +2415,12 @@ export function getMockCases(): Record<string, InspectionCase> {
 
   const res: Record<string, InspectionCase> = {};
   dynamicCases.forEach((val, key) => {
-    if (deletedIds.has(key) || (val.id && deletedIds.has(val.id)) || (val.inspection_number && deletedIds.has(val.inspection_number))) {
+    if (
+      deletedIds.has(key) ||
+      (val.id && deletedIds.has(val.id)) ||
+      (val.inspection_number && deletedIds.has(val.inspection_number)) ||
+      (val.sku_demo_id && deletedIds.has(val.sku_demo_id))
+    ) {
       return;
     }
     if (!val.audit_trail || val.audit_trail.length === 0) {
@@ -2423,32 +2442,82 @@ export function addMockCase(c: InspectionCase): void {
   savePersistedCases(dynamicCases);
 }
 
+export function isCaseDeleted(id?: string, inspectionNumber?: string): boolean {
+  if (!id && !inspectionNumber) return false;
+  const deleted = getDeletedCaseIds();
+  if (id && deleted.has(id)) return true;
+  if (inspectionNumber && deleted.has(inspectionNumber)) return true;
+  return false;
+}
+
 export function deleteMockCase(id: string): boolean {
   if (!id) return false;
   let found = false;
-  const deletedIdentifiers: string[] = [id];
+  const deletedIdentifiers = new Set<string>([id]);
 
-  // Find all keys associated with this case
+  // 1. Check in-memory dynamic cases for any matching aliases
   for (const [key, val] of dynamicCases.entries()) {
     if (key === id || val.id === id || val.inspection_number === id || val.sku_demo_id === id) {
       found = true;
-      if (val.id) deletedIdentifiers.push(val.id);
-      if (val.inspection_number) deletedIdentifiers.push(val.inspection_number);
-      if (val.sku_demo_id) deletedIdentifiers.push(val.sku_demo_id);
+      if (key) deletedIdentifiers.add(key);
+      if (val.id) deletedIdentifiers.add(val.id);
+      if (val.inspection_number) deletedIdentifiers.add(val.inspection_number);
+      if (val.sku_demo_id) deletedIdentifiers.add(val.sku_demo_id);
+    }
+  }
+
+  // 2. Check localStorage persisted cases directly to catch any alternate key representations
+  const persisted = loadPersistedCases();
+  let persistedChanged = false;
+  for (const [k, v] of Object.entries(persisted)) {
+    if (
+      deletedIdentifiers.has(k) ||
+      (v.id && deletedIdentifiers.has(v.id)) ||
+      (v.inspection_number && deletedIdentifiers.has(v.inspection_number)) ||
+      (v.sku_demo_id && deletedIdentifiers.has(v.sku_demo_id))
+    ) {
+      found = true;
+      deletedIdentifiers.add(k);
+      if (v.id) deletedIdentifiers.add(v.id);
+      if (v.inspection_number) deletedIdentifiers.add(v.inspection_number);
+      if (v.sku_demo_id) deletedIdentifiers.add(v.sku_demo_id);
+      delete persisted[k];
+      persistedChanged = true;
+    }
+  }
+
+  // 3. Purge from dynamicCases
+  for (const [key, val] of Array.from(dynamicCases.entries())) {
+    if (
+      deletedIdentifiers.has(key) ||
+      (val.id && deletedIdentifiers.has(val.id)) ||
+      (val.inspection_number && deletedIdentifiers.has(val.inspection_number)) ||
+      (val.sku_demo_id && deletedIdentifiers.has(val.sku_demo_id))
+    ) {
       dynamicCases.delete(key);
     }
   }
 
-  // Remove directly
-  if (dynamicCases.has(id)) {
-    dynamicCases.delete(id);
-    found = true;
-  }
-
-  // Record into persistent deleted set
+  // 4. Save deleted identifiers into permanent tombstone set
   deletedIdentifiers.forEach(saveDeletedCaseId);
 
-  // Update persisted storage
+  // 5. Update localStorage persisted cases
+  const storage = getStorage();
+  if (storage) {
+    if (persistedChanged) {
+      try {
+        storage.setItem(USER_CASES_STORAGE_KEY, JSON.stringify(persisted));
+      } catch {}
+    }
+    try {
+      const lastCaseId = storage.getItem("nyayadrishti_last_case_id");
+      if (lastCaseId && deletedIdentifiers.has(lastCaseId)) {
+        storage.removeItem("nyayadrishti_last_case_id");
+      }
+    } catch {}
+  }
+
+  // 6. Resave dynamic cases to sync storage state
   savePersistedCases(dynamicCases);
 
   return found;
@@ -2456,6 +2525,7 @@ export function deleteMockCase(id: string): boolean {
 
 export function resetMockCases(): void {
   dynamicCases.clear();
+  inMemoryDeletedIds.clear();
   try {
     const storage = getStorage();
     if (storage) {

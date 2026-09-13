@@ -4,12 +4,14 @@ import { InspectionCase } from "../../types/inspection";
 import { VerdictBadge, WorkflowBadge } from "../../components/common/StatusBadge";
 import { ApiService } from "../../services/api";
 import { GoldenSkuQuickSelector } from "../desk/GoldenSkuQuickSelector";
+import { Trash2 } from "lucide-react";
 
 interface CaseHeaderProps {
   caseData: InspectionCase;
   onBack: () => void;
   isProcessing?: boolean;
   onSelectSku?: (caseId: string) => void;
+  onDeleteCase?: () => void;
 }
 
 export const CaseHeader: React.FC<CaseHeaderProps> = ({
@@ -17,6 +19,7 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
   onBack,
   isProcessing = false,
   onSelectSku,
+  onDeleteCase,
 }) => {
   const { language } = useLanguage();
   const isMock = caseData.is_mock_fixture || ApiService.isMockMode();
@@ -57,6 +60,18 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
             </span>
           ) : (
             <VerdictBadge verdict={caseData.overall_status} />
+          )}
+          {onDeleteCase && (
+            <button
+              type="button"
+              onClick={onDeleteCase}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold text-rose-700 hover:text-white bg-rose-50 hover:bg-rose-600 border border-rose-200 hover:border-rose-600 transition-all shadow-2xs focus:outline-none focus:ring-1 focus:ring-rose-500 ml-1"
+              title={language === "hi" ? "मामला स्थायी रूप से हटाएं" : "Permanently Dispose & Delete Case"}
+              aria-label="Dispose and delete case"
+            >
+              <Trash2 size={13} />
+              <span>{language === "hi" ? "केस हटाएं" : "Dispose Case"}</span>
+            </button>
           )}
         </div>
       </div>

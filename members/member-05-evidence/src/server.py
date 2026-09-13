@@ -1836,14 +1836,15 @@ def delete_inspection_case(
     """Statutorily disposes and permanently deletes an inspection case and all associated
     evidence assets, evaluations, certificates, notices, and audit records sitewide.
     """
+    clean_id = inspection_id.strip()
     insp = db.execute(
         select(Inspection).where(
-            (Inspection.id == inspection_id)
-            | (Inspection.inspection_number == inspection_id)
+            (Inspection.id == clean_id)
+            | (Inspection.inspection_number == clean_id)
         )
     ).scalar_one_or_none()
     if not insp:
-        raise HTTPException(status_code=404, detail="Inspection record not found.")
+        raise HTTPException(status_code=404, detail=f"Inspection record '{inspection_id}' not found.")
 
     target_id = insp.id
     target_insp_num = insp.inspection_number
@@ -1867,6 +1868,8 @@ def delete_inspection_case(
                 pass
         db.execute(delete(BoundingBox).where(BoundingBox.image_id == img.id))
         db.delete(img)
+
+    db.flush()
 
     # 5. Append immutable disposal entry to cryptographic audit ledger (Section 63 BSA 2023)
     AuditLedgerService.append_audit_entry(
