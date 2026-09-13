@@ -157,11 +157,44 @@ except ImportError:
 
 
 
-# -----------------------------------------------------------------------------
-# App Lifespan & Initialization
-# -----------------------------------------------------------------------------
-
 storage_manager = DecoupledStorageManager()
+
+# In-memory LRU cache for recently uploaded raw image bytes
+# Protects against ephemeral disk delay/resets on container platforms like Render
+_IMAGE_MEMORY_CACHE: Dict[str, bytes] = {}
+_CACHED_OCR_ENGINE = None
+
+
+def get_cached_ocr_engine():
+    """Returns a cached, warm singleton instance of MultilingualOCREngine for low-latency inference."""
+    global _CACHED_OCR_ENGINE
+    if _CACHED_OCR_ENGINE is not None:
+        return _CACHED_OCR_ENGINE
+
+    try:
+        import importlib.util
+        m2_engine_path = REPO_ROOT / "members" / "member-02-ocr" / "src" / "engine.py"
+        if m2_engine_path.exists():
+            spec = importlib.util.spec_from_file_location("m2_engine_isolated", str(m2_engine_path))
+            m2_mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(m2_mod)
+            OCREngineClass = getattr(m2_mod, "MultilingualOCREngine", None)
+            if OCREngineClass is not None:
+                int8_det = REPO_ROOT / "members" / "member-02-ocr" / "models" / "int8" / "ch_PP-OCRv4_det_int8.onnx"
+                exec_mode = "INT8" if int8_det.exists() else "FP32"
+                # Set fallback_threshold=0.0 so high-speed neural PP-OCRv4 runs in ~2.5s without blocking CPU on sequential Tesseract calls
+                _CACHED_OCR_ENGINE = OCREngineClass(
+                    execution_mode=exec_mode,
+                    allow_classical_fallback=True,
+                    fallback_threshold=0.0,
+                    det_num_threads=2,
+                    rec_num_threads=2,
+                )
+                logger.info(f"Initialized cached MultilingualOCREngine in {exec_mode} mode with fallback_threshold=0.0")
+    except Exception as err:
+        logger.error(f"Failed to initialize OCR engine singleton: {err}")
+        _CACHED_OCR_ENGINE = None
+    return _CACHED_OCR_ENGINE
 
 
 @asynccontextmanager
@@ -642,6 +675,12 @@ async def upload_inspection_image(
     db.add(ev_image)
     db.flush()
 
+    # Retain image bytes in fast memory cache
+    _IMAGE_MEMORY_CACHE[ev_image.id] = raw_bytes
+    if len(_IMAGE_MEMORY_CACHE) > 20:
+        first_k = next(iter(_IMAGE_MEMORY_CACHE))
+        _IMAGE_MEMORY_CACHE.pop(first_k, None)
+
     AuditLedgerService.append_audit_entry(
         session=db,
         actor_id=user.user_id,
@@ -1047,17 +1086,28 @@ def execute_pipeline(
                 }
             ]
         else:
-            # Try to load actual uploaded image from storage
+            # Try to load actual uploaded image from fast memory cache or storage
             img_bgr = None
-            img_path = storage_manager.get_file_path(ev_image.file_path)
-            if not img_path.exists():
-                img_path = REPO_ROOT / ev_image.file_path
-            if img_path.exists():
+            if ev_image.id in _IMAGE_MEMORY_CACHE:
                 try:
                     import cv2
-                    img_bgr = cv2.imread(str(img_path))
+                    import numpy as np
+                    img_bgr = cv2.imdecode(np.frombuffer(_IMAGE_MEMORY_CACHE[ev_image.id], dtype=np.uint8), cv2.IMREAD_COLOR)
                 except Exception:
                     img_bgr = None
+
+            if img_bgr is None:
+                img_path = storage_manager.get_file_path(ev_image.file_path)
+                if not img_path.exists():
+                    img_path = REPO_ROOT / ev_image.file_path
+                if not img_path.exists():
+                    img_path = REPO_ROOT / "storage" / ev_image.file_path
+                if img_path.exists():
+                    try:
+                        import cv2
+                        img_bgr = cv2.imread(str(img_path))
+                    except Exception:
+                        img_bgr = None
 
             if img_bgr is not None:
                 # 1. Real Optical Quality Gate verification on loaded image
@@ -1135,27 +1185,11 @@ def execute_pipeline(
                         pdp_area = 112.0
 
                     # 3. Real Multilingual OCR Engine (Member 2)
-                    try:
-                        import importlib.util
-                        m2_engine_path = REPO_ROOT / "members" / "member-02-ocr" / "src" / "engine.py"
-                        if m2_engine_path.exists():
-                            spec = importlib.util.spec_from_file_location("m2_engine_isolated", str(m2_engine_path))
-                            m2_mod = importlib.util.module_from_spec(spec)
-                            spec.loader.exec_module(m2_mod)
-                            OCREngineClass = getattr(m2_mod, "MultilingualOCREngine", None)
-                        else:
-                            OCREngineClass = None
-                    except Exception as ocr_import_err:
-                        logger.error(f"MultilingualOCREngine isolated import failed: {ocr_import_err}")
-                        OCREngineClass = None
-
-                    if OCREngineClass is not None:
+                    ocr_engine = get_cached_ocr_engine()
+                    if ocr_engine is not None:
                         try:
-                            int8_det = REPO_ROOT / "members" / "member-02-ocr" / "models" / "int8" / "ch_PP-OCRv4_det_int8.onnx"
-                            exec_mode = "INT8" if int8_det.exists() else "FP32"
-                            ocr_engine = OCREngineClass(execution_mode=exec_mode, allow_classical_fallback=True)
                             ocr_output = ocr_engine.process_image(img_bgr, image_id=ev_image.id)
-                            logger.info(f"Multilingual OCR processed {len(ocr_output.tokens)} tokens using {exec_mode}")
+                            logger.info(f"Multilingual OCR processed {len(ocr_output.tokens)} tokens using {getattr(ocr_engine, 'execution_mode', 'INT8')}")
                         except Exception as ocr_proc_err:
                             logger.error(f"OCR process_image failed: {ocr_proc_err}")
                             from contracts.ocr.ocr_dto import OCROutput
