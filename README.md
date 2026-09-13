@@ -1,254 +1,454 @@
-# NyayaDrishti-LM (न्याय दृष्टि)
-
 <p align="center">
-  <img src="brand/svg/nirikshak-banner-hero.svg" alt="NIRIKSHAK — Legal Metrology Inspection Workstation" width="100%" />
+  <a href="https://www.sih.gov.in/"><img src="https://img.shields.io/badge/Problem%20ID-SIH26034-blue.svg?style=flat-square" alt="Problem ID: SIH26034" /></a>&nbsp;
+  <a href="https://consumeraffairs.nic.in/"><img src="https://img.shields.io/badge/Department-DoCA-teal.svg?style=flat-square" alt="Department: DoCA" /></a>&nbsp;
+  <img src="https://img.shields.io/badge/Tests-562%20Passed-brightgreen.svg?style=flat-square" alt="Tests: 562 Passed" />&nbsp;
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square" alt="License: Apache 2.0" /></a>
 </p>
 
-### Online AI-Powered Legal Metrology Compliance Inspection & Verification Web Platform
-#### Problem Statement ID: SIH26034 | Smart India Hackathon 2026
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="brand/svg/nirikshak-banner-hero-dark.svg">
+    <img src="brand/svg/nirikshak-banner-hero.svg" alt="NIRIKSHAK — Legal Metrology Inspection Workstation" width="100%" />
+  </picture>
+</p>
 
-[![SIH 2026](https://img.shields.io/badge/SIH-2026-orange.svg?style=flat-square)](https://www.sih.gov.in/)
-[![Problem ID](https://img.shields.io/badge/Problem%20ID-SIH26034-blue.svg?style=flat-square)](https://www.sih.gov.in/)
-[![Ministry](https://img.shields.io/badge/Ministry-Consumer%20Affairs%2C%20Food%20%26%20Public%20Distribution-green.svg?style=flat-square)](https://consumeraffairs.nic.in/)
-[![Department](https://img.shields.io/badge/Department-DoCA-teal.svg?style=flat-square)](https://consumeraffairs.nic.in/)
-[![Architecture](https://img.shields.io/badge/Architecture-Online--First%20Web%20App-success.svg?style=flat-square)]()
-[![Database](https://img.shields.io/badge/Database-PostgreSQL%2016%2B%20%7C%20SQLite-blue.svg?style=flat-square)]()
-[![CI](https://github.com/anonymousgrouphp-collab/sih26034/actions/workflows/ci.yml/badge.svg)](https://github.com/anonymousgrouphp-collab/sih26034/actions/workflows/ci.yml)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](LICENSE)
-[![Python](https://img.shields.io/badge/Python-3.11%2B-blue.svg?style=flat-square&logo=python)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-009688.svg?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
-[![React](https://img.shields.io/badge/React-18%2B%20Vite-61DAFB.svg?style=flat-square&logo=react)](https://reactjs.org/)
-[![ONNX Runtime](https://img.shields.io/badge/ONNX%20Runtime-INT8%20CPU-005CED.svg?style=flat-square)](https://onnxruntime.ai/)
+<h3 align="center">AI-Assisted Legal Metrology Inspection & Evidence Workstation</h3>
+<p align="center"><em>Statutory Compliance Verification & Evidentiary Dossier Generation for the Department of Consumer Affairs (DoCA)</em></p>
 
----
+<p align="center">
+  <strong>📸 75 Packaging Photos</strong> &nbsp;&nbsp;•&nbsp;&nbsp;
+  <strong>📦 7 Golden Demo SKUs</strong> &nbsp;&nbsp;•&nbsp;&nbsp;
+  <strong>💻 Offline Field Mode</strong>
+  <br/>
+  <strong>Evidence-Linked Traceability</strong> &nbsp;•&nbsp;
+  <strong>Human-Reviewed Adjudication</strong> &nbsp;•&nbsp;
+  <strong>Section 63 BSA Support</strong>
+</p>
 
-## 📌 Executive Summary
-
-**NyayaDrishti-LM** is an enterprise-grade, **Online-First Web Application** engineered for the **Department of Consumer Affairs (DoCA)**, Ministry of Consumer Affairs, Food & Public Distribution, Government of India. The system includes an **Optional Local Inspection Capability (Mode B)** to guarantee uninterrupted field operational resilience in remote or network-deprived circles.
-
-The platform automates the audit of packaged commodities against the statutory provisions of the **Legal Metrology Act, 2009** and the **Legal Metrology (Packaged Commodities) Rules, 2011** (incorporating all gazette amendments up to 2026, including G.S.R. 629(E), G.S.R. 779(E), and G.S.R. 128(E)).
-
-Operating as an **Augmented Diagnostic Assistant** with a mandatory **Human-in-the-Loop (HITL)** adjudication workflow, the system performs sub-second optical verification, physical millimeter font height measurement, spatial semantic extraction, centralized dashboard analytics, and cryptographically generates **Section 63 Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)** compliant electronic evidentiary dossiers.
-
----
-
-## 🌐 Operational Modes & Connectivity Model
-
-NyayaDrishti-LM operates across three clearly demarcated connectivity tiers:
-
-- **Mode A: Online Web Mode (Primary Production):** Centralized web application running in modern web browsers (Chrome, Edge, Firefox), backed by FastAPI, PostgreSQL 16+, central file storage, and server-side INT8 ONNX CPU inference. Features multi-user RBAC, centralized audit history, and national/state compliance dashboards.
-- **Mode B: Optional Local Inspection Mode (Secondary Field Resiliency):** Lightweight standalone execution engine running on field laptops (`localhost:8000`) for officers deployed in zero-connectivity wholesale mandis or basements. Executes core optical calibration, OCR, and rule validation locally using local SQLite (SQLCipher), queueing signed sync bundles for upload to Mode A.
-- **Mode C: External Integrations (Future Roadmap):** Future national registry webhooks for eMaap, MCA21, and GSTN verification.
+<p align="center">
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.11%2B-blue.svg?style=flat-square&logo=python&logoColor=white" alt="Python 3.11+" /></a>&nbsp;
+  <a href="https://fastapi.tiangolo.com/"><img src="https://img.shields.io/badge/FastAPI-0.110%2B-009688.svg?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI 0.110+" /></a>&nbsp;
+  <a href="https://reactjs.org/"><img src="https://img.shields.io/badge/React-18-61DAFB.svg?style=flat-square&logo=react&logoColor=white" alt="React 18" /></a>&nbsp;
+  <a href="https://onnxruntime.ai/"><img src="https://img.shields.io/badge/ONNX%20Runtime-CPU-005CED.svg?style=flat-square&logo=onnx&logoColor=white" alt="ONNX Runtime CPU" /></a>
+</p>
 
 ---
 
-## 🏗️ 12-Stage Pipeline Architecture
+## Overview
 
-The system executes a deterministic 12-stage modular pipeline from optical capture to statutory notice generation:
+**Nirikshak is a digital inspection workstation for Legal Metrology officers.**
+
+It turns fragmented packaging inspection into one traceable workflow: **capture evidence, measure, extract declarations, check rules, review findings, and generate the inspection dossier.**
+
+### The Core Differentiator
+> **Evidence-linked inspection with automated analysis, physical measurement, deterministic statutory checks, and mandatory officer adjudication in one workflow.**
+
+Every finding remains traceable to the evidence that produced it:
+
+<p align="center">
+  <img src="brand/svg/nirikshak-evidence-trace.svg"
+       alt="Nirikshak evidence traceability from finding to preserved dossier"
+       width="100%" />
+</p>
+
+Nirikshak incorporates workflow safeguards that keep automated analysis subordinate to authorized officer review. The system serves strictly as an **Augmented Diagnostic Assistant**—it never issues compounding orders, penalty notices, or citations autonomously. Every statutory adjudication remains under the explicit control of a qualified Legal Metrology Officer (LMO).
+
+---
+
+## Problem & Solution
+
+### The Problem (SIH26034)
+Enforcement officers inspecting packaged commodities in wholesale mandis, retail outlets, and e-commerce fulfillment hubs face persistent operational hurdles:
+1. **Scattered Evidence & Broken Traceability:** Officers capture loose photos on personal phones, take manual notes in paper registers, and calculate metrics by hand—creating fractured chains of custody vulnerable to evidentiary challenge.
+2. **Cognitive Load Across Multilingual Packaging:** Transcribing mandatory statutory declarations (MRP, Net Quantity, Unit Sale Price, Manufacturing Date, Consumer Care, Country of Origin) across English and regional Indic scripts is labor-intensive and prone to error.
+3. **Complex Metric Font Verification:** Verifying minimum numeral font heights across packaging surface areas under the Legal Metrology (Packaged Commodities) Rules, 2011 (varying from $1.0\text{ mm}$ to $6.0\text{ mm}$) requires physical calipers and manual geometric calculations that are difficult to standardize in field conditions.
+4. **Black-Box Automation Pitfalls:** Automated scanners often output opaque, unverifiable verdicts without showing underlying coordinate evidence or permitting human correction, failing administrative standards.
+
+### The Solution: Nirikshak
+Nirikshak unifies field intake, calibrated computer vision, multilingual scene text recognition, deterministic statutory logic, and human adjudication into a single web platform:
+
+<p align="center">
+  <img src="brand/svg/nirikshak-problem-solution.svg"
+       alt="How Nirikshak transforms fragmented packaging inspection into one traceable workflow"
+       width="100%" />
+</p>
+
+---
+
+## Flagship Inspector Workflow
+
+The complete inspection flow:
+
+<p align="center">
+  <img src="brand/svg/nirikshak-inspector-workflow.svg"
+       alt="Nirikshak flagship inspector workflow"
+       width="100%" />
+</p>
+
+> **The key idea:** Every automated finding remains linked to the evidence that produced it, and the authorized officer makes the final disposition.
+
+*For complete pipeline stage specifications, sequence diagrams, and mathematical formulations, see [docs/specifications/03_FINAL_ARCHITECTURE.md](docs/specifications/03_FINAL_ARCHITECTURE.md).*
+
+---
+
+## Human-in-the-Loop Adjudication
+
+Nirikshak places the human officer at the center of all enforcement decisions:
+
+<p align="center">
+  <img src="brand/svg/nirikshak-adjudication.svg"
+       alt="Nirikshak human-in-the-loop adjudication canvas"
+       width="100%" />
+</p>
+
+- **AI findings stay diagnostic:** automated analysis never becomes the final legal disposition.
+- **Every finding is inspectable:** officers can trace it to the source evidence, extracted field and governing rule.
+- **Overrides are accountable:** changes require written justification and remain in the audit trail.
+
+Administrative authority is strictly separated via role-based access control (RBAC): field inspectors propose preliminary recommendations, while authorized Controllers review and sign formal statutory notices.
+
+---
+
+## Key Capabilities
+
+### 1. Evidence Intake & Optical Quality Gate
+- **Guided Viewfinder HUD:** Real-time optical assistance prompts field officers for camera stabilization, framing distance, and glare control.
+- **Degradation Screening:** Automatically detects excessive blur and specular glare, routing unreadable inputs to guided recapture.
+- **Multi-Source Ingestion:** Supports live camera captures, high-resolution multi-facet photos, and Rule 6(10) e-commerce URLs.
+
+### 2. Physical Measurement & Metric Calibration
+- **Scale Calibration:** Computes physical millimeter scale from standard reference cards or ArUco markers on standard camera hardware.
+- **PDP Surface Area:** Determines physical packaging face area across rectangular, cylindrical, and flexible packages.
+- **Numeral Font Measurement:** Measures physical millimeter numeral height to verify compliance against statutory minimums.
+
+### 3. Multilingual Declaration Extraction
+- **Bilingual Scene Text:** Transcribes packaging declarations across English and Devanagari Hindi text.
+- **Statutory Entity Parsing:** Extracts mandatory declarations: MRP, Net Quantity, Unit Sale Price, Dates, Consumer Care, and Origin.
+- **Prohibited Unit Detection:** Flags non-standard metric abbreviations (`gms`, `gm`, `ML`, `ltrs`) prohibited under Section 11.
+
+### 4. Deterministic Compliance Analysis
+- **Table-I Font Schedules:** Verifies numeral height against surface-area statutory schedules without probabilistic drift.
+- **USP Arithmetic Consistency:** Checks Unit Sale Price calculations against declared MRP and Net Quantity.
+- **Statutory Rules & Epochs:** Evaluates declarations against packaging date amendments and Rule 6(10) digital marketplace exemptions.
+
+### 5. Evidence-Linked Officer Adjudication
+- **Interactive Split Canvas:** Side-by-side packaging photo inspection with vector bounding polygons and statutory findings.
+- **Audit-Logged Overrides:** Requires mandatory written justification remarks whenever an officer overrides a recommendation.
+- **Case State Lifecycle:** Enforces structured case progression from initial registration to final administrative disposition.
+
+### 6. Cryptographic Evidence Trail
+- **Section 63 BSA Support:** Generates evidentiary metadata and audit logs supporting Section 63 BSA 2023 digital evidence workflows.
+- **Merkle Chain of Custody:** Anchors source images, extracted tokens, and officer decisions in a tamper-evident SHA-256 hash tree.
+- **Form-1 Statutory Notice PDF:** Compiles formal inspection memos with evidence crops, cryptographic digests, and signature blocks.
+
+### 7. Offline Field Resilience (Mode B)
+- **Local Standalone Runner:** Enables field officers to conduct inspections on standalone laptops (`localhost:8000`) with local SQLite.
+- **Cryptographic Sync Bundles:** Packages offline inspection cases and evidence into signed bundles for central reconciliation.
+
+---
+
+## 4-State Uncertainty-Aware Verdict Model
+
+Nirikshak classifies evaluated checks into four clear operational states:
+
+```text
+┌───────────────────┬────────────────────────────────────────────────────────────────────────┐
+│ Verdict State     │ Operational Definition & System Action                                 │
+├───────────────────┼────────────────────────────────────────────────────────────────────────┤
+│ PASS              │ No configured statutory discrepancy detected across the evaluated      │
+│                   │ declarations and measurements.                                         │
+├───────────────────┼────────────────────────────────────────────────────────────────────────┤
+│ FAIL              │ Rule-engine discrepancy detected based on available evidence (e.g.,    │
+│                   │ font deficit, prohibited unit 'gms', or USP math mismatch > 0.02 INR). │
+├───────────────────┼────────────────────────────────────────────────────────────────────────┤
+│ REVIEW            │ Borderline measurement falling within the sensor uncertainty band      │
+│                   │ (k=2, 95% confidence). Officer must conduct physical verification.     │
+├───────────────────┼────────────────────────────────────────────────────────────────────────┤
+│ UNABLE_TO_VERIFY  │ Optical quality degraded (excessive blur, glare bloom, or occlusion).  │
+│                   │ Directs officer to guided recapture flow before processing.            │
+└───────────────────┴────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Real-World Validation & Proof
+
+Nirikshak is backed by empirical testing on real retail commodities and automated verification:
+
+<p align="center">
+  <img src="brand/svg/nirikshak-proof.svg"
+       alt="Nirikshak real-world proof and verification metrics"
+       width="100%" />
+</p>
+
+### Golden Demonstration SKUs
+Seven representative reference commodities are packaged directly into the workspace for instant demonstration:
+
+| SKU | Scenario | Result | Key Diagnostic Observation |
+|:---|:---|:---:|:---|
+| **DEMO-01** | Sunfeast Butter Cookies 200g | `FAIL` | Table-I font deficit ($2.8\text{ mm} < 4.0\text{ mm}$); prohibited unit `gms` |
+| **DEMO-02** | Everest Garam Masala 100g | `FAIL` | USP mismatch ($\text{Rs } 0.45/\text{g}$ declared vs $\text{Rs } 0.52/\text{g}$ computed) |
+| **DEMO-03** | Himalayan Mineral Water 1L | `PASS` | Compliant baseline (numeral font $4.2\text{ mm}$, valid unit `L`, correct USP) |
+| **DEMO-04** | Medimix Ayurvedic Soap 75g | `REVIEW` | Sensor uncertainty ($2.48\text{ mm}$ observed within $\pm 0.05\text{ mm}$ threshold band) |
+| **DEMO-05** | Kurkure Masala Munch 90g | `UNABLE_TO_VERIFY` | Specular glare bloom obscuring net quantity panel; routes to recapture |
+| **DEMO-06** | Royal Delight Almonds 500g | `FAIL` | E-Commerce: missing Country of Origin declaration; exempts Mfg Date |
+| **DEMO-07** | Fortune Sunlite Oil 1L | `FAIL` | Indic Hindi Devanagari Net Qty numeral font deficit ($2.9\text{ mm} < 4.0\text{ mm}$) |
+
+---
+
+## System Architecture
+
+Nirikshak is engineered as an **Online-First Modular Monolith** coupling a React 18 single-page application with an asynchronous FastAPI application service:
 
 ```mermaid
-flowchart TD
-    A["📸 Web Ingestion / Upload<br/>(Browser Camera / Image / URL)"] --> B["🛡️ Stage 1: Quality Gate<br/>(Laplacian Variance >= 150, Glare <= 3%)"]
-    B -->|Pass| C["📐 Stage 2: Planar Homography<br/>(ArUco 4x4 / ISO Card Scale Calib)"]
-    B -->|Fail| A1["⚠️ Guided Recapture UI"]
-    
-    C --> D["🔤 Stage 3: Multilingual OCR<br/>(DBNet++ Polygon + PP-OCRv4 INT8)"]
-    D --> E["📏 Stage 4: Font Measurement<br/>(Connected Component Physical mm)"]
-    
-    E --> F["🧠 Stage 5: Semantic Extraction<br/>(Regex + Spatial Graph + Address NER)"]
-    F --> G["⚖️ Stage 6: Deterministic AST Rules<br/>(Rules 6, 7, 8, 9, 10, 18 / Gazette Amendments)"]
-    
-    G --> H["👥 Stage 7: HITL Inspector Canvas<br/>(Visual Overlay, Side-by-Side Review)"]
-    H -->|Officer Approves| I["🔐 Stage 8: Merkle Audit & Ledger<br/>(SHA-256 Hash Chain of Custody)"]
-    
-    I --> J["📄 Stage 9: Evidentiary Dossier<br/>(Sec 63 BSA 2023 Archival PDF/A Notice)"]
-    J --> K["🌐 Stage 10: Central Datastore & Sync<br/>(PostgreSQL 16+ / eMaap Sync Bundle)"]
+flowchart LR
+    subgraph Client ["Client Tier (Browser)"]
+        UI["React 18 SPA<br/>Vite 6 + Tailwind"]
+        HUD["Camera Viewfinder HUD"]
+        Canvas["Split-View Adjudication Canvas"]
+    end
+
+    subgraph Service ["Application Monolith"]
+        API["FastAPI REST Catalog"]
+        RBAC["JWT RBAC Engine"]
+        Storage["Evidence Storage Manager"]
+    end
+
+    subgraph Pipeline ["12-Stage Diagnostic Pipeline"]
+        direction TB
+        QG["1. Quality Gate"]
+        Calib["2. Scale Calibration"]
+        OCR["3. Multilingual OCR"]
+        Ext["4. Semantic Extraction"]
+        Rule["5. Legal Rule Engine"]
+        DAG["6. Cryptographic Provenance"]
+        QG --> Calib --> OCR --> Ext --> Rule --> DAG
+    end
+
+    subgraph Output ["Evidentiary Outputs"]
+        DB[("PostgreSQL / SQLite")]
+        Notice["ReportLab Form-1 Notice PDF"]
+    end
+
+    HUD --> UI
+    Canvas <--> UI
+    UI -->|HTTPS / REST| API
+    API --> RBAC
+    API --> Storage
+    API --> Pipeline
+    DAG --> DB
+    DAG --> Notice
 ```
+
+*For comprehensive pipeline stage specifications, sequence diagrams, and mathematical formulations, see [docs/specifications/03_FINAL_ARCHITECTURE.md](docs/specifications/03_FINAL_ARCHITECTURE.md).*
 
 ---
 
-## ⚖️ Ground Truth Statutory & Technical Constants
+## Tech Stack
 
-| Parameter / Metric | Statutory / Engineering Constant | Legal Authority / Specification |
+| Layer | Technology | Operational Purpose |
 |:---|:---|:---|
-| **Area $> 2500\text{ cm}^2$ Minimum Font Height** | **6.0 mm** *(Correcting historical 8.0 mm typo)* | Gazette Notification **G.S.R. 629(E)** dated 23.06.2017 |
-| **Unit Sale Price (USP) Mandate** | Explicit per g/ml or per kg/L (2 decimal places) | Gazette Notification **G.S.R. 779(E)** dated 02.11.2021 |
-| **E-Commerce Country of Origin** | Mandatory structured, searchable filter (Rule 6(10A)) | Gazette Notification **G.S.R. 128(E)** dated 13.02.2026 |
-| **Electronic Evidence Admissibility** | **Section 63 BSA 2023** *(Repealed 65B IEA 1872)* | Bharatiya Sakshya Adhiniyam, 2023 (w.e.f. 01.07.2024) |
-| **Optical Scale Calibration Margin** | **$\le 0.15\text{ mm}$ (Synthetic) / $\le 0.30\text{ mm}$ (Retail)** | Planar Homography vs Digital Calipers Ground Truth |
-| **Web Round-Trip Latency (TARGET)** | **$\le 1800\text{ ms}$** | Network upload + server CPU inference + rule evaluation |
-| **Local Engine Latency (BENCHMARK)** | **$\le 1200\text{ ms}$** | INT8 Quantized ONNX Runtime on 4-Core CPU |
-| **Open-Source License Safety** | **Strictly Permissive (Apache-2.0 / MIT)** | Zero AGPL-3.0 copyleft models (Ultralytics strictly banned) |
-| **System Philosophy** | **Augmented Diagnostic Assistant (HITL)** | Constitutional Due Process & Administrative Law |
+| **Frontend Workstation** | React 18.3, Vite 6.0, TypeScript 5.7 | Responsive inspector workspace, interactive adjudication canvas |
+| **Styling & UI Tokens** | Tailwind CSS 3.4, Lucide React, Framer Motion | Government of India design tokens, accessible UI, micro-interactions |
+| **API & Backend** | FastAPI 0.110+, Python 3.11+, Pydantic v2 | High-throughput asynchronous REST catalog, typed schemas |
+| **Application Server** | Uvicorn ASGI | Production web process server |
+| **Primary Datastore** | PostgreSQL 16+ | Relational schema, indices, JSONB evidence graphs |
+| **Local Field Datastore** | SQLite 3.45+ | Mode B offline field database for connectivity blackouts |
+| **Computer Vision** | OpenCV 4.9+ (`opencv-python-headless`) | Laplacian blur variance, specular glare masking, ArUco fiducial calibration |
+| **Multilingual OCR** | DBNet++ (Detection), PP-OCRv4 (Recognition) | ONNX Runtime CPU inference with quantized model variants for supported hardware |
+| **Fallback OCR** | Tesseract 5 / pytesseract | Secondary fallback recognition engine |
+| **Compliance Rule Engine** | Deterministic Python AST Engine | Codified statutory logic without probabilistic drift |
+| **Dossier & Notice Engine** | ReportLab 4.1+ | Cryptographically anchored Form-1 Statutory Notice PDF generator |
+| **Cryptography** | `hashlib` (SHA-256) | Append-only Merkle DAG hash tree |
+| **Licensing** | Apache-2.0, MIT, BSD-3-Clause | Apache-2.0, MIT, BSD-3-Clause — dependency stack reviewed for license compatibility. |
 
 ---
 
-## 📚 Master Documentation & Specifications Index
+## Compact Project Structure
 
-The repository houses an authoritative, frozen specification suite:
-
-| Document | Description | Format |
-|:---|:---|:---:|
-| [SYSTEM_MODES_AND_CONNECTIVITY.md](SYSTEM_MODES_AND_CONNECTIVITY.md) | Mode A (Online Web), Mode B (Local Resiliency), Mode C (Integrations) | [Markdown](SYSTEM_MODES_AND_CONNECTIVITY.md) |
-| [CONNECTIVITY_REQUIREMENTS.md](CONNECTIVITY_REQUIREMENTS.md) | 24-Row Component Dependency Matrix & Failure Behavior | [Markdown](CONNECTIVITY_REQUIREMENTS.md) |
-| [01_MASTER_PROJECT_BLUEPRINT.md](01_MASTER_PROJECT_BLUEPRINT.md) | Single Source of Truth (SSOT), vision, constants, schedule | [PDF](01_MASTER_PROJECT_BLUEPRINT.pdf) |
-| [02_FINAL_REQUIREMENTS_SPECIFICATION.md](02_FINAL_REQUIREMENTS_SPECIFICATION.md) | Master Functional (FR 01-22) & Non-Functional (NFR 01-10) Specs | [PDF](02_FINAL_REQUIREMENTS_SPECIFICATION.pdf) |
-| [03_FINAL_ARCHITECTURE.md](03_FINAL_ARCHITECTURE.md) | Online-first modular monolith, C4 containers, Docker topology | [PDF](03_FINAL_ARCHITECTURE.pdf) |
-| [04_FINAL_MVP_SCOPE.md](04_FINAL_MVP_SCOPE.md) | MoSCoW feature hierarchy, P0 web MVP scope, cut list | [PDF](04_FINAL_MVP_SCOPE.pdf) |
-| [05_TECHNOLOGY_DECISION_RECORD.md](05_TECHNOLOGY_DECISION_RECORD.md) | 13 Formal Architecture Decision Records (ADR-01 to ADR-13) | [PDF](05_TECHNOLOGY_DECISION_RECORD.pdf) |
-| [06_DATA_AND_MODEL_STRATEGY.md](06_DATA_AND_MODEL_STRATEGY.md) | Synthetic dataset DS-SYNTH-001, pilot DS-PILOT-050, INT8 ONNX | [PDF](06_DATA_AND_MODEL_STRATEGY.pdf) |
-| [07_API_AND_INTERFACE_CONTRACTS.md](07_API_AND_INTERFACE_CONTRACTS.md) | OpenAPI 3.1 REST specs, Pydantic v2 pipeline DTOs | [PDF](07_API_AND_INTERFACE_CONTRACTS.pdf) |
-| [08_DATABASE_SPECIFICATION.md](08_DATABASE_SPECIFICATION.md) | PostgreSQL 16+ Primary DDL, SQLite Mode B, storage separation | [PDF](08_DATABASE_SPECIFICATION.pdf) |
-| [09_UI_UX_BLUEPRINT.md](09_UI_UX_BLUEPRINT.md) | React 18 SPA, Field HUD, Adjudication Canvas, Central Dashboard | [PDF](09_UI_UX_BLUEPRINT.pdf) |
-| [10_SECURITY_AND_AUDIT_SPECIFICATION.md](10_SECURITY_AND_AUDIT_SPECIFICATION.md) | Web TLS 1.3, JWT RBAC, Section 63 BSA Merkle DAG, DPDP Act | [PDF](10_SECURITY_AND_AUDIT_SPECIFICATION.pdf) |
-| [11_TESTING_AND_VALIDATION_PLAN.md](11_TESTING_AND_VALIDATION_PLAN.md) | 5-tier test pyramid, Web API/E2E tests, caliper benchmarks | [PDF](11_TESTING_AND_VALIDATION_PLAN.pdf) |
-| [12_DEMO_PLAN.md](12_DEMO_PLAN.md) | 3-tier live evaluation fallback, 3-minute pitch, Q&A defense | [PDF](12_DEMO_PLAN.pdf) |
-| [13_SIX_MEMBER_EXECUTION_PLAN.md](13_SIX_MEMBER_EXECUTION_PLAN.md) | Granular workstreams, APIs, and daily assignments for 6 devs | [PDF](13_SIX_MEMBER_EXECUTION_PLAN.pdf) |
-| [14_GITHUB_WORKFLOW.md](14_GITHUB_WORKFLOW.md) | Trunk-based git strategy, PR gates, AGPL exclusion CI, DoD | [PDF](14_GITHUB_WORKFLOW.pdf) |
-| [15_RISK_AND_CONTINGENCY_REGISTER.md](15_RISK_AND_CONTINGENCY_REGISTER.md) | 14 Red-team failure modes, tripwires, and fallback mitigations | [PDF](15_RISK_AND_CONTINGENCY_REGISTER.pdf) |
-| [16_DECISION_LOG.md](16_DECISION_LOG.md) | Architectural Decision Log (ADL 01-19) & trade-off rationales | [PDF](16_DECISION_LOG.pdf) |
-| [17_OPEN_QUESTIONS.md](17_OPEN_QUESTIONS.md) | Bounded technical questions with frozen working defaults | [PDF](17_OPEN_QUESTIONS.pdf) |
-| [CLAIMS_WE_MUST_NOT_MAKE.md](CLAIMS_WE_MUST_NOT_MAKE.md) | Legally hazardous & connectivity claims blacklist | [PDF](CLAIMS_WE_MUST_NOT_MAKE.pdf) |
-| [COMPLETE_PROJECT_END_TO_END_GUIDE.md](COMPLETE_PROJECT_END_TO_END_GUIDE.md) | Comprehensive 50+ page end-to-end technical guidebook | [PDF](COMPLETE_PROJECT_END_TO_END_GUIDE.pdf) |
-| [FINAL_AUTHENTICITY_AND_ACCURACY_AUDIT.md](FINAL_AUTHENTICITY_AND_ACCURACY_AUDIT.md) | Comprehensive pre-development authenticity and accuracy audit | [Markdown](FINAL_AUTHENTICITY_AND_ACCURACY_AUDIT.md) |
-
-### 🔬 Research Dossiers (Bilingual: English & Hinglish)
-
-| Research Dossier | Scope & Focus | Formats |
-|:---|:---|:---:|
-| **Phase 1: Domain & Legal Metrology** | Statutory frameworks, GSR 629(E), GSR 779(E), Section 63 BSA 2023 | [English](PHASE_1_SIH26034_Domain_Research_Dossier.md) ([PDF](PHASE_1_SIH26034_Domain_Research_Dossier.pdf)) \| [Hinglish](PHASE_1_SIH26034_Domain_Research_Dossier_HINGLISH.md) ([PDF](PHASE_1_SIH26034_Domain_Research_Dossier_HINGLISH.pdf)) |
-| **Phase 2: Technology & Benchmarking** | Optical math, ArUco homography, DBNet++, PP-OCRv4, INT8 CPU optimization | [English](PHASE_2_RESEARCH_REPORT.md) ([PDF](PHASE_2_RESEARCH_REPORT.pdf)) \| [Hinglish](PHASE_2_RESEARCH_REPORT_HINGLISH.md) ([PDF](PHASE_2_RESEARCH_REPORT_HINGLISH.pdf)) |
-| **Phase 3: Solution Architecture** | 12-stage modular monolith, HITL adjudication canvas, cryptographic Merkle ledger | [Blueprint](PHASE_3_SOLUTION_BLUEPRINT.md) ([PDF](PHASE_3_SOLUTION_BLUEPRINT.pdf)) |
-
----
-
-## 🛠️ Technology Stack & Decisions
-
-```
-┌───────────────────────────────────────────────────────────────────────────┐
-│                           PRESENTATION TIER                               │
-│  React 18+ SPA  •  Vite  •  Tailwind CSS  •  HTML5 Canvas  •  Lucide      │
-│          Accessible on Chrome 120+, Edge, Firefox (Desktop & Mobile)      │
-└───────────────────────────────────────────────────────────────────────────┘
-                                     │
-                             HTTPS / TLS 1.3 / OpenAPI 3.1
-                                     │
-┌───────────────────────────────────────────────────────────────────────────┐
-│                        REVERSE PROXY & GATEWAY                            │
-│           Nginx (Reverse Proxy, TLS 1.3, Rate Limiting, 15MB Upload Cap)  │
-└───────────────────────────────────────────────────────────────────────────┘
-                                     │
-┌───────────────────────────────────────────────────────────────────────────┐
-│                             API & ORCHESTRATION                           │
-│     FastAPI 0.110+ (Python 3.11+)  •  Pydantic v2  •  Uvicorn ASGI        │
-│          OAuth2 Bearer JWT Auth  •  SlowAPI  •  Lifespan Management       │
-└───────────────────────────────────────────────────────────────────────────┘
-                                     │
-┌───────────────────────────────────────────────────────────────────────────┐
-│                          COMPUTER VISION & OCR                            │
-│  OpenCV 4.9+ (ArUco, Homography) • DBNet++ (Detection) • PP-OCRv4 (Rec)   │
-│         ONNX Runtime INT8 (CPU Vectorized) • Tesseract 5 (Fallback)       │
-│               Colocated on Server CPU  /  Local Runner CPU                │
-└───────────────────────────────────────────────────────────────────────────┘
-                                     │
-┌───────────────────────────────────────────────────────────────────────────┐
-│                        RULE ENGINE & COMPLIANCE                           │
-│    Deterministic Python AST Engine • Gazette Temporal Epoch Router        │
-└───────────────────────────────────────────────────────────────────────────┘
-                                     │
-┌───────────────────────────────────────────────────────────────────────────┐
-│                       EVIDENCE & PERSISTENCE                              │
-│   ReportLab PDF/A (Sec 63 BSA 2023) • SHA-256 Merkle Chain of Custody     │
-│   PostgreSQL 16+ [Primary Datastore] • SQLite 3.45+ (SQLCipher) [Mode B]  │
-│   Decoupled Central File Storage: /storage/uploads/ & /storage/evidence/  │
-└───────────────────────────────────────────────────────────────────────────┘
+```text
+.
+├── main.py                             # Monolith production server (FastAPI + SPA mount)
+├── local_runner.py                     # Mode B standalone offline runner (localhost:8000)
+├── inspect_cli.py                      # Headless CLI inspection utility
+├── requirements.txt                    # Root Python dependencies
+│
+├── members/                            # CV, OCR, extraction, rules, evidence subsystems
+├── contracts/                          # Frozen interfaces and schemas
+├── integration/                        # Cross-subsystem fixtures and tests
+├── ui-combined/                        # Inspector workstation frontend (React 18 + Vite)
+├── docs/                               # Technical specifications and guides
+├── audit/                              # Validation and ground-truth evidence
+└── Legal Metrology real product images/# 75 Physical packaging test photos & collection notes
 ```
 
 ---
 
-## 📅 6-Day Execution Plan (07 – 13 September 2026)
-
-| Day & Date | Milestone Focus | Deliverables |
-|:---|:---|:---|
-| **Day 1 (07 Sep)** | **Foundations & Contracts** | Git repo, CI pipeline, Pydantic DTOs, PostgreSQL DDL models, Vite skeleton |
-| **Day 2 (08 Sep)** | **Pre-Processing & Data** | OpenCV ArUco detector, Laplacian quality gate, synthetic label generator |
-| **Day 3 (09 Sep)** | **OCR & Measurement** | DBNet++ & PP-OCRv4 ONNX pipeline, connected component font engine |
-| **Day 4 (10 Sep)** | **Rule Engine & UI** | Deterministic AST legal rules, HITL Inspector Adjudication Canvas |
-| **Day 5 (11 Sep)** | **Evidence, DB & Notice**| Section 63 BSA 2023 PDF/A generator, SHA-256 Merkle DAG, e-commerce audit, DB sync |
-| **Day 6 (12 Sep)** | **Testing & Benchmarks** | End-to-end regression tests, physical vernier caliper validation, demo polish |
-| **Day 7 (13 Sep)** | **Final Submission** | Online Web Portal Live Evaluation & Department of Consumer Affairs presentation |
-
----
-
-## 🚀 Quick Start & Development Setup
+## Getting Started
 
 ### Prerequisites
-- Python 3.11+
-- Node.js 18+ (for frontend client)
-- PostgreSQL 16+ (or Docker)
-- Git
+- **Python:** Version 3.11, 3.12, or 3.13 (64-bit)
+- **Node.js:** Version 18.x or 20.x LTS with npm
+- **Database:** PostgreSQL 16+ *(Optional for local evaluation; automatic SQLite fallback is pre-configured)*
+- **Git:** Standard git client
 
-### 1. Run via Docker Compose (Recommended)
+---
+
+### Quickstart (Local Monolith)
+
+#### 1. Backend Setup
 ```bash
-docker-compose up --build
-```
-Access the application at `http://localhost:3000` (Frontend SPA) and `http://localhost:8000/docs` (FastAPI Swagger UI).
+# Clone the repository
+git clone https://github.com/anonymousgrouphp-collab/sih26034.git
+cd sih26034
 
-### 2. Standalone Local Mode (Mode B for Field Inspection)
+# Create and activate virtual environment
+python -m venv .venv
+# Windows PowerShell:
+.venv\Scripts\Activate.ps1
+# Linux / macOS:
+source .venv/bin/activate
+
+# Install dependencies
+pip install --upgrade pip
+pip install -r requirements.txt
+
+# Start the application server
+python main.py
+```
+*The backend API will start at `http://localhost:8000`. Interactive OpenAPI documentation is accessible at `http://localhost:8000/docs`.*
+
+#### 2. Frontend Setup
+```bash
+# In a new terminal, navigate to the frontend directory
+cd ui-combined
+
+# Install frontend packages
+npm install
+
+# Start Vite development server
+npm run dev
+```
+*Open your browser at `http://localhost:5173`. Requests to `/api` and `/storage` automatically proxy to `http://127.0.0.1:8000`.*
+
+#### 3. Production Build
+```bash
+cd ui-combined
+npm run build
+```
+*The production build compiles into `ui-combined/dist`, which is served directly by `main.py` at `http://localhost:8000`.*
+
+---
+
+### Inspection Execution Modes
+
+#### Standard Web Workflow
+1. Open `http://localhost:5173` (or `http://localhost:8000`).
+2. Log in using the seeded `Inspector` profile (quick-login buttons available in development mode).
+3. Select **"New Inspection"** from the navigation bar.
+4. Choose an intake mode: **Upload Photo**, **Live Camera Viewfinder**, **E-Commerce URL**, or **Demonstration Showcase**.
+5. Execute the pipeline and review findings in the **Adjudication Canvas**.
+6. Switch to the `Controller` role to review officer recommendations and generate the formal **Form-1 Statutory Notice PDF**.
+
+#### Headless CLI Inspection
+Inspect physical packaging directly from the command line:
+```bash
+python inspect_cli.py --image "Legal Metrology real product images/item 1 facewash/front_01.jpg" --reference card
+```
+
+#### Standalone Mode B (Offline Field Runner)
+Execute inspections during field connectivity blackouts:
 ```bash
 python local_runner.py
 ```
 
 ---
 
-## 👥 Core Engineering Team & Contributors
+## Verification & Automated Testing
 
-NyayaDrishti-LM is developed under Smart India Hackathon 2026 for the **Department of Consumer Affairs (DoCA)**:
+Nirikshak enforces strict automated test verification across frontend, backend, and integration layers:
 
-| Member | Workstream & Focus | Subsystem Scope | GitHub Profile |
+```bash
+# 1. Run all Frontend Tests (142 passing tests across 18 test files)
+cd ui-combined && npm test
+
+# 2. Run Evidence & Backend + Integration Tests (95 passing tests)
+python -m pytest members/member-05-evidence/tests/ integration/tests/ -v
+
+# 3. Run Computer Vision, OCR & Rule Engine Unit Tests (174 passing tests)
+python -m pytest members/member-01-cv-metrology/tests/ members/member-02-ocr/tests/ members/member-04-rule-engine/tests/ -v
+
+# 4. Run Semantic Extraction Test Suite (151 passing tests)
+python -m pytest members/member-03-extraction/tests/ -v
+```
+
+### Authoritative Test Summary
+- **Frontend Test Suite (`ui-combined`):** **142 passing tests** across 18 test files (0 failed, 0 skipped)
+- **Backend & Subsystem Suites (`members/` & `integration/`):** **420 passing tests** across 37 test files (0 failed, 0 skipped)
+- **Platform Total:** **562 passing tests across 55 standard test files** (0 failed, 0 skipped)
+
+---
+
+## Safety, Workflow Safeguards & Evidentiary Support
+
+1. **Augmented Assistant Boundary:** Nirikshak is strictly a diagnostic support tool. It possesses no autonomous legal authority and never issues notices or compounding orders independently.
+2. **Mandatory Officer Adjudication:** Every automated finding is presented as a preliminary diagnostic observation. A qualified Legal Metrology Officer (LMO) must explicitly review, adjudicate, and sign off on each item.
+3. **Mandatory Text Remarks on Override:** Any modification to an automated finding requires a mandatory written justification remark, preventing undocumented officer tampering.
+4. **Separation of Duties (RBAC):** Field inspectors conduct intake and submit preliminary recommendations; only authorized district Controllers have administrative authority to dispose of cases or sign statutory notices.
+5. **Section 63 BSA 2023 Evidentiary Workflows:** Electronic-evidence metadata and cryptographic hash manifests designed to support Section 63 Bharatiya Sakshya Adhiniyam, 2023 workflows, recording device parameters, software version digests, timestamps, and officer credentials.
+6. **Pristine Evidence Preservation:** Ingested photographs are immutably preserved in storage (`/storage/uploads/`). Bounding polygons and coordinate annotations are maintained as distinct vector layers, ensuring original evidence pixels are never altered.
+
+---
+
+## Operational Boundaries & Limitations
+
+1. **Optical Image Quality:** Accurate sub-millimeter font height measurement requires photographs with adequate focus and resolution ($\ge 1080\text{p}$). Heavily degraded or blurry images are routed to `UNABLE_TO_VERIFY` for guided recapture.
+2. **Planar Reference Placement:** Physical scale calibration relies on planar homography. If a reference card or fiducial marker is placed on a different plane than the packaging face, perspective error may occur.
+3. **Hardware Execution Profile:** CPU inference with quantized model variants is designed for standard multi-core laptops. On low-power hardware, pipeline execution times may be longer than on standard workstations.
+4. **Human Adjudication Requirement:** Nirikshak does not substitute for authorized regulatory officers. Final legal adjudication, statutory notices, and enforcement actions remain the sole responsibility of human officials.
+
+---
+
+## Deep Dive Documentation
+
+For comprehensive technical, legal, and operational specifications, consult the detailed documentation:
+
+| Domain | Canonical Reference | Focus Areas |
+|:---|:---|:---|
+| **System Architecture** | [docs/specifications/03_FINAL_ARCHITECTURE.md](docs/specifications/03_FINAL_ARCHITECTURE.md) | 12-stage pipeline, subsystem interaction, data flows |
+| **Project Engineering Guide** | [docs/COMPLETE_PROJECT_END_TO_END_GUIDE.md](docs/COMPLETE_PROJECT_END_TO_END_GUIDE.md) | 42-section comprehensive technical and domain guide |
+| **Specifications & ADRs** | [docs/specifications/](docs/specifications/) | Frozen specifications (01 through 17), architectural decision records |
+| **Technical Implementation** | [docs/technical/CAMERA_CAPTURE_IMPLEMENTATION.md](docs/technical/CAMERA_CAPTURE_IMPLEMENTATION.md) | Viewfinder HUD, camera stream management, canvas controls |
+| **Research & Legal Dossiers** | [docs/research/](docs/research/) | Statutory research dossiers, GSR Gazette analyses |
+| **UI/UX & Design System** | [docs/design/](docs/design/) & [docs/ux/](docs/ux/) | Design tokens, wireframes, inspector user journey |
+| **Validation & Audits** | [audit/](audit/) | Ground-truth SKU matrices, provenance registers, defect logs |
+| **Deployment Guide** | [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md) | Docker Compose, reverse proxy configuration, cloud setup |
+
+---
+
+## Core Engineering Team
+
+Developed for the **Department of Consumer Affairs (DoCA)** under **Smart India Hackathon 2026**:
+
+| Contributor | Workstream & Focus | Subsystem Scope | GitHub Profile |
 |:---|:---|:---|:---:|
-| **Kunal Raj** | **Member 1: CV, Metrology & Frontend** | Optical quality gate, ArUco 4×4 calibration, planar homography, PDP metric schedule, Frontend Adjudication canvas | [@kunal-raj-dev](https://github.com/kunal-raj-dev) |
-| **Parmarth Kumar** | **Member 2: Multilingual OCR & Member 6: Lead Frontend** | DBNet++ text detection, PP-OCRv4 Indic recognition, ONNX INT8 inference, React 18 + Vite SPA, Metrology workbench, split-view Canvas HUD | [@parmarth-kumar](https://github.com/parmarth-kumar) |
-| **Harsh Patel** | **Member 3: Semantic Extraction, Rule Engine & Frontend** | Statutory field parsing (MRP, Net Qty, Dates, Address, PIN), banned unit flagger, AST rule engine hardening, Frontend E2E pipeline orchestration | [@anonymousgrouphp-collab](https://github.com/anonymousgrouphp-collab) |
-| **Ambika Bansal** | **Member 4: Statutory Rule Engine** *(Co-engineered with Harsh Patel)* | AST statutory engine, Table-I font schedule (Row 5 = 6.0 mm), USP math, IEEE 754 precision guard, Rule 6(1)(k) single-unit proviso, 4-state triage | [@bansalambika12-ship-it](https://github.com/bansalambika12-ship-it) |
-| **Shailendra Pratap Singh** | **Member 5: Evidence & Cryptography** | FastAPI REST services, PostgreSQL 16 schema, Merkle DAG, Section 63 BSA 2023 certificate, Form-1 PDF engine | [@shailendrapratap1](https://github.com/shailendrapratap1) |
-| **Urvashi Rajput** | **UI/UX Architecture & Design System** | Initial frontend architecture, Nirikshak Metrolens workstation framework, Quick Triage Filter Pills, elevation shadow design tokens & UI styling | [@rajputurvashi2006-bit](https://github.com/rajputurvashi2006-bit) |
-
-### ⚖️ Statutory Rule Engine Collaboration
-The deterministic compliance engine (`members/member-04-rule-engine/`) was co-engineered for 100% legal reproducibility:
-- **Lead Statutory Rule Architecture & Font Schedules:** Ambika Bansal ([@bansalambika12-ship-it](https://github.com/bansalambika12-ship-it))
-- **AST Compliance Hardening, IEEE 754 Precision Guard & Statutory Provisos:** Harsh Patel ([@anonymousgrouphp-collab](https://github.com/anonymousgrouphp-collab))
-
-### 🎨 Frontend & Adjudication Workstation Collaboration
-The production web platform (`ui-combined/`) is a collaborative achievement across the team:
-- **Lead Frontend Architecture & Inspection HUD:** Parmarth Kumar ([@parmarth-kumar](https://github.com/parmarth-kumar))
-- **Full-Pipeline Integration & Verification:** Harsh Patel ([@anonymousgrouphp-collab](https://github.com/anonymousgrouphp-collab))
-- **Metrology Canvas & Calibration Overlay:** Kunal Raj ([@kunal-raj-dev](https://github.com/kunal-raj-dev))
-- **Initial UI Foundation & Workstation Design:** Urvashi Rajput ([@rajputurvashi2006-bit](https://github.com/rajputurvashi2006-bit))
-
-See **[CONTRIBUTORS.md](CONTRIBUTORS.md)** for full details and attribution policies.
+| **Kunal Raj** | **CV & Metrology** | Optical quality gate, ArUco calibration, planar homography, PDP metric schedules | [@kunal-raj-dev](https://github.com/kunal-raj-dev) |
+| **Parmarth Kumar** | **Multilingual OCR & Lead Frontend** | DBNet++ text detection, PP-OCRv4 Indic recognition, React 18 SPA, Adjudication Canvas | [@parmarth-kumar](https://github.com/parmarth-kumar) |
+| **Harsh Patel** | **Semantic Extraction & Compliance Engine** | Statutory entity parsing (MRP, Net Qty, Dates), banned unit detection, AST rule engine hardening | [@anonymousgrouphp-collab](https://github.com/anonymousgrouphp-collab) |
+| **Ambika Bansal** | **Statutory Rule Engine** | Table-I font schedules, USP math verification, temporal epoch routing, 4-state triage | [@bansalambika12-ship-it](https://github.com/bansalambika12-ship-it) |
+| **Shailendra Pratap Singh** | **Evidence & Backend** | FastAPI REST services, PostgreSQL schema, Merkle DAG, Section 63 BSA support, Form-1 PDF | [@shailendrapratap1](https://github.com/shailendrapratap1) |
+| **Urvashi Rajput** | **UI/UX Architecture** | Workstation visual foundations, triage filter components, design tokens | [@rajputurvashi2006-bit](https://github.com/rajputurvashi2006-bit) |
 
 ---
 
-## 🤝 Community & Governance
+## License & Legal Notice
 
-- **[Contributing Guidelines](CONTRIBUTING.md)**: Branching policy, definition of done (DoD), commit standards.
-- **[Code of Conduct](CODE_OF_CONDUCT.md)**: Contributor Covenant v2.1 code of conduct.
-- **[Security Policy](SECURITY.md)**: Vulnerability disclosure procedure and Section 63 BSA 2023 evidence integrity.
-- **[GitHub Engineering Workflow](14_GITHUB_WORKFLOW.md)**: Trunk-based branching and automated gate controls.
-
----
-
-## 🛡️ License & Compliance
-
-This project is licensed under the **[Apache License 2.0](LICENSE)**.
-
-All deep learning models, optical pipelines, and software libraries used in NyayaDrishti-LM adhere strictly to permissive licenses (Apache-2.0, MIT, BSD-3-Clause, PostgreSQL). **GNU AGPL-3.0 dependencies are strictly prohibited** to safeguard institutional legal integrity.
+This project is licensed under the **[Apache License 2.0](LICENSE)**. Dependencies and model components were reviewed for license compatibility with the project.
 
 ---
 
 <p align="center">
   <b>Department of Consumer Affairs (DoCA)</b><br/>
   Ministry of Consumer Affairs, Food & Public Distribution • Government of India<br/>
-  <i>Smart India Hackathon 2026</i>
+  <i>Smart India Hackathon 2026 • Problem Statement ID: SIH26034</i>
 </p>

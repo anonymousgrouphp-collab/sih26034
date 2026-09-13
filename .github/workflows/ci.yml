@@ -1,4 +1,4 @@
-name: NyayaDrishti-LM CI
+name: Nirikshak CI
 
 on:
   push:
@@ -48,28 +48,28 @@ jobs:
                       CONTRIBUTING.md \
                       CODE_OF_CONDUCT.md \
                       SECURITY.md \
-                      01_MASTER_PROJECT_BLUEPRINT.md \
-                      02_FINAL_REQUIREMENTS_SPECIFICATION.md \
-                      03_FINAL_ARCHITECTURE.md \
-                      04_FINAL_MVP_SCOPE.md \
-                      05_TECHNOLOGY_DECISION_RECORD.md \
-                      06_DATA_AND_MODEL_STRATEGY.md \
-                      07_API_AND_INTERFACE_CONTRACTS.md \
-                      08_DATABASE_SPECIFICATION.md \
-                      09_UI_UX_BLUEPRINT.md \
-                      10_SECURITY_AND_AUDIT_SPECIFICATION.md \
-                      11_TESTING_AND_VALIDATION_PLAN.md \
-                      12_DEMO_PLAN.md \
-                      13_SIX_MEMBER_EXECUTION_PLAN.md \
-                      14_GITHUB_WORKFLOW.md \
-                      15_RISK_AND_CONTINGENCY_REGISTER.md \
-                      16_DECISION_LOG.md \
-                      17_OPEN_QUESTIONS.md \
                       CLAIMS_WE_MUST_NOT_MAKE.md \
-                      COMPLETE_PROJECT_END_TO_END_GUIDE.md \
-                      CONNECTIVITY_REQUIREMENTS.md \
-                      SYSTEM_MODES_AND_CONNECTIVITY.md \
-                      FINAL_AUTHENTICITY_AND_ACCURACY_AUDIT.md; do
+                      docs/COMPLETE_PROJECT_END_TO_END_GUIDE.md \
+                      docs/design/09_UI_UX_BLUEPRINT.md \
+                      docs/specifications/01_MASTER_PROJECT_BLUEPRINT.md \
+                      docs/specifications/02_FINAL_REQUIREMENTS_SPECIFICATION.md \
+                      docs/specifications/03_FINAL_ARCHITECTURE.md \
+                      docs/specifications/04_FINAL_MVP_SCOPE.md \
+                      docs/specifications/05_TECHNOLOGY_DECISION_RECORD.md \
+                      docs/specifications/06_DATA_AND_MODEL_STRATEGY.md \
+                      docs/specifications/07_API_AND_INTERFACE_CONTRACTS.md \
+                      docs/specifications/08_DATABASE_SPECIFICATION.md \
+                      docs/specifications/10_SECURITY_AND_AUDIT_SPECIFICATION.md \
+                      docs/specifications/11_TESTING_AND_VALIDATION_PLAN.md \
+                      docs/specifications/12_DEMO_PLAN.md \
+                      docs/specifications/13_SIX_MEMBER_EXECUTION_PLAN.md \
+                      docs/specifications/14_GITHUB_WORKFLOW.md \
+                      docs/specifications/15_RISK_AND_CONTINGENCY_REGISTER.md \
+                      docs/specifications/16_DECISION_LOG.md \
+                      docs/specifications/17_OPEN_QUESTIONS.md \
+                      docs/specifications/CONNECTIVITY_REQUIREMENTS.md \
+                      docs/specifications/SYSTEM_MODES_AND_CONNECTIVITY.md \
+                      audit/FINAL_AUTHENTICITY_AND_ACCURACY_AUDIT.md; do
             if [ ! -f "$file" ]; then
               echo "::error::Missing critical specification file: $file"
               exit 1
@@ -79,11 +79,11 @@ jobs:
 
       - name: Verify Research Reports & Bilingual Dossiers
         run: |
-          for dossier in PHASE_1_SIH26034_Domain_Research_Dossier.md \
-                         PHASE_1_SIH26034_Domain_Research_Dossier_HINGLISH.md \
-                         PHASE_2_RESEARCH_REPORT.md \
-                         PHASE_2_RESEARCH_REPORT_HINGLISH.md \
-                         PHASE_3_SOLUTION_BLUEPRINT.md; do
+          for dossier in docs/research/PHASE_1_Domain_Research_Dossier.md \
+                         docs/research/PHASE_1_Domain_Research_Dossier_HINGLISH.md \
+                         docs/research/PHASE_2_Research_Report.md \
+                         docs/research/PHASE_2_Research_Report_HINGLISH.md \
+                         docs/research/PHASE_3_Solution_Blueprint.md; do
             if [ ! -f "$dossier" ]; then
               echo "::error::Missing research dossier: $dossier"
               exit 1

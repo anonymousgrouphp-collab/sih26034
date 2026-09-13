@@ -1,4 +1,4 @@
-# NyayaDrishti-LM (SIH26034) — Member 1 Implementation Report
+# Nirikshak (SIH26034) — Member 1 Implementation Report
 **Subsystem:** Computer Vision, Optics & Metrological Scale Calibration  
 **Assigned Engineer:** Kunal Raj ([@kunal-raj-dev](https://github.com/kunal-raj-dev))  
 **Feature Branch:** `feat/m1-cv-metrology`  
@@ -9,11 +9,11 @@
 
 ## 1. Executive Summary
 
-Member 1 delivers the metrological and optical foundation for **NyayaDrishti-LM**, an AI-powered statutory compliance verification platform built for the Department of Consumer Affairs (DoCA), Government of India. 
+Member 1 delivers the metrological and optical foundation for **Nirikshak**, an AI-powered statutory compliance verification platform built for the Department of Consumer Affairs (DoCA), Government of India.
 
 Under the Legal Metrology (Packaged Commodities) Rules, 2011 (LMPC Rules, 2011), verifying numeral font heights (Table-I schedule) and packaging declarations requires certified, scale-accurate physical measurements in millimeters ($mm$) and square centimeters ($cm^2$). Uncalibrated monocular camera capture is legally inadmissible due to projective scale ambiguity.
 
-This workstream implements Stages 2 through 5 of the 12-stage NyayaDrishti-LM pipeline:
+This workstream implements Stages 2 through 5 of the 12-stage Nirikshak pipeline:
 1. **Optical Quality Gate:** Laplacian variance blur estimation ($\sigma^2 \ge 150.0$), HSV specular glare bloom detection ($V > 245, S < 15, \le 3.0\%$), and camera tilt verification ($\le 15.0^\circ$).
 2. **Metric Scale Calibration:** Planar homography anchored to standard ArUco 4x4_50 fiducials ($50.0\text{ mm}$, primary standard) with automatic contour-based fallback to ISO 7810 ID-1 reference cards ($85.60 \times 53.98\text{ mm}$, secondary standard), utilizing subpixel corner refinement (`CORNER_REFINE_SUBPIX`).
 3. **Packaging Geometry & PDP Measurement:** Contour segmentation and statutory 40% Principal Display Panel (PDP) surface area estimation under Rule 2(h) and Rule 7 for rectangular and cylindrical packaging.
@@ -421,7 +421,7 @@ The Member 1 subsystem provides the following clean handoffs:
 
 ```text
 ======================================================================
-SIH26034 — NyayaDrishti-LM
+SIH26034 — Nirikshak
 MEMBER 1 WORKSTREAM OFFICIAL SIGN-OFF
 ======================================================================
 
@@ -435,6 +435,6 @@ Latency (CPU):    46.20 ms mean / 49.38 ms p95 (Budget <= 80 ms) [ACHIEVED]
 AGPL Exposure:    0.0% (OpenCV, NumPy, Pydantic, PyTest)
 BSA Compliance:   Section 63 Bharatiya Sakshya Adhiniyam, 2023 Verified
 
-SIGNED OFF BY: kunal-raj-dev (kunal.raj@nyayadrishti.gov.in) — 2026-09-08 21:35 IST [VERIFIED]
+SIGNED OFF BY: kunal-raj-dev (kunal.raj@nirikshak.gov.in) — 2026-09-08 21:35 IST [VERIFIED]
 ======================================================================
 ```

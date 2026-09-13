@@ -11,7 +11,7 @@
 
 ```
 ================================================================================
-                    METROLENS AUTOMATED TEST SUITE METRICS
+                    NIRIKSHAK AUTOMATED TEST SUITE METRICS
 ================================================================================
 Subsystem / Workstream               | Suite File Count | Tests Run | Passed | Failed | Skipped | Runtime
 ---------------------------------------------------------------------------------------------------------

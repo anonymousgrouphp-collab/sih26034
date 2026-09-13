@@ -1,4 +1,4 @@
-# NyayaDrishti-LM (SIH26034) — Member 6 UI to Backend Integration Handoff Specification
+# Nirikshak (SIH26034) — Member 6 UI to Backend Integration Handoff Specification
 
 **Document Version:** 1.0.0-PROD-READY  
 **Author:** Member 6 (Frontend & HUD Engineer)  

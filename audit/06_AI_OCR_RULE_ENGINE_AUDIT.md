@@ -11,13 +11,13 @@
 
 In evaluating hackathon AI solutions, judges frequently encounter "fake AI" (e.g. sending raw packaging images to OpenAI GPT-4 Vision and asking "is this compliant?"). 
 
-MetroLens adopts an uncompromising, legally defensible hybrid architecture:
+Nirikshak adopts an uncompromising, legally defensible hybrid architecture:
 1. **Probabilistic Deep Learning is restricted strictly to PERCEPTION (Where is text? What letters were printed?).**
 2. **Deterministic AST Code handles 100% of STATUTORY EVALUATION (Does the font height meet Table-I? Does the USP match the MRP?).**
 
 ```
 +---------------------------------------------------------------------------------------------------------+
-|                                    METROLENS HYBRID INTELLIGENCE PIPELINE                               |
+|                                    NIRIKSHAK HYBRID INTELLIGENCE PIPELINE                               |
 +------------------------------------+------------------------------------+-------------------------------+
 | COMPONENT                          | UNDERLYING ENGINE                  | NATURE OF INFERENCE           |
 +------------------------------------+------------------------------------+-------------------------------+
@@ -34,7 +34,7 @@ MetroLens adopts an uncompromising, legally defensible hybrid architecture:
 ```
 
 **Why this matters to SIH Judges:**
-An LLM can hallucinate numbers, prices, or Gazette rules. A legal notice citing a hallucinated rule will be dismissed in court with judicial strictures against the officer. By keeping compliance logic 100% deterministic, MetroLens guarantees zero hallucinations while leveraging neural nets for difficult optical extraction.
+An LLM can hallucinate numbers, prices, or Gazette rules. A legal notice citing a hallucinated rule will be dismissed in court with judicial strictures against the officer. By keeping compliance logic 100% deterministic, Nirikshak guarantees zero hallucinations while leveraging neural nets for difficult optical extraction.
 
 ---
 
@@ -71,7 +71,7 @@ The repository vendors genuine, pre-trained deep learning ONNX checkpoints in `m
    $$H_{\text{mm}} = \frac{H_{\text{px}}}{S} \quad [\text{mm}]$$
 
 ### 3.2 Planar Homography Perspective Rectification
-When a packaging label is photographed at an angle, perspective foreshortening shrinks distant letters. MetroLens computes the $3 \times 3$ planar homography matrix $H$:
+When a packaging label is photographed at an angle, perspective foreshortening shrinks distant letters. Nirikshak computes the $3 \times 3$ planar homography matrix $H$:
 $$\begin{bmatrix} x' \\ y' \\ 1 \end{bmatrix} = H \begin{bmatrix} x \\ y \\ 1 \end{bmatrix}$$
 and warps the image plane via `cv2.warpPerspective` to restore true orthogonal Euclidean dimensions before font measurement.
 
@@ -123,7 +123,7 @@ Under Act No. 18 of 2023:
 
 ```
 +---------------------------------------------------------------------------------------------------------+
-| ADVERSARIAL INPUT SCENARIO           | NAIVE OCR SYSTEM ACTION          | METROLENS STATUTORY DEFENSE   |
+| ADVERSARIAL INPUT SCENARIO           | NAIVE OCR SYSTEM ACTION          | NIRIKSHAK STATUTORY DEFENSE   |
 +--------------------------------------+----------------------------------+-------------------------------+
 | Serving suggestion: "with 100 ml e.g. | Naive scanner flags 'g.' as      | Masks Latin abbreviations     |
 | milk"                                | prohibited unit under Rule 12    | before unit scanning -> PASS  |

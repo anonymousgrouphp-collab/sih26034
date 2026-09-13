@@ -108,7 +108,7 @@ COMPLETE
 Prepare pull request from `feat/m1-cv-metrology` into `dev` integration branch.
 
 ### Signing Note
-SIGNED OFF BY: kunal-raj-dev (kunal.raj@nyayadrishti.gov.in) — 2026-09-08 21:35 IST [VERIFIED]
+SIGNED OFF BY: kunal-raj-dev (kunal.raj@nirikshak.gov.in) — 2026-09-08 21:35 IST [VERIFIED]
 
 ---
 
@@ -153,7 +153,7 @@ COMPLETE
 Hand off stable subsystem interfaces to Member 2 (Multilingual OCR) and Member 5 (FastAPI / Evidence Backend). Ready for PR merge to `dev`.
 
 ### Signing Note
-SIGNED OFF BY: kunal-raj-dev (kunal.raj@nyayadrishti.gov.in) — 2026-09-08 21:52 IST [VERIFIED]
+SIGNED OFF BY: kunal-raj-dev (kunal.raj@nirikshak.gov.in) — 2026-09-08 21:52 IST [VERIFIED]
 
 ---
 
@@ -191,7 +191,7 @@ COMPLETE
 Prepare comprehensive CTO critique report detailing vulnerabilities, empirical metrics, and defense strategies.
 
 ### Signing Note
-SIGNED OFF BY: kunal-raj-dev (kunal.raj@nyayadrishti.gov.in) — 2026-09-10 16:15 IST [VERIFIED]
+SIGNED OFF BY: kunal-raj-dev (kunal.raj@nirikshak.gov.in) — 2026-09-10 16:15 IST [VERIFIED]
 
 ---
 
@@ -230,7 +230,7 @@ COMPLETE
 Deliver final CTO critique report to caller and prepare for integration review.
 
 ### Signing Note
-SIGNED OFF BY: kunal-raj-dev (kunal.raj@nyayadrishti.gov.in) — 2026-09-10 16:30 IST [VERIFIED]
+SIGNED OFF BY: kunal-raj-dev (kunal.raj@nirikshak.gov.in) — 2026-09-10 16:30 IST [VERIFIED]
 
 ---
 
@@ -271,6 +271,6 @@ COMPLETE
 Deploy and verify live on web platform and field inspection desks.
 
 ### Signing Note
-SIGNED OFF BY: kunal-raj-dev (kunal.raj@nyayadrishti.gov.in) — 2026-09-13 01:30 IST [VERIFIED]
+SIGNED OFF BY: kunal-raj-dev (kunal.raj@nirikshak.gov.in) — 2026-09-13 01:30 IST [VERIFIED]
 
 

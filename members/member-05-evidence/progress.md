@@ -269,7 +269,7 @@ COMPLETE
 - **Inspection Detail Resolution (`server.py`):**
   - Updated `get_inspection_detail` query to resolve inspections by UUID, inspection number, or product name pattern.
 - **Render PostgreSQL Seeding Script (`scripts/seed_render_db.py`):**
-  - Executed end-to-end against live Render backend (`https://nyayadrishti-backend.onrender.com`).
+  - Executed end-to-end against live Render backend (`https://nirikshak-backend.onrender.com`).
   - Successfully authenticated, uploaded physical evidence, and executed full 12-stage AI pipeline for all Golden Demonstration SKUs (`SKU-DEMO-01` through `06`).
   - Verified 100% database persistence across findings, bounding boxes, OCR tokens, and Section 63 BSA certificates.
 

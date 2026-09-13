@@ -1,6 +1,6 @@
 # AGENTS.md — Universal Master Rules for Developers & AI Agents
 
-Welcome to **NyayaDrishti-LM (SIH26034)**.
+Welcome to **Nirikshak (SIH26034)**.
 This document is the authoritative engineering handbook, architectural boundary guide, and operational rulebook for all contributors to this codebase.
 
 Whether you are a **human software engineer** or an **AI coding assistant / autonomous agent** (e.g., Claude Code, Cursor, Windsurf, GitHub Copilot, Devin, Antigravity, Cline, Roo Code, Aider, Codex, or any LLM-powered pair-programmer), you **must adhere strictly and unconditionally** to every rule, boundary, and protocol defined in this specification.
@@ -9,7 +9,7 @@ Whether you are a **human software engineer** or an **AI coding assistant / auto
 
 ## 1. Project Purpose & System Context
 
-NyayaDrishti-LM is an AI-powered legal metrology compliance verification web platform built for the **Department of Consumer Affairs (DoCA)**, Government of India.
+**Nirikshak** is an AI-powered legal metrology compliance verification web platform built for the **Department of Consumer Affairs (DoCA)**, Government of India.
 Its primary objective is to assist government enforcement officers in verifying packaged commodities against statutory labeling requirements under the **Legal Metrology (Packaged Commodities) Rules, 2011** (LMPC Rules, 2011) and the **Legal Metrology Act, 2009**. It also inspects single e-commerce product listings under Rule 6(10).
 
 ### Operational Modes
@@ -18,7 +18,7 @@ Its primary objective is to assist government enforcement officers in verifying 
 3. **Mode C (Integrations):** External statutory registry lookups (e.g., National Consumer Helpline, packaging portals).
 
 ### Crucial Legal Principle: Human-in-the-Loop (HITL)
-NyayaDrishti-LM is strictly an **Augmented Diagnostic Assistant**.
+Nirikshak is strictly an **Augmented Diagnostic Assistant**.
 - The system **never** issues legal notices, compounding orders, or fines autonomously.
 - Every automated finding is a diagnostic recommendation presented to a qualified human Legal Metrology Officer (LMO).
 - The human officer makes the final adjudication and signs all official documentation.

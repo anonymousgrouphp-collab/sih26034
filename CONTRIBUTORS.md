@@ -1,6 +1,6 @@
-# NyayaDrishti-LM Contributors
+# Nirikshak Contributors
 
-The development of **NyayaDrishti-LM (SIH26034)** is driven by a specialized six-member parallel engineering workstream under the Smart India Hackathon 2026 for the **Department of Consumer Affairs (DoCA)**, Ministry of Consumer Affairs, Food & Public Distribution, Government of India.
+The development of **Nirikshak (SIH26034)** is driven by a specialized six-member parallel engineering workstream under the Smart India Hackathon 2026 for the **Department of Consumer Affairs (DoCA)**, Ministry of Consumer Affairs, Food & Public Distribution, Government of India.
 
 ---
 
@@ -13,7 +13,7 @@ The development of **NyayaDrishti-LM (SIH26034)** is driven by a specialized six
 | **Harsh Patel** | **Member 3: Semantic Extraction, Rule Engine & Frontend** | Statutory entity extraction (MRP, Net Qty, Dates, Address, PIN, Consumer Care, Origin), Prohibited unit flagger (`gms`, `ML`, `gm`, `ltrs`), Indic numeral converter, AST compliance engine hardening, IEEE 754 precision guard, and Frontend E2E pipeline orchestration. | [@anonymousgrouphp-collab](https://github.com/anonymousgrouphp-collab) |
 | **Ambika Bansal** | **Member 4: Statutory Rule Engine** *(Co-engineered with Harsh Patel)* | Abstract Syntax Tree (AST) statutory compliance engine, Table-I font schedule enforcement, Unit Sale Price (USP) tolerance math, Rule 6(1)(k) single-unit proviso, E-Commerce Rule 6(10) audit, and 4-state epistemic triage (`PASS`, `FAIL`, `REVIEW`, `UNABLE_TO_VERIFY`). | [@bansalambika12-ship-it](https://github.com/bansalambika12-ship-it) |
 | **Shailendra Pratap Singh** | **Member 5: Evidence & Cryptography** | FastAPI REST microservices, PostgreSQL 16 schema, SHA-256 Merkle chain-of-custody ledger, Section 63 BSA 2023 digital certificate generator, and ReportLab Form-1 Show Cause Notice PDF/A generation. | [@shailendrapratap1](https://github.com/shailendrapratap1) |
-| **Urvashi Rajput** | **UI/UX Architecture & Design System** | Initial frontend architecture, Nirikshak Metrolens workstation framework, Quick Triage Filter Pills, elevation shadow tokens, initial inspection desk and conflict card ergonomics. | [@rajputurvashi2006-bit](https://github.com/rajputurvashi2006-bit) |
+| **Urvashi Rajput** | **UI/UX Architecture & Design System** | Initial frontend architecture, Nirikshak workstation framework, Quick Triage Filter Pills, elevation shadow tokens, initial inspection desk and conflict card ergonomics. | [@rajputurvashi2006-bit](https://github.com/rajputurvashi2006-bit) |
 
 ---
 
