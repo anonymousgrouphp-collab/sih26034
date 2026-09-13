@@ -90,7 +90,13 @@ def test_cache_queue_adapter_mocked_redis():
     mock_redis.ping.return_value = True
     mock_redis.get.return_value = '{"source": "redis_val"}'
 
-    with patch("redis.Redis.from_url", return_value=mock_redis):
+    mock_redis_module = MagicMock()
+    mock_redis_module.Redis.from_url.return_value = mock_redis
+
+    import sys
+    with patch.dict(sys.modules, {"redis": mock_redis_module}), \
+         patch("cache_queue.REDIS_AVAILABLE", True), \
+         patch("cache_queue.redis", mock_redis_module):
         adapter = CacheQueueAdapter(redis_url="redis://localhost:6379/0")
         assert adapter.is_redis_active
         assert adapter.redis_client is not None

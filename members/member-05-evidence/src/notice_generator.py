@@ -244,26 +244,34 @@ class Form1NoticePDFGenerator:
         story.append(Paragraph(narrative_text, style_body))
         story.append(Spacer(1, 3 * mm))
 
+        def _clean_pdf_text(val: Any) -> str:
+            if val is None:
+                return ""
+            text = str(val).replace("₹", "Rs. ")
+            while "Rs.  " in text:
+                text = text.replace("Rs.  ", "Rs. ")
+            return text
+
         # 5.5 Schedule A: Particulars of Inspected Commodity
         story.append(Paragraph("<b>SCHEDULE A: PARTICULARS OF INSPECTED PACKAGED COMMODITY:</b>", style_heading))
         sched_a_data = [
             [
-                Paragraph(f"<b>Commodity / Product:</b> {commodity_name or 'Packaged Commodity'}", style_body),
-                Paragraph(f"<b>Brand Name:</b> {brand_name or 'N/A'}", style_body),
+                Paragraph(f"<b>Commodity / Product:</b> {_clean_pdf_text(commodity_name) or 'Packaged Commodity'}", style_body),
+                Paragraph(f"<b>Brand Name:</b> {_clean_pdf_text(brand_name) or 'N/A'}", style_body),
             ],
             [
-                Paragraph(f"<b>Declared Net Qty:</b> {declared_net_qty or 'N/A'}", style_body),
-                Paragraph(f"<b>Retail Price (MRP):</b> {declared_mrp or 'N/A'}", style_body),
+                Paragraph(f"<b>Declared Net Qty:</b> {_clean_pdf_text(declared_net_qty) or 'N/A'}", style_body),
+                Paragraph(f"<b>Retail Price (MRP):</b> {_clean_pdf_text(declared_mrp) or 'N/A'}", style_body),
             ],
             [
-                Paragraph(f"<b>Batch / Lot No.:</b> {batch_number or 'N/A'}", style_body),
-                Paragraph(f"<b>Packaging Geometry:</b> {package_type or 'Standard Box / Pack'}", style_body),
+                Paragraph(f"<b>Batch / Lot No.:</b> {_clean_pdf_text(batch_number) or 'N/A'}", style_body),
+                Paragraph(f"<b>Packaging Geometry:</b> {_clean_pdf_text(package_type) or 'Standard Box / Pack'}", style_body),
             ],
         ]
         if pdp_area_cm2:
             sched_a_data.append([
                 Paragraph(f"<b>Measured PDP Area:</b> {pdp_area_cm2:.1f} cm²", style_body),
-                Paragraph(f"<b>Inspection Dossier ID:</b> {inspection_id}", style_body),
+                Paragraph(f"<b>Inspection Dossier ID:</b> {_clean_pdf_text(inspection_id)}", style_body),
             ])
         sched_a_table = Table(sched_a_data, colWidths=[85 * mm, 80 * mm])
         sched_a_table.setStyle(TableStyle([
@@ -292,11 +300,11 @@ class Form1NoticePDFGenerator:
         violation_strings = []
 
         for v in violations:
-            v_code = v.get("rule_code", "RULE_UNKNOWN")
-            v_ref = v.get("statutory_reference", "LM (PC) Rules 2011")
-            v_req = v.get("required_value", "N/A")
-            v_meas = v.get("measured_value", "N/A")
-            v_disc = v.get("discrepancy", "Deficit detected")
+            v_code = _clean_pdf_text(v.get("rule_code", "RULE_UNKNOWN"))
+            v_ref = _clean_pdf_text(v.get("statutory_reference", "LM (PC) Rules 2011"))
+            v_req = _clean_pdf_text(v.get("required_value", "N/A"))
+            v_meas = _clean_pdf_text(v.get("measured_value", "N/A"))
+            v_disc = _clean_pdf_text(v.get("discrepancy", "Deficit detected"))
             violation_strings.append(f"{v_code}: {v_disc} ({v_ref})")
 
             v_rows.append([
@@ -325,7 +333,7 @@ class Form1NoticePDFGenerator:
         fee_data = [
             [
                 Paragraph(f"<b>Statutory Compounding Fee (Section 48 LM Act):</b>", style_body_bold),
-                Paragraph(f"<font color='#1B365D' size='11'><b>₹ {compounding_fee:,.2f}</b></font>", style_body_bold),
+                Paragraph(f"<font color='#1B365D' size='11'><b>Rs. {compounding_fee:,.2f}</b></font>", style_body_bold),
                 Paragraph(f"<b>Reply Window:</b> {reply_window_days} Days", style_body),
             ]
         ]

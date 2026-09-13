@@ -547,8 +547,13 @@ async def upload_inspection_image(
 ):
     """Uploads raw packaging image + capture metadata enforcing TS-WEB-01 and ADL-19."""
     raw_bytes = await image.read()
-    if not raw_bytes:
-        raise HTTPException(status_code=400, detail="Empty upload stream.")
+    if not raw_bytes or len(raw_bytes) == 0:
+        raise HTTPException(status_code=400, detail="Empty upload stream (0-byte image rejected).")
+
+    # Explicit Adversarial Polyglot & SVG Defense
+    sniff_header = raw_bytes[:1024].lower()
+    if b"<svg" in sniff_header or b"<?xml" in sniff_header or b"<script" in sniff_header or b"<html" in sniff_header:
+        raise HTTPException(status_code=415, detail="Adversarial SVG / XML / HTML polyglot payload rejected.")
 
     # Storage manager checks magic bytes and 15MB cap (raises UnsupportedMediaTypeError / PayloadTooLargeError)
     rel_path, file_hash, mime_type = storage_manager.save_upload(raw_bytes, image.filename)
@@ -1207,7 +1212,9 @@ def execute_pipeline(
                     ocr_engine = get_cached_ocr_engine()
                     if ocr_engine is not None:
                         try:
-                            ocr_output = ocr_engine.process_image(img_bgr, image_id=ev_image.id)
+                            from quality_gate import QualityGateEvaluator
+                            ocr_ready_img = QualityGateEvaluator.preprocess_for_ocr(img_bgr)
+                            ocr_output = ocr_engine.process_image(ocr_ready_img, image_id=ev_image.id)
                             logger.info(f"Multilingual OCR processed {len(ocr_output.tokens)} tokens using {getattr(ocr_engine, 'execution_mode', 'INT8')}")
                         except Exception as ocr_proc_err:
                             logger.error(f"OCR process_image failed: {ocr_proc_err}")
@@ -2531,7 +2538,7 @@ def generate_legal_notice(
     batch_number = getattr(insp, "batch_number", None)
     declared_net_qty = getattr(insp, "declared_net_quantity", None)
     declared_mrp_val = getattr(insp, "declared_mrp", None)
-    declared_mrp = f"₹ {declared_mrp_val:.2f}" if declared_mrp_val is not None else None
+    declared_mrp = f"Rs. {declared_mrp_val:.2f}" if declared_mrp_val is not None else None
     package_type = getattr(insp, "package_type", None)
     pdp_area = getattr(insp, "pdp_surface_area_cm2", None)
 
@@ -2792,7 +2799,7 @@ def download_notice_pdf(
             brand_name=insp.brand_name if insp else None,
             batch_number=insp.batch_number if insp else None,
             declared_net_qty=insp.declared_net_quantity if insp else None,
-            declared_mrp=f"₹ {insp.declared_mrp:.2f}" if insp and insp.declared_mrp is not None else None,
+            declared_mrp=f"Rs. {insp.declared_mrp:.2f}" if insp and insp.declared_mrp is not None else None,
             package_type=insp.package_type if insp else None,
             pdp_area_cm2=insp.pdp_surface_area_cm2 if insp else None,
         )
