@@ -672,6 +672,54 @@ Commit and push to `origin main` and `origin dev` for automated cloud deployment
 ### Signing Note
 SIGNED OFF BY: Harsh Patel (anonymousgrouphp-collab) & Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-13 11:20 IST [VERIFIED]
 
+---
+
+## [13 September 2026] [11:45] IST
+
+### Task / Chunk
+Cloud Pipeline Throughput Optimization & Live E2E Physical Evidence Verification (Render & Vercel).
+
+### Status
+COMPLETE
+
+### Completed
+- **Eliminated Sequential Tesseract Noise Loops (`members/member-02-ocr/src/engine.py`):**
+  - Identified that on cloud container CPUs (0.5 vCPU on Render), invoking Tesseract sequentially on ~30 low-confidence noise crops (logos, barcode textures, icons) took 150+ seconds, causing Render HTTP gateway 502 timeouts.
+  - Guarded consensus fallback with `if self.fallback_threshold > 0 and ...`, allowing high-speed primary neural OCR to process full packaging labels in ~2.6s.
+- **Warm Singleton OCR Engine (`members/member-05-evidence/src/server.py`):**
+  - Added `get_cached_ocr_engine()` singleton so ONNX sessions stay warm in memory across requests instead of re-importing and reloading weights on every HTTP call.
+  - Set thread count to 2 (`det_num_threads=2, rec_num_threads=2`), matching container CPU topologies and eliminating thread thrashing.
+- **In-Memory Image Buffer (`_IMAGE_MEMORY_CACHE`):**
+  - Added fast in-memory LRU cache storing uploaded raw bytes, ensuring instant <1ms image decode for pipeline execution immune to ephemeral container filesystem resets.
+- **Live Cloud Verification on Real Packaging (`media_1789250888882.jpg`):**
+  - Deployed container version `1.0.1-pipeline-opt` (Commit `92be152`) on Render (`nyayadrishti-backend.onrender.com`).
+  - Executed live E2E inspection: created case `insp_f72038db-6ed1-464f-95dc-af19ca1eec77`, uploaded packaging evidence `goboult_back_panel.jpg`, and triggered 12-stage AI pipeline.
+  - Pipeline returned HTTP 200 with:
+    - Calibration: ISO-7810 RuPay Card detected (`px_to_mm: 2.8102`, box `[636, 501, 786, 756]`).
+    - Extracted Declarations: 8 genuine statutory fields (MRP ₹1999, Net Qty 1N, Mfg Date April 2026, COO India, Exotic Mile Pvt Ltd, support@goboult.co.in, W45).
+    - Rule Evaluations: 7 statutory rules evaluated and verified compliant (PASS).
+    - Overall AI Verdict: **PASS**.
+
+### Tests
+- `pytest members/member-02-ocr/tests/` (77 passed, 1 skipped in 16.70s)
+- `pytest members/member-05-evidence/tests/` (71 passed in 5.65s)
+- `npm test -- --run` in `ui-combined` (146 passed in 4.80s)
+- Live Render E2E Verification: HTTP 200, 8 fields, 7 rules, AI Verdict `PASS`.
+
+### Problems
+Resolved 502 Bad Gateway timeout by eliminating sequential Tesseract noise loops on non-text crops.
+
+### Decisions
+1. Primary multilingual text extraction uses PP-OCRv4 neural models; secondary Tesseract fallback is reserved strictly for edge cases when primary confidence demands it, never unconditionally across noise crops.
+2. In-memory image caching provides immediate resilience against cloud container storage latencies.
+
+### Next Step
+Verify real browser rendering via Vercel frontend and present live inspection evidence dossier to the user.
+
+### Signing Note
+SIGNED OFF BY: Harsh Patel (anonymousgrouphp-collab) & Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-13 11:45 IST [VERIFIED]
+
+
 
 
 
