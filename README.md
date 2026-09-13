@@ -7,8 +7,8 @@
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="brand/svg/nirikshak-banner-hero-dark.svg">
-    <img src="brand/svg/nirikshak-banner-hero.svg" alt="NIRIKSHAK — Legal Metrology Inspection Workstation" width="100%" />
+    <source media="(prefers-color-scheme: dark)" srcset="assets/brand/svg/nirikshak-banner-hero-dark.svg">
+    <img src="assets/brand/svg/nirikshak-banner-hero.svg" alt="NIRIKSHAK — Legal Metrology Inspection Workstation" width="100%" />
   </picture>
 </p>
 
@@ -46,7 +46,7 @@ It turns fragmented packaging inspection into one traceable workflow: **capture 
 Every finding remains traceable to the evidence that produced it:
 
 <p align="center">
-  <img src="brand/svg/nirikshak-evidence-trace.svg"
+  <img src="assets/brand/svg/nirikshak-evidence-trace.svg"
        alt="Nirikshak evidence traceability from finding to preserved dossier"
        width="100%" />
 </p>
@@ -68,7 +68,7 @@ Enforcement officers inspecting packaged commodities in wholesale mandis, retail
 Nirikshak unifies field intake, calibrated computer vision, multilingual scene text recognition, deterministic statutory logic, and human adjudication into a single web platform:
 
 <p align="center">
-  <img src="brand/svg/nirikshak-problem-solution.svg"
+  <img src="assets/brand/svg/nirikshak-problem-solution.svg"
        alt="How Nirikshak transforms fragmented packaging inspection into one traceable workflow"
        width="100%" />
 </p>
@@ -80,7 +80,7 @@ Nirikshak unifies field intake, calibrated computer vision, multilingual scene t
 The complete inspection flow:
 
 <p align="center">
-  <img src="brand/svg/nirikshak-inspector-workflow.svg"
+  <img src="assets/brand/svg/nirikshak-inspector-workflow.svg"
        alt="Nirikshak flagship inspector workflow"
        width="100%" />
 </p>
@@ -96,7 +96,7 @@ The complete inspection flow:
 Nirikshak places the human officer at the center of all enforcement decisions:
 
 <p align="center">
-  <img src="brand/svg/nirikshak-adjudication.svg"
+  <img src="assets/brand/svg/nirikshak-adjudication.svg"
        alt="Nirikshak human-in-the-loop adjudication canvas"
        width="100%" />
 </p>
@@ -179,7 +179,7 @@ Nirikshak classifies evaluated checks into four clear operational states:
 Nirikshak is backed by empirical testing on real retail commodities and automated verification:
 
 <p align="center">
-  <img src="brand/svg/nirikshak-proof.svg"
+  <img src="assets/brand/svg/nirikshak-proof.svg"
        alt="Nirikshak real-world proof and verification metrics"
        width="100%" />
 </p>
@@ -462,3 +462,5 @@ This project is licensed under the **[Apache License 2.0](LICENSE)**. Dependenci
   Ministry of Consumer Affairs, Food & Public Distribution • Government of India<br/>
   <i>Smart India Hackathon 2026 • Problem Statement ID: SIH26034</i>
 </p>
+
+
