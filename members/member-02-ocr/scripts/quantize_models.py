@@ -318,8 +318,7 @@ def main():
     }
 
     manifest_path = INT8_DIR / "int8_manifest.json"
-    with open(manifest_path, "w", encoding="utf-8") as f:
-        json.dump(manifest, f, indent=2)
+    manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
     print(f"\nQuantization complete! Metadata written to {manifest_path}")
     print("=" * 80)

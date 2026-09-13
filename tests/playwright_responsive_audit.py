@@ -215,8 +215,7 @@ def run_responsive_audit():
 
     # Save results json
     results_path = SCRATCH_DIR / "playwright_audit_results.json"
-    with open(results_path, "w", encoding="utf-8") as f:
-        json.dump(audit_results, f, indent=2)
+    results_path.write_text(json.dumps(audit_results, indent=2), encoding="utf-8")
     print(f"\n[AUDIT COMPLETE] Results saved to {results_path}")
     
     if audit_results["issues"]:

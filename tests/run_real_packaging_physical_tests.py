@@ -8,8 +8,10 @@ USP math consistency, and Section 63 BSA 2023 Merkle audit ledger.
 """
 
 import json
+import ipaddress
 import os
 from pathlib import Path
+import socket
 import sys
 import time
 import urllib.parse
@@ -134,17 +136,28 @@ REAL_PRODUCTS = [
 ]
 
 
+def _assert_public_http_url(url: str) -> None:
+    """SSRF guard: only absolute http(s) URLs resolving to public hosts."""
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme not in ("http", "https") or not parsed.hostname:
+        raise ValueError(f"Refusing non-http(s) URL: {url}")
+    for info in socket.getaddrinfo(parsed.hostname, None):
+        ip = ipaddress.ip_address(info[4][0])
+        if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved:
+            raise ValueError(f"Refusing fetch to non-public host: {parsed.hostname} ({ip})")
+
+
 def download_image(url: str, dest_path: Path) -> bool:
     """Downloads an image from URL if not already cached locally."""
     if dest_path.is_file() and dest_path.stat().st_size > 1000:
         return True
+    _assert_public_http_url(url)
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "NyayaDrishti-Inspection/1.0"})
         with urllib.request.urlopen(req, timeout=15) as resp:
             data = resp.read()
             if len(data) > 500:
-                with open(dest_path, "wb") as f:
-                    f.write(data)
+                dest_path.write_bytes(data)
                 return True
     except Exception as e:
         print(f"  [!] Failed to download {url}: {e}")

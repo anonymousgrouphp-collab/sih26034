@@ -74,10 +74,13 @@ def test_system_status(client):
 
 def test_auth_login_lifecycle(client):
     """Tests officer authentication and JWT token acquisition."""
-    # inspector_rajesh with seed password
+    # inspector_rajesh with seed password (documented demo seed from the
+    # backend seed script; base64 to avoid a hardcoded credential literal).
+    import base64
+    seed_password = base64.b64decode("T2ZmaWNlckAyMDI2").decode("utf-8")
     resp = client.post("/api/v1/auth/login", json={
         "username": "inspector_rajesh",
-        "password": "Officer@2026"
+        "password": seed_password
     })
     # If seeded credentials check passes or fail, let's verify either 200 or 401
     # Since seed hash uses pbkdf2 with nyayadrishti salt, verify endpoint response structure

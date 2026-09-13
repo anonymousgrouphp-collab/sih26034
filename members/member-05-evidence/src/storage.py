@@ -212,8 +212,10 @@ class DecoupledStorageManager:
         date_dir.mkdir(parents=True, exist_ok=True)
 
         target_file = date_dir / f"{file_hash}{ext}"
+        if not target_file.resolve().is_relative_to(self.uploads_dir.resolve()):
+            raise StorageSecurityError("Resolved upload path escapes the uploads directory.")
         if not target_file.exists():
-            with open(target_file, "wb") as f:
+            with target_file.open("wb") as f:
                 f.write(raw_bytes)
 
         relative_path = str(target_file.relative_to(self.base_dir)).replace("\\", "/")
@@ -254,8 +256,10 @@ class DecoupledStorageManager:
 
         safe_prefix = "".join(c for c in filename_prefix if c.isalnum() or c in ("-", "_"))
         target_file = date_dir / f"{safe_prefix}_{file_hash[:16]}.pdf"
+        if not target_file.resolve().is_relative_to(self.evidence_dir.resolve()):
+            raise StorageSecurityError("Resolved evidence path escapes the evidence directory.")
 
-        with open(target_file, "wb") as f:
+        with target_file.open("wb") as f:
             f.write(doc_bytes)
 
         relative_path = str(target_file.relative_to(self.base_dir)).replace("\\", "/")
@@ -278,8 +282,9 @@ class DecoupledStorageManager:
         if clean_rel.startswith("storage/"):
             clean_rel = clean_rel[len("storage/"):]
         resolved = (self.base_dir / clean_rel).resolve()
-        # Path traversal guard
-        if not str(resolved).startswith(str(self.base_dir)):
+        # Path traversal guard (Path comparison, not string prefix — a sibling
+        # directory such as <base_dir>_external must not pass).
+        if not resolved.is_relative_to(self.base_dir):
             raise StorageSecurityError("Illegal path traversal detected.")
 
         if not resolved.exists() and self.supabase and self.supabase.is_configured:
@@ -287,7 +292,7 @@ class DecoupledStorageManager:
                 cloud_bytes = self.supabase.download_file(clean_rel)
                 if cloud_bytes:
                     resolved.parent.mkdir(parents=True, exist_ok=True)
-                    with open(resolved, "wb") as f:
+                    with resolved.open("wb") as f:
                         f.write(cloud_bytes)
             except Exception:
                 pass

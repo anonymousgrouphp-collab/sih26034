@@ -11,6 +11,7 @@ from pathlib import Path
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 
 # Setup paths
@@ -41,6 +42,23 @@ if sys.platform == "win32":
 
 VERCEL_URL = os.getenv("FRONTEND_URL", "https://sih26034.vercel.app")
 RENDER_URL = os.getenv("BACKEND_URL", "https://nyayadrishti-backend.onrender.com")
+
+
+def _fetch(path, *, data=None, headers=None, timeout=15):
+    """Fetch a path from the configured render host only (SSRF-hardened).
+
+    Every request is pinned to the scheme/host of RENDER_URL; any redirect
+    target or injected URL pointing elsewhere is refused before connect.
+    """
+    base = urllib.parse.urlparse(RENDER_URL)
+    if base.scheme not in ("http", "https") or not base.hostname:
+        raise ValueError(f"RENDER_URL must be an absolute http(s) URL: {RENDER_URL}")
+    target = urllib.parse.urljoin(f"{base.scheme}://{base.netloc}", path)
+    target_parsed = urllib.parse.urlparse(target)
+    if target_parsed.scheme != base.scheme or target_parsed.hostname != base.hostname:
+        raise ValueError(f"Blocked fetch outside the configured render host: {target}")
+    req = urllib.request.Request(target, data=data, headers=headers)
+    return urllib.request.urlopen(req, timeout=timeout)
 
 test_results = []
 
@@ -308,8 +326,7 @@ def run_cloud_api_suite():
 
     # 1. Live Health Probe
     try:
-        req = urllib.request.Request(f"{RENDER_URL}/api/v1/health")
-        with urllib.request.urlopen(req, timeout=15) as res:
+        with _fetch("/api/v1/health") as res:
             data = json.loads(res.read())
             record_test("Cloud API", "1. Live Health Endpoint HTTP 200", res.status == 200 and data.get("status") == "ONLINE")
     except Exception as e:
@@ -317,8 +334,7 @@ def run_cloud_api_suite():
 
     # 2. Section 63 BSA 2023 Statutory Citation Check
     try:
-        req = urllib.request.Request(f"{RENDER_URL}/api/v1/system/status")
-        with urllib.request.urlopen(req, timeout=15) as res:
+        with _fetch("/api/v1/system/status") as res:
             data = json.loads(res.read())
             has_sec63 = "Section 63" in data.get("statutory_mandate", "") or "BSA 2023" in data.get("statutory_mandate", "")
             no_repealed_65b = data.get("repealed_acts_cited") is None
@@ -328,8 +344,7 @@ def run_cloud_api_suite():
 
     # 3. Cryptographic Audit Chain Valid in Live Datastore
     try:
-        req = urllib.request.Request(f"{RENDER_URL}/api/v1/system/status")
-        with urllib.request.urlopen(req, timeout=15) as res:
+        with _fetch("/api/v1/system/status") as res:
             data = json.loads(res.read())
             record_test("Cloud API", "3. Cryptographic Audit Chain Valid in Datastore", data.get("audit_chain_valid") is True)
     except Exception as e:
@@ -337,8 +352,7 @@ def run_cloud_api_suite():
 
     # 4. Unauthenticated Access Protection (RBAC 401)
     try:
-        req = urllib.request.Request(f"{RENDER_URL}/api/v1/inspections")
-        urllib.request.urlopen(req, timeout=15)
+        _fetch("/api/v1/inspections")
         record_test("Cloud API", "4. Unauthenticated Access Rejected (401)", False, "Allowed unauthenticated")
     except urllib.error.HTTPError as e:
         record_test("Cloud API", "4. Unauthenticated Access Rejected (401)", e.code == 401)
@@ -349,8 +363,7 @@ def run_cloud_api_suite():
     token = None
     try:
         login_data = json.dumps({"username": "inspector_rajesh", "password": "Officer@2026"}).encode()
-        req = urllib.request.Request(f"{RENDER_URL}/api/v1/auth/login", data=login_data, headers={"Content-Type": "application/json"})
-        with urllib.request.urlopen(req, timeout=15) as res:
+        with _fetch("/api/v1/auth/login", data=login_data, headers={"Content-Type": "application/json"}) as res:
             data = json.loads(res.read())
             token = data.get("access_token")
             record_test("Cloud API", "5. Officer Login & JWT Issuance", res.status == 200 and token is not None)
@@ -359,8 +372,7 @@ def run_cloud_api_suite():
 
     # 6. Authenticated Inspections Query with JWT
     try:
-        req = urllib.request.Request(f"{RENDER_URL}/api/v1/inspections", headers={"Authorization": f"Bearer {token}"})
-        with urllib.request.urlopen(req, timeout=15) as res:
+        with _fetch("/api/v1/inspections", headers={"Authorization": f"Bearer {token}"}) as res:
             data = json.loads(res.read())
             record_test("Cloud API", "6. Authenticated Inspections Query", res.status == 200 and "items" in data)
     except Exception as e:
@@ -372,12 +384,11 @@ def run_cloud_api_suite():
             "inspection_id": "insp_test",
             "recipient": {"name": "Test FMCG", "address": "New Delhi"},
         }).encode()
-        req = urllib.request.Request(
-            f"{RENDER_URL}/api/v1/notices/generate",
+        _fetch(
+            "/api/v1/notices/generate",
             data=notice_payload,
-            headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+            headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
         )
-        urllib.request.urlopen(req, timeout=15)
         record_test("Cloud API", "7. Inspector Prohibited from Notice Dispatch (403)", False, "Inspector allowed to issue notice")
     except urllib.error.HTTPError as e:
         record_test("Cloud API", "7. Inspector Prohibited from Notice Dispatch (403)", e.code in (403, 404))
@@ -388,8 +399,7 @@ def run_cloud_api_suite():
     ctrl_token = None
     try:
         login_data = json.dumps({"username": "controller_south", "password": "Officer@2026"}).encode()
-        req = urllib.request.Request(f"{RENDER_URL}/api/v1/auth/login", data=login_data, headers={"Content-Type": "application/json"})
-        with urllib.request.urlopen(req, timeout=15) as res:
+        with _fetch("/api/v1/auth/login", data=login_data, headers={"Content-Type": "application/json"}) as res:
             data = json.loads(res.read())
             ctrl_token = data.get("access_token")
             record_test("Cloud API", "8. Controller Login & Privilege Acquisition", ctrl_token is not None and data["user"]["role"] == "CONTROLLER")

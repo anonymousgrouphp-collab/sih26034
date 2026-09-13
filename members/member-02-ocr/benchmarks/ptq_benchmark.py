@@ -409,7 +409,6 @@ if __name__ == "__main__":
     }
 
     out_file = REPO_ROOT / "ptq_benchmark_results.json"
-    with open(out_file, "w", encoding="utf-8") as f:
-        json.dump(full_output, f, indent=2)
+    out_file.write_text(json.dumps(full_output, indent=2), encoding="utf-8")
 
     print("\nBENCHMARK COMPLETE. Results saved to ptq_benchmark_results.json")

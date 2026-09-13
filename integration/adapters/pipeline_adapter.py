@@ -56,8 +56,10 @@ class CentralPipelineAdapter:
     def execute_ocr(cls, image: Any, image_id: str = "img_01") -> Dict[str, Any]:
         """Executes Member 2 Multilingual OCR pipeline on rectified image."""
         from engine import MultilingualOCREngine
+        
         engine = MultilingualOCREngine()
-        output = engine.process_image(image, image_id=image_id)
+        ocr_ready_img = QualityGateEvaluator.preprocess_for_ocr(image)
+        output = engine.process_image(ocr_ready_img, image_id=image_id)
         return output.model_dump()
 
     @classmethod

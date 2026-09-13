@@ -1,0 +1,675 @@
+- generic [ref=f1e291]:
+  - link "Skip to main statutory content" [ref=f1e292] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=f1e295]:
+    - generic [ref=f1e296]:
+      - img "National Flag of India (Tiranga / तिरंगा)" [ref=f1e297]
+      - generic [ref=f1e325]:
+        - generic [ref=f1e326]: Department of Consumer Affairs
+        - generic [ref=f1e327]: •
+        - generic [ref=f1e328]: Evidentiary Verification Platform
+    - generic [ref=f1e329]:
+      - generic [ref=f1e330]: EVIDENTIARY ASSISTANCE // SEC 63 BSA 2023
+      - generic [ref=f1e334]: 13 Sept 2026, 15:54:11 IST
+    - generic [ref=f1e338]:
+      - link "Screen Reader Access" [ref=f1e339] [cursor=pointer]:
+        - /url: "#main-content"
+      - generic [ref=f1e341]:
+        - button "Small font size" [ref=f1e342] [cursor=pointer]: A-
+        - button "Default font size" [ref=f1e343] [cursor=pointer]: A
+        - button "Large font size" [ref=f1e344] [cursor=pointer]: A+
+      - button "Toggle High Contrast Mode" [ref=f1e345] [cursor=pointer]:
+        - generic [ref=f1e349]: Contrast
+      - button "Toggle Language" [ref=f1e350] [cursor=pointer]:
+        - generic [ref=f1e354]: हिन्दी
+  - banner [ref=f1e355]:
+    - generic [ref=f1e358]:
+      - link "State Emblem of India — Satyameva Jayate (Lion Capital of Ashoka) NIRIKSHAK Inspection Workstation" [ref=f1e360] [cursor=pointer]:
+        - /url: /
+        - img "State Emblem of India — Satyameva Jayate (Lion Capital of Ashoka)" [ref=f1e361]:
+          - img "State Emblem of India — Satyameva Jayate"
+        - generic [ref=f1e362]:
+          - generic [ref=f1e363]: NIRIKSHAK
+          - paragraph [ref=f1e369]: Inspection Workstation
+      - button "Open universal command search palette (Ctrl+K)" [ref=f1e370] [cursor=pointer]:
+        - generic [ref=f1e373]: Quick Search Cases & Rules...
+        - generic [ref=f1e374]: Ctrl K
+      - generic [ref=f1e375]:
+        - button "Demo Cases 7" [ref=f1e377] [cursor=pointer]:
+          - generic [ref=f1e382]: Demo Cases
+          - generic [ref=f1e383]: "7"
+        - generic [ref=f1e386]:
+          - generic [ref=f1e387]: "Circle:"
+          - combobox "Circle:" [ref=f1e388] [cursor=pointer]:
+            - option "DL-SOUTH-01 • South Delhi Circle (Saket / Kalkaji)" [selected]
+            - option "DL-CENTRAL-02 • Central Delhi Circle (Connaught Place)"
+            - option "UP-GBN-01 • Gautam Buddha Nagar Division (Noida / Gr. Noida)"
+            - option "MH-MUM-01 • Mumbai Suburban Enforcement Circle"
+            - option "KA-BLR-01 • Bengaluru Urban Enforcement Depot"
+            - option "＋ Add New Circle…"
+        - generic [ref=f1e389]:
+          - button "LMO Inspector" [ref=f1e390] [cursor=pointer]
+          - button "Controller" [ref=f1e391] [cursor=pointer]
+        - button "System operating mode" [ref=f1e393] [cursor=pointer]:
+          - generic [ref=f1e400]: System Mode
+          - generic [ref=f1e401]: Mode A (Online)
+  - generic [ref=f1e404]:
+    - complementary [ref=f1e405]:
+      - generic [ref=f1e406]:
+        - link "New Inspection Case" [ref=f1e407] [cursor=pointer]:
+          - /url: /inspections/new
+        - paragraph [ref=f1e410]: Navigation Menu
+        - navigation [ref=f1e411]:
+          - link "Executive Dashboard" [ref=f1e412] [cursor=pointer]:
+            - /url: /dashboard
+          - link "Inspection Register" [ref=f1e418] [cursor=pointer]:
+            - /url: /inspections
+          - link "Demo Scenarios (7) 7 DEMOS" [ref=f1e425] [cursor=pointer]:
+            - /url: /inspections/SKU-DEMO-01
+            - generic [ref=f1e426]: Demo Scenarios (7)
+            - generic [ref=f1e432]: 7 DEMOS
+          - link "New Inspection" [ref=f1e433] [cursor=pointer]:
+            - /url: /inspections/new
+          - link "Review Queue 2" [ref=f1e440] [cursor=pointer]:
+            - /url: /review-queue
+            - generic [ref=f1e441]: Review Queue
+            - generic [ref=f1e448]: "2"
+          - link "Rules & Schedules" [ref=f1e449] [cursor=pointer]:
+            - /url: /rules
+          - link "Evidence Dossier" [ref=f1e456] [cursor=pointer]:
+            - /url: /inspections/demo-fortune-sunlite/evidence
+          - link "Reports & Notices" [ref=f1e463] [cursor=pointer]:
+            - /url: /reports
+      - generic [ref=f1e468]:
+        - link "Station Settings" [ref=f1e469] [cursor=pointer]:
+          - /url: /settings
+        - generic [ref=f1e474]:
+          - generic [ref=f1e475]: Legal Metrology Act, 2009
+          - paragraph [ref=f1e480]: Section 63 BSA 2023 evidence certification active.
+        - generic [ref=f1e481]:
+          - generic [ref=f1e482]:
+            - generic [ref=f1e483]: "Statute:"
+            - generic [ref=f1e484]: LMPC 2011
+          - generic [ref=f1e485]:
+            - generic [ref=f1e486]: "Evidence Act:"
+            - generic [ref=f1e487]: Sec 63 BSA 2023
+          - generic [ref=f1e488]:
+            - generic [ref=f1e489]: "Fiducial:"
+            - generic [ref=f1e490]: ArUco / ISO 7810
+          - generic [ref=f1e491]:
+            - generic [ref=f1e492]: "Table-I Row 5:"
+            - generic [ref=f1e493]: 6.0 mm (ADL-01)
+          - generic [ref=f1e494]: NIRIKSHAK • v1.0.0-sih26034
+        - 'generic "Active Officer: Rajesh Sharma (LMO Inspector)" [ref=f1e495]':
+          - generic [ref=f1e496]: RS
+          - generic [ref=f1e497]:
+            - generic [ref=f1e498]:
+              - generic [ref=f1e499]: Rajesh Sharma
+              - generic [ref=f1e500]: LMO
+            - generic [ref=f1e501]: INSP-DL-0842
+          - button "Sign out" [ref=f1e502] [cursor=pointer]
+    - main [ref=f1e506]:
+      - generic [ref=f1e508]:
+        - generic [ref=f1e511]:
+          - generic [ref=f1e512]:
+            - generic [ref=f1e513]:
+              - img "State Emblem of India — Satyameva Jayate (Lion Capital of Ashoka)" [ref=f1e515]:
+                - img "State Emblem of India — Satyameva Jayate"
+              - generic [ref=f1e516]:
+                - generic [ref=f1e517]:
+                  - generic [ref=f1e518]: Government of India • Department of Consumer Affairs
+                  - generic [ref=f1e519]: •
+                  - generic [ref=f1e520]: Legal Metrology Division
+                  - generic [ref=f1e521]: DoCA Workstation
+                - heading "Executive Inspection Control Centre" [level=1] [ref=f1e522]
+            - generic [ref=f1e527]:
+              - link "New Inspection Case" [ref=f1e528] [cursor=pointer]:
+                - /url: /inspections/new
+              - link "Full Register" [ref=f1e531] [cursor=pointer]:
+                - /url: /inspections
+          - generic [ref=f1e536]:
+            - generic [ref=f1e537]:
+              - generic [ref=f1e538]: LMO
+              - generic [ref=f1e539]:
+                - paragraph [ref=f1e540]: Active Inspector
+                - paragraph [ref=f1e541]: Rajesh Sharma (LMO-DL-048)
+            - generic [ref=f1e547]:
+              - paragraph [ref=f1e548]: Jurisdiction Circle
+              - paragraph [ref=f1e549]: DL-SOUTH-01 • South Delhi Circle (Saket / Kalkaji)
+            - generic [ref=f1e554]:
+              - paragraph [ref=f1e555]: Live Indian Standard Time
+              - paragraph [ref=f1e556]: Sun, 13 Sept, 2026, 15:54:11 IST
+            - generic [ref=f1e564]:
+              - paragraph [ref=f1e565]: System Telemetry
+              - paragraph [ref=f1e566]: Mode A Online • Mode B Resilient
+          - generic [ref=f1e567]:
+            - generic [ref=f1e568]:
+              - generic [ref=f1e569]: Quick Statutory & Precedent Lookup
+              - generic [ref=f1e574]: Query statutory rules, Table-I font schedule, banned units, or inspection dossier
+            - generic [ref=f1e575]:
+              - generic [ref=f1e577]:
+                - textbox "Statutory Inspection & Rule Search Omnibox" [ref=f1e582]:
+                  - /placeholder: Search statutory rules, Table-I font schedule, banned units, GSR notifications, or case precedents...
+                - generic [ref=f1e583]:
+                  - generic [ref=f1e584]: Select Category
+                  - combobox "Select Category" [ref=f1e585] [cursor=pointer]:
+                    - option "All Categories" [selected]
+                    - option "Table-I Font Schedule"
+                    - option "Prohibited Units (gms/ML)"
+                    - option "USP Math Verification"
+                    - option "E-Commerce Rule 6(10)"
+                    - option "Sec 63 BSA Evidence"
+                - button "Search" [ref=f1e586] [cursor=pointer]
+              - generic [ref=f1e590]:
+                - generic [ref=f1e591]: "Trending Searches :"
+                - button "Table-I Font Schedule (Row 5 = 6.0 mm)" [ref=f1e592] [cursor=pointer]
+                - button "Prohibited Units (gms, ML, gm, ltrs)" [ref=f1e593] [cursor=pointer]
+                - button "USP Math (|USP×Qty - MRP| ≤ ₹0.02)" [ref=f1e594] [cursor=pointer]
+                - button "Rule 6(10) E-Commerce" [ref=f1e595] [cursor=pointer]
+                - button "Section 63 BSA 2023 Merkle Proof" [ref=f1e596] [cursor=pointer]
+        - generic [ref=f1e597]:
+          - generic [ref=f1e598]: Statutory Directives
+          - generic [ref=f1e603]:
+            - generic [ref=f1e604]:
+              - generic [ref=f1e605]: GSR 779(E)
+              - paragraph [ref=f1e606]:
+                - strong [ref=f1e607]: "Mandatory Unit Sale Price (USP) Audit Active:"
+                - text: Verification of price per g/ml/kg/litre is enforced for all packaged retail commodities. Tolerance strictly |USP×Qty - MRP| ≤ ₹0.02.
+            - link "View Rule" [ref=f1e608] [cursor=pointer]:
+              - /url: /rules
+          - generic [ref=f1e612]:
+            - button "Go to statutory bulletin 1" [ref=f1e613] [cursor=pointer]
+            - button "Go to statutory bulletin 2" [ref=f1e614] [cursor=pointer]
+            - button "Go to statutory bulletin 3" [ref=f1e615] [cursor=pointer]
+            - button "Go to statutory bulletin 4" [ref=f1e616] [cursor=pointer]
+        - region "Statutory Demonstration Suite" [ref=f1e617]:
+          - generic [ref=f1e618]:
+            - generic [ref=f1e619]:
+              - generic [ref=f1e620]:
+                - generic [ref=f1e621]:
+                  - generic [ref=f1e622]: CERTIFIED DEMO SUITE
+                  - generic [ref=f1e626]: 7 Pre-Certified Enforcement Scenarios Ready
+                - heading "Statutory Demonstration & Evaluation Hub" [level=2] [ref=f1e627]
+                - paragraph [ref=f1e628]: Test end-to-end statutory verification workflows with pre-certified demonstration scenarios. Each case includes high-resolution packaging frames, calibrated ArUco homography, multilingual OCR, rule AST evaluations, and Section 63 BSA 2023 Merkle certificates.
+              - button "Start Demo Tour (Case 1) →" [ref=f1e630] [cursor=pointer]
+            - generic [ref=f1e634]:
+              - generic [ref=f1e635]: "Filter Scenarios:"
+              - button "All Demo Cases (7)" [ref=f1e636] [cursor=pointer]
+              - button "Violations / FAIL (3)" [ref=f1e637] [cursor=pointer]
+              - button "Compliant / PASS (2)" [ref=f1e638] [cursor=pointer]
+              - button "Borderline / REVIEW (1)" [ref=f1e639] [cursor=pointer]
+              - button "Retake / UNABLE (1)" [ref=f1e640] [cursor=pointer]
+          - generic [ref=f1e642]:
+            - generic [ref=f1e643]:
+              - generic [ref=f1e644]:
+                - generic [ref=f1e645]:
+                  - generic [ref=f1e646]:
+                    - generic [ref=f1e647]: "DEMO #1"
+                    - generic [ref=f1e648]: SKU-DEMO-01
+                  - generic [ref=f1e649]: FAIL
+                - generic [ref=f1e653]:
+                  - img "Sunfeast Butter Cookies 200g" [ref=f1e655]
+                  - generic [ref=f1e656]:
+                    - heading "Sunfeast Butter Cookies 200g" [level=3] [ref=f1e657]
+                    - paragraph [ref=f1e658]: Food & Snacks • Rectangular Cardboard Carton
+                    - generic [ref=f1e659]: INSP-20260910-B144
+                - paragraph [ref=f1e664]: Table-I Font Deficit 1.84 mm vs 2.50 mm + Banned 'gms' Unit
+                - generic [ref=f1e665]:
+                  - generic [ref=f1e666]:
+                    - generic [ref=f1e667]: PDP Area
+                    - generic [ref=f1e668]: 144 cm²
+                  - generic [ref=f1e669]:
+                    - generic [ref=f1e670]: Table-I Min Font
+                    - text: 1.84 mm (Req >= 2.5 mm)
+                - generic [ref=f1e671]: Rule:Rule 6(1)(h) read with Table-I, G.S.R. 629(E)
+              - generic [ref=f1e672]:
+                - generic [ref=f1e673]: Sec 63 BSA 2023
+                - button "Inspect Demo" [ref=f1e674] [cursor=pointer]
+            - generic [ref=f1e678]:
+              - generic [ref=f1e679]:
+                - generic [ref=f1e680]:
+                  - generic [ref=f1e681]:
+                    - generic [ref=f1e682]: "DEMO #2"
+                    - generic [ref=f1e683]: SKU-DEMO-02
+                  - generic [ref=f1e684]: FAIL
+                - generic [ref=f1e688]:
+                  - img "Ready Curry Retort Pouch 300g" [ref=f1e690]
+                  - generic [ref=f1e691]:
+                    - heading "Ready Curry Retort Pouch 300g" [level=3] [ref=f1e692]
+                    - paragraph [ref=f1e693]: Ready-to-Eat Food • Flexible Stand-up Pouch
+                    - generic [ref=f1e694]: INSP-20260910-C208
+                - paragraph [ref=f1e699]: Rule 6(1)(e) USP Mismatch (Declared ₹0.28 vs Calc ₹0.23/g) + Missing Email
+                - generic [ref=f1e700]:
+                  - generic [ref=f1e701]:
+                    - generic [ref=f1e702]: PDP Area
+                    - generic [ref=f1e703]: 120 cm²
+                  - generic [ref=f1e704]:
+                    - generic [ref=f1e705]: Table-I Min Font
+                    - text: 2.7 mm (Req >= 2.5 mm)
+                - generic [ref=f1e706]: Rule:Rule 6(1)(e) read with GSR 779(E) (Unit Sale Price Mandate)
+              - generic [ref=f1e707]:
+                - generic [ref=f1e708]: Sec 63 BSA 2023
+                - button "Inspect Demo" [ref=f1e709] [cursor=pointer]
+            - generic [ref=f1e713]:
+              - generic [ref=f1e714]:
+                - generic [ref=f1e715]:
+                  - generic [ref=f1e716]:
+                    - generic [ref=f1e717]: "DEMO #3"
+                    - generic [ref=f1e718]: SKU-DEMO-03
+                  - generic [ref=f1e719]: PASS
+                - generic [ref=f1e724]:
+                  - img "Packaged Natural Mineral Water 1L" [ref=f1e726]
+                  - generic [ref=f1e727]:
+                    - heading "Packaged Natural Mineral Water 1L" [level=3] [ref=f1e728]
+                    - paragraph [ref=f1e729]: Beverages / Water • Cylindrical PET Bottle
+                    - generic [ref=f1e730]: INSP-20260910-W312
+                - paragraph [ref=f1e736]: Full Statutory Compliance (Cylindrical PDP 40% Area, Font 3.1mm, Valid USP)
+                - generic [ref=f1e737]:
+                  - generic [ref=f1e738]:
+                    - generic [ref=f1e739]: PDP Area
+                    - generic [ref=f1e740]: 314 cm²
+                  - generic [ref=f1e741]:
+                    - generic [ref=f1e742]: Table-I Min Font
+                    - text: 3.1 mm (Req >= 2.5 mm)
+                - generic [ref=f1e743]: Rule:Rule 6(1) Complete Mandatory Declarations Verified
+              - generic [ref=f1e744]:
+                - generic [ref=f1e745]: Sec 63 BSA 2023
+                - button "Inspect Demo" [ref=f1e746] [cursor=pointer]
+            - generic [ref=f1e750]:
+              - generic [ref=f1e751]:
+                - generic [ref=f1e752]:
+                  - generic [ref=f1e753]:
+                    - generic [ref=f1e754]: "DEMO #4"
+                    - generic [ref=f1e755]: SKU-DEMO-04
+                  - generic [ref=f1e756]: REVIEW
+                - generic [ref=f1e762]:
+                  - img "Herbal Bathing Soap Bar 125g" [ref=f1e764]
+                  - generic [ref=f1e765]:
+                    - heading "Herbal Bathing Soap Bar 125g" [level=3] [ref=f1e766]
+                    - paragraph [ref=f1e767]: Cosmetics & Personal Care • Rectangular Paper Wrap
+                    - generic [ref=f1e768]: INSP-20260910-S419
+                - paragraph [ref=f1e775]: Borderline Font Measurement (2.46 mm within sensor k=2 uncertainty band)
+                - generic [ref=f1e776]:
+                  - generic [ref=f1e777]:
+                    - generic [ref=f1e778]: PDP Area
+                    - generic [ref=f1e779]: 110 cm²
+                  - generic [ref=f1e780]:
+                    - generic [ref=f1e781]: Table-I Min Font
+                    - text: 2.46 mm (Req >= 2.5 mm)
+                - generic [ref=f1e782]: Rule:Rule 6(1)(h) read with Table-I Row 3 (Required >= 2.50 mm)
+              - generic [ref=f1e783]:
+                - generic [ref=f1e784]: Sec 63 BSA 2023
+                - button "Inspect Demo" [ref=f1e785] [cursor=pointer]
+            - generic [ref=f1e789]:
+              - generic [ref=f1e790]:
+                - generic [ref=f1e791]:
+                  - generic [ref=f1e792]:
+                    - generic [ref=f1e793]: "DEMO #5"
+                    - generic [ref=f1e794]: SKU-DEMO-05
+                  - generic [ref=f1e795]: UNABLE_TO_VERIFY
+                - generic [ref=f1e800]:
+                  - img "Crispy Potato Chips 75g" [ref=f1e802]
+                  - generic [ref=f1e803]:
+                    - heading "Crispy Potato Chips 75g" [level=3] [ref=f1e804]
+                    - paragraph [ref=f1e805]: Food & Snacks • Glossy Metallic Pillow Pouch
+                    - generic [ref=f1e806]: INSP-20260910-P525
+                - paragraph [ref=f1e812]: Specular Glare Bloom (6.4% > 3.0% threshold) Obscuring Declarations
+                - generic [ref=f1e813]:
+                  - generic [ref=f1e814]:
+                    - generic [ref=f1e815]: PDP Area
+                    - generic [ref=f1e816]: 210 cm²
+                  - generic [ref=f1e817]:
+                    - generic [ref=f1e818]: Table-I Min Font
+                    - text: ">= 2.5 mm"
+                - generic [ref=f1e819]: Rule:Section 63 BSA 2023 Digital Evidence Quality Standards
+              - generic [ref=f1e820]:
+                - generic [ref=f1e821]: Sec 63 BSA 2023
+                - button "Inspect Demo" [ref=f1e822] [cursor=pointer]
+            - generic [ref=f1e826]:
+              - generic [ref=f1e827]:
+                - generic [ref=f1e828]:
+                  - generic [ref=f1e829]:
+                    - generic [ref=f1e830]: "DEMO #6"
+                    - generic [ref=f1e831]: SKU-DEMO-06
+                  - generic [ref=f1e832]: FAIL
+                - generic [ref=f1e836]:
+                  - img "Premium Wireless Earbuds (E-Commerce)" [ref=f1e838]
+                  - generic [ref=f1e839]:
+                    - heading "Premium Wireless Earbuds (E-Commerce)" [level=3] [ref=f1e840]
+                    - paragraph [ref=f1e841]: Electronics / E-Commerce • Digital Marketplace Single Listing
+                    - generic [ref=f1e842]: INSP-20260910-E631
+                - paragraph [ref=f1e847]: Rule 6(10) / GSR 594(E) Missing Mandatory Country of Origin Declaration
+                - generic [ref=f1e848]:
+                  - generic [ref=f1e849]:
+                    - generic [ref=f1e850]: PDP Area
+                    - generic [ref=f1e851]: 400 cm²
+                  - generic [ref=f1e852]:
+                    - generic [ref=f1e853]: Table-I Min Font
+                    - text: ">= 2.5 mm"
+                - generic [ref=f1e854]: Rule:Rule 6(10) read with Rule 6(1)(p) and G.S.R. 128(E)
+              - generic [ref=f1e855]:
+                - generic [ref=f1e856]: Sec 63 BSA 2023
+                - button "Inspect Demo" [ref=f1e857] [cursor=pointer]
+            - generic [ref=f1e861]:
+              - generic [ref=f1e862]:
+                - generic [ref=f1e863]:
+                  - generic [ref=f1e864]:
+                    - generic [ref=f1e865]: "DEMO #7"
+                    - generic [ref=f1e866]: demo-fortune-sunlite
+                  - generic [ref=f1e867]: PASS
+                - generic [ref=f1e872]:
+                  - img "Fortune Sunlite Refined Sunflower Oil 1L" [ref=f1e874]
+                  - generic [ref=f1e875]:
+                    - heading "Fortune Sunlite Refined Sunflower Oil 1L" [level=3] [ref=f1e876]
+                    - paragraph [ref=f1e877]: Edible Oils • Flexible Liquid Pouch
+                    - generic [ref=f1e878]: INSP-20260910-F001
+                - paragraph [ref=f1e884]: "Complete End-to-End Benchmark: ArUco Fiducial, Table-I Compliance, Section 63 Proof"
+                - generic [ref=f1e885]:
+                  - generic [ref=f1e886]:
+                    - generic [ref=f1e887]: PDP Area
+                    - generic [ref=f1e888]: 180 cm²
+                  - generic [ref=f1e889]:
+                    - generic [ref=f1e890]: Table-I Min Font
+                    - text: 3.8 mm (Req >= 2.5 mm)
+                - generic [ref=f1e891]: "Rule:Rule 6(1) Edible Oil Mandatory Declarations (Dual Units: 1 L / 910 g)"
+              - generic [ref=f1e892]:
+                - generic [ref=f1e893]: Sec 63 BSA 2023
+                - button "Inspect Demo" [ref=f1e894] [cursor=pointer]
+        - generic [ref=f1e898]:
+          - link [ref=f1e899] [cursor=pointer]:
+            - /url: /inspections/new
+            - heading "Physical Label Scan" [level=4] [ref=f1e907]
+            - paragraph [ref=f1e908]: ArUco fiducial & Table-I metric scale
+          - link [ref=f1e909] [cursor=pointer]:
+            - /url: /inspections/new?mode=ecommerce
+            - heading "E-Commerce Listing Audit" [level=4] [ref=f1e917]
+            - paragraph [ref=f1e918]: Rule 6(10) digital marketplace verify
+          - link [ref=f1e919] [cursor=pointer]:
+            - /url: /inspections
+            - heading "Issue Form-1 Notice" [level=4] [ref=f1e927]
+            - paragraph [ref=f1e928]: Sec 63 BSA signed compounding notice
+          - link [ref=f1e929] [cursor=pointer]:
+            - /url: /rules
+            - heading "Offline Cache & Sync" [level=4] [ref=f1e938]
+            - paragraph [ref=f1e939]: SQLite resilient local pipeline (Mode B)
+        - generic [ref=f1e940]:
+          - generic [ref=f1e943] [cursor=pointer]:
+            - paragraph [ref=f1e944]: Total Packaging Cases
+            - generic [ref=f1e945]:
+              - generic [ref=f1e946]: "8"
+              - generic [ref=f1e947]: +12% this week
+            - paragraph [ref=f1e948]: Central + Local Mode B
+          - generic [ref=f1e956] [cursor=pointer]:
+            - paragraph [ref=f1e957]: Statutory Compliance Rate
+            - generic [ref=f1e958]:
+              - generic [ref=f1e959]: 38%
+              - generic [ref=f1e960]: 3 Pass
+            - paragraph [ref=f1e961]: Full statutory compliance
+          - generic [ref=f1e968] [cursor=pointer]:
+            - paragraph [ref=f1e969]: Violations Established
+            - generic [ref=f1e970]:
+              - generic [ref=f1e971]: "3"
+              - generic [ref=f1e972]: 3 Actionable
+            - paragraph [ref=f1e973]: Form-1 Notice actionable
+          - generic [ref=f1e979] [cursor=pointer]:
+            - paragraph [ref=f1e980]: Human Review Pending
+            - generic [ref=f1e981]:
+              - generic [ref=f1e982]: "3"
+              - generic [ref=f1e983]: 1 Rev | 2 Degraded
+            - paragraph [ref=f1e984]: Borderline sensor uncertainty
+        - generic [ref=f1e988]:
+          - generic [ref=f1e989]:
+            - generic [ref=f1e990]:
+              - generic [ref=f1e991]:
+                - generic [ref=f1e992]:
+                  - paragraph [ref=f1e993]: Recent Inspection Cases
+                  - generic [ref=f1e994]: 8 Dossiers
+                - paragraph [ref=f1e995]: Active packaging dossiers undergoing automated checks or officer adjudication.
+              - generic [ref=f1e996]:
+                - button "All 8" [ref=f1e997] [cursor=pointer]:
+                  - generic [ref=f1e998]: All
+                  - generic [ref=f1e999]: "8"
+                - button "Pass 3" [ref=f1e1000] [cursor=pointer]:
+                  - generic [ref=f1e1001]: Pass
+                  - generic [ref=f1e1002]: "3"
+                - button "Fail 3" [ref=f1e1003] [cursor=pointer]:
+                  - generic [ref=f1e1004]: Fail
+                  - generic [ref=f1e1005]: "3"
+                - button "Review 3" [ref=f1e1006] [cursor=pointer]:
+                  - generic [ref=f1e1007]: Review
+                  - generic [ref=f1e1008]: "3"
+            - table [ref=f1e1011]:
+              - rowgroup [ref=f1e1012]:
+                - row [ref=f1e1013]:
+                  - columnheader "Case / Product" [ref=f1e1014]
+                  - columnheader "Compliance Verdict" [ref=f1e1015]
+                  - columnheader "Confidence" [ref=f1e1016]
+                  - columnheader "Action" [ref=f1e1017]
+              - rowgroup [ref=f1e1018]:
+                - row [ref=f1e1019] [cursor=pointer]:
+                  - cell "Wireless Bluetooth Earbuds (Imported Listing) INSP-20260910-E199 • AudioTech Marketplace Seller (Listing Audit Demo) • Electronics Commodity" [ref=f1e1020]:
+                    - generic "Wireless Bluetooth Earbuds (Imported Listing)" [ref=f1e1021]
+                    - generic [ref=f1e1022]:
+                      - generic [ref=f1e1023]: INSP-20260910-E199
+                      - generic [ref=f1e1024]: •
+                      - generic [ref=f1e1025]: AudioTech Marketplace Seller (Listing Audit Demo)
+                      - generic [ref=f1e1026]: •
+                      - generic [ref=f1e1027]: Electronics Commodity
+                  - cell [ref=f1e1028]:
+                    - generic "Statutory non-compliance identified under LMPC Rules, 2011" [ref=f1e1029]: FAIL
+                  - cell "95%" [ref=f1e1031]
+                  - cell "Inspect" [ref=f1e1036]
+                - row [ref=f1e1041] [cursor=pointer]:
+                  - cell "Crispy Potato Chips 90g (Metallic Foil Pouch) INSP-20260910-G090 • Chawla Snacks Depot • Food Snacks" [ref=f1e1042]:
+                    - generic "Crispy Potato Chips 90g (Metallic Foil Pouch)" [ref=f1e1043]
+                    - generic [ref=f1e1044]:
+                      - generic [ref=f1e1045]: INSP-20260910-G090
+                      - generic [ref=f1e1046]: •
+                      - generic [ref=f1e1047]: Chawla Snacks Depot
+                      - generic [ref=f1e1048]: •
+                      - generic [ref=f1e1049]: Food Snacks
+                  - cell [ref=f1e1050]:
+                    - generic "Optical quality degraded (specular glare, blur, or obscured text)" [ref=f1e1051]: UNABLE TO VERIFY
+                  - cell "42%" [ref=f1e1053]
+                  - cell "Inspect" [ref=f1e1058]
+                - row [ref=f1e1063] [cursor=pointer]:
+                  - cell "Herbal Bathing Bar 125g INSP-20260910-S125 • Siddhivinayak Chemist & Retail • Cosmetics" [ref=f1e1064]:
+                    - generic "Herbal Bathing Bar 125g" [ref=f1e1065]
+                    - generic [ref=f1e1066]:
+                      - generic [ref=f1e1067]: INSP-20260910-S125
+                      - generic [ref=f1e1068]: •
+                      - generic [ref=f1e1069]: Siddhivinayak Chemist & Retail
+                      - generic [ref=f1e1070]: •
+                      - generic [ref=f1e1071]: Cosmetics
+                  - cell [ref=f1e1072]:
+                    - generic "Borderline measurement within sensor uncertainty band (k=2, 95% confidence)" [ref=f1e1073]: REVIEW
+                  - cell "74%" [ref=f1e1075]
+                  - cell "Inspect" [ref=f1e1080]
+                - row [ref=f1e1085] [cursor=pointer]:
+                  - cell "Natural Mineral Water 1L INSP-20260910-W001 • Kishan Lal General Store • Beverages" [ref=f1e1086]:
+                    - generic "Natural Mineral Water 1L" [ref=f1e1087]
+                    - generic [ref=f1e1088]:
+                      - generic [ref=f1e1089]: INSP-20260910-W001
+                      - generic [ref=f1e1090]: •
+                      - generic [ref=f1e1091]: Kishan Lal General Store
+                      - generic [ref=f1e1092]: •
+                      - generic [ref=f1e1093]: Beverages
+                  - cell [ref=f1e1094]:
+                    - generic "Full statutory compliance verified under LMPC Rules, 2011" [ref=f1e1095]: PASS
+                  - cell "98%" [ref=f1e1097]
+                  - cell "Inspect" [ref=f1e1102]
+                - row [ref=f1e1107] [cursor=pointer]:
+                  - cell "Ready-to-Eat Dal Makhani 300g INSP-20260910-C300 • Modern Departmental Store • Food Snacks" [ref=f1e1108]:
+                    - generic "Ready-to-Eat Dal Makhani 300g" [ref=f1e1109]
+                    - generic [ref=f1e1110]:
+                      - generic [ref=f1e1111]: INSP-20260910-C300
+                      - generic [ref=f1e1112]: •
+                      - generic [ref=f1e1113]: Modern Departmental Store
+                      - generic [ref=f1e1114]: •
+                      - generic [ref=f1e1115]: Food Snacks
+                  - cell [ref=f1e1116]:
+                    - generic "Statutory non-compliance identified under LMPC Rules, 2011" [ref=f1e1117]: FAIL
+                  - cell "95%" [ref=f1e1119]
+                  - cell "Inspect" [ref=f1e1124]
+                - row [ref=f1e1129] [cursor=pointer]:
+                  - cell "Premium Butter Cookies 200g INSP-20260910-B144 • Aggarwal Supermart, Kalkaji • Food Snacks" [ref=f1e1130]:
+                    - generic "Premium Butter Cookies 200g" [ref=f1e1131]
+                    - generic [ref=f1e1132]:
+                      - generic [ref=f1e1133]: INSP-20260910-B144
+                      - generic [ref=f1e1134]: •
+                      - generic [ref=f1e1135]: Aggarwal Supermart, Kalkaji
+                      - generic [ref=f1e1136]: •
+                      - generic [ref=f1e1137]: Food Snacks
+                  - cell [ref=f1e1138]:
+                    - generic "Statutory non-compliance identified under LMPC Rules, 2011" [ref=f1e1139]: FAIL
+                  - cell "95%" [ref=f1e1141]
+                  - cell "Inspect" [ref=f1e1146]
+          - generic [ref=f1e1151]:
+            - generic [ref=f1e1152]:
+              - generic [ref=f1e1153]:
+                - generic [ref=f1e1154]: Officer Triage Needed
+                - generic [ref=f1e1161]: 3 Cases
+              - paragraph [ref=f1e1162]: Automated rules have identified borderline measurements within sensor uncertainty limits or degraded photographs requiring human officer adjudication.
+              - link "Open Review Queue" [ref=f1e1163] [cursor=pointer]:
+                - /url: /review-queue
+            - generic [ref=f1e1167]:
+              - paragraph [ref=f1e1171]: Pre-loaded Golden SKUs
+              - paragraph [ref=f1e1172]: "Test end-to-end statutory adjudication against pre-configured golden demonstration cases:"
+              - generic [ref=f1e1173]:
+                - button "DEMO Sunfeast Butter Cookies 200g FAIL — Font Deficit (1.84mm) + 'gms' unit FAIL" [ref=f1e1174] [cursor=pointer]:
+                  - generic [ref=f1e1175]:
+                    - generic [ref=f1e1176]:
+                      - generic [ref=f1e1177]: DEMO
+                      - paragraph [ref=f1e1178]: Sunfeast Butter Cookies 200g
+                    - paragraph [ref=f1e1179]: FAIL — Font Deficit (1.84mm) + 'gms' unit
+                  - generic "Statutory non-compliance identified under LMPC Rules, 2011" [ref=f1e1180]: FAIL
+                - button "DEMO Ready Curry Retort Pouch 300g FAIL — Rule 6(1)(e) USP Mismatch FAIL" [ref=f1e1182] [cursor=pointer]:
+                  - generic [ref=f1e1183]:
+                    - generic [ref=f1e1184]:
+                      - generic [ref=f1e1185]: DEMO
+                      - paragraph [ref=f1e1186]: Ready Curry Retort Pouch 300g
+                    - paragraph [ref=f1e1187]: FAIL — Rule 6(1)(e) USP Mismatch
+                  - generic "Statutory non-compliance identified under LMPC Rules, 2011" [ref=f1e1188]: FAIL
+                - button "DEMO Natural Mineral Water 1L PASS — 100% Compliant (Cylindrical) PASS" [ref=f1e1190] [cursor=pointer]:
+                  - generic [ref=f1e1191]:
+                    - generic [ref=f1e1192]:
+                      - generic [ref=f1e1193]: DEMO
+                      - paragraph [ref=f1e1194]: Natural Mineral Water 1L
+                    - paragraph [ref=f1e1195]: PASS — 100% Compliant (Cylindrical)
+                  - generic "Full statutory compliance verified under LMPC Rules, 2011" [ref=f1e1196]: PASS
+                - button "DEMO Herbal Bathing Soap 125g REVIEW — Borderline Font (k=2 band) REVIEW" [ref=f1e1198] [cursor=pointer]:
+                  - generic [ref=f1e1199]:
+                    - generic [ref=f1e1200]:
+                      - generic [ref=f1e1201]: DEMO
+                      - paragraph [ref=f1e1202]: Herbal Bathing Soap 125g
+                    - paragraph [ref=f1e1203]: REVIEW — Borderline Font (k=2 band)
+                  - generic "Borderline measurement within sensor uncertainty band (k=2, 95% confidence)" [ref=f1e1204]: REVIEW
+                - button "DEMO Crispy Potato Chips 75g UNABLE — Specular Glare (6.4% > 3.0%) UNABLE TO VERIFY" [ref=f1e1206] [cursor=pointer]:
+                  - generic [ref=f1e1207]:
+                    - generic [ref=f1e1208]:
+                      - generic [ref=f1e1209]: DEMO
+                      - paragraph [ref=f1e1210]: Crispy Potato Chips 75g
+                    - paragraph [ref=f1e1211]: UNABLE — Specular Glare (6.4% > 3.0%)
+                  - generic "Optical quality degraded (specular glare, blur, or obscured text)" [ref=f1e1212]: UNABLE TO VERIFY
+                - button "DEMO Wireless Earbuds (E-Commerce) FAIL — Rule 6(10) Missing Country of Origin FAIL" [ref=f1e1214] [cursor=pointer]:
+                  - generic [ref=f1e1215]:
+                    - generic [ref=f1e1216]:
+                      - generic [ref=f1e1217]: DEMO
+                      - paragraph [ref=f1e1218]: Wireless Earbuds (E-Commerce)
+                    - paragraph [ref=f1e1219]: FAIL — Rule 6(10) Missing Country of Origin
+                  - generic "Statutory non-compliance identified under LMPC Rules, 2011" [ref=f1e1220]: FAIL
+                - button "DEMO Fortune Sunlite Oil 1L PASS — Calibrated ArUco Benchmark PASS" [ref=f1e1222] [cursor=pointer]:
+                  - generic [ref=f1e1223]:
+                    - generic [ref=f1e1224]:
+                      - generic [ref=f1e1225]: DEMO
+                      - paragraph [ref=f1e1226]: Fortune Sunlite Oil 1L
+                    - paragraph [ref=f1e1227]: PASS — Calibrated ArUco Benchmark
+                  - generic "Full statutory compliance verified under LMPC Rules, 2011" [ref=f1e1228]: PASS
+            - generic [ref=f1e1230]:
+              - generic [ref=f1e1231]: Section 63 BSA 2023 Evidentiary Invariant
+              - paragraph [ref=f1e1236]: Electronic evidence certificates adhere strictly to Bharatiya Sakshya Adhiniyam, 2023. Repealed Section 65B Indian Evidence Act 1872 references are strictly forbidden.
+  - contentinfo [ref=f1e1237]:
+    - generic [ref=f1e1239]:
+      - generic [ref=f1e1240]:
+        - generic [ref=f1e1241]:
+          - generic [ref=f1e1242]:
+            - img "State Emblem of India — Satyameva Jayate (Lion Capital of Ashoka)" [ref=f1e1243]:
+              - img "State Emblem of India — Satyameva Jayate"
+            - generic [ref=f1e1244]:
+              - heading "Government of India" [level=3] [ref=f1e1245]
+              - heading "Ministry of Consumer Affairs, Food & Public Distribution" [level=4] [ref=f1e1246]
+              - paragraph [ref=f1e1247]: Department of Consumer Affairs — Legal Metrology Division
+              - generic [ref=f1e1248]: "Statutory Authority: Act No. 1 of 2010"
+          - paragraph [ref=f1e1254]: NIRIKSHAK is the authorized digital compliance verification workstation deployed for authorized Legal Metrology Officers (LMO) under the Legal Metrology (Packaged Commodities) Rules, 2011.
+        - generic [ref=f1e1255]:
+          - heading "Statutory Enactments & Acts" [level=4] [ref=f1e1256]
+          - list [ref=f1e1257]:
+            - listitem [ref=f1e1258]:
+              - link "The Legal Metrology Act, 2009" [ref=f1e1262] [cursor=pointer]:
+                - /url: /statutory/legal-metrology-act-2009
+            - listitem [ref=f1e1263]:
+              - link "LMPC Rules, 2011 (As Amended 2024)" [ref=f1e1267] [cursor=pointer]:
+                - /url: /statutory/lmpc-rules-2011
+            - listitem [ref=f1e1268]:
+              - link "Section 63 BSA 2023 (Admissibility)" [ref=f1e1272] [cursor=pointer]:
+                - /url: /statutory/section-63-bsa-2023
+            - listitem [ref=f1e1273]:
+              - link "E-Commerce Compliance GSR 629(E)" [ref=f1e1277] [cursor=pointer]:
+                - /url: /statutory/ecommerce-rule-6-10
+            - listitem [ref=f1e1278]:
+              - link "Unit Sale Price Mandate GSR 779(E)" [ref=f1e1282] [cursor=pointer]:
+                - /url: /statutory/usp-gsr-779e
+        - generic [ref=f1e1283]:
+          - heading "National Interoperability" [level=4] [ref=f1e1284]
+          - list [ref=f1e1285]:
+            - listitem [ref=f1e1286]:
+              - link "e-Maap (National LM Portal)" [ref=f1e1287] [cursor=pointer]:
+                - /url: https://emaap.gov.in/
+            - listitem [ref=f1e1293]:
+              - link "DoCA Official Portal" [ref=f1e1294] [cursor=pointer]:
+                - /url: https://consumeraffairs.nic.in/
+            - listitem [ref=f1e1300]:
+              - link "e-Gazette of India" [ref=f1e1301] [cursor=pointer]:
+                - /url: https://egazette.gov.in/
+            - listitem [ref=f1e1307]:
+              - link "National Consumer Helpline (NCH - 1915)" [ref=f1e1308] [cursor=pointer]:
+                - /url: https://consumerhelpline.gov.in/
+            - listitem [ref=f1e1314]:
+              - link "National Portal of India (india.gov.in)" [ref=f1e1315] [cursor=pointer]:
+                - /url: https://india.gov.in/
+        - generic [ref=f1e1321]:
+          - heading "Standards & Security" [level=4] [ref=f1e1322]
+          - generic [ref=f1e1323]:
+            - link "GIGW 3.0 Govt Website Standard" [ref=f1e1324] [cursor=pointer]:
+              - /url: /standards/gigw-3-0
+              - generic [ref=f1e1329]:
+                - generic [ref=f1e1330]: GIGW 3.0
+                - generic [ref=f1e1331]: Govt Website Standard
+            - link "SHA-256 Merkle Section 63 BSA Chain" [ref=f1e1332] [cursor=pointer]:
+              - /url: /standards/sha256-merkle-chain
+              - generic [ref=f1e1337]:
+                - generic [ref=f1e1338]: SHA-256 Merkle
+                - generic [ref=f1e1339]: Section 63 BSA Chain
+      - generic [ref=f1e1340]:
+        - generic [ref=f1e1342]:
+          - text: Designed & Developed for
+          - strong [ref=f1e1343]: Department of Consumer Affairs
+          - text: ", Government of India."
+        - generic [ref=f1e1344]:
+          - link "Terms & Conditions" [ref=f1e1345] [cursor=pointer]:
+            - /url: /policies/terms-and-conditions
+          - generic [ref=f1e1346]: •
+          - link "Privacy Policy" [ref=f1e1347] [cursor=pointer]:
+            - /url: /policies/privacy-policy
+          - generic [ref=f1e1348]: •
+          - link "Hyperlink Policy" [ref=f1e1349] [cursor=pointer]:
+            - /url: /policies/hyperlink-policy
+          - generic [ref=f1e1350]: •
+          - link "Copyright Policy" [ref=f1e1351] [cursor=pointer]:
+            - /url: /policies/copyright-policy
+          - generic [ref=f1e1352]: •
+          - link "Accessibility Statement" [ref=f1e1353] [cursor=pointer]:
+            - /url: /policies/accessibility-statement
+      - generic [ref=f1e1354]:
+        - generic [ref=f1e1355]: Official Electronic Enforcement System • Version 1.0.0-SIH26034
+        - generic [ref=f1e1356]: "Last Updated: 11 September 2026 | Server Time: IST (UTC+05:30)"

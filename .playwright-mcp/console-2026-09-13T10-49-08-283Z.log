@@ -1,0 +1,75 @@
+[     251ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5174/node_modules/.vite/deps/chunk-SVG7M4VJ.js?v=372c255e:21606
+[     399ms] [WARNING] ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition. @ http://localhost:5174/node_modules/.vite/deps/react-router-dom.js?v=372c255e:4414
+[     400ms] [WARNING] ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath. @ http://localhost:5174/node_modules/.vite/deps/react-router-dom.js?v=372c255e:4414
+[     422ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5174/api/v1/auth/login:0
+[     511ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5174/api/v1/inspections?circle_id=CIRCLE_DL_SOUTH_01:0
+[     511ms] [WARNING] Live server unreachable for listInspections. Falling back to Mode B local datastore: {error_code: NETWORK_OR_SERVER_ERROR, status: 503, message: HTTP 500, remediation: Check network connection or toggle Local Resilient Mode., timestamp: 2026-09-13T10:49:08.794Z} @ http://localhost:5174/src/services/api.ts:133
+[     512ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5174/api/v1/inspections?circle_id=CIRCLE_DL_SOUTH_01:0
+[     512ms] [WARNING] Live server unreachable for listInspections. Falling back to Mode B local datastore: {error_code: NETWORK_OR_SERVER_ERROR, status: 503, message: HTTP 500, remediation: Check network connection or toggle Local Resilient Mode., timestamp: 2026-09-13T10:49:08.795Z} @ http://localhost:5174/src/services/api.ts:133
+[     513ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5174/api/v1/inspections?circle_id=CIRCLE_DL_SOUTH_01:0
+[     513ms] [WARNING] Live server unreachable for listInspections. Falling back to Mode B local datastore: {error_code: NETWORK_OR_SERVER_ERROR, status: 503, message: HTTP 500, remediation: Check network connection or toggle Local Resilient Mode., timestamp: 2026-09-13T10:49:08.795Z} @ http://localhost:5174/src/services/api.ts:133
+[     513ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5174/api/v1/inspections?circle_id=CIRCLE_DL_SOUTH_01:0
+[     513ms] [WARNING] Live server unreachable for listInspections. Falling back to Mode B local datastore: {error_code: NETWORK_OR_SERVER_ERROR, status: 503, message: HTTP 500, remediation: Check network connection or toggle Local Resilient Mode., timestamp: 2026-09-13T10:49:08.796Z} @ http://localhost:5174/src/services/api.ts:133
+[   98731ms] Error: useAuth must be used inside AuthProvider
+    at useAuth (http://localhost:5174/src/context/AuthContext.tsx:152:23)
+    at ProtectedWorkstation (http://localhost:5174/src/App.tsx?t=1789296488409:42:20)
+    at renderWithHooks (http://localhost:5174/node_modules/.vite/deps/chunk-SVG7M4VJ.js?v=372c255e:11594:26)
+    at mountIndeterminateComponent (http://localhost:5174/node_modules/.vite/deps/chunk-SVG7M4VJ.js?v=372c255e:14972:21)
+    at beginWork (http://localhost:5174/node_modules/.vite/deps/chunk-SVG7M4VJ.js?v=372c255e:15960:22)
+    at HTMLUnknownElement.callCallback2 (http://localhost:5174/node_modules/.vite/deps/chunk-SVG7M4VJ.js?v=372c255e:3678:22)
+    at Object.invokeGuardedCallbackDev (http://localhost:5174/node_modules/.vite/deps/chunk-SVG7M4VJ.js?v=372c255e:3703:24)
+    at invokeGuardedCallback (http://localhost:5174/node_modules/.vite/deps/chunk-SVG7M4VJ.js?v=372c255e:3737:39)
+    at beginWork$1 (http://localhost:5174/node_modules/.vite/deps/chunk-SVG7M4VJ.js?v=372c255e:19816:15)
+    at performUnitOfWork (http://localhost:5174/node_modules/.vite/deps/chunk-SVG7M4VJ.js?v=372c255e:19249:20)
+[   98739ms] Error: useAuth must be used inside AuthProvider
+    at useAuth (http://localhost:5174/src/context/AuthContext.tsx:152:23)
+    at ProtectedWorkstation (http://localhost:5174/src/App.tsx?t=1789296488409:42:20)
+    at renderWithHooks (http://localhost:5174/node_modules/.vite/deps/chunk-SVG7M4VJ.js?v=372c255e:11594:26)
+    at mountIndeterminateComponent (http://localhost:5174/node_modules/.vite/deps/chunk-SVG7M4VJ.js?v=372c255e:14972:21)
+    at beginWork (http://localhost:5174/node_modules/.vite/deps/chunk-SVG7M4VJ.js?v=372c255e:15960:22)
+    at HTMLUnknownElement.callCallback2 (http://localhost:5174/node_modules/.vite/deps/chunk-SVG7M4VJ.js?v=372c255e:3678:22)
+    at Object.invokeGuardedCallbackDev (http://localhost:5174/node_modules/.vite/deps/chunk-SVG7M4VJ.js?v=372c255e:3703:24)
+    at invokeGuardedCallback (http://localhost:5174/node_modules/.vite/deps/chunk-SVG7M4VJ.js?v=372c255e:3737:39)
+    at beginWork$1 (http://localhost:5174/node_modules/.vite/deps/chunk-SVG7M4VJ.js?v=372c255e:19816:15)
+    at performUnitOfWork (http://localhost:5174/node_modules/.vite/deps/chunk-SVG7M4VJ.js?v=372c255e:19249:20)
+[   98742ms] [ERROR] The above error occurred in the <ProtectedWorkstation> component:
+
+    at ProtectedWorkstation (http://localhost:5174/src/App.tsx?t=1789296488409:40:33)
+    at RenderedRoute (http://localhost:5174/node_modules/.vite/deps/react-router-dom.js?v=372c255e:4110:5)
+    at Routes (http://localhost:5174/node_modules/.vite/deps/react-router-dom.js?v=372c255e:4580:5)
+    at PopChildMeasure (http://localhost:5174/node_modules/.vite/deps/framer-motion.js?v=372c255e:8547:23)
+    at PopChild (http://localhost:5174/node_modules/.vite/deps/framer-motion.js?v=372c255e:8575:21)
+    at PresenceChild (http://localhost:5174/node_modules/.vite/deps/framer-motion.js?v=372c255e:8627:24)
+    at AnimatePresence (http://localhost:5174/node_modules/.vite/deps/framer-motion.js?v=372c255e:8714:26)
+    at AnimatedRoutes (http://localhost:5174/src/App.tsx?t=1789296488409:66:20)
+    at CircleProvider (http://localhost:5174/src/context/CircleContext.tsx:126:34)
+    at AuthProvider (http://localhost:5174/src/context/AuthContext.tsx?t=1789296646567:94:32)
+    at LanguageProvider (http://localhost:5174/src/context/LanguageContext.tsx:21:36)
+    at Router (http://localhost:5174/node_modules/.vite/deps/react-router-dom.js?v=372c255e:4523:15)
+    at BrowserRouter (http://localhost:5174/node_modules/.vite/deps/react-router-dom.js?v=372c255e:5261:5)
+    at App
+    at MotionConfig (http://localhost:5174/node_modules/.vite/deps/framer-motion.js?v=372c255e:8940:25)
+    at LazyMotion (http://localhost:5174/node_modules/.vite/deps/framer-motion.js?v=372c255e:8914:23)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries. @ http://localhost:5174/node_modules/.vite/deps/chunk-SVG7M4VJ.js?v=372c255e:14077
+[   98745ms] Error: useAuth must be used inside AuthProvider
+    at useAuth (http://localhost:5174/src/context/AuthContext.tsx:152:23)
+    at ProtectedWorkstation (http://localhost:5174/src/App.tsx?t=1789296488409:42:20)
+    at renderWithHooks (http://localhost:5174/node_modules/.vite/deps/chunk-SVG7M4VJ.js?v=372c255e:11594:26)
+    at mountIndeterminateComponent (http://localhost:5174/node_modules/.vite/deps/chunk-SVG7M4VJ.js?v=372c255e:14972:21)
+    at beginWork (http://localhost:5174/node_modules/.vite/deps/chunk-SVG7M4VJ.js?v=372c255e:15960:22)
+    at beginWork$1 (http://localhost:5174/node_modules/.vite/deps/chunk-SVG7M4VJ.js?v=372c255e:19804:22)
+    at performUnitOfWork (http://localhost:5174/node_modules/.vite/deps/chunk-SVG7M4VJ.js?v=372c255e:19249:20)
+    at workLoopSync (http://localhost:5174/node_modules/.vite/deps/chunk-SVG7M4VJ.js?v=372c255e:19188:13)
+    at renderRootSync (http://localhost:5174/node_modules/.vite/deps/chunk-SVG7M4VJ.js?v=372c255e:19167:15)
+    at recoverFromConcurrentError (http://localhost:5174/node_modules/.vite/deps/chunk-SVG7M4VJ.js?v=372c255e:18784:28)
+[   98966ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5174/api/v1/auth/login:0
+[   99024ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5174/api/v1/inspections?circle_id=CIRCLE_DL_SOUTH_01:0
+[   99025ms] [WARNING] Live server unreachable for listInspections. Falling back to Mode B local datastore: {error_code: NETWORK_OR_SERVER_ERROR, status: 503, message: HTTP 500, remediation: Check network connection or toggle Local Resilient Mode., timestamp: 2026-09-13T10:50:47.307Z} @ http://localhost:5174/src/services/api.ts?t=1789296646567:133
+[   99055ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5174/api/v1/inspections?circle_id=CIRCLE_DL_SOUTH_01:0
+[   99055ms] [WARNING] Live server unreachable for listInspections. Falling back to Mode B local datastore: {error_code: NETWORK_OR_SERVER_ERROR, status: 503, message: HTTP 500, remediation: Check network connection or toggle Local Resilient Mode., timestamp: 2026-09-13T10:50:47.338Z} @ http://localhost:5174/src/services/api.ts?t=1789296646567:133
+[   99056ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5174/api/v1/inspections?circle_id=CIRCLE_DL_SOUTH_01:0
+[   99056ms] [WARNING] Live server unreachable for listInspections. Falling back to Mode B local datastore: {error_code: NETWORK_OR_SERVER_ERROR, status: 503, message: HTTP 500, remediation: Check network connection or toggle Local Resilient Mode., timestamp: 2026-09-13T10:50:47.338Z} @ http://localhost:5174/src/services/api.ts?t=1789296646567:133
+[   99056ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5174/api/v1/inspections?circle_id=CIRCLE_DL_SOUTH_01:0
+[   99056ms] [WARNING] Live server unreachable for listInspections. Falling back to Mode B local datastore: {error_code: NETWORK_OR_SERVER_ERROR, status: 503, message: HTTP 500, remediation: Check network connection or toggle Local Resilient Mode., timestamp: 2026-09-13T10:50:47.339Z} @ http://localhost:5174/src/services/api.ts?t=1789296646567:133

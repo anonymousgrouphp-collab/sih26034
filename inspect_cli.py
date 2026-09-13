@@ -588,8 +588,10 @@ class FieldInspectorCLI:
         else:
             from engine import MultilingualOCREngine
             from extractor import CommodityFactExtractor
+            
             ocr_engine = MultilingualOCREngine(allow_classical_fallback=True)
-            ocr_output = ocr_engine.process_image(img, image_id=inspection_id)
+            ocr_ready_img = QualityGateEvaluator.preprocess_for_ocr(img)
+            ocr_output = ocr_engine.process_image(ocr_ready_img, image_id=inspection_id)
             extractor = CommodityFactExtractor()
             facts = extractor.extract(ocr_output, calibration=calib_res)
             
