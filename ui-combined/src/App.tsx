@@ -21,8 +21,8 @@ import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Unauthorized from "./pages/Unauthorized";
-import PolicyPage from "./pages/PolicyPage";
-import { POLICY_SLUGS } from "./pages/policyContent";
+import StatutoryDocumentPage from "./pages/statutory/StatutoryDocumentPage";
+import { LEGAL_DOCS, docBasePath } from "./pages/statutory/legalDocRegistry";
 
 // Protected Workstation Route Wrapper
 const ProtectedWorkstation: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -48,12 +48,12 @@ const AnimatedRoutes: React.FC = () => {
           <Route path="/" element={<AnimatedPage><Landing /></AnimatedPage>} />
           <Route path="/login" element={<AnimatedPage><Login /></AnimatedPage>} />
 
-          {/* GIGW 3.0 Mandatory Policy Pages */}
-          {POLICY_SLUGS.map((slug) => (
+          {/* GIGW 3.0 Governed Document Pages — Statutory Enactments, Policies & Standards */}
+          {LEGAL_DOCS.map((doc) => (
             <Route
-              key={slug}
-              path={`/policies/${slug}`}
-              element={<AnimatedPage><PolicyPage slug={slug} /></AnimatedPage>}
+              key={doc.slug}
+              path={`${docBasePath(doc.category)}/${doc.slug}`}
+              element={<AnimatedPage><StatutoryDocumentPage slug={doc.slug} /></AnimatedPage>}
             />
           ))}
 

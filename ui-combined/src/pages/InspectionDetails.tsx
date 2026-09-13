@@ -50,9 +50,9 @@ export const InspectionDetails: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="card p-12 text-center bg-white space-y-3">
-        <div className="w-8 h-8 border-4 border-govNavy border-t-transparent rounded-full animate-spin mx-auto" />
-        <p className="text-xs font-bold text-slate-600">
+      <div className="glass-panel p-12 text-center rounded-2xl border border-slate-700/60 shadow-xl space-y-3">
+        <div className="w-8 h-8 border-4 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto" />
+        <p className="text-xs font-bold text-slate-300 font-mono">
           {language === "hi"
             ? "सांविधिक केस फ़ाइल और क्रिप्टोग्राफ़िक साक्ष्य संपत्तियां लोड हो रही हैं..."
             : "Loading statutory case file and cryptographic evidence assets..."}
@@ -63,23 +63,23 @@ export const InspectionDetails: React.FC = () => {
 
   if (error || !caseData) {
     return (
-      <div className="card p-10 text-center bg-white space-y-4 max-w-xl mx-auto">
-        <AlertCircle size={36} className="text-rose-600 mx-auto" />
-        <h2 className="text-base font-bold text-slate-800">
+      <div className="glass-panel p-10 text-center rounded-2xl border border-rose-900/50 shadow-xl space-y-4 max-w-xl mx-auto">
+        <AlertCircle size={36} className="text-rose-400 mx-auto" />
+        <h2 className="text-base font-bold text-white">
           {language === "hi" ? "निरीक्षण केस नहीं मिला" : "Inspection Case Not Found"}
         </h2>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-400">
           {language === "hi" ? (
             <>
               केस संदर्भ आईडी{" "}
-              <code className="font-mono bg-slate-100 px-1 py-0.5 rounded">{id}</code>{" "}
-              स्थानीय डेटास्टोर से पुनर्प्राप्त नहीं की जा सकी।
+              <code className="font-mono bg-slate-800 text-amber-300 border border-slate-700 px-1.5 py-0.5 rounded">{id}</code>{" "}
+              डेटास्टोर से पुनर्प्राप्त नहीं की जा सकी।
             </>
           ) : (
             <>
               Case reference ID{" "}
-              <code className="font-mono bg-slate-100 px-1 py-0.5 rounded">{id}</code> could
-              not be retrieved from local datastore.
+              <code className="font-mono bg-slate-800 text-amber-300 border border-slate-700 px-1.5 py-0.5 rounded">{id}</code> could
+              not be retrieved from datastore.
             </>
           )}
         </p>

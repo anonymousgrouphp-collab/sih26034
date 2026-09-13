@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { m } from "framer-motion";
+import { Reveal } from "../components/common/motion";
 import { useLanguage } from "../context/LanguageContext";
 import {
   Scale,
@@ -115,15 +117,15 @@ export const Rules: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-workstation">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 glass-panel p-5 rounded-xl border border-slate-700/60 shadow-2xl">
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-govNavy bg-govNavy/5 px-2 py-0.5 rounded">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-amber-400 bg-amber-400/10 border border-amber-400/30 px-2 py-0.5 rounded">
             {language === "hi" ? "सांविधिक विधिक आधार" : "Statutory Legal Basis"}
           </span>
-          <h1 className="text-2xl font-black text-slate-900 mt-1">
+          <h1 className="text-2xl font-black text-white mt-1">
             {language === "hi" ? "नियम, अनुसूचियां एवं साक्ष्य मानक" : "Rules, Schedules & Evidentiary Invariants"}
           </h1>
-          <p className="text-xs text-slate-500 mt-0.5 max-w-2xl">
+          <p className="text-xs text-slate-400 mt-0.5 max-w-2xl">
             {language === "hi"
               ? "विधिक मापविज्ञान (पैकेज्ड कमोडिटीज) नियम, 2011 और धारा 63 बीएसए 2023 के तहत निरीक्षक नियम इंजन द्वारा लागू किए गए प्राधिकृत विधिक प्रावधान।"
               : "Authoritative legal schedules enforced by the NIRIKSHAK Rule Engine under the Legal Metrology (Packaged Commodities) Rules, 2011 and Section 63 BSA 2023."}
@@ -131,12 +133,12 @@ export const Rules: React.FC = () => {
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs font-bold">
+        <div className="flex items-center bg-slate-800/80 p-1 rounded-lg border border-slate-700/60 text-xs font-bold">
           <button
             type="button"
             onClick={() => setActiveTab("SCHEDULES")}
             className={`px-3 py-1.5 rounded-md transition-colors ${
-              activeTab === "SCHEDULES" ? "bg-govNavy text-white shadow-xs" : "text-slate-600 hover:text-slate-900"
+              activeTab === "SCHEDULES" ? "bg-amber-400 text-slate-950 font-bold shadow-xs" : "text-slate-400 hover:text-white hover:bg-white/5"
             }`}
           >
             {language === "hi" ? "तालिका-I फ़ॉन्ट अनुसूची" : "Table-I Font Schedule"}
@@ -145,7 +147,7 @@ export const Rules: React.FC = () => {
             type="button"
             onClick={() => setActiveTab("CATALOG")}
             className={`px-3 py-1.5 rounded-md transition-colors ${
-              activeTab === "CATALOG" ? "bg-govNavy text-white shadow-xs" : "text-slate-600 hover:text-slate-900"
+              activeTab === "CATALOG" ? "bg-amber-400 text-slate-950 font-bold shadow-xs" : "text-slate-400 hover:text-white hover:bg-white/5"
             }`}
           >
             {language === "hi" ? "नियम सूची (कैटलॉग)" : "Rule Catalog"}
@@ -154,7 +156,7 @@ export const Rules: React.FC = () => {
             type="button"
             onClick={() => setActiveTab("INVARIANTS")}
             className={`px-3 py-1.5 rounded-md transition-colors ${
-              activeTab === "INVARIANTS" ? "bg-govNavy text-white shadow-xs" : "text-slate-600 hover:text-slate-900"
+              activeTab === "INVARIANTS" ? "bg-amber-400 text-slate-950 font-bold shadow-xs" : "text-slate-400 hover:text-white hover:bg-white/5"
             }`}
           >
             {language === "hi" ? "साक्ष्य मानक" : "Evidentiary Invariants"}
@@ -162,26 +164,28 @@ export const Rules: React.FC = () => {
         </div>
       </div>
 
+
       {/* Tab 1: Table-I Font Schedule */}
       {activeTab === "SCHEDULES" && (
+        <Reveal>
         <div className="space-y-6">
-          <div className="card p-6 bg-white space-y-4">
+          <div className="glass-panel p-6 space-y-4 border border-slate-700/60 rounded-xl">
             <div>
-              <h3 className="text-sm font-extrabold text-govNavy">
+              <h3 className="text-sm font-extrabold text-white">
                 {language === "hi"
                   ? "तालिका-I: अंकों एवं अक्षरों की न्यूनतम ऊंचाई (नियम 6(1)(h) / सा.का.नि. 629(अ))"
                   : "Table-I: Minimum Height of Numerals & Letters (Rule 6(1)(h) / G.S.R. 629(E))"}
               </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-400 mt-0.5">
                 {language === "hi"
                   ? "मुख्य प्रदर्शन फलक (PDP) के क्षेत्रफल के अनुसार सांविधिक फ़ॉन्ट ऊंचाई आवश्यकताएं।"
                   : "Statutory font height requirements mapped against Principal Display Panel (PDP) surface area."}
               </p>
             </div>
 
-            <div className="overflow-x-auto border border-slate-200 rounded-lg">
-              <table className="min-w-full divide-y divide-slate-200 text-xs">
-                <thead className="bg-slate-50 text-[11px] font-bold text-slate-700 uppercase">
+            <div className="overflow-x-auto border border-slate-700/60 rounded-lg">
+              <table className="min-w-full divide-y divide-slate-700/60 text-xs">
+                <thead className="bg-slate-800/90 text-[11px] font-bold text-slate-300 uppercase">
                   <tr>
                     <th className="px-4 py-3 text-left">{language === "hi" ? "पंक्ति" : "Row"}</th>
                     <th className="px-4 py-3 text-left">{language === "hi" ? "मुख्य प्रदर्शन फलक क्षेत्रफल (A)" : "Principal Display Panel Area (A)"}</th>
@@ -190,45 +194,45 @@ export const Rules: React.FC = () => {
                     <th className="px-4 py-3 text-left">{language === "hi" ? "सांविधिक संदर्भ" : "Statutory Citation"}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200 font-normal">
-                  <tr className="hover:bg-slate-50">
-                    <td className="px-4 py-3 font-mono font-bold text-slate-700">1</td>
+                <tbody className="divide-y divide-slate-700/60 font-normal text-slate-300">
+                  <tr className="hover:bg-white/5">
+                    <td className="px-4 py-3 font-mono font-bold text-slate-200">1</td>
                     <td className="px-4 py-3">A ≤ 50 cm²</td>
-                    <td className="px-4 py-3 font-bold text-govNavy font-mono">1.0 mm</td>
-                    <td className="px-4 py-3 font-mono text-slate-600">1.5 mm</td>
-                    <td className="px-4 py-3 text-slate-500">{language === "hi" ? "पंक्ति 1, तालिका-I" : "Row 1, Table-I"}</td>
+                    <td className="px-4 py-3 font-bold text-white font-mono">1.0 mm</td>
+                    <td className="px-4 py-3 font-mono text-slate-300">1.5 mm</td>
+                    <td className="px-4 py-3 text-slate-400">{language === "hi" ? "पंक्ति 1, तालिका-I" : "Row 1, Table-I"}</td>
                   </tr>
-                  <tr className="hover:bg-slate-50">
-                    <td className="px-4 py-3 font-mono font-bold text-slate-700">2</td>
+                  <tr className="hover:bg-white/5">
+                    <td className="px-4 py-3 font-mono font-bold text-slate-200">2</td>
                     <td className="px-4 py-3">50 cm² &lt; A ≤ 100 cm²</td>
-                    <td className="px-4 py-3 font-bold text-govNavy font-mono">1.5 mm</td>
-                    <td className="px-4 py-3 font-mono text-slate-600">3.0 mm</td>
-                    <td className="px-4 py-3 text-slate-500">{language === "hi" ? "पंक्ति 2, तालिका-I" : "Row 2, Table-I"}</td>
+                    <td className="px-4 py-3 font-bold text-white font-mono">1.5 mm</td>
+                    <td className="px-4 py-3 font-mono text-slate-300">3.0 mm</td>
+                    <td className="px-4 py-3 text-slate-400">{language === "hi" ? "पंक्ति 2, तालिका-I" : "Row 2, Table-I"}</td>
                   </tr>
-                  <tr className="hover:bg-slate-50">
-                    <td className="px-4 py-3 font-mono font-bold text-slate-700">3</td>
+                  <tr className="hover:bg-white/5">
+                    <td className="px-4 py-3 font-mono font-bold text-slate-200">3</td>
                     <td className="px-4 py-3">100 cm² &lt; A ≤ 500 cm²</td>
-                    <td className="px-4 py-3 font-bold text-govNavy font-mono">2.5 mm</td>
-                    <td className="px-4 py-3 font-mono text-slate-600">4.0 mm</td>
-                    <td className="px-4 py-3 text-slate-500">{language === "hi" ? "पंक्ति 3, तालिका-I" : "Row 3, Table-I"}</td>
+                    <td className="px-4 py-3 font-bold text-white font-mono">2.5 mm</td>
+                    <td className="px-4 py-3 font-mono text-slate-300">4.0 mm</td>
+                    <td className="px-4 py-3 text-slate-400">{language === "hi" ? "पंक्ति 3, तालिका-I" : "Row 3, Table-I"}</td>
                   </tr>
-                  <tr className="hover:bg-slate-50">
-                    <td className="px-4 py-3 font-mono font-bold text-slate-700">4</td>
+                  <tr className="hover:bg-white/5">
+                    <td className="px-4 py-3 font-mono font-bold text-slate-200">4</td>
                     <td className="px-4 py-3">500 cm² &lt; A ≤ 2500 cm²</td>
-                    <td className="px-4 py-3 font-bold text-govNavy font-mono">4.0 mm</td>
-                    <td className="px-4 py-3 font-mono text-slate-600">6.0 mm</td>
-                    <td className="px-4 py-3 text-slate-500">{language === "hi" ? "पंक्ति 4, तालिका-I" : "Row 4, Table-I"}</td>
+                    <td className="px-4 py-3 font-bold text-white font-mono">4.0 mm</td>
+                    <td className="px-4 py-3 font-mono text-slate-300">6.0 mm</td>
+                    <td className="px-4 py-3 text-slate-400">{language === "hi" ? "पंक्ति 4, तालिका-I" : "Row 4, Table-I"}</td>
                   </tr>
-                  <tr className="bg-amber-50/70 hover:bg-amber-50">
-                    <td className="px-4 py-3 font-mono font-black text-amber-900">5</td>
-                    <td className="px-4 py-3 font-bold text-amber-950">
+                  <tr className="bg-amber-950/40 hover:bg-amber-900/40 border-y border-amber-600/40">
+                    <td className="px-4 py-3 font-mono font-black text-amber-400">5</td>
+                    <td className="px-4 py-3 font-bold text-amber-300">
                       {language === "hi" ? "A > 2500 सेमी² (ADL-01 आधार)" : "A > 2500 cm² (ADL-01 Baseline)"}
                     </td>
-                    <td className="px-4 py-3 font-black text-rose-700 font-mono text-sm">
+                    <td className="px-4 py-3 font-black text-rose-400 font-mono text-sm">
                       {language === "hi" ? "6.0 मिमी (8.0 मिमी कभी नहीं)" : "6.0 mm (Never 8.0 mm)"}
                     </td>
-                    <td className="px-4 py-3 font-mono text-slate-700 font-bold">6.0 mm</td>
-                    <td className="px-4 py-3 font-bold text-amber-900">
+                    <td className="px-4 py-3 font-mono text-slate-200 font-bold">6.0 mm</td>
+                    <td className="px-4 py-3 font-bold text-amber-400">
                       {language === "hi" ? "सा.का.नि. 629(अ) संशोधन" : "G.S.R. 629(E) Amendment"}
                     </td>
                   </tr>
@@ -236,8 +240,8 @@ export const Rules: React.FC = () => {
               </table>
             </div>
 
-            <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1">
-              <span className="font-bold text-slate-800">
+            <div className="p-3.5 rounded-lg bg-slate-800/60 border border-slate-700/60 text-xs text-slate-300 space-y-1">
+              <span className="font-bold text-amber-400">
                 {language === "hi" ? "विधिक मापविज्ञान अधिकारी मार्गदर्शन टिप्पणी:" : "Legal Metrology Officer Guidance Note:"}
               </span>
               <p>
@@ -248,6 +252,7 @@ export const Rules: React.FC = () => {
             </div>
           </div>
         </div>
+        </Reveal>
       )}
 
       {/* Tab 2: Rule Catalog */}
@@ -256,24 +261,24 @@ export const Rules: React.FC = () => {
           {RULE_CATALOG.map((r) => {
             const isOpen = expandedRule === r.code;
             return (
-              <div key={r.code} className="card overflow-hidden bg-white">
+              <div key={r.code} className="glass-panel overflow-hidden border border-slate-700/60 rounded-xl">
                 <button
                   type="button"
                   onClick={() => setExpandedRule(isOpen ? null : r.code)}
-                  className="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50 transition-colors"
+                  className="w-full p-4 flex items-center justify-between text-left hover:bg-white/5 transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-govNavy/5 text-govNavy shrink-0">
+                    <div className="p-2 rounded-lg bg-slate-800 text-cyan-300 shrink-0 border border-slate-700">
                       <GitBranch size={16} />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-mono font-bold text-xs text-govNavy">{r.code}</span>
-                        <h4 className="text-xs sm:text-sm font-bold text-slate-800">
+                        <span className="font-mono font-bold text-xs text-cyan-400">{r.code}</span>
+                        <h4 className="text-xs sm:text-sm font-bold text-white">
                           {language === "hi" && r.titleHi ? r.titleHi : r.title}
                         </h4>
                       </div>
-                      <p className="text-[11px] text-slate-500 mt-0.5">
+                      <p className="text-[11px] text-slate-400 mt-0.5">
                         {language === "hi" && r.categoryHi ? r.categoryHi : r.category} • {r.statute}
                       </p>
                     </div>
@@ -285,16 +290,16 @@ export const Rules: React.FC = () => {
                 </button>
 
                 {isOpen && (
-                  <div className="p-4 pt-1 border-t border-slate-100 bg-slate-50/50 space-y-3 text-xs">
+                  <div className="p-4 pt-2 border-t border-slate-700/60 bg-slate-800/40 space-y-3 text-xs">
                     <div>
-                      <span className="font-bold text-slate-700">
+                      <span className="font-bold text-slate-200">
                         {language === "hi" ? "सांविधिक आवश्यकता:" : "Statutory Requirement:"}
                       </span>
-                      <p className="text-slate-600 mt-0.5 leading-relaxed">
+                      <p className="text-slate-300 mt-0.5 leading-relaxed">
                         {language === "hi" && r.descriptionHi ? r.descriptionHi : r.description}
                       </p>
                     </div>
-                    <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900">
+                    <div className="p-2.5 rounded-lg bg-amber-950/40 border border-amber-600/40 text-amber-300">
                       <span className="font-bold">
                         {language === "hi" ? "विधिक प्रवर्तन कार्रवाई: " : "Legal Enforcement Action: "}
                       </span>
@@ -311,8 +316,8 @@ export const Rules: React.FC = () => {
       {/* Tab 3: Evidentiary Invariants */}
       {activeTab === "INVARIANTS" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="card p-5 bg-white space-y-3">
-            <div className="flex items-center gap-2 text-govNavy font-bold text-sm">
+          <div className="glass-panel p-5 space-y-3 border border-slate-700/60 rounded-xl">
+            <div className="flex items-center gap-2 text-white font-bold text-sm">
               <ShieldCheck size={18} />
               <span>
                 {language === "hi"
@@ -320,15 +325,15 @@ export const Rules: React.FC = () => {
                   : "Section 63 BSA 2023 Evidentiary Defense"}
               </span>
             </div>
-            <p className="text-xs text-slate-600 leading-relaxed">
+            <p className="text-xs text-slate-300 leading-relaxed">
               {language === "hi"
                 ? "इलेक्ट्रॉनिक साक्ष्य प्रमाणपत्रों में भारतीय साक्ष्य अधिनियम, 2023 की धारा 63 का संदर्भ अनिवार्य है। निरस्त भारतीय साक्ष्य अधिनियम, 1872 की धारा 65B का संदर्भ देना सख्त वर्जित है। सभी डिजिटल फोटोग्राफ, ओसीआर निर्देशांक और मार्करों को अपरिवर्तनीय SHA-256 डाइजेस्ट सुरक्षित रखना चाहिए।"
                 : "Electronic evidence certificates must cite Section 63 of Bharatiya Sakshya Adhiniyam, 2023. Citing repealed Section 65B of the Indian Evidence Act, 1872 is strictly prohibited. All digital photographs, OCR coordinates, and fiducials must preserve immutable SHA-256 digests."}
             </p>
           </div>
 
-          <div className="card p-5 bg-white space-y-3">
-            <div className="flex items-center gap-2 text-govNavy font-bold text-sm">
+          <div className="glass-panel p-5 space-y-3 border border-slate-700/60 rounded-xl">
+            <div className="flex items-center gap-2 text-white font-bold text-sm">
               <Calculator size={18} />
               <span>
                 {language === "hi"
@@ -336,29 +341,29 @@ export const Rules: React.FC = () => {
                   : "Unit Sale Price (USP) Mathematical Tolerance"}
               </span>
             </div>
-            <p className="text-xs text-slate-600 leading-relaxed">
+            <p className="text-xs text-slate-300 leading-relaxed">
               {language === "hi"
                 ? "नियम 6(1)(k) के तहत, गणितीय पहचान |(USP × NetQty) - MRP| ≤ ₹0.02 लागू की जाती है। 2 पैसे से अधिक का कोई भी अंतर भ्रामक राउंडिंग या गैर-अनुपालन पैकेजिंग को दर्शाता है।"
                 : "Under Rule 6(1)(k), the mathematical identity |(USP × NetQty) - MRP| ≤ ₹0.02 is enforced. Any discrepancy exceeding 2 paise indicates deceptive rounding or non-compliant packaging."}
             </p>
           </div>
 
-          <div className="card p-5 bg-white space-y-3">
-            <div className="flex items-center gap-2 text-govNavy font-bold text-sm">
+          <div className="glass-panel p-5 space-y-3 border border-slate-700/60 rounded-xl">
+            <div className="flex items-center gap-2 text-white font-bold text-sm">
               <AlertCircle size={18} />
               <span>
                 {language === "hi" ? "प्रतिबंधित इकाई पहचान प्रणाली" : "Prohibited Units Flagger"}
               </span>
             </div>
-            <p className="text-xs text-slate-600 leading-relaxed">
+            <p className="text-xs text-slate-300 leading-relaxed">
               {language === "hi"
                 ? "विधिक मापविज्ञान अधिनियम, 2009 की दूसरी अनुसूची के तहत, 'gms', 'gm', 'ML', 'ltrs' जैसे बोलचाल के इकाई प्रतीकों का उपयोग प्रतिबंधित है। केवल मानक SI इकाइयों 'g', 'kg', 'ml', 'l' को ही अनुमति है।"
                 : "Under the Second Schedule of the Legal Metrology Act, 2009, colloquial unit symbols such as `gms`, `gm`, `ML`, `ltrs` are prohibited. Standard SI units `g`, `kg`, `ml`, `l` must be enforced."}
             </p>
           </div>
 
-          <div className="card p-5 bg-white space-y-3">
-            <div className="flex items-center gap-2 text-govNavy font-bold text-sm">
+          <div className="glass-panel p-5 space-y-3 border border-slate-700/60 rounded-xl">
+            <div className="flex items-center gap-2 text-white font-bold text-sm">
               <Info size={18} />
               <span>
                 {language === "hi"
@@ -366,7 +371,7 @@ export const Rules: React.FC = () => {
                   : "Rule 6(10) E-Commerce Statutory Exemption"}
               </span>
             </div>
-            <p className="text-xs text-slate-600 leading-relaxed">
+            <p className="text-xs text-slate-300 leading-relaxed">
               {language === "hi"
                 ? "नियम 6(10) / सा.का.नि. 594(अ) के तहत, डिजिटल मार्केटप्लेस लिस्टिंग को निर्माण की तारीख घोषित करने से सांविधिक छूट प्राप्त है। प्रणाली अनुपलब्ध निर्माण तिथि को उल्लंघन के रूप में चिह्नित करने के बजाय एक अभिलेखीय सांविधिक छूट दर्ज करती है।"
                 : "Under Rule 6(10) / G.S.R. 594(E), digital marketplace listings are statutorily exempt from declaring the date of manufacture. The system records an archival statutory exemption entry rather than flagging missing manufacture dates as a contravention."}
@@ -379,3 +384,4 @@ export const Rules: React.FC = () => {
 };
 
 export default Rules;
+

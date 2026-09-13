@@ -819,6 +819,51 @@ Chunk 4: Frontend Multi-Facet Batch Execution & Attribution HUD (`ui-combined/`)
 ### Signing Note
 SIGNED OFF BY: Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-13 12:55 IST [VERIFIED]
 
+---
+
+## [13 September 2026] [15:58] IST
+
+### Task / Chunk
+Supabase Cloud Object Storage Integration, Permanent Evidence Retention & Case Disposal (`members/member-05-evidence/src/storage.py` and `tests/test_supabase_storage.py`).
+
+### Status
+COMPLETE
+
+### Completed
+- **Supabase Cloud Object Storage Adapter (`SupabaseStorageAdapter` in `storage.py`):**
+  - Integrated Supabase Storage with dedicated public bucket `evidence-images` (`https://ihqhfusgkullpbjfmjiy.supabase.co`).
+  - Automatically uploads incoming evidence images to Supabase with `content-type` preservation and `x-upsert: true`.
+  - Solves the Render Free Tier ephemeral disk constraint: evidence photographs remain permanently persistent across container sleep cycles, reboots, and redeployments.
+- **Dynamic Cloud Rehydration (`resolve_absolute_path` in `DecoupledStorageManager`):**
+  - If a container restarts and an evidence file is missing from local disk, `resolve_absolute_path` automatically downloads and rehydrates the binary from Supabase Storage on the fly, eliminating 404 errors.
+- **Permanent Cloud Disposal on Delete:**
+  - Enhanced `delete_file` to delete files locally AND execute API deletion against Supabase Storage bucket (`DELETE /storage/v1/object/evidence-images`).
+  - Seamlessly linked with `DELETE /api/v1/inspections/{id}`: deleting a case from the Desk, Workspace, or Review Queue permanently purges all associated evidence images from both database and Supabase bucket.
+- **Existing Evidence Mirroring:**
+  - Batch synchronized all 39 existing local evidence images from `storage/uploads/` directly to Supabase Storage with 0 failures.
+- **Unit Testing:**
+  - Created test suite `test_supabase_storage.py` covering adapter configuration, full upload/download/delete lifecycle, and decoupled rehydration.
+
+### Tests
+- `python -m pytest members/member-05-evidence/tests/test_supabase_storage.py -v`: 3/3 passed in 8.45s.
+- `python -m pytest members/member-05-evidence/tests/ -q`: 81/81 passed in 34.95s.
+- `npm test -- --run` in `ui-combined`: 146/146 passed in 3.10s.
+- `node build-root.cjs`: Clean production build in 10.82s (`dist/` populated).
+
+### Problems
+None. 100% backward compatible with Mode B offline runner (gracefully defaults to local filesystem if network is unreachable).
+
+### Decisions
+1. Evidence files are saved locally for ultra-low-latency OpenCV and OCR analysis, while simultaneously streaming to Supabase Storage for permanent cloud durability.
+2. Case deletion must purge evidence from Supabase Storage to respect statutory data hygiene and storage quotas.
+
+### Next Step
+Execute Physical Validation Dataset Benchmark & Tuning (Watch, Facewash, Perfume, Haldiram's, Chia Seeds, Himalaya Wellness) to calibrate and bulletproof extraction rules.
+
+### Signing Note
+SIGNED OFF BY: Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-13 15:58 IST [VERIFIED]
+
+
 
 
 

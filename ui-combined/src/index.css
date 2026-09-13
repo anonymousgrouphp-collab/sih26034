@@ -4,9 +4,9 @@
 
 @layer base {
   :root {
-    font-family: 'Noto Sans', 'Noto Sans Devanagari', sans-serif;
-    color: #1f2937;
-    background: #F8FAFC;
+    font-family: 'Inter', 'Roboto', 'Plus Jakarta Sans', sans-serif;
+    color: #f1f5f9;
+    background: #0b1320;
     font-synthesis: none;
     text-rendering: optimizeLegibility;
   }
@@ -15,15 +15,17 @@
     margin: 0;
     min-width: 320px;
     min-height: 100vh;
-    background: #F8FAFC;
-    font-family: 'Noto Sans', 'Noto Sans Devanagari', sans-serif !important;
+    background: #0b1320;
+    font-family: 'Inter', 'Roboto', 'Plus Jakarta Sans', sans-serif !important;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
   
-  /* High contrast focus ring for WCAG 2.1 AA accessibility */
+  /* High contrast focus ring for WCAG 2.1 AA accessibility —
+     #38bdf8 (Cyan/Azure) is the platform accent; it meets AA contrast
+     on both dark-slate (#0b1320) and white panel surfaces. */
   :focus-visible {
-    outline: 2px solid #1B365D;
+    outline: 2px solid #38bdf8;
     outline-offset: 2px;
   }
 }
@@ -122,6 +124,46 @@
   animation: popIn 0.18s cubic-bezier(0.05, 0.7, 0.1, 1) both;
 }
 
+@keyframes glowPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(220, 38, 38, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
+  }
+}
+
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+/* Motion Design: Hero radial gradient ambient glow pulse */
+@keyframes pulseGlow {
+  0% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 4s ease-in-out infinite alternate;
+}
+
+
 /* Motion Design: Card hover lift (secondary layer — shadow arrives with motion) */
 .card-lift {
   transition:
@@ -152,21 +194,60 @@
 
 /* Custom scrollbars for high-density ledgers */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #eef1f4;
+  background: #0b1320;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #b7c0ca;
-  border-radius: 4px;
+  background: #1B365D;
+  border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #8995a2;
+  background: #38bdf8;
+}
+
+/* Glassmorphism */
+.glass {
+  background: rgba(19, 34, 56, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-panel {
+  background: rgba(19, 34, 56, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Skeleton Loader */
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+.skeleton {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(to right, #132238 4%, #1B365D 25%, #132238 36%);
+  background-size: 1000px 100%;
+}
+
+/* Row Expansion */
+.row-expand-enter {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.3s ease-out;
+}
+.row-expand-enter-active {
+  opacity: 1;
+  max-height: 500px;
 }
 
 @layer components {
@@ -175,11 +256,11 @@
   }
 
   .card {
-    @apply rounded-xl border border-slate-200 bg-white shadow-workstation;
+    @apply rounded-xl border border-slate-700/60 bg-slate-800/60 shadow-workstation;
   }
 
   .section-title {
-    @apply text-xs font-bold uppercase tracking-wider text-govNavy;
+    @apply text-xs font-bold uppercase tracking-wider text-slate-200;
   }
 
   .btn-primary {
@@ -187,7 +268,7 @@
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-700 transition duration-150 hover:bg-slate-50 active:scale-[0.97] focus:outline-none focus:ring-2 focus:ring-slate-300 shadow-sm;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-slate-700/80 bg-slate-800/80 px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-200 transition duration-150 hover:bg-slate-700 hover:text-white active:scale-[0.97] focus:outline-none focus:ring-2 focus:ring-slate-500 shadow-sm;
   }
 
   .btn-danger {
@@ -195,7 +276,20 @@
   }
 
   .input {
-    @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs sm:text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-govNavy focus:ring-2 focus:ring-govNavy/20;
+    @apply w-full rounded-lg border border-slate-700/80 bg-slate-800/80 px-3 py-2 text-xs sm:text-sm text-white placeholder:text-slate-400 outline-none transition-all focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/30;
+  }
+  
+  .input-group {
+    @apply relative mb-4;
+  }
+
+  .input-label {
+    @apply absolute left-3 top-2 text-xs text-slate-500 transition-all duration-200 pointer-events-none origin-left transform -translate-y-4 scale-75 bg-white px-1 font-semibold;
+  }
+
+  .input:focus ~ .input-label,
+  .input:not(:placeholder-shown) ~ .input-label {
+    @apply -translate-y-5 scale-75 text-cyan;
   }
 }
 
@@ -313,4 +407,158 @@ html.high-contrast-mode .bg-rose-500 {
   background: #000000 !important;
   border: 2px solid #FFFFFF !important;
   color: #FFFFFF !important;
+}
+
+/* ── Uniform high-contrast coverage ────────────────────────────────────────
+   Attribute (substring) selectors are deliberate: Tailwind opacity variants
+   such as `bg-white/80` or `bg-amber-50/50` emit distinct class names that
+   plain class selectors miss, which left a mixed light/dark patchwork on
+   every tab when contrast mode was enabled. */
+
+/* Light tinted surfaces → black */
+html.high-contrast-mode [class*="bg-white"],
+html.high-contrast-mode [class*="bg-surfaceBg"],
+html.high-contrast-mode [class*="bg-panelBg"],
+html.high-contrast-mode [class*="bg-slate-1"],
+html.high-contrast-mode [class*="bg-slate-2"],
+html.high-contrast-mode [class*="bg-slate-3"],
+html.high-contrast-mode [class*="bg-slate-4"],
+html.high-contrast-mode [class*="bg-slate-5"],
+html.high-contrast-mode [class*="bg-gray-"],
+html.high-contrast-mode [class*="bg-amber-1"],
+html.high-contrast-mode [class*="bg-amber-2"],
+html.high-contrast-mode [class*="bg-amber-5"],
+html.high-contrast-mode [class*="bg-yellow-"],
+html.high-contrast-mode [class*="bg-orange-"],
+html.high-contrast-mode [class*="bg-emerald-1"],
+html.high-contrast-mode [class*="bg-emerald-2"],
+html.high-contrast-mode [class*="bg-emerald-5"],
+html.high-contrast-mode [class*="bg-green-"],
+html.high-contrast-mode [class*="bg-teal-"],
+html.high-contrast-mode [class*="bg-cyan-"],
+html.high-contrast-mode [class*="bg-sky-"],
+html.high-contrast-mode [class*="bg-blue-"],
+html.high-contrast-mode [class*="bg-indigo-"],
+html.high-contrast-mode [class*="bg-violet-"],
+html.high-contrast-mode [class*="bg-purple-1"],
+html.high-contrast-mode [class*="bg-purple-2"],
+html.high-contrast-mode [class*="bg-purple-5"],
+html.high-contrast-mode [class*="bg-fuchsia-"],
+html.high-contrast-mode [class*="bg-pink-"],
+html.high-contrast-mode [class*="bg-rose-1"],
+html.high-contrast-mode [class*="bg-rose-2"],
+html.high-contrast-mode [class*="bg-rose-5"],
+html.high-contrast-mode [class*="bg-red-"] {
+  background-color: #000000 !important;
+}
+
+/* Body text → white; semantic accents → bright variants so the 4-state
+   verdict colours stay distinguishable on black */
+html.high-contrast-mode [class*="text-slate-"],
+html.high-contrast-mode [class*="text-gray-"],
+html.high-contrast-mode .text-govNavy {
+  color: #FFFFFF !important;
+}
+html.high-contrast-mode [class*="text-emerald-"],
+html.high-contrast-mode [class*="text-green-"],
+html.high-contrast-mode [class*="text-teal-"] {
+  color: #6EE7B7 !important;
+}
+html.high-contrast-mode [class*="text-amber-"],
+html.high-contrast-mode [class*="text-yellow-"],
+html.high-contrast-mode [class*="text-orange-"] {
+  color: #FCD34D !important;
+}
+html.high-contrast-mode [class*="text-rose-"],
+html.high-contrast-mode [class*="text-red-"] {
+  color: #F87171 !important;
+}
+html.high-contrast-mode [class*="text-purple-"],
+html.high-contrast-mode [class*="text-violet-"],
+html.high-contrast-mode [class*="text-fuchsia-"] {
+  color: #C4B5FD !important;
+}
+html.high-contrast-mode [class*="text-blue-"],
+html.high-contrast-mode [class*="text-sky-"],
+html.high-contrast-mode [class*="text-indigo-"],
+html.high-contrast-mode [class*="text-cyan-"] {
+  color: #7DD3FC !important;
+}
+
+/* All coloured outlines → white so cards, chips and inputs keep definition */
+html.high-contrast-mode [class*="border-slate-"],
+html.high-contrast-mode [class*="border-gray-"],
+html.high-contrast-mode [class*="border-amber-"],
+html.high-contrast-mode [class*="border-yellow-"],
+html.high-contrast-mode [class*="border-orange-"],
+html.high-contrast-mode [class*="border-emerald-"],
+html.high-contrast-mode [class*="border-green-"],
+html.high-contrast-mode [class*="border-teal-"],
+html.high-contrast-mode [class*="border-cyan-"],
+html.high-contrast-mode [class*="border-sky-"],
+html.high-contrast-mode [class*="border-blue-"],
+html.high-contrast-mode [class*="border-indigo-"],
+html.high-contrast-mode [class*="border-violet-"],
+html.high-contrast-mode [class*="border-purple-"],
+html.high-contrast-mode [class*="border-fuchsia-"],
+html.high-contrast-mode [class*="border-pink-"],
+html.high-contrast-mode [class*="border-rose-"],
+html.high-contrast-mode [class*="border-red-"] {
+  border-color: #FFFFFF !important;
+}
+
+/* Form fields → black with white outlines, text and placeholders */
+html.high-contrast-mode .input,
+html.high-contrast-mode input:not([type="checkbox"]):not([type="radio"]),
+html.high-contrast-mode select,
+html.high-contrast-mode textarea {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  border: 2px solid #FFFFFF !important;
+}
+html.high-contrast-mode .input::placeholder,
+html.high-contrast-mode input::placeholder,
+html.high-contrast-mode textarea::placeholder {
+  color: #FFFFFF !important;
+  opacity: 1 !important;
+}
+html.high-contrast-mode option {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Governed Legal / Statutory Document Pages (dark slate template).
+   Print parity: the global print rules force a white page; these scoped
+   overrides neutralise the dark surfaces so the printed statutory record
+   is black-on-white and matches the on-screen document content.
+   ───────────────────────────────────────────────────────────────────────── */
+@media print {
+  .legal-doc-page,
+  .legal-doc-page * {
+    background: transparent !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  .legal-doc-page a {
+    color: #000000 !important;
+    text-decoration: underline !important;
+  }
+  .legal-doc-page mark {
+    background: #fff3bf !important;
+    color: #000000 !important;
+  }
+  .legal-doc-page .legal-doc-badge,
+  .legal-doc-page section,
+  .legal-doc-page table,
+  .legal-doc-page th,
+  .legal-doc-page td,
+  .legal-doc-page figure {
+    border: 1px solid #64748b !important;
+  }
+  .legal-doc-page pre {
+    white-space: pre-wrap !important;
+    word-break: break-all !important;
+  }
 }

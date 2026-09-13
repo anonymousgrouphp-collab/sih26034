@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext";
 import { DEMO_SCENARIOS, getDemoScenarioById, DemoScenarioItem } from "./demoCatalog";
 import {
-  Sparkles,
   ChevronLeft,
   ChevronRight,
   Info,
@@ -109,7 +108,7 @@ export const DemoCaseTourBanner: React.FC<DemoCaseTourBannerProps> = ({
           {/* Left: Prominent Demo Identification & Scenario Summary */}
           <div className="flex items-start gap-3 min-w-0">
             <div className="p-2.5 rounded-xl bg-govNavy text-amber-400 shrink-0 shadow-xs hidden sm:flex items-center justify-center">
-              <Sparkles size={20} className="animate-pulse" />
+              <Scale size={20} className="text-amber-400" />
             </div>
 
             <div className="min-w-0 space-y-1">

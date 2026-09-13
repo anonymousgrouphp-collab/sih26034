@@ -25,10 +25,11 @@ export interface InspectionTableItem {
 interface InspectionTableProps {
   inspections: InspectionTableItem[];
   className?: string;
+  isLoading?: boolean;
   onDelete?: (id: string) => void | Promise<void>;
 }
 
-export const InspectionTable: React.FC<InspectionTableProps> = ({ inspections, className = "", onDelete }) => {
+export const InspectionTable: React.FC<InspectionTableProps> = ({ inspections, className = "", isLoading = false, onDelete }) => {
   const navigate = useNavigate();
   const { language } = useLanguage();
   const [caseToDelete, setCaseToDelete] = useState<InspectionTableItem | null>(null);
@@ -54,11 +55,11 @@ export const InspectionTable: React.FC<InspectionTableProps> = ({ inspections, c
 
   return (
     <div className={`overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs ${className}`}>
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[850px] text-left">
-          <thead className="border-b border-slate-200 bg-slate-50/75">
+      <div className="overflow-x-auto custom-scrollbar relative max-h-[600px]">
+        <table className="w-full min-w-[850px] text-left border-collapse">
+          <thead className="border-b border-slate-200 bg-slate-50/75 sticky top-0 z-20 glass backdrop-blur-md">
             <tr>
-              <th className="px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <th className="px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500 sticky left-0 bg-slate-50/90 z-10 backdrop-blur-sm shadow-[1px_0_0_rgba(226,232,240,1)]">
                 {language === "hi" ? "प्रकरण एवं वस्तु" : "Case & Commodity"}
               </th>
               <th className="px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">
@@ -76,11 +77,26 @@ export const InspectionTable: React.FC<InspectionTableProps> = ({ inspections, c
               <th className="px-5 py-3 text-right"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
-            {inspections.length === 0 && (
+          <tbody className="divide-y divide-slate-100 relative">
+            {isLoading && (
+              Array.from({ length: 3 }).map((_, i) => (
+                <tr key={i} className="animate-pulse">
+                  <td className="px-5 py-4 sticky left-0 bg-white z-10 shadow-[1px_0_0_rgba(226,232,240,1)]">
+                    <div className="h-4 bg-slate-200 rounded skeleton w-3/4 mb-2"></div>
+                    <div className="h-3 bg-slate-200 rounded skeleton w-1/2"></div>
+                  </td>
+                  <td className="px-5 py-4"><div className="h-4 bg-slate-200 rounded skeleton w-full"></div></td>
+                  <td className="px-5 py-4"><div className="h-4 bg-slate-200 rounded skeleton w-24"></div></td>
+                  <td className="px-5 py-4"><div className="h-4 bg-slate-200 rounded skeleton w-16"></div></td>
+                  <td className="px-5 py-4"><div className="h-6 bg-slate-200 rounded-full skeleton w-20"></div></td>
+                  <td className="px-5 py-4 text-right"><div className="h-6 bg-slate-200 rounded skeleton w-8 ml-auto"></div></td>
+                </tr>
+              ))
+            )}
+            {!isLoading && inspections.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-5 py-8 text-center text-xs text-slate-400">
-                  {language === "hi" ? "कोई निरीक्षण उपलब्ध नहीं है" : "No inspections available"}
+                <td colSpan={6} className="px-5 py-8 text-center text-slate-500 font-mono text-xs">
+                  {language === "hi" ? "कोई निरीक्षण मामले उपलब्ध नहीं।" : "No inspection cases found."}
                 </td>
               </tr>
             )}
@@ -99,13 +115,13 @@ export const InspectionTable: React.FC<InspectionTableProps> = ({ inspections, c
                 <tr
                   key={item.id}
                   onClick={() => navigate(`/inspections/${item.id}`)}
-                  className="group hover:bg-slate-50/80 transition-colors cursor-pointer"
+                  className="group hover:bg-slate-50/80 transition-all duration-200 cursor-pointer row-expand-enter-active hover:shadow-sm"
                 >
-                  <td className="px-5 py-3.5">
+                  <td className="px-5 py-3.5 sticky left-0 bg-white group-hover:bg-slate-50/90 z-10 transition-colors shadow-[1px_0_0_rgba(226,232,240,1)]">
                     <div className="flex items-start gap-2">
                       <div>
                         <div className="flex items-center gap-2">
-                          <p className="font-bold text-xs text-slate-900 group-hover:text-govNavy">
+                          <p className="font-bold text-xs text-slate-900 group-hover:text-govNavy transition-colors">
                             {item.productName}
                           </p>
                           {item.hasConflicts && (
@@ -132,7 +148,7 @@ export const InspectionTable: React.FC<InspectionTableProps> = ({ inspections, c
                     </div>
                   </td>
                   <td className="px-5 py-3.5">
-                    <div className="flex items-center gap-1.5 text-xs text-slate-600">
+                    <div className="flex items-center gap-1.5 text-xs text-slate-600 tabular-nums">
                       <CalendarDays size={13} className="text-slate-400 shrink-0" />
                       <span>{formatDate(item.createdAt)}</span>
                     </div>
@@ -140,14 +156,14 @@ export const InspectionTable: React.FC<InspectionTableProps> = ({ inspections, c
                   <td className="px-5 py-3.5">
                     <div className="w-24">
                       <div className="flex items-center justify-between text-[10px] font-bold text-slate-700">
-                        <span>{confPct}%</span>
+                        <span className="tabular-nums">{confPct}%</span>
                         <span className="text-[9px] font-normal text-slate-400">
                           {language === "hi" ? "सेंसर" : "sensor"}
                         </span>
                       </div>
                       <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-slate-100 border border-slate-200">
                         <div
-                          className={`h-full rounded-full ${
+                          className={`h-full rounded-full transition-all duration-700 ease-out ${
                             confPct >= 90
                               ? "bg-emerald-500"
                               : confPct >= 75
@@ -163,14 +179,14 @@ export const InspectionTable: React.FC<InspectionTableProps> = ({ inspections, c
                     <VerdictBadge verdict={verdict} size="sm" />
                   </td>
                   <td className="px-5 py-3.5 text-right whitespace-nowrap">
-                    <div className="flex items-center justify-end gap-1.5">
+                    <div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           setCaseToDelete(item);
                         }}
-                        className="rounded-lg p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-colors"
+                        className="rounded-lg p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-colors btn-press"
                         title={language === "hi" ? "मामला डेटाबेस से हटाएं" : "Dispose & Delete Case from Database"}
                         aria-label={`Delete case ${item.caseNumber}`}
                       >
@@ -182,7 +198,7 @@ export const InspectionTable: React.FC<InspectionTableProps> = ({ inspections, c
                           e.stopPropagation();
                           navigate(`/inspections/${item.id}`);
                         }}
-                        className="rounded-lg p-1.5 text-slate-400 hover:bg-govNavy/10 hover:text-govNavy transition-colors"
+                        className="rounded-lg p-1.5 text-slate-400 hover:bg-govNavy/10 hover:text-govNavy transition-colors btn-press"
                         title={language === "hi" ? "निरीक्षण प्रकरण खोलें" : "Open Inspection Case"}
                       >
                         <ArrowRight size={16} />

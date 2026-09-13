@@ -665,6 +665,45 @@ Chunk 2: Resilient Caching & Queue Layer (`members/member-05-evidence/src/cache_
 ### Signing Note
 SIGNED OFF BY: Harsh Patel (anonymousgrouphp@gmail.com) — 2026-09-13 12:45 IST [VERIFIED]
 
+---
+
+## [13 September 2026] [17:05] IST
+
+### Task / Chunk
+Real Physical Packaging Validation Dataset Calibration & Benchmark (SIH 2026 Ground Truth Matrix across 7 Categories).
+
+### Status
+COMPLETE
+
+### Completed
+- **Count Units Normalization:** Added `"number"`, `"numbers"` to `RECOGNIZED_VALID_UNITS` and normalized to statutory count unit `"N"`, directly fixing extraction for Fastrack Watch (`"01 NUMBER"`).
+- **Flexible MRP Syntax:** Made colon and separator flexible around tax inclusivity clauses in `parse_mrp` (`p1`), enabling robust extraction of `MRP ₹ (incl. of all taxes) : 399.00` on cosmetic/perfume packaging (Bella Vita Rosé).
+- **Trailing & Parenthetical MRP Pattern:** Added `p1c` pattern to capture amounts preceding parenthetical MRP clauses (e.g. `RS. 260. 00 (MRP Rs. Incl. of all taxes and USP, see below:)` on Himalaya Brahmi Wellness).
+- **Inverted USP Syntax:** Added `p1_inv` pattern to support inverted rate syntax where metric unit precedes rate amount (e.g. `USP ₹/ml : 19.95` on Bella Vita, `USP Rs./g : 0.25`).
+- **Compound Corporate Suffix Hierarchy:** Updated `corp_suffix_re` in `parse_address` to prioritize compound corporate expressions (`Company Limited`, `Co. Limited`) over standalone words, preserving complete entity names for `TITAN COMPANY LIMITED` while capturing non-limited entities like `Himalaya Wellness Company`.
+- **Benchmark Test Suite:** Created `members/member-03-extraction/tests/test_physical_dataset_benchmark.py` validating 100% extraction and rule evaluation accuracy across all 7 physical packaging commodities (Watch, Brahmi Wellness, Face Wash, Perfume, Haldiram's Namkeen, Chia Seeds, and GOBOULT Earbuds).
+
+### Tests
+- `python -m pytest members/member-03-extraction/tests/test_physical_dataset_benchmark.py -v` (14 passed in 0.20s)
+- `python -m pytest members/member-03-extraction/tests/ members/member-04-rule-engine/tests/ members/member-05-evidence/tests/ -v` (312 passed in 42.37s)
+- `npm test -- --run` in `ui-combined` (146 passed in 2.58s)
+- `node build-root.cjs` (built successfully in 10.48s)
+
+### Problems
+None. All 7 real-world items passed extraction, normalization, and statutory legal evaluation with 100% precision.
+
+### Decisions
+1. `01 NUMBER` on lifestyle and durables packaging is legally recognized as a count unit per LMPC Rules 2011 Second Schedule and normalized to `N`.
+2. Packages with net quantity of 1 unit (`1.0 N` or `1.0 U`) are statutorily exempt from declaring Unit Sale Price under Rule 6(1)(k) second proviso / G.S.R. 779(E).
+3. Inverted rate declarations (`USP ₹/ml : 19.95`) are legally compliant under Rule 6(1)(k) provided the arithmetic unit rate matches the declared net quantity and MRP.
+
+### Next Step
+Synchronize git branch with `origin main` and `origin dev` and review live deployment telemetry.
+
+### Signing Note
+SIGNED OFF BY: Harsh Patel (anonymousgrouphp@gmail.com) — 2026-09-13 17:05 IST [VERIFIED]
+
+
 
 
 

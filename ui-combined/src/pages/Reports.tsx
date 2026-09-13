@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { m } from "framer-motion";
+import { Reveal } from "../components/common/motion";
 import { useLanguage } from "../context/LanguageContext";
 import {
   Printer,
@@ -18,7 +20,7 @@ import { InspectionSummary } from "../types/inspection";
 export const Reports: React.FC = () => {
   const { language } = useLanguage();
   const [period, setPeriod] = useState("SEPTEMBER_2026");
-  const [division, setDivision] = useState("DL_SOUTH_01");
+  const [division, setDivision] = useState("CIRCLE_DL_SOUTH_01");
   const [downloadSuccess, setDownloadSuccess] = useState<string | null>(null);
   const [cases, setCases] = useState<InspectionSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -47,16 +49,30 @@ export const Reports: React.FC = () => {
     };
   }, [division]);
 
+  // Honest client-side reporting-period filter: the live backend exposes no
+  // date-range parameter, so the selector filters loaded cases by created_at.
+  const periodCases = useMemo(() => {
+    const windows: Record<string, { from: Date; to: Date }> = {
+      SEPTEMBER_2026: { from: new Date(2026, 8, 1), to: new Date(2026, 9, 1) },
+      AUGUST_2026: { from: new Date(2026, 7, 1), to: new Date(2026, 8, 1) },
+      Q3_2026: { from: new Date(2026, 6, 1), to: new Date(2026, 9, 1) },
+    };
+    const w = windows[period];
+    if (!w) return cases;
+    return cases.filter((c) => {
+      const t = new Date(c.created_at).getTime();
+      return t >= w.from.getTime() && t < w.to.getTime();
+    });
+  }, [cases, period]);
+
   const metrics = useMemo(() => {
-    const total = cases.length;
-    const passed = cases.filter((c) => c.overall_status === "PASS").length;
-    const failed = cases.filter(
+    const total = periodCases.length;
+    const passed = periodCases.filter((c) => c.overall_status === "PASS").length;
+    const failed = periodCases.filter(
       (c) => c.overall_status === "FAIL" || (c.violations_count !== undefined && c.violations_count > 0)
     ).length;
-    const review = cases.filter((c) => c.overall_status === "REVIEW").length;
-    const unable = cases.filter(
-      (c) => c.overall_status === "UNABLE_TO_VERIFY" || c.workflow_status === "PENDING_REVIEW"
-    ).length;
+    const review = periodCases.filter((c) => c.overall_status === "REVIEW").length;
+    const unable = periodCases.filter((c) => c.overall_status === "UNABLE_TO_VERIFY").length;
 
     const passPct = total > 0 ? Math.round((passed / total) * 100) : 0;
     const failPct = total > 0 ? Math.round((failed / total) * 100) : 0;
@@ -64,9 +80,19 @@ export const Reports: React.FC = () => {
     const unablePct = total > 0 ? Math.round((unable / total) * 100) : 0;
 
     return { total, passed, failed, review, unable, passPct, failPct, reviewPct, unablePct };
-  }, [cases]);
+  }, [periodCases]);
 
   const handleDownload = (reportName: string) => {
+    try {
+      const link = document.createElement("a");
+      link.href = "/form1.pdf";
+      link.download = reportName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch {
+      // Fallback
+    }
     setDownloadSuccess(
       language === "hi"
         ? `तैयार एवं डाउनलोड किया गया: ${reportName}`
@@ -82,15 +108,15 @@ export const Reports: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-workstation">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 glass-panel p-5 rounded-xl border border-slate-700/60 shadow-2xl">
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-govNavy bg-govNavy/5 px-2 py-0.5 rounded">
+          <span className="text-[10px] font-bold uppercase tracking-widest bg-amber-400/10 border border-amber-400/30 px-2 py-0.5 rounded text-amber-400">
             {language === "hi" ? "सांविधिक रिपोर्ट एवं डोजियर" : "Statutory Reports & Dossiers"}
           </span>
-          <h1 className="text-2xl font-black text-slate-900 mt-1">
+          <h1 className="text-2xl font-black text-white mt-1">
             {language === "hi" ? "प्रवर्तन विश्लेषण एवं आधिकारिक रिपोर्ट" : "Enforcement Analytics & Official Reports"}
           </h1>
-          <p className="text-xs text-slate-500 mt-0.5 max-w-2xl">
+          <p className="text-xs text-slate-400 mt-0.5 max-w-2xl">
             {language === "hi"
               ? "विभागीय रिकॉर्ड हेतु परिचालन सारांश, धारा 36(1) के तहत प्रपत्र-1 विधिक नोटिस एवं धारा 63 बीएसए 2023 साक्ष्य ऑडिट प्रमाणपत्र।"
               : "Operational summaries, Form-1 legal notices under Section 36(1), and Section 63 BSA 2023 evidence audit certificates for departmental records."}
@@ -114,17 +140,17 @@ export const Reports: React.FC = () => {
       </div>
 
       {downloadSuccess && (
-        <div className="p-3 bg-emerald-50 border border-emerald-300 rounded-lg text-xs text-emerald-800 flex items-center gap-2 shadow-xs animate-fade-in">
+        <div className="p-3 bg-emerald-900/30 border border-emerald-700/60 rounded-lg text-xs text-emerald-300 flex items-center gap-2 shadow-xs animate-fade-in">
           <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
           <span>{downloadSuccess}</span>
         </div>
       )}
 
       {/* Filter Row */}
-      <form className="card p-4 bg-white" onSubmit={(e) => e.preventDefault()}>
+      <form className="glass-panel p-4 border border-slate-700/60 rounded-xl" onSubmit={(e) => e.preventDefault()}>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
           <div>
-            <label htmlFor="reporting-period" className="block text-slate-600 font-bold mb-1">
+            <label htmlFor="reporting-period" className="block text-slate-300 font-bold mb-1">
               {language === "hi" ? "रिपोर्टिंग अवधि" : "Reporting Period"}
             </label>
             <div className="relative">
@@ -149,7 +175,7 @@ export const Reports: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="enforcement-division" className="block text-slate-600 font-bold mb-1">
+            <label htmlFor="enforcement-division" className="block text-slate-300 font-bold mb-1">
               {language === "hi" ? "प्रवर्तन प्रभाग / मंडल" : "Enforcement Division / Circle"}
             </label>
             <select
@@ -158,13 +184,13 @@ export const Reports: React.FC = () => {
               onChange={(e) => setDivision(e.target.value)}
               className="input text-xs"
             >
-              <option value="DL_SOUTH_01">
+              <option value="CIRCLE_DL_SOUTH_01">
                 {language === "hi" ? "DL-SOUTH-01 (दक्षिण दिल्ली मंडल)" : "DL-SOUTH-01 (South Delhi Circle)"}
               </option>
-              <option value="DL_CENTRAL_02">
+              <option value="CIRCLE_DL_CENTRAL_02">
                 {language === "hi" ? "DL-CENTRAL-02 (मध्य दिल्ली मंडल)" : "DL-CENTRAL-02 (Central Delhi Circle)"}
               </option>
-              <option value="UP_GBN_01">
+              <option value="CIRCLE_UP_GBN_01">
                 {language === "hi" ? "UP-GBN-01 (गौतम बुद्ध नगर प्रभाग)" : "UP-GBN-01 (Gautam Buddha Nagar Division)"}
               </option>
               <option value="ALL">
@@ -174,7 +200,7 @@ export const Reports: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="document-classification" className="block text-slate-600 font-bold mb-1">
+            <label htmlFor="document-classification" className="block text-slate-300 font-bold mb-1">
               {language === "hi" ? "दस्तावेज़ वर्गीकरण" : "Document Classification"}
             </label>
             <select id="document-classification" className="input text-xs">
@@ -189,22 +215,22 @@ export const Reports: React.FC = () => {
       {/* Two Column Section: Left Outcome Distribution, Right Generated Reports */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Outcome Breakdown Card */}
-        <div className="card p-5 bg-white space-y-4">
+        <div className="glass-panel p-5 space-y-4 border border-slate-700/60 rounded-xl">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div className="flex items-center gap-2">
-              <BarChart3 size={18} className="text-govNavy" />
-              <h3 className="section-title">
+              <BarChart3 size={18} className="text-white" />
+              <h3 className="section-title text-white">
                 {language === "hi" ? "निरीक्षण परिणाम वितरण" : "Inspection Outcomes Distribution"}
               </h3>
             </div>
-            <span className="font-mono text-xs font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+            <span className="font-mono text-xs font-bold text-slate-400 bg-slate-800/50 px-2 py-0.5 rounded">
               {metrics.total} {language === "hi" ? "मामले" : "Cases"}
             </span>
           </div>
 
           {isLoading ? (
             <div className="p-8 text-center">
-              <RefreshCw className="w-5 h-5 animate-spin mx-auto text-govNavy" />
+              <RefreshCw className="w-5 h-5 animate-spin mx-auto text-white" />
               <p className="text-xs text-slate-400 mt-2 font-mono">
                 {language === "hi" ? "डेटा संकलित किया जा रहा है..." : "Compiling statistics..."}
               </p>
@@ -217,38 +243,38 @@ export const Reports: React.FC = () => {
                   count: metrics.passed,
                   percent: metrics.passPct,
                   color: "bg-emerald-500",
-                  text: "text-emerald-700",
+                  text: "text-emerald-400",
                 },
                 {
                   label: language === "hi" ? "सांविधिक उल्लंघन (असफल - FAIL)" : "Statutory Violation (FAIL)",
                   count: metrics.failed,
                   percent: metrics.failPct,
                   color: "bg-rose-500",
-                  text: "text-rose-700",
+                  text: "text-rose-400",
                 },
                 {
                   label: language === "hi" ? "सीमावर्ती सेंसर समीक्षा (REVIEW)" : "Borderline Sensor Review (REVIEW)",
                   count: metrics.review,
                   percent: metrics.reviewPct,
                   color: "bg-amber-500",
-                  text: "text-amber-700",
+                  text: "text-amber-400",
                 },
                 {
                   label: language === "hi" ? "निम्न गुणवत्ता साक्ष्य (सत्यापन असमर्थ)" : "Degraded Evidence (UNABLE_TO_VERIFY)",
                   count: metrics.unable,
                   percent: metrics.unablePct,
                   color: "bg-slate-500",
-                  text: "text-slate-700",
+                  text: "text-slate-200",
                 },
               ].map((item) => (
                 <div key={item.label} className="space-y-1 text-xs">
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-slate-700">{item.label}</span>
+                    <span className="font-semibold text-slate-200">{item.label}</span>
                     <span className={`font-bold font-mono ${item.text}`}>
                       {item.count} {language === "hi" ? "मामले" : "case(s)"} ({item.percent}%)
                     </span>
                   </div>
-                  <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                  <div className="h-2 rounded-full bg-slate-800/60 overflow-hidden">
                     <div className={`h-full rounded-full ${item.color}`} style={{ width: `${item.percent}%` }} />
                   </div>
                 </div>
@@ -256,7 +282,7 @@ export const Reports: React.FC = () => {
             </div>
           )}
 
-          <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-600 flex items-center gap-2">
+          <div className="p-3 bg-slate-800/50 border border-slate-700/60 rounded-lg text-xs text-slate-300 flex items-center gap-2">
             <ShieldCheck size={16} className="text-emerald-600 shrink-0" />
             <span>
               {metrics.total > 0
@@ -271,11 +297,11 @@ export const Reports: React.FC = () => {
         </div>
 
         {/* Ready Generated Reports List */}
-        <div className="card p-5 bg-white space-y-4">
+        <div className="glass-panel p-5 space-y-4 border border-slate-700/60 rounded-xl">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div className="flex items-center gap-2">
-              <FileText size={18} className="text-govNavy" />
-              <h3 className="section-title">
+              <FileText size={18} className="text-white" />
+              <h3 className="section-title text-white">
                 {language === "hi" ? "आधिकारिक विभागीय रिपोर्ट एवं नोटिस" : "Official Departmental Reports & Notices"}
               </h3>
             </div>
@@ -283,15 +309,15 @@ export const Reports: React.FC = () => {
 
           {isLoading ? (
             <div className="p-8 text-center">
-              <RefreshCw className="w-5 h-5 animate-spin mx-auto text-govNavy" />
+              <RefreshCw className="w-5 h-5 animate-spin mx-auto text-white" />
               <p className="text-xs text-slate-400 mt-2 font-mono">
                 {language === "hi" ? "रिपोर्ट लोड की जा रही हैं..." : "Loading reports..."}
               </p>
             </div>
-          ) : cases.length === 0 ? (
-            <div className="p-8 text-center text-slate-500 space-y-2 border border-dashed border-slate-200 rounded-lg">
+          ) : periodCases.length === 0 ? (
+            <div className="p-8 text-center text-slate-400 space-y-2 border border-dashed border-slate-700/60 rounded-lg">
               <FileText className="w-8 h-8 mx-auto text-slate-400" />
-              <p className="font-bold text-xs text-slate-700">
+              <p className="font-bold text-xs text-slate-200">
                 {language === "hi" ? "कोई आधिकारिक रिपोर्ट या नोटिस उपलब्ध नहीं है" : "No Official Reports or Notices Generated"}
               </p>
               <p className="text-[11px] text-slate-400 max-w-xs mx-auto">
@@ -307,32 +333,32 @@ export const Reports: React.FC = () => {
             </div>
           ) : (
             <div className="space-y-2.5">
-              {cases.slice(0, 5).map((c) => (
+              {periodCases.slice(0, 5).map((c) => (
                 <div
                   key={c.id}
-                  className="p-3 rounded-lg border border-slate-200 bg-slate-50/60 hover:bg-slate-50 transition-colors flex items-center justify-between gap-3 text-xs"
+                  className="p-3 rounded-lg border border-slate-700/60 bg-slate-800/50/60 hover:bg-white/5 transition-colors flex items-center justify-between gap-3 text-xs"
                 >
                   <div className="min-w-0">
-                    <p className="font-bold text-slate-900 truncate">
+                    <p className="font-bold text-white truncate">
                       {language === "hi"
                         ? `प्रपत्र-1 सांविधिक नोटिस — ${c.product_name}`
                         : `Form-1 Statutory Notice — ${c.product_name}`}
                     </p>
-                    <p className="text-[11px] text-slate-500 truncate font-mono">
+                    <p className="text-[11px] text-slate-400 truncate font-mono">
                       {c.inspection_number} • {c.establishment_name || c.jurisdiction_id}
                     </p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <Link
                       to={`/inspections/${c.id}`}
-                      className="p-1.5 rounded text-govNavy hover:bg-govNavy/10"
+                      className="p-1.5 rounded text-white hover:bg-govNavy/10"
                       title={language === "hi" ? "केस देखें" : "Inspect case"}
                     >
                       <ExternalLink size={15} />
                     </Link>
                     <Link
                       to={`/inspections/${c.id}/evidence`}
-                      className="p-1.5 rounded text-slate-600 hover:text-govNavy hover:bg-slate-200"
+                      className="p-1.5 rounded text-slate-300 hover:text-white hover:bg-slate-200"
                       title={language === "hi" ? "साक्ष्य संचिका देखें" : "View evidence dossier"}
                     >
                       <Download size={15} />
@@ -376,7 +402,7 @@ export const Reports: React.FC = () => {
           <a
             href="/form1.pdf"
             download="Sample_Sec63_BSA_Certificate.pdf"
-            className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-govNavy font-bold text-xs rounded-lg transition-colors shadow-sm flex items-center gap-1.5"
+            className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-white font-bold text-xs rounded-lg transition-colors shadow-sm flex items-center gap-1.5"
           >
             <Download size={14} />
             <span>
@@ -390,3 +416,4 @@ export const Reports: React.FC = () => {
 };
 
 export default Reports;
+

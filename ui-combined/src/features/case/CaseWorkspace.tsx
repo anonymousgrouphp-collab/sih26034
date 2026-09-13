@@ -375,10 +375,10 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
 
   const canvasImages: CanvasImageItem[] = useMemo(() => {
     const normalizeUrl = (u?: string, imgId?: string) => {
-      if (!u) return imgId ? `https://nyayadrishti-backend.onrender.com/api/v1/evidence/image/${imgId}` : "";
+      if (!u) return imgId ? `/api/v1/evidence/image/${imgId}` : "";
       if (u.startsWith("http://") || u.startsWith("https://") || u.startsWith("data:") || u.startsWith("blob:")) return u;
       if (u.startsWith("uploads/") || u.startsWith("/uploads/")) {
-        return `/storage/${u.replace(/^\//, "")}`;
+        return imgId ? `/api/v1/evidence/image/${imgId}` : `/storage/${u.replace(/^\//, "")}`;
       }
       if (u.startsWith("/")) return u;
       return `/${u}`;
@@ -805,7 +805,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                 </Link>
               </div>
 
-              <span className="text-[11px] font-mono text-slate-500 pr-2 hidden xl:inline font-semibold shrink-0">
+              <span className="text-[11px] font-mono text-slate-500 pr-2 hidden 2xl:inline font-semibold shrink-0">
                 {caseData.rule_evaluations.length} {language === "hi" ? "सांविधिक निष्कर्ष मूल्यांकित" : "statutory findings evaluated"}
               </span>
             </div>
@@ -862,7 +862,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                       title={language === "hi" ? "केस आईडी कॉपी करने हेतु क्लिक करें" : "Click to copy Case ID"}
                     >
                       {copiedId ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
-                      <span>{caseData.id}</span>
+                      <span className="max-w-[160px] xl:max-w-[220px] truncate">{caseData.id}</span>
                     </button>
                   </div>
                 </div>

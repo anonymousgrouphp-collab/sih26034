@@ -16,7 +16,7 @@ export const GovFooter: React.FC = () => {
       <div className="w-full max-w-[1750px] mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 pb-8 border-b border-slate-700/60">
           {/* Column 1 (4 cols): State Emblem & Ministry Authority */}
-          <div className="lg:col-span-4 space-y-4">
+          <div className="lg:col-span-4 space-y-4 border-t border-transparent hover:border-amber-400/60 transition-colors duration-300 pt-2 -mt-2">
             <div className="flex items-start gap-3.5">
               {/* Sole Sovereign National Emblem of India (Ashoka Lion Capital) — Unboxed & Independent */}
               <StateEmblem size={38} tone="white" showMotto={true} className="shrink-0 mt-0.5" />
@@ -54,27 +54,55 @@ export const GovFooter: React.FC = () => {
               {language === "hi" ? "सांविधिक अधिनियम एवं नियम" : "Statutory Enactments & Acts"}
             </h4>
             <ul className="space-y-2 text-xs text-slate-300">
-              <li className="flex items-center gap-2">
+              <li className="flex items-center gap-2 group relative">
                 <CheckCircle2 size={13} className="text-amber-400 shrink-0" />
-                <span>{language === "hi" ? "विधिक मापविज्ञान अधिनियम, 2009" : "The Legal Metrology Act, 2009"}</span>
+                <Link
+                  to="/statutory/legal-metrology-act-2009"
+                  className="hover:text-amber-300 transition-colors relative"
+                >
+                  {language === "hi" ? "विधिक मापविज्ञान अधिनियम, 2009" : "The Legal Metrology Act, 2009"}
+                  <span className="absolute bottom-0 left-0 h-px w-0 bg-amber-400 transition-all duration-200 group-hover:w-full" />
+                </Link>
               </li>
-              <li className="flex items-center gap-2">
+              <li className="flex items-center gap-2 group relative">
                 <CheckCircle2 size={13} className="text-amber-400 shrink-0" />
-                <span>{language === "hi" ? "एलएमपीसी नियम, 2011 (यथा संशोधित 2024)" : "LMPC Rules, 2011 (As Amended 2024)"}</span>
+                <Link
+                  to="/statutory/lmpc-rules-2011"
+                  className="hover:text-amber-300 transition-colors relative"
+                >
+                  {language === "hi" ? "एलएमपीसी नियम, 2011 (यथा संशोधित 2024)" : "LMPC Rules, 2011 (As Amended 2024)"}
+                  <span className="absolute bottom-0 left-0 h-px w-0 bg-amber-400 transition-all duration-200 group-hover:w-full" />
+                </Link>
               </li>
-              <li className="flex items-center gap-2">
+              <li className="flex items-center gap-2 group relative">
                 <CheckCircle2 size={13} className="text-emerald-400 shrink-0" />
-                <span className="font-bold text-white">
+                <Link
+                  to="/statutory/section-63-bsa-2023"
+                  className="font-bold text-white hover:text-amber-300 transition-colors relative"
+                >
                   {language === "hi" ? "धारा 63 बीएसए 2023 (साक्ष्य ग्राह्यता)" : "Section 63 BSA 2023 (Admissibility)"}
-                </span>
+                  <span className="absolute bottom-0 left-0 h-px w-0 bg-amber-400 transition-all duration-200 group-hover:w-full" />
+                </Link>
               </li>
-              <li className="flex items-center gap-2">
+              <li className="flex items-center gap-2 group relative">
                 <CheckCircle2 size={13} className="text-amber-400 shrink-0" />
-                <span>{language === "hi" ? "ई-कॉमर्स अनुपालन जीएसआर 594(E)" : "E-Commerce Compliance GSR 594(E)"}</span>
+                <Link
+                  to="/statutory/ecommerce-rule-6-10"
+                  className="hover:text-amber-300 transition-colors relative"
+                >
+                  {language === "hi" ? "ई-कॉमर्स अनुपालन जीएसआर 629(ई)" : "E-Commerce Compliance GSR 629(E)"}
+                  <span className="absolute bottom-0 left-0 h-px w-0 bg-amber-400 transition-all duration-200 group-hover:w-full" />
+                </Link>
               </li>
-              <li className="flex items-center gap-2">
+              <li className="flex items-center gap-2 group relative">
                 <CheckCircle2 size={13} className="text-amber-400 shrink-0" />
-                <span>{language === "hi" ? "इकाई विक्रय मूल्य अधिदेश जीएसआर 779(E)" : "Unit Sale Price Mandate GSR 779(E)"}</span>
+                <Link
+                  to="/statutory/usp-gsr-779e"
+                  className="hover:text-amber-300 transition-colors relative"
+                >
+                  {language === "hi" ? "इकाई विक्रय मूल्य अधिदेश जीएसआर 779(ई)" : "Unit Sale Price Mandate GSR 779(E)"}
+                  <span className="absolute bottom-0 left-0 h-px w-0 bg-amber-400 transition-all duration-200 group-hover:w-full" />
+                </Link>
               </li>
             </ul>
           </div>
@@ -85,59 +113,68 @@ export const GovFooter: React.FC = () => {
               {language === "hi" ? "राष्ट्रीय अंतःक्रियाशीलता" : "National Interoperability"}
             </h4>
             <ul className="space-y-2 text-xs text-slate-300">
-              <li>
+              <li className="group relative inline-block">
                 <a
                   href="https://emaap.gov.in/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 hover:text-amber-300 transition-colors"
+                  className="flex items-center gap-1.5 hover:text-amber-300 transition-colors relative pb-0.5"
                 >
                   <ExternalLink size={13} className="text-slate-400" />
                   <span>{language === "hi" ? "ई-माप (राष्ट्रीय विधिक मापविज्ञान पोर्टल)" : "e-Maap (National LM Portal)"}</span>
+                  <span className="absolute bottom-0 left-0 h-px w-0 bg-amber-400 transition-all duration-200 group-hover:w-full" />
                 </a>
               </li>
-              <li>
+              <br/>
+              <li className="group relative inline-block">
                 <a
                   href="https://consumeraffairs.nic.in/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 hover:text-amber-300 transition-colors"
+                  className="flex items-center gap-1.5 hover:text-amber-300 transition-colors relative pb-0.5"
                 >
                   <ExternalLink size={13} className="text-slate-400" />
                   <span>{language === "hi" ? "उपभोक्ता मामले विभाग आधिकारिक पोर्टल" : "DoCA Official Portal"}</span>
+                  <span className="absolute bottom-0 left-0 h-px w-0 bg-amber-400 transition-all duration-200 group-hover:w-full" />
                 </a>
               </li>
-              <li>
+              <br/>
+              <li className="group relative inline-block">
                 <a
                   href="https://egazette.gov.in/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 hover:text-amber-300 transition-colors"
+                  className="flex items-center gap-1.5 hover:text-amber-300 transition-colors relative pb-0.5"
                 >
                   <ExternalLink size={13} className="text-slate-400" />
                   <span>{language === "hi" ? "भारत का ई-राजपत्र" : "e-Gazette of India"}</span>
+                  <span className="absolute bottom-0 left-0 h-px w-0 bg-amber-400 transition-all duration-200 group-hover:w-full" />
                 </a>
               </li>
-              <li>
+              <br/>
+              <li className="group relative inline-block">
                 <a
                   href="https://consumerhelpline.gov.in/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 hover:text-amber-300 transition-colors"
+                  className="flex items-center gap-1.5 hover:text-amber-300 transition-colors relative pb-0.5"
                 >
                   <ExternalLink size={13} className="text-slate-400" />
                   <span>{language === "hi" ? "राष्ट्रीय उपभोक्ता हेल्पलाइन (एनसीएच - 1915)" : "National Consumer Helpline (NCH - 1915)"}</span>
+                  <span className="absolute bottom-0 left-0 h-px w-0 bg-amber-400 transition-all duration-200 group-hover:w-full" />
                 </a>
               </li>
-              <li>
+              <br/>
+              <li className="group relative inline-block">
                 <a
                   href="https://india.gov.in/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 hover:text-amber-300 transition-colors"
+                  className="flex items-center gap-1.5 hover:text-amber-300 transition-colors relative pb-0.5"
                 >
                   <ExternalLink size={13} className="text-slate-400" />
                   <span>{language === "hi" ? "भारत का राष्ट्रीय पोर्टल (india.gov.in)" : "National Portal of India (india.gov.in)"}</span>
+                  <span className="absolute bottom-0 left-0 h-px w-0 bg-amber-400 transition-all duration-200 group-hover:w-full" />
                 </a>
               </li>
             </ul>
@@ -149,25 +186,35 @@ export const GovFooter: React.FC = () => {
               {language === "hi" ? "मानक एवं सुरक्षा" : "Standards & Security"}
             </h4>
             <div className="space-y-2 text-[11px] font-mono text-slate-300">
-              <div className="p-2 rounded bg-slate-800/80 border border-slate-700 flex items-center gap-2">
-                <ShieldCheck size={16} className="text-emerald-400 shrink-0" />
-                <div>
-                  <div className="font-bold text-white">GIGW 3.0</div>
-                  <div className="text-[9.5px] text-slate-400">
-                    {language === "hi" ? "सरकारी वेबसाइट मानक" : "Govt Website Standard"}
+              <Link
+                to="/standards/gigw-3-0"
+                className="group block p-2 rounded bg-slate-800/80 border border-slate-700 hover:border-emerald-400/50 hover:bg-slate-800 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <ShieldCheck size={16} className="text-emerald-400 shrink-0" />
+                  <div>
+                    <div className="font-bold text-white group-hover:text-emerald-300 transition-colors">GIGW 3.0</div>
+                    <div className="text-[9.5px] text-slate-400">
+                      {language === "hi" ? "सरकारी वेबसाइट मानक" : "Govt Website Standard"}
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Link>
 
-              <div className="p-2 rounded bg-slate-800/80 border border-slate-700 flex items-center gap-2">
-                <Lock size={16} className="text-amber-400 shrink-0" />
-                <div>
-                  <div className="font-bold text-white">SHA-256 Merkle</div>
-                  <div className="text-[9.5px] text-slate-400">
-                    {language === "hi" ? "धारा 63 बीएसए श्रृंखला" : "Section 63 BSA Chain"}
+              <Link
+                to="/standards/sha256-merkle-chain"
+                className="group block p-2 rounded bg-slate-800/80 border border-slate-700 hover:border-amber-400/50 hover:bg-slate-800 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <Lock size={16} className="text-amber-400 shrink-0" />
+                  <div>
+                    <div className="font-bold text-white group-hover:text-amber-300 transition-colors">SHA-256 Merkle</div>
+                    <div className="text-[9.5px] text-slate-400">
+                      {language === "hi" ? "धारा 63 बीएसए श्रृंखला" : "Section 63 BSA Chain"}
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             </div>
           </div>
         </div>
@@ -217,13 +264,48 @@ export const GovFooter: React.FC = () => {
               ? "आधिकारिक इलेक्ट्रॉनिक प्रवर्तन प्रणाली • संस्करण 1.0.0-SIH26034"
               : "Official Electronic Enforcement System • Version 1.0.0-SIH26034"}
           </div>
-          <div className="mt-1 sm:mt-0">
-            {language === "hi"
-              ? "अंतिम अद्यतन: 11 सितंबर 2026 | सर्वर समय: भारतीय मानक समय (UTC+05:30)"
-              : "Last Updated: 11 September 2026 | Server Time: IST (UTC+05:30)"}
+          <div className="mt-1 sm:mt-0 flex gap-4">
+            <span>
+              {language === "hi"
+                ? "अंतिम अद्यतन: 11 सितंबर 2026"
+                : "Last Updated: 11 September 2026"}
+            </span>
+            <span className="font-bold text-slate-400">
+              <ISTClock language={language} />
+            </span>
           </div>
         </div>
       </div>
     </footer>
+  );
+};
+
+// Internal component for real-time IST clock
+const ISTClock: React.FC<{ language: string }> = ({ language }) => {
+  const [time, setTime] = React.useState<string>("");
+
+  React.useEffect(() => {
+    const updateClock = () => {
+      const now = new Date();
+      // Format to IST
+      const istTime = now.toLocaleTimeString(language === "hi" ? "hi-IN" : "en-IN", {
+        timeZone: "Asia/Kolkata",
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      });
+      setTime(istTime);
+    };
+
+    updateClock(); // Initial call
+    const timer = setInterval(updateClock, 1000);
+    return () => clearInterval(timer);
+  }, [language]);
+
+  return (
+    <>
+      {language === "hi" ? `सर्वर समय: ${time} IST (UTC+05:30)` : `Server Time: ${time} IST (UTC+05:30)`}
+    </>
   );
 };

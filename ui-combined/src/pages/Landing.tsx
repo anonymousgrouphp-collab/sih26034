@@ -66,7 +66,7 @@ export const Landing: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#0b1320] text-white flex flex-col font-sans">
       {/* Official GIGW 3.0 Top Utility Bar */}
       <GovTopBar />
 
@@ -101,6 +101,10 @@ export const Landing: React.FC = () => {
       {/* Main Hero Section Inspired by india.gov.in */}
       <main id="main-content" className="flex-1">
         <section className="relative overflow-hidden bg-[#071526] text-white pt-12 pb-24 sm:pt-16 sm:pb-32">
+          {/* Animated Radial Gradient Background */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-800/40 via-[#071526] to-[#071526] pointer-events-none" />
+          <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-500/10 blur-[120px] rounded-full mix-blend-screen pointer-events-none [animation:glowPulse_4s_ease-in-out_infinite]" />
+          
           {/* India Gate Dusk Architectural Vector Backdrop */}
           <IndiaGateHeroBackdrop />
 
@@ -139,7 +143,7 @@ export const Landing: React.FC = () => {
 
             {/* Sovereign Portal Title & Tagline */}
             <div className="space-y-3.5 max-w-4xl mx-auto">
-              <div className="inline-block">
+              <div className="inline-block animate-fade-up">
                 <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] text-white">
                   {t("hero.headline_1", "Evidence-Grade Package Compliance.")}
                   <span className="block text-amber-300 mt-1">
@@ -154,7 +158,7 @@ export const Landing: React.FC = () => {
                 </div>
               </div>
 
-              <p className="text-sm sm:text-base text-slate-200 max-w-3xl mx-auto leading-relaxed pt-1">
+              <p className="text-sm sm:text-base text-slate-200 max-w-3xl mx-auto leading-relaxed pt-1 animate-fade-up" style={{ animationDelay: "100ms" }}>
                 {t(
                   "hero.description",
                   "Empowering Legal Metrology Officers with automated optical quality gates, ArUco metric calibration, multilingual OCR (English + Hindi), Table-I numeral font schedule checks, and Section 63 BSA 2023 tamper-evident digital certificates."
@@ -163,22 +167,22 @@ export const Landing: React.FC = () => {
             </div>
 
             {/* Central Statutory Omnibox Search Engine (Signature Feature inspired by india.gov.in) */}
-            <div className="pt-2">
+            <div className="pt-2 animate-fade-up" style={{ animationDelay: "200ms" }}>
               <StatutoryOmnibox />
             </div>
 
             {/* Action CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-3">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-3 animate-fade-up" style={{ animationDelay: "300ms" }}>
               <Link
                 to="/dashboard"
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-govNavy px-6 py-3.5 text-sm font-black shadow-xl hover:shadow-amber-500/25 transition-all transform hover:-translate-y-0.5"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-govNavy px-6 py-3.5 text-sm font-black shadow-xl hover:shadow-amber-500/25 transition-all transform hover:-translate-y-0.5 btn-press"
               >
                 <span>{t("hero.cta_workstation", "Launch Officer Workstation")}</span>
                 <ArrowRight size={17} />
               </Link>
               <Link
                 to="/rules"
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/10 hover:bg-white/20 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-xs transition-all"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/10 hover:bg-white/20 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-xs transition-all btn-press"
               >
                 <span>{t("hero.cta_rules", "Statutory Rules & Table-I Schedule")}</span>
               </Link>
@@ -228,7 +232,7 @@ export const Landing: React.FC = () => {
         {/* Live Demonstration Snapshot & Packaging Calibration Preview */}
         <section className="py-12 bg-slate-50 border-b border-slate-200">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <Reveal className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-md">
+            <Reveal className="rounded-2xl border border-slate-700/60 bg-[#132238]/80 p-5 sm:p-6 shadow-md">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 pb-4 gap-3">
                 <div>
                   <div className="flex items-center gap-2">
@@ -315,7 +319,7 @@ export const Landing: React.FC = () => {
         </section>
 
         {/* National Metrology Infrastructure & e-Maap Operations Showcase */}
-        <section className="py-16 bg-slate-100/80 border-b border-slate-200">
+        <section className="py-16 bg-[#0d1a2d] border-b border-slate-800">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               {/* Officer Visual with Official Stamp Caption */}
@@ -402,7 +406,7 @@ export const Landing: React.FC = () => {
                 </div>
 
                 <div className="space-y-3 text-xs">
-                  <div className="p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs flex items-start gap-3">
+                  <div className="p-3.5 rounded-xl bg-[#132238] border border-slate-700/60 shadow-xs flex items-start gap-3">
                     <div className="p-2 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 shrink-0">
                       <ExternalLink size={16} />
                     </div>
@@ -423,7 +427,7 @@ export const Landing: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs flex items-start gap-3">
+                  <div className="p-3.5 rounded-xl bg-[#132238] border border-slate-700/60 shadow-xs flex items-start gap-3">
                     <div className="p-2 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 shrink-0">
                       <ShieldCheck size={16} />
                     </div>
@@ -446,7 +450,7 @@ export const Landing: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs flex items-start gap-3">
+                  <div className="p-3.5 rounded-xl bg-[#132238] border border-slate-700/60 shadow-xs flex items-start gap-3">
                     <div className="p-2 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 shrink-0">
                       <Scale size={16} />
                     </div>
@@ -497,12 +501,12 @@ export const Landing: React.FC = () => {
         </section>
 
         {/* Interactive 5-Stage Statutory Pipeline Infographic */}
-        <section className="py-16 bg-white border-b border-slate-200">
+        <section className="py-16 bg-[#0b1320] border-b border-slate-800">
           <StatutoryPipelineInfographic />
         </section>
 
         {/* 4-Stage Statutory Flow */}
-        <section className="py-16 bg-white border-b border-slate-200">
+        <section className="py-16 bg-[#0b1320] border-b border-slate-800">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto mb-12">
               <span className="text-xs font-bold uppercase tracking-widest text-govNavy">
@@ -567,18 +571,18 @@ export const Landing: React.FC = () => {
         </section>
 
         {/* Feature Highlights Grid */}
-        <section className="py-16 bg-slate-50">
+        <section className="py-16 bg-[#0B1727] border-t border-slate-800">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid gap-6 md:grid-cols-3">
               {highlights.map((item, idx) => {
                 const Icon = item.icon;
                 return (
-                  <Reveal key={item.title} delay={idx * 0.06} className="card card-lift p-6 space-y-3 bg-white">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-govNavy/10 text-govNavy">
+                  <Reveal key={item.title} delay={idx * 0.06} className="glass-panel card-lift p-6 space-y-3 rounded-2xl border border-slate-700/60 shadow-xl">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-400/10 text-amber-400 border border-amber-400/20">
                       <Icon size={22} />
                     </div>
-                    <h4 className="font-extrabold text-base text-slate-900">{item.title}</h4>
-                    <p className="text-xs text-slate-600 leading-relaxed">{item.desc}</p>
+                    <h4 className="font-extrabold text-base text-white">{item.title}</h4>
+                    <p className="text-xs text-slate-300 leading-relaxed">{item.desc}</p>
                   </Reveal>
                 );
               })}
@@ -594,3 +598,4 @@ export const Landing: React.FC = () => {
 };
 
 export default Landing;
+

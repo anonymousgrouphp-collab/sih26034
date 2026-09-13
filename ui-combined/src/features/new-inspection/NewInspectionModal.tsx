@@ -137,34 +137,34 @@ export const NewInspectionModal: React.FC<NewInspectionModalProps> = ({
               : "1. Packaged Commodity Particulars (Rule 6 Declarations)"}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div className="md:col-span-2">
-              <label htmlFor="product-name" className="block text-xs font-semibold text-slate-700 mb-1">
-                {language === "hi" ? "वस्तु / उत्पाद का नाम" : "Commodity / Product Name"}{" "}
-                <span className="text-rose-600">*</span>
-              </label>
+            <div className="md:col-span-2 input-group pt-2">
               <input
                 id="product-name"
                 type="text"
                 value={productName}
                 onChange={(e) => setProductName(e.target.value)}
                 placeholder={language === "hi" ? "उदा. प्रीमियम संपूर्ण गेहूं आटा 5kg" : "e.g., Premium Whole Wheat Atta 5kg"}
-                className="w-full text-xs px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-govNavy bg-white"
+                className="input"
                 required
               />
+              <label htmlFor="product-name" className="input-label">
+                {language === "hi" ? "वस्तु / उत्पाद का नाम" : "Commodity / Product Name"}{" "}
+                <span className="text-rose-600">*</span>
+              </label>
             </div>
 
-            <div>
-              <label htmlFor="brand-name" className="block text-xs font-medium text-slate-700 mb-1">
-                {language === "hi" ? "ब्रांड का नाम" : "Brand Name"}
-              </label>
+            <div className="input-group pt-2">
               <input
                 id="brand-name"
                 type="text"
                 value={brandName}
                 onChange={(e) => setBrandName(e.target.value)}
                 placeholder={language === "hi" ? "उदा. अन्नपूर्णा" : "e.g., Annapurna"}
-                className="w-full text-xs px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-govNavy bg-white"
+                className="input"
               />
+              <label htmlFor="brand-name" className="input-label">
+                {language === "hi" ? "ब्रांड का नाम" : "Brand Name"}
+              </label>
             </div>
 
             <div>

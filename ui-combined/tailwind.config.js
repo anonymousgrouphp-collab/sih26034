@@ -7,6 +7,28 @@ export default {
   theme: {
     extend: {
       colors: {
+        base: "#0b1320",
+        surface: "#132238",
+        saffron: "#e5a93c",
+        // NOTE: assigning a single string to `cyan` would replace Tailwind's
+        // entire default cyan scale (cyan-50…950), silently killing every
+        // `cyan-<shade>` utility used across src. Keep the full scale and
+        // pin the brand accent as DEFAULT (#38bdf8, WCAG focus-ring color).
+        cyan: {
+          DEFAULT: "#38bdf8",
+          50: "#ecfeff",
+          100: "#cffafe",
+          200: "#a5f3fc",
+          300: "#67e8f9",
+          400: "#22d3ee",
+          500: "#06b6d4",
+          600: "#0891b2",
+          700: "#0e7490",
+          800: "#155e75",
+          900: "#164e63",
+          950: "#083344",
+        },
+        success: "#138A4B",
         // Official Statutory & Institutional Tokens (09_UI_UX_BLUEPRINT.md)
         govNavy: {
           DEFAULT: "#1B365D", // Ashoka Deep Navy
@@ -52,11 +74,11 @@ export default {
           dark: "#334155",
         },
         // Surface and Panel Tokens
-        surfaceBg: "#F8FAFC",
-        panelBg: "#FFFFFF",
+        surfaceBg: "#0b1320",
+        panelBg: "#132238",
       },
       fontFamily: {
-        sans: ['"Noto Sans"', '"Noto Sans Devanagari"', "sans-serif"],
+        sans: ['"Inter"', '"Roboto"', '"Plus Jakarta Sans"', "sans-serif"],
         mono: ['"JetBrains Mono"', "Fira Code", "Courier New", "monospace"],
       },
       boxShadow: {

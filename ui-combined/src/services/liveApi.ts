@@ -82,6 +82,14 @@ export class LiveApiService implements IInspectionApiService {
     }
 
     const username = role === "controller" ? "controller_south" : "inspector_rajesh";
+    // Demo officer password is environment-provided (.env.local, git-ignored) —
+    // never hardcoded in source. Without it, auto-auth is skipped and officers
+    // sign in through the Login gateway instead.
+    const env = (import.meta as any)?.env || {};
+    const demoPassword = env.VITE_DEMO_OFFICER_PASSWORD as string | undefined;
+    if (!demoPassword) {
+      return null;
+    }
     const newAuthPromise = (async () => {
       try {
         const res = await fetch(`${this.baseUrl}/auth/login`, {
@@ -93,7 +101,7 @@ export class LiveApiService implements IInspectionApiService {
           },
           body: JSON.stringify({
             username,
-            password: "Officer@2026",
+            password: demoPassword,
           }),
         });
 

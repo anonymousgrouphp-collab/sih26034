@@ -4,6 +4,7 @@ import { ApiService } from "../services/api";
 import { InspectionCase } from "../types/inspection";
 import { VerdictBadge } from "../components/common/StatusBadge";
 import { useLanguage } from "../context/LanguageContext";
+import { getJurisdictionCircle } from "../context/CircleContext";
 import {
   ArrowLeft,
   Download,
@@ -252,7 +253,7 @@ export const EvidenceDossier: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="card p-12 text-center bg-white space-y-3">
+      <div className="glass-panel p-12 text-center space-y-3 border border-slate-700/60 rounded-xl">
         <div className="w-8 h-8 border-4 border-govNavy border-t-transparent rounded-full animate-spin mx-auto" />
         <p className="text-xs font-bold text-slate-600">
           {language === "hi"
@@ -266,8 +267,8 @@ export const EvidenceDossier: React.FC = () => {
   if (!caseData) {
     if (!loadError && !targetCaseId) {
       return (
-        <div className="card p-10 text-center bg-white space-y-4 max-w-xl mx-auto border border-slate-200 shadow-workstation">
-          <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center mx-auto">
+        <div className="glass-panel p-10 text-center space-y-4 max-w-xl mx-auto border border-slate-700/60 rounded-xl">
+          <div className="w-12 h-12 rounded-full bg-slate-700/50 text-slate-400 flex items-center justify-center mx-auto">
             <FileArchive size={24} />
           </div>
           <h2 className="text-base font-bold text-slate-800">
@@ -291,7 +292,7 @@ export const EvidenceDossier: React.FC = () => {
     }
 
     return (
-      <div className="card p-10 text-center bg-white space-y-4 max-w-xl mx-auto border border-rose-200">
+      <div className="glass-panel p-10 text-center space-y-4 max-w-xl mx-auto border border-slate-700/60 rounded-xl">
         <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto">
           <FileArchive size={24} />
         </div>
@@ -320,16 +321,16 @@ export const EvidenceDossier: React.FC = () => {
     <div className="space-y-6">
       {/* Print-specific Government Header (Only visible in Print/PDF mode) */}
       <div className="hidden print:block text-center border-b-2 border-slate-900 pb-4 mb-6">
-        <div className="text-[11px] font-bold tracking-widest text-slate-700 uppercase">
+        <div className="text-[11px] font-bold tracking-widest text-slate-200 uppercase">
           Government of India • Ministry of Consumer Affairs, Food & Public Distribution
         </div>
-        <div className="text-sm font-black tracking-wide text-slate-900 uppercase mt-0.5">
+        <div className="text-sm font-black tracking-wide text-white uppercase mt-0.5">
           Department of Consumer Affairs • Legal Metrology Division
         </div>
-        <div className="text-base font-black text-slate-900 uppercase mt-2">
+        <div className="text-base font-black text-white uppercase mt-2">
           Certificate of Electronic Record & Evidence Dossier
         </div>
-        <div className="text-xs font-semibold text-slate-700">
+        <div className="text-xs font-semibold text-slate-200">
           Under Section 63 of Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)
         </div>
         <div className="flex justify-between items-center text-[10px] font-mono text-slate-600 mt-3 pt-2 border-t border-slate-300">
@@ -340,32 +341,32 @@ export const EvidenceDossier: React.FC = () => {
       </div>
 
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-workstation print:hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-panel p-5 rounded-xl border border-slate-700/60 shadow-2xl print:hidden">
         <div className="flex items-start gap-3">
           <button
             type="button"
             onClick={() => navigate(`/inspections/${caseData.id}`)}
-            className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors mt-0.5"
+            className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors mt-0.5"
             title={language === "hi" ? "निरीक्षण कार्यक्षेत्र पर वापस जाएं" : "Back to Inspection Workspace"}
           >
             <ArrowLeft size={18} />
           </button>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-govNavy bg-govNavy/5 px-2 py-0.5 rounded">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-400/10 border border-amber-400/30 px-2 py-0.5 rounded">
                 {language === "hi"
                   ? "धारा 63 बीएसए 2023 इलेक्ट्रॉनिक साक्ष्य संचिका (डोज़ियर)"
                   : "Section 63 BSA 2023 Electronic Evidence Dossier"}
               </span>
-              <span className="text-slate-300">•</span>
-              <span className="font-mono text-xs font-bold text-slate-600">
+              <span className="text-slate-500">•</span>
+              <span className="font-mono text-xs font-bold text-slate-300">
                 {caseData.inspection_number}
               </span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-black text-slate-900 mt-1">
+            <h1 className="text-xl sm:text-2xl font-black text-white mt-1">
               {language === "hi" ? "साक्ष्य संचिका:" : "Evidence Dossier:"} {caseData.product_name}
             </h1>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-slate-400 mt-0.5">
               {language === "hi"
                 ? "मूल भौतिक तस्वीरों को सांविधिक निष्कर्षों से जोड़ने वाला मर्कल डीएजी अभिरक्षा-श्रृंखला रिकॉर्ड।"
                 : "Merkle DAG Chain-of-Custody record linking raw physical photographs to statutory findings."}
@@ -412,11 +413,11 @@ export const EvidenceDossier: React.FC = () => {
 
       {/* 3 Summary Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="card p-4 bg-white">
+        <div className="glass-panel p-4 border border-slate-700/60 rounded-xl">
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
             {language === "hi" ? "स्रोत साक्ष्य संपत्तियां" : "Source Evidence Assets"}
           </span>
-          <p className="text-2xl font-black text-slate-900 mt-1">
+          <p className="text-2xl font-black text-white mt-1">
             {(caseData.evidence_assets || []).length} {language === "hi" ? "भौतिक तस्वीर" : "Physical Photo(s)"}
           </p>
           <p className="text-[11px] text-slate-500 mt-0.5">
@@ -424,11 +425,11 @@ export const EvidenceDossier: React.FC = () => {
           </p>
         </div>
 
-        <div className="card p-4 bg-white">
+        <div className="glass-panel p-4 border border-slate-700/60 rounded-xl">
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
             {language === "hi" ? "निष्कर्षित घोषणाएं" : "Extracted Declarations"}
           </span>
-          <p className="text-2xl font-black text-slate-900 mt-1">
+          <p className="text-2xl font-black text-white mt-1">
             {caseData.extracted_fields?.length || 0} {language === "hi" ? "सांविधिक क्षेत्र" : "Statutory Fields"}
           </p>
           <p className="text-[11px] text-slate-500 mt-0.5">
@@ -436,7 +437,7 @@ export const EvidenceDossier: React.FC = () => {
           </p>
         </div>
 
-        <div className="card p-4 bg-white">
+        <div className="glass-panel p-4 border border-slate-700/60 rounded-xl">
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
             {language === "hi" ? "विधिक मापविज्ञान निर्णय" : "Legal Metrology Verdict"}
           </span>
@@ -450,29 +451,29 @@ export const EvidenceDossier: React.FC = () => {
       </div>
 
       {/* 3-Tier Evidence Chain */}
-      <div className="card overflow-hidden bg-white">
-        <div className="border-b border-slate-200 p-4 bg-slate-50 flex items-center justify-between">
+      <div className="glass-panel overflow-hidden border border-slate-700/60 rounded-xl">
+        <div className="border-b border-slate-700/60 p-4 bg-slate-800/60 flex items-center justify-between">
           <div>
-            <h3 className="section-title">
+            <h3 className="section-title text-white">
               {language === "hi" ? "क्रिप्टोग्राफिक साक्ष्य श्रृंखला" : "Cryptographic Evidence Chain"}
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-slate-400 mt-0.5">
               {language === "hi"
                 ? "स्रोत साक्ष्य → अवलोकन → नियम मूल्यांकन → अधिकारी अधिनिर्णय"
                 : "Source Evidence → Observations → Rule Evaluations → Officer Adjudication"}
             </p>
           </div>
-          <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-100/60 px-2.5 py-1 rounded-full border border-emerald-300">
+          <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-950/40 px-2.5 py-1 rounded-full border border-emerald-700/60">
             <ShieldCheck size={14} />
             <span>{language === "hi" ? "धारा 63 बीएसए 2023 सत्यापित" : "Section 63 BSA 2023 Validated"}</span>
           </div>
         </div>
 
         {/* Tier 1: Original Photographs */}
-        <section className="p-5 border-b border-slate-100 space-y-3">
+        <section className="p-5 border-b border-slate-700/60 space-y-3">
           <div className="flex items-center gap-2">
-            <FileImage size={18} className="text-govNavy" />
-            <h4 className="text-sm font-bold text-slate-800">
+            <FileImage size={18} className="text-cyan-400" />
+            <h4 className="text-sm font-bold text-white">
               {language === "hi" ? "1. मूल पैकेजिंग साक्ष्य तस्वीरें" : "1. Raw Packaging Evidence Photographs"}
             </h4>
             <span className="text-xs font-mono text-slate-400">
@@ -484,14 +485,14 @@ export const EvidenceDossier: React.FC = () => {
             {(caseData.evidence_assets || []).map((asset) => (
               <div
                 key={asset.image_id}
-                className="p-3.5 rounded-lg border border-slate-200 bg-slate-50/50 space-y-2 text-xs"
+                className="p-3.5 rounded-lg border border-slate-700/60 bg-slate-800/40 space-y-2 text-xs"
               >
                 <div className="flex gap-3 items-start">
                   {asset.file_path && (
                     <img
                       src={asset.file_path}
                       alt={asset.panel_type}
-                      className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded border border-slate-200 bg-slate-100 shrink-0"
+                      className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded border border-slate-700/60 bg-slate-900 shrink-0"
                       onError={(e) => {
                         (e.currentTarget as HTMLElement).style.display = "none";
                       }}
@@ -499,17 +500,17 @@ export const EvidenceDossier: React.FC = () => {
                   )}
                   <div className="flex-1 min-w-0 space-y-1">
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-govNavy font-mono truncate">{asset.image_id}</span>
-                      <span className="px-2 py-0.5 text-[10px] rounded bg-white border border-slate-300 font-semibold">
+                      <span className="font-bold text-cyan-400 font-mono truncate">{asset.image_id}</span>
+                      <span className="px-2 py-0.5 text-[10px] rounded bg-slate-700 border border-slate-600 text-slate-300">
                         {asset.panel_type}
                       </span>
                     </div>
-                    <div className="font-mono text-[11px] text-slate-600 space-y-0.5">
+                    <div className="font-mono text-[11px] text-slate-300 space-y-0.5">
                       <div>
                         {language === "hi" ? "आयाम:" : "Dimensions:"} {asset.image_width || 1920} × {asset.image_height || 1080} px
                       </div>
                       <div className="break-all" title={asset.raw_sha256}>
-                        SHA-256: <span className="text-slate-800 font-bold">{asset.raw_sha256 || "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"}</span>
+                        SHA-256: <span className="text-white font-bold">{asset.raw_sha256 || "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"}</span>
                       </div>
                       <div>
                         {language === "hi"
@@ -517,7 +518,7 @@ export const EvidenceDossier: React.FC = () => {
                           : `Optical Quality: Blur σ²=${asset.quality_gate?.blur_variance?.toFixed(1) || "340.0"} • Glare=${asset.quality_gate?.glare_percentage?.toFixed(1) || "2.1"}%`}
                       </div>
                       {asset.calibration && (
-                        <div className="text-govNavy font-semibold">
+                        <div className="text-amber-400 font-semibold">
                           {language === "hi" ? "कैलिब्रेशन:" : "Calibration:"} {asset.calibration.method} (Scale: {asset.calibration.px_to_mm.toFixed(3)} mm/px)
                         </div>
                       )}
@@ -530,10 +531,10 @@ export const EvidenceDossier: React.FC = () => {
         </section>
 
         {/* Tier 2: OCR Declarations */}
-        <section className="p-5 border-b border-slate-100 space-y-3">
+        <section className="p-5 border-b border-slate-700/60 space-y-3">
           <div className="flex items-center gap-2">
-            <ScanText size={18} className="text-govNavy" />
-            <h4 className="text-sm font-bold text-slate-800">
+            <ScanText size={18} className="text-cyan-400" />
+            <h4 className="text-sm font-bold text-white">
               {language === "hi" ? "2. बहुभाषी ओसीआर टोकन अवलोकन" : "2. Multilingual OCR Token Observations"}
             </h4>
             <span className="text-xs font-mono text-slate-400">
@@ -541,9 +542,9 @@ export const EvidenceDossier: React.FC = () => {
             </span>
           </div>
 
-          <div className="overflow-x-auto border border-slate-200 rounded-lg">
-            <table className="min-w-full divide-y divide-slate-200 text-xs">
-              <thead className="bg-slate-50 text-[11px] font-bold text-slate-600">
+          <div className="overflow-x-auto border border-slate-700/60 rounded-lg">
+            <table className="min-w-full divide-y divide-slate-700/60 text-xs">
+              <thead className="bg-slate-800/80 text-[11px] font-bold text-slate-300">
                 <tr>
                   <th className="py-2 px-3 text-left">{language === "hi" ? "टोकन आईडी" : "Token ID"}</th>
                   <th className="py-2 px-3 text-left">{language === "hi" ? "निष्कर्षित पाठ" : "Extracted Text"}</th>
@@ -552,7 +553,7 @@ export const EvidenceDossier: React.FC = () => {
                   <th className="py-2 px-3 text-left">{language === "hi" ? "कैलिब्रेटेड ऊंचाई" : "Fiducial Height"}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-700/60 text-slate-200">
                 {ocrTokens.slice(0, 10).map((token) => {
                   // Robust font height determination: use measured_font_height_mm or scale math
                   const calculatedHeight = (() => {
@@ -574,16 +575,16 @@ export const EvidenceDossier: React.FC = () => {
                   })();
 
                   return (
-                    <tr key={token.token_id || token.id} className="hover:bg-slate-50">
-                      <td className="py-2 px-3 font-mono text-slate-500">{token.token_id || token.id}</td>
-                      <td className="py-2 px-3 font-bold text-slate-800">{token.text || token.raw_ocr_text}</td>
-                      <td className="py-2 px-3 font-mono">{Math.round((token.confidence || token.ocr_confidence || 0.95) * 100)}%</td>
-                      <td className="py-2 px-3 font-mono text-slate-600">
+                    <tr key={token.token_id || token.id} className="hover:bg-slate-800/50">
+                      <td className="py-2 px-3 font-mono text-slate-400">{token.token_id || token.id}</td>
+                      <td className="py-2 px-3 font-bold text-white">{token.text || token.raw_ocr_text}</td>
+                      <td className="py-2 px-3 font-mono text-cyan-300">{Math.round((token.confidence || token.ocr_confidence || 0.95) * 100)}%</td>
+                      <td className="py-2 px-3 font-mono text-slate-300">
                         {token.language === "hi" || /[\u0900-\u097F]/.test(token.text || "")
                           ? (language === "hi" ? "देवनागरी (हिन्दी)" : "Devanagari (Hindi)")
                           : (language === "hi" ? "लैटिन (अंग्रेज़ी)" : "Latin (English)")}
                       </td>
-                      <td className="py-2 px-3 font-mono font-bold text-govNavy">
+                      <td className="py-2 px-3 font-mono font-bold text-emerald-400">
                         {calculatedHeight}
                       </td>
                     </tr>
@@ -595,10 +596,10 @@ export const EvidenceDossier: React.FC = () => {
         </section>
 
         {/* Tier 3: Statutory Rule Evaluations */}
-        <section className="p-5 border-b border-slate-100 space-y-3">
+        <section className="p-5 border-b border-slate-700/60 space-y-3">
           <div className="flex items-center gap-2">
-            <ShieldCheck size={18} className="text-govNavy" />
-            <h4 className="text-sm font-bold text-slate-800">
+            <ShieldCheck size={18} className="text-emerald-400" />
+            <h4 className="text-sm font-bold text-white">
               {language === "hi" ? "3. नियतात्मक नियम मूल्यांकन" : "3. Deterministic Rule Evaluations"}
             </h4>
             <span className="text-xs font-mono text-slate-400">
@@ -618,14 +619,14 @@ export const EvidenceDossier: React.FC = () => {
               return (
                 <div
                   key={rule.finding_id}
-                  className="p-3 rounded-lg border border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
+                  className="p-3 rounded-lg border border-slate-700/60 bg-slate-800/40 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono font-bold text-govNavy">{rule.rule_code}</span>
-                      <span className="font-bold text-slate-800">{rule.statutory_reference}</span>
+                      <span className="font-mono font-bold text-cyan-400">{rule.rule_code}</span>
+                      <span className="font-bold text-slate-200">{rule.statutory_reference}</span>
                     </div>
-                    <p className="text-slate-600 text-[11.5px]">
+                    <p className="text-slate-400 text-[11.5px]">
                       {rule.discrepancy || rule.legal_consequence}
                     </p>
                   </div>
@@ -642,8 +643,8 @@ export const EvidenceDossier: React.FC = () => {
         {auditEvents.length > 0 && (
           <section className="p-5 space-y-3">
             <div className="flex items-center gap-2">
-              <Activity size={18} className="text-govNavy" />
-              <h4 className="text-sm font-bold text-slate-800">
+              <Activity size={18} className="text-amber-400" />
+              <h4 className="text-sm font-bold text-white">
                 {language === "hi" ? "4. क्रिप्टोग्राफिक ऑडिट लेज़र (मर्कल ट्रेल)" : "4. Cryptographic Audit Ledger (Merkle Trail)"}
               </h4>
               <span className="text-xs font-mono text-slate-400">
@@ -651,9 +652,9 @@ export const EvidenceDossier: React.FC = () => {
               </span>
             </div>
 
-            <div className="overflow-x-auto border border-slate-200 rounded-lg">
-              <table className="min-w-full divide-y divide-slate-200 text-xs">
-                <thead className="bg-slate-50 text-[11px] font-bold text-slate-600">
+            <div className="overflow-x-auto border border-slate-700/60 rounded-lg">
+              <table className="min-w-full divide-y divide-slate-700/60 text-xs">
+                <thead className="bg-slate-800/80 text-[11px] font-bold text-slate-300">
                   <tr>
                     <th className="py-2 px-3 text-left">#</th>
                     <th className="py-2 px-3 text-left">{language === "hi" ? "समय मोहर (UTC)" : "Timestamp (UTC)"}</th>
@@ -662,16 +663,16 @@ export const EvidenceDossier: React.FC = () => {
                     <th className="py-2 px-3 text-left">{language === "hi" ? "एसएचए-256 हैश" : "Entry Hash"}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 font-mono text-[11px]">
+                <tbody className="divide-y divide-slate-700/60 font-mono text-[11px] text-slate-300">
                   {auditEvents.map((evt, idx) => (
-                    <tr key={evt.id || idx} className="hover:bg-slate-50">
+                    <tr key={evt.id || idx} className="hover:bg-slate-800/50">
                       <td className="py-2 px-3 text-slate-400">{evt.sequence_number || idx + 1}</td>
-                      <td className="py-2 px-3 text-slate-600">
+                      <td className="py-2 px-3 text-slate-300">
                         {evt.timestamp_utc ? new Date(evt.timestamp_utc).toLocaleString("en-IN") : "N/A"}
                       </td>
-                      <td className="py-2 px-3 font-bold text-slate-800">{evt.event_type || evt.event_label}</td>
-                      <td className="py-2 px-3 text-govNavy font-semibold">{evt.actor_id}</td>
-                      <td className="py-2 px-3 text-slate-500 truncate max-w-[200px]" title={evt.entry_hash}>
+                      <td className="py-2 px-3 font-bold text-white">{evt.event_type || evt.event_label}</td>
+                      <td className="py-2 px-3 text-cyan-400 font-semibold">{evt.actor_id}</td>
+                      <td className="py-2 px-3 text-slate-400 truncate max-w-[200px]" title={evt.entry_hash}>
                         {evt.entry_hash ? `${evt.entry_hash.slice(0, 16)}...` : "TAMPER_EVIDENT_OK"}
                       </td>
                     </tr>
@@ -684,21 +685,21 @@ export const EvidenceDossier: React.FC = () => {
       </div>
 
       {/* Section 63 BSA 2023 Digital Certificate Statement */}
-      <div className="rounded-xl border border-emerald-300 bg-emerald-50/60 p-5 space-y-3">
-        <div className="flex items-center gap-2 font-bold text-emerald-900 text-sm">
-          <Lock size={18} className="text-emerald-700" />
+      <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/30 p-5 space-y-3">
+        <div className="flex items-center gap-2 font-bold text-emerald-300 text-sm">
+          <Lock size={18} className="text-emerald-400" />
           <span>
             {language === "hi"
               ? "धारा 63 भारतीय साक्ष्य अधिनियम, 2023 साक्ष्य संबंधी निश्चर (इनवेरिएंट्स)"
               : "Section 63 Bharatiya Sakshya Adhiniyam, 2023 Evidentiary Invariants"}
           </span>
         </div>
-        <p className="text-xs text-emerald-950 leading-relaxed">
+        <p className="text-xs text-emerald-200/90 leading-relaxed">
           {language === "hi"
             ? "यह डिजिटल प्रमाणपत्र भारतीय साक्ष्य अधिनियम, 1872 की निरस्त धारा 65B का स्थान लेने वाले भारतीय साक्ष्य अधिनियम, 2023 (बीएसए 2023) की धारा 63 की अनिवार्य आवश्यकताओं का अनुपालन करता है। सभी क्रिप्टोग्राफिक हैश, डिवाइस पैरामीटर और अधिकारी टाइमस्टैम्प मर्कल डीएजी लेज़र में अपरिवर्तनीय रूप से अंकित हैं।"
             : "This digital certificate complies with the mandatory requirements of Section 63 of Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023), superseding repealed Section 65B of the Indian Evidence Act, 1872. All cryptographic hashes, device parameters, and officer timestamps are immutably anchored to the Merkle DAG ledger."}
         </p>
-        <div className="p-3 bg-white/80 rounded-lg border border-emerald-300/80 font-mono text-[11px] text-emerald-900 space-y-1">
+        <div className="p-3 bg-emerald-950/60 rounded-lg border border-emerald-500/30 font-mono text-[11px] text-emerald-200 space-y-1">
           <div>
             <span className="font-bold">{language === "hi" ? "प्रमाणपत्र आईडी:" : "Cert ID:"}</span> {certificateNumber}
           </div>
@@ -711,7 +712,9 @@ export const EvidenceDossier: React.FC = () => {
           </div>
           <div>
             <span className="font-bold">{language === "hi" ? "क्षेत्राधिकार सर्कल:" : "Jurisdiction Circle:"}</span>{" "}
-            {caseData.jurisdiction_id || "CIRCLE_DL_SOUTH_01"} • South Delhi Circle
+            {language === "hi"
+              ? getJurisdictionCircle(caseData.jurisdiction_id).labelHi
+              : getJurisdictionCircle(caseData.jurisdiction_id).label}
           </div>
           <div>
             <span className="font-bold">{language === "hi" ? "समय मोहर:" : "Timestamp:"}</span>{" "}
@@ -725,3 +728,4 @@ export const EvidenceDossier: React.FC = () => {
 };
 
 export default EvidenceDossier;
+

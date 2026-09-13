@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { m, AnimatePresence } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
 import { useLanguage } from "../context/LanguageContext";
 import { ApiService } from "../services/api";
@@ -89,15 +90,15 @@ export const ReviewQueue: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-workstation">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 glass-panel p-5 rounded-xl border border-slate-700/60 shadow-2xl">
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-govNavy bg-govNavy/5 px-2 py-0.5 rounded">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-amber-400 bg-amber-400/10 border border-amber-400/30 px-2 py-0.5 rounded">
             {language === "hi" ? "मानव-हस्तक्षेप अधिनिर्णय (HITL)" : "Human-in-the-Loop Adjudication"}
           </span>
-          <h1 className="text-2xl font-black text-slate-900 mt-1">
+          <h1 className="text-2xl font-black text-white mt-1">
             {language === "hi" ? "अधिकारी समीक्षा कतार" : "Officer Review Queue"}
           </h1>
-          <p className="text-xs text-slate-500 mt-0.5 max-w-2xl">
+          <p className="text-xs text-slate-300 mt-0.5 max-w-2xl">
             {language === "hi"
               ? "पैकेजिंग निरीक्षण जहां स्वचालित विश्लेषण में मानव अधिकारी मूल्यांकन, सेंसर अनिश्चितता अधिनिर्णय या फोटोग्राफिक पुनः प्राप्ति की आवश्यकता है।"
               : "Packaging inspections where automated analysis requires human officer assessment, sensor uncertainty adjudication, or photographic re-capture."}
@@ -105,7 +106,7 @@ export const ReviewQueue: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <Link to="/inspections" className="btn-secondary text-xs">
+          <Link to="/inspections" className="btn-secondary text-xs bg-slate-800/80 text-white border-slate-700 hover:bg-slate-700">
             <span>{language === "hi" ? "सभी मामले देखें" : "View All Cases"}</span>
           </Link>
         </div>
@@ -115,49 +116,49 @@ export const ReviewQueue: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div
           onClick={() => setTriageFilter("ALL")}
-          className={`card p-4 cursor-pointer transition-all ${
-            triageFilter === "ALL" ? "ring-2 ring-govNavy border-govNavy bg-govNavy/5" : "bg-white"
+          className={`card-lift glass-panel p-4 cursor-pointer transition-all rounded-xl border ${
+            triageFilter === "ALL" ? "ring-2 ring-cyan-500/50 border-cyan-500/50 bg-cyan-500/10 shadow-[0_0_15px_rgba(6,182,212,0.15)]" : "glass-panel border-slate-700/60 hover:bg-slate-800/80"
           }`}
         >
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
             {language === "hi" ? "कुल चिह्नित मामले" : "Total Flagged Cases"}
           </span>
-          <p className="text-3xl font-black text-slate-900 mt-1">{counts.total}</p>
-          <p className="text-[11px] text-slate-500 mt-0.5">
+          <p className="text-3xl font-black text-white mt-1">{counts.total}</p>
+          <p className="text-[11px] text-slate-400 mt-0.5">
             {language === "hi" ? "मानव सत्यापन की आवश्यकता" : "Requiring human verification"}
           </p>
         </div>
 
         <div
           onClick={() => setTriageFilter("REVIEW")}
-          className={`card p-4 cursor-pointer transition-all ${
+          className={`card-lift glass-panel p-4 cursor-pointer transition-all rounded-xl border ${
             triageFilter === "REVIEW"
-              ? "ring-2 ring-amber-500 border-amber-500 bg-amber-50"
-              : "bg-white"
+              ? "ring-2 ring-amber-500/50 border-amber-500/50 bg-amber-500/10 shadow-[0_0_15px_rgba(245,158,11,0.15)]"
+              : "glass-panel border-slate-700/60 hover:bg-slate-800/80"
           }`}
         >
-          <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400">
             {language === "hi" ? "सीमावर्ती सेंसर रीडिंग (समीक्षा)" : "Borderline Sensor Readings (REVIEW)"}
           </span>
-          <p className="text-3xl font-black text-amber-700 mt-1">{counts.borderline}</p>
-          <p className="text-[11px] text-slate-500 mt-0.5">
+          <p className="text-3xl font-black text-amber-400 mt-1">{counts.borderline}</p>
+          <p className="text-[11px] text-slate-400 mt-0.5">
             {language === "hi" ? "सेंसर अनिश्चितता बैंड के भीतर (k=2, 95%)" : "Within sensor uncertainty band (k=2, 95%)"}
           </p>
         </div>
 
         <div
           onClick={() => setTriageFilter("UNABLE")}
-          className={`card p-4 cursor-pointer transition-all ${
+          className={`card-lift glass-panel p-4 cursor-pointer transition-all rounded-xl border ${
             triageFilter === "UNABLE"
-              ? "ring-2 ring-slate-600 border-slate-600 bg-slate-100"
-              : "bg-white"
+              ? "ring-2 ring-slate-500/50 border-slate-500/50 bg-slate-500/10 shadow-[0_0_15px_rgba(100,116,139,0.15)]"
+              : "glass-panel border-slate-700/60 hover:bg-slate-800/80"
           }`}
         >
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
             {language === "hi" ? "निम्न गुणवत्ता साक्ष्य कमियां" : "Degraded Evidence Gaps"}
           </span>
-          <p className="text-3xl font-black text-slate-700 mt-1">{counts.degraded}</p>
-          <p className="text-[11px] text-slate-500 mt-0.5">
+          <p className="text-3xl font-black text-slate-300 mt-1">{counts.degraded}</p>
+          <p className="text-[11px] text-slate-400 mt-0.5">
             {language === "hi" ? "अत्यधिक धुंधलापन (σ²<120) या चमक प्रकीर्णन (>15%)" : "High blur (σ²<120) or glare bloom (>15%)"}
           </p>
         </div>
@@ -165,88 +166,98 @@ export const ReviewQueue: React.FC = () => {
 
       {/* Case List */}
       <div className="space-y-3">
-        {filtered.map((c) => {
-          const isReview = c.overall_status === "REVIEW";
-          return (
-            <div key={c.id} className="card p-5 bg-white space-y-3">
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                <div className="flex items-start gap-4">
-                  <div
-                    className={`p-3 rounded-xl shrink-0 ${
-                      isReview ? "bg-amber-100 text-amber-800" : "bg-slate-200 text-slate-700"
-                    }`}
-                  >
-                    {isReview ? <AlertTriangle size={22} /> : <Clock3 size={22} />}
+        <AnimatePresence>
+          {filtered.map((c) => {
+            const isReview = c.overall_status === "REVIEW";
+            return (
+              <m.div
+                key={c.id}
+                layout
+                initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+                className="glass-panel p-5 rounded-xl space-y-3 shadow-2xl border border-slate-700/60"
+              >
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                  <div className="flex items-start gap-4">
+                    <div
+                      className={`p-3 rounded-xl shrink-0 ${
+                        isReview ? "bg-amber-500/20 text-amber-400" : "bg-slate-700/50 text-slate-300"
+                      }`}
+                    >
+                      {isReview ? <AlertTriangle size={22} /> : <Clock3 size={22} />}
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-mono font-bold text-xs text-cyan-400">
+                          {c.inspection_number}
+                        </span>
+                        <h3 className="text-sm font-bold text-white">{c.product_name}</h3>
+                        <VerdictBadge verdict={c.overall_status} size="sm" />
+                      </div>
+                      <p className="text-xs text-slate-400">
+                        {c.brand_name || (language === "hi" ? "पैकेज्ड वस्तुएं" : "Packaged Goods")} • {language === "hi" ? "अधिकार क्षेत्र:" : "Jurisdiction:"} <span className="text-slate-300">{c.jurisdiction_id || "DL-SOUTH-01"}</span> • <span className="font-mono text-slate-400 font-medium">{formatDateTime(c.created_at || (c as any).inspection_timestamp)}</span>
+                      </p>
+                      <div className="p-2.5 rounded-lg bg-slate-800/80 border border-slate-700/60 text-xs text-slate-300 max-w-3xl">
+                        {isReview ? (
+                          language === "hi" ? (
+                            <span>
+                              <b className="text-amber-400">सीमावर्ती माप: </b> अंक तालिका-I की सीमा के करीब पाए गए हैं।
+                              माप अनिश्चितता बैंड (±0.08 मिमी) के लिए अधिकारी आवर्धक (लूप) पुष्टि आवश्यक है।
+                            </span>
+                          ) : (
+                            <span>
+                              <b className="text-amber-400">Borderline Measurement: </b> Numerals detected close to Table-I threshold.
+                              Measurement uncertainty band (±0.08 mm) requires officer loupe confirmation.
+                            </span>
+                          )
+                        ) : (
+                          language === "hi" ? (
+                            <span>
+                              <b className="text-rose-400">साक्ष्य निम्नीकरण: </b> ऑप्टिकल गुणवत्ता गेट ने अत्यधिक धुंधलापन या
+                              चमक पाई जो नियम 6 की अनिवार्य घोषणाओं को अस्पष्ट करती है। पुनः फोटो लेने का सुझाव है।
+                            </span>
+                          ) : (
+                            <span>
+                              <b className="text-rose-400">Evidence Degradation: </b> Optical quality gate detected excessive blur or
+                              specular glare obscuring mandatory Rule 6 text declarations. Photographic retake suggested.
+                            </span>
+                          )
+                        )}
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="space-y-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-mono font-bold text-xs text-govNavy">
-                        {c.inspection_number}
-                      </span>
-                      <h3 className="text-sm font-bold text-slate-900">{c.product_name}</h3>
-                      <VerdictBadge verdict={c.overall_status} size="sm" />
-                    </div>
-                    <p className="text-xs text-slate-500">
-                      {c.brand_name || (language === "hi" ? "पैकेज्ड वस्तुएं" : "Packaged Goods")} • {language === "hi" ? "अधिकार क्षेत्र:" : "Jurisdiction:"} {c.jurisdiction_id || "DL-SOUTH-01"} • <span className="font-mono text-slate-700 font-medium">{formatDateTime(c.created_at || (c as any).inspection_timestamp)}</span>
-                    </p>
-                    <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700 max-w-3xl">
-                      {isReview ? (
-                        language === "hi" ? (
-                          <span>
-                            <b>सीमावर्ती माप: </b> अंक तालिका-I की सीमा के करीब पाए गए हैं।
-                            माप अनिश्चितता बैंड (±0.08 मिमी) के लिए अधिकारी आवर्धक (लूप) पुष्टि आवश्यक है।
-                          </span>
-                        ) : (
-                          <span>
-                            <b>Borderline Measurement: </b> Numerals detected close to Table-I threshold.
-                            Measurement uncertainty band (±0.08 mm) requires officer loupe confirmation.
-                          </span>
-                        )
-                      ) : (
-                        language === "hi" ? (
-                          <span>
-                            <b>साक्ष्य निम्नीकरण: </b> ऑप्टिकल गुणवत्ता गेट ने अत्यधिक धुंधलापन या
-                            चमक पाई जो नियम 6 की अनिवार्य घोषणाओं को अस्पष्ट करती है। पुनः फोटो लेने का सुझाव है।
-                          </span>
-                        ) : (
-                          <span>
-                            <b>Evidence Degradation: </b> Optical quality gate detected excessive blur or
-                            specular glare obscuring mandatory Rule 6 text declarations. Photographic retake suggested.
-                          </span>
-                        )
-                      )}
-                    </div>
+                  <div className="shrink-0 flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setCaseToDelete(c)}
+                      className="p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-900/30 border border-slate-700 hover:border-rose-500/30 rounded-lg transition-colors btn-press"
+                      title={language === "hi" ? "डेटाबेस से मामला हटाएं" : "Dispose & Delete Case from Database"}
+                      aria-label={`Delete case ${c.inspection_number}`}
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/inspections/${c.id}`)}
+                      className="btn-primary py-2 px-3 text-xs whitespace-nowrap bg-cyan-600 hover:bg-cyan-500 text-white border-transparent"
+                    >
+                      <UserCheck size={14} />
+                      <span>{language === "hi" ? "कैनवास में निर्णय करें" : "Adjudicate in Canvas"}</span>
+                      <ArrowRight size={13} />
+                    </button>
                   </div>
                 </div>
-
-                <div className="shrink-0 flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setCaseToDelete(c)}
-                    className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-300 rounded-lg transition-colors"
-                    title={language === "hi" ? "डेटाबेस से मामला हटाएं" : "Dispose & Delete Case from Database"}
-                    aria-label={`Delete case ${c.inspection_number}`}
-                  >
-                    <Trash2 size={15} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => navigate(`/inspections/${c.id}`)}
-                    className="btn-primary text-xs whitespace-nowrap"
-                  >
-                    <UserCheck size={14} />
-                    <span>{language === "hi" ? "कैनवास में निर्णय करें" : "Adjudicate in Canvas"}</span>
-                    <ArrowRight size={13} />
-                  </button>
-                </div>
-              </div>
-            </div>
-          );
-        })}
+              </m.div>
+            );
+          })}
+        </AnimatePresence>
 
         {filtered.length === 0 && (
-          <div className="card p-10 text-center bg-white space-y-3 shadow-xs">
+          <div className="glass-panel p-10 text-center space-y-3 border border-slate-700/60 rounded-xl">
             <img
               src="/assets/empty-states/empty_review_queue.svg"
               alt="Review queue is clear with zero pending adjudications"
@@ -256,7 +267,7 @@ export const ReviewQueue: React.FC = () => {
               <p className="text-sm font-bold text-slate-800">
                 {language === "hi" ? "इस श्रेणी में कोई लंबित मामला नहीं है" : "No Pending Cases in this Category"}
               </p>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto mt-0.5">
+              <p className="text-xs text-slate-400 max-w-sm mx-auto mt-0.5">
                 {language === "hi"
                   ? "सभी सीमावर्ती मापों और सेंसर अनिश्चितता मामलों का विधिक मापविज्ञान अधिकारी द्वारा अधिनिर्णय किया जा चुका है।"
                   : "All borderline measurements and sensor uncertainty cases have been adjudicated by the Legal Metrology Officer."}
@@ -278,16 +289,16 @@ export const ReviewQueue: React.FC = () => {
       {/* Deletion Confirmation Modal */}
       {caseToDelete && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-overlay-in">
-          <div className="bg-white rounded-2xl border border-rose-200 shadow-2xl max-w-md w-full p-6 space-y-4 text-left animate-pop-in">
+          <div className="glass-panel rounded-2xl border border-rose-700/60 shadow-2xl overflow-hidden">
             <div className="flex items-start gap-3">
               <div className="p-2.5 bg-rose-100 text-rose-700 rounded-full shrink-0">
                 <Trash2 size={22} />
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-900">
+                <h3 className="text-base font-bold text-white">
                   {language === "hi" ? "मामला निरस्त एवं स्थायी निष्कासन" : "Dispose & Permanently Delete Case"}
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-slate-400 mt-0.5">
                   {language === "hi"
                     ? "डेटाबेस से यह मामला एवं सभी संबंधित विधिक विवरण पूरी तरह हटा दिए जाएंगे।"
                     : "This inspection case and all related statutory details will be permanently removed from the database sitewide."}
@@ -295,17 +306,17 @@ export const ReviewQueue: React.FC = () => {
               </div>
             </div>
 
-            <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs space-y-1.5">
+            <div className="p-3 bg-slate-50 rounded-lg border border-slate-700/60 text-xs space-y-1.5">
               <div className="flex justify-between">
-                <span className="text-slate-500">{language === "hi" ? "केस संख्या:" : "Case Number:"}</span>
+                <span className="text-slate-400">{language === "hi" ? "केस संख्या:" : "Case Number:"}</span>
                 <span className="font-mono font-bold text-slate-800">{caseToDelete.inspection_number}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">{language === "hi" ? "उत्पाद / वस्तु:" : "Product / Commodity:"}</span>
+                <span className="text-slate-400">{language === "hi" ? "उत्पाद / वस्तु:" : "Product / Commodity:"}</span>
                 <span className="font-semibold text-slate-800 truncate max-w-[220px]">{caseToDelete.product_name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">{language === "hi" ? "दिनांक एवं समय:" : "Date & Time:"}</span>
+                <span className="text-slate-400">{language === "hi" ? "दिनांक एवं समय:" : "Date & Time:"}</span>
                 <span className="font-mono text-slate-700">{formatDateTime(caseToDelete.created_at || (caseToDelete as any).inspection_timestamp)}</span>
               </div>
             </div>
@@ -365,3 +376,4 @@ export const ReviewQueue: React.FC = () => {
 };
 
 export default ReviewQueue;
+

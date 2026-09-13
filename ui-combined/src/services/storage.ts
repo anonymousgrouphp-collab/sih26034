@@ -15,6 +15,7 @@ export interface DraftInspection {
   package_type: string;
   jurisdiction_id: string;
   notes?: string;
+  declared_net_qty?: string;
   saved_at: string;
 }
 

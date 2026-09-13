@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { m } from "framer-motion";
 import { StateEmblem } from "../components/common/StateEmblem";
 import { GovTopBar } from "../components/layout/GovTopBar";
 import { GovFooter } from "../components/layout/GovFooter";
@@ -16,15 +17,20 @@ export const NotFound: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-surfaceBg flex flex-col font-sans">
+    <div className="min-h-screen bg-[#0b1320] flex flex-col font-sans text-white">
       {/* Official GIGW 3.0 Top Utility Bar */}
       <GovTopBar />
 
       {/* Main Content Area */}
       <main id="main-content" className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
-        <div className="w-full max-w-xl bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden animate-fade-in">
+        <m.div 
+          initial={{ opacity: 0, y: 10, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.3 }}
+          className="w-full max-w-xl glass-panel rounded-2xl border border-slate-700/60 shadow-2xl overflow-hidden"
+        >
           {/* Sovereign Masthead */}
-          <div className="bg-govNavy text-white p-6 sm:p-8 text-center relative overflow-hidden">
+          <div className="bg-slate-800/80 text-white p-6 sm:p-8 text-center relative overflow-hidden">
             <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px]" />
             <div className="relative z-10 flex flex-col items-center space-y-3">
               <StateEmblem size={44} tone="white" showMotto={true} />
@@ -33,7 +39,7 @@ export const NotFound: React.FC = () => {
                   ? "भारत सरकार • उपभोक्ता मामले विभाग"
                   : "Government of India • Department of Consumer Affairs"}
               </div>
-              <h1 className="text-xl sm:text-2xl font-black tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white">
                 {language === "hi" ? "विधिक मापविज्ञान पोर्टल" : "Legal Metrology Inspection Portal"}
               </h1>
             </div>
@@ -45,20 +51,20 @@ export const NotFound: React.FC = () => {
               <img
                 src="/assets/errors/error_404_dossier.svg"
                 alt="404 Case Dossier Not Found Illustration"
-                className="w-48 h-36 object-contain drop-shadow-sm"
+                className="w-48 h-36 object-contain drop-shadow-sm opacity-80"
               />
             </div>
 
             <div className="space-y-2">
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-amber-800 bg-amber-100/70 px-3 py-1 rounded-full">
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-rose-400 bg-rose-900/30 border border-rose-500/30 px-3 py-1 rounded-full inline-block">
                 {language === "hi" ? "त्रुटि कोड: 404 // सांविधिक रिकॉर्ड नहीं मिला" : "Error Code: 404 // Statutory Record Not Found"}
               </span>
-              <h2 className="text-2xl font-black text-slate-900">
+              <h2 className="text-2xl font-black text-white">
                 {language === "hi"
                   ? "पृष्ठ या निरीक्षण मामला नहीं मिला"
                   : "Requested Page or Case Dossier Not Found"}
               </h2>
-              <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
                 {language === "hi"
                   ? "आपके द्वारा अनुरोधित URL या केस फ़ाइल उपलब्ध नहीं है अथवा स्थानांतरित कर दी गई है। कृपया नीचे दिए गए आधिकारिक विकल्पों का उपयोग करें।"
                   : "The statutory URL or inspection case record you requested does not exist, has expired, or may have been re-indexed in another enforcement division."}
@@ -69,16 +75,16 @@ export const NotFound: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-left">
               <Link
                 to="/dashboard"
-                className="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 hover:border-govNavy/40 hover:bg-slate-50 transition-colors group"
+                className="flex items-start gap-3 p-3.5 rounded-xl border border-slate-700/60 hover:border-cyan-500/40 hover:bg-slate-800/80 transition-colors group btn-press"
               >
-                <div className="p-2 rounded-lg bg-govNavy/5 text-govNavy group-hover:bg-govNavy group-hover:text-white transition-colors shrink-0">
+                <div className="p-2 rounded-lg bg-cyan-900/30 text-cyan-400 group-hover:bg-cyan-600 group-hover:text-white transition-colors shrink-0">
                   <Home size={18} />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-slate-900">
+                  <div className="text-xs font-bold text-white">
                     {language === "hi" ? "कार्यकारी डैशबोर्ड" : "Executive Dashboard"}
                   </div>
-                  <div className="text-[11px] text-slate-500 mt-0.5">
+                  <div className="text-[11px] text-slate-400 mt-0.5">
                     {language === "hi" ? "निरीक्षण नियंत्रण कक्ष पर लौटें" : "Return to inspection control centre"}
                   </div>
                 </div>
@@ -86,16 +92,16 @@ export const NotFound: React.FC = () => {
 
               <Link
                 to="/inspections"
-                className="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 hover:border-govNavy/40 hover:bg-slate-50 transition-colors group"
+                className="flex items-start gap-3 p-3.5 rounded-xl border border-slate-700/60 hover:border-cyan-500/40 hover:bg-slate-800/80 transition-colors group btn-press"
               >
-                <div className="p-2 rounded-lg bg-govNavy/5 text-govNavy group-hover:bg-govNavy group-hover:text-white transition-colors shrink-0">
+                <div className="p-2 rounded-lg bg-cyan-900/30 text-cyan-400 group-hover:bg-cyan-600 group-hover:text-white transition-colors shrink-0">
                   <ClipboardList size={18} />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-slate-900">
+                  <div className="text-xs font-bold text-white">
                     {language === "hi" ? "निरीक्षण पंजी" : "Inspection Register"}
                   </div>
-                  <div className="text-[11px] text-slate-500 mt-0.5">
+                  <div className="text-[11px] text-slate-400 mt-0.5">
                     {language === "hi" ? "सक्रिय जिंस मामले देखें" : "Browse active commodity cases"}
                   </div>
                 </div>
@@ -103,31 +109,31 @@ export const NotFound: React.FC = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 border-t border-slate-100">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 border-t border-slate-700/60">
               <button
                 type="button"
                 onClick={() => navigate(-1)}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-slate-600 text-xs font-bold text-slate-300 hover:bg-slate-700 hover:text-white transition-colors btn-press"
               >
                 <ArrowLeft size={14} />
                 <span>{language === "hi" ? "पिछली स्क्रीन पर वापस जाएं" : "Go Back to Previous Screen"}</span>
               </button>
               <Link
                 to="/rules"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-govNavy text-xs font-bold text-white hover:bg-govNavy-light transition-colors shadow-xs"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-cyan-600 text-xs font-bold text-white hover:bg-cyan-500 transition-colors shadow-xs btn-press"
               >
                 <span>{language === "hi" ? "एलएमपीसी सांविधिक नियम देखें" : "Browse LMPC Statutory Rules"}</span>
               </Link>
             </div>
 
             {/* Support / Helpdesk Disclaimer */}
-            <div className="pt-2 text-[11px] text-slate-400 font-mono">
+            <div className="pt-2 text-[11px] text-slate-500 font-mono">
               {language === "hi"
                 ? "राष्ट्रीय उपभोक्ता हेल्पलाइन: 1915 • ई-माप प्रवर्तन डेस्क • निरीक्षक"
                 : "National Consumer Helpline: 1915 • eMaap Enforcement Desk • NIRIKSHAK"}
             </div>
           </div>
-        </div>
+        </m.div>
       </main>
 
       {/* Official Government Footer */}

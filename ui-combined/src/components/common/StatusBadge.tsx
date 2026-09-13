@@ -30,7 +30,7 @@ export const VerdictBadge: React.FC<VerdictBadgeProps> = ({
     case "FAIL":
       return (
         <span
-          className={`inline-flex items-center gap-1.5 rounded-full border border-verdictFail-dark/20 bg-verdictFail-light text-verdictFail-dark ${sizeClasses}`}
+          className={`inline-flex items-center gap-1.5 rounded-full border border-verdictFail-dark/20 bg-verdictFail-light text-verdictFail-dark [animation:glowPulse_2s_ease-in-out_infinite] motion-reduce:animate-none ${sizeClasses}`}
           title={language === "hi" ? "विधिक मापविज्ञान नियम, 2011 के तहत विधिक उल्लंघन पाया गया" : "Statutory non-compliance identified under LMPC Rules, 2011"}
         >
           {showDot && <span className="h-1.5 w-1.5 rounded-full bg-verdictFail" />}
@@ -40,7 +40,7 @@ export const VerdictBadge: React.FC<VerdictBadgeProps> = ({
     case "REVIEW":
       return (
         <span
-          className={`inline-flex items-center gap-1.5 rounded-full border border-verdictReview-dark/20 bg-verdictReview-light text-verdictReview-dark ${sizeClasses}`}
+          className={`inline-flex items-center gap-1.5 rounded-full border border-verdictReview-dark/20 bg-verdictReview-light text-verdictReview-dark [animation:breathe_2.5s_ease-in-out_infinite] motion-reduce:animate-none ${sizeClasses}`}
           title={language === "hi" ? "सेंसर अनिश्चितता सीमा में सीमावर्ती माप (k=2, 95% विश्वास)" : "Borderline measurement within sensor uncertainty band (k=2, 95% confidence)"}
         >
           {showDot && <span className="h-1.5 w-1.5 rounded-full bg-verdictReview" />}

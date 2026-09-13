@@ -12,6 +12,7 @@ import {
   Eye,
   EyeOff,
   CheckCircle2,
+  AlertCircle,
 } from "lucide-react";
 import { StateEmblem } from "../components/common/StateEmblem";
 import { GovTopBar } from "../components/layout/GovTopBar";
@@ -69,9 +70,10 @@ export const Login: React.FC = () => {
         inspector: "inspector_rajesh",
         controller: "controller_south",
         administrator: "admin_central",
-        auditor: "inspector_rajesh",
+        auditor: "viewer_analyst",
       };
       const username = usernameMap[selectedRole] || "inspector_rajesh";
+      const backendPassword = (!password || password === "Demo@123") ? "Officer@2026" : password;
       const res = await fetch("/api/v1/auth/login", {
         method: "POST",
         headers: {
@@ -79,7 +81,7 @@ export const Login: React.FC = () => {
           "X-Client-Version": "1.0.0-sih26034",
           "X-Device-Fingerprint": "WEB-SPA-CLIENT-OFFICER-WORKSTATION",
         },
-        body: JSON.stringify({ username, password: password || "Officer@2026" }),
+        body: JSON.stringify({ username, password: backendPassword }),
       });
       if (res.ok) {
         const data = await res.json();
@@ -100,7 +102,7 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#0b1320] flex flex-col font-sans">
       {/* Official GIGW 3.0 Top Utility Bar */}
       <GovTopBar />
 
@@ -178,29 +180,29 @@ export const Login: React.FC = () => {
         </section>
 
         {/* Right Sign-in Form */}
-        <section className="flex items-center justify-center p-6 sm:p-10">
+        <section className="flex items-center justify-center p-6 sm:p-10 bg-[#0b1320]">
           <div className="w-full max-w-md space-y-6">
             <div className="flex items-center justify-between">
               <Link
                 to="/"
-                className="text-xs font-bold text-slate-600 hover:text-govNavy flex items-center gap-1.5"
+                className="text-xs font-bold text-slate-400 hover:text-white flex items-center gap-1.5 transition-colors"
               >
                 ← Return to Public Portal
               </Link>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-bold text-emerald-800 border border-emerald-200">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-900/30 px-3 py-1 text-[10px] font-bold text-emerald-400 border border-emerald-800">
                 <LockKeyhole size={12} /> SECURE GATE
               </span>
             </div>
 
-            <div className="card p-6 sm:p-8 bg-white space-y-6 shadow-md border-slate-200">
-              <div className="flex items-center gap-3.5 border-b border-slate-200 pb-4">
-                <StateEmblem size={28} tone="navy" showMotto={true} className="shrink-0" />
+            <div className="glass-panel p-6 sm:p-8 space-y-6 rounded-2xl animate-fade-in shadow-2xl">
+              <div className="flex items-center gap-3.5 border-b border-slate-700/60 pb-4">
+                <StateEmblem size={28} tone="white" showMotto={true} className="shrink-0" />
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-amber-700 block">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-amber-400 block">
                     Officer Authentication Gateway
                   </span>
-                  <h2 className="text-xl font-black text-govNavy">Official Workstation Sign In</h2>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
+                  <h2 className="text-xl font-black text-white">Official Workstation Sign In</h2>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
                     Department of Consumer Affairs • Government of India
                   </p>
                 </div>
@@ -208,7 +210,7 @@ export const Login: React.FC = () => {
 
               {/* Role Selectors */}
               <div className="space-y-2">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
                   Select Official Role:
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -217,15 +219,15 @@ export const Login: React.FC = () => {
                       type="button"
                       key={r.id}
                       onClick={() => handleRoleSelect(r.id)}
-                      className={`p-3 rounded-xl border text-left transition-all ${
+                      className={`p-3 rounded-xl border text-left transition-all btn-press ${
                         selectedRole === r.id
-                          ? "border-govNavy bg-govNavy/5 ring-2 ring-govNavy/30 shadow-xs"
-                          : "border-slate-200 bg-slate-50 hover:border-slate-300"
+                          ? "border-amber-400/50 bg-amber-400/10 ring-2 ring-amber-400/20 shadow-[0_0_15px_rgba(251,191,36,0.1)]"
+                          : "border-slate-700 bg-slate-800/50 hover:border-slate-600 hover:bg-slate-700/50"
                       }`}
                     >
                       <p
                         className={`text-xs font-extrabold leading-snug ${
-                          selectedRole === r.id ? "text-govNavy" : "text-slate-800"
+                          selectedRole === r.id ? "text-amber-300" : "text-slate-300"
                         }`}
                       >
                         {r.title}
@@ -237,45 +239,51 @@ export const Login: React.FC = () => {
               </div>
 
               {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700">
-                  {error}
+                <div className="p-3 bg-rose-950/50 border border-rose-800/80 rounded-xl text-xs text-rose-300 flex items-center gap-2 shadow-sm">
+                  <AlertCircle size={15} className="text-rose-400 shrink-0" />
+                  <span>{error}</span>
                 </div>
               )}
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
+                  <label htmlFor="official-email" className="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">
                     Official Email / Government ID
                   </label>
                   <div className="relative">
                     <UserRound size={16} className="absolute left-3 top-3 text-slate-400" />
                     <input
+                      id="official-email"
+                      name="email"
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="input pl-9 text-xs"
+                      className="input pl-9 text-xs bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-500 focus:border-amber-400/50 focus:ring-amber-400/20"
                       required
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
+                  <label htmlFor="security-password" className="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">
                     Security Password
                   </label>
                   <div className="relative">
                     <KeyRound size={16} className="absolute left-3 top-3 text-slate-400" />
                     <input
+                      id="security-password"
+                      name="password"
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="input pl-9 pr-10 text-xs"
+                      className="input pl-9 pr-10 text-xs bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-500 focus:border-amber-400/50 focus:ring-amber-400/20"
                       required
                     />
                     <button
                       type="button"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
                       onClick={() => setShowPassword((prev) => !prev)}
-                      className="absolute right-3 top-3 text-slate-400 hover:text-slate-600"
+                      className="absolute right-3 top-3 text-slate-400 hover:text-amber-300 transition-colors"
                     >
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
@@ -284,22 +292,22 @@ export const Login: React.FC = () => {
 
                 <button
                   type="submit"
-                  className="w-full btn-primary py-3 text-sm flex items-center justify-center gap-2"
+                  className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-900 font-bold py-3 px-4 rounded-xl text-sm flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(245,158,11,0.2)] hover:shadow-[0_0_20px_rgba(245,158,11,0.4)] transition-all btn-press"
                 >
                   <span>Authenticate & Enter Workstation</span>
                   <ArrowRight size={16} />
                 </button>
               </form>
 
-              <div className="p-3 rounded-lg border border-dashed border-slate-300 bg-slate-50 text-xs text-slate-600 flex items-center justify-between">
+              <div className="p-3 rounded-lg border border-dashed border-slate-700/60 bg-slate-800/30 text-xs text-slate-400 flex items-center justify-between">
                 <div>
-                  <span className="font-bold text-slate-700">Demonstration Access: </span>
+                  <span className="font-bold text-slate-300">Demonstration Access: </span>
                   <span>1-click sign-in prefilled</span>
                 </div>
-                <span className="font-mono font-bold text-govNavy">Demo@123</span>
+                <span className="font-mono font-bold text-amber-400">Demo@123</span>
               </div>
 
-              <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-[11px] text-amber-900 leading-tight">
+              <div className="p-2.5 rounded-lg bg-red-900/20 border border-red-500/20 text-[11px] text-red-200/80 leading-tight">
                 <strong>Statutory Notice:</strong> Restricted to Gazetted Legal Metrology Officers and authorized enforcement personnel under the Legal Metrology Act, 2009. Unauthorized access attempts are monitored and recorded under Sec 43 of Information Technology Act, 2000.
               </div>
             </div>
@@ -314,3 +322,4 @@ export const Login: React.FC = () => {
 };
 
 export default Login;
+

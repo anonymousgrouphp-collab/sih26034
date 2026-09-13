@@ -50,34 +50,34 @@ export const StatutoryDemoShowcase: React.FC<StatutoryDemoShowcaseProps> = ({
     switch (verdict) {
       case "FAIL":
         return {
-          pill: "bg-rose-100 text-rose-800 border-rose-300",
-          cardBorder: "border-rose-200/90 hover:border-rose-500 bg-white hover:shadow-lg",
-          accentText: "text-rose-700",
-          tagBg: "bg-rose-50",
+          pill: "bg-red-950/80 text-red-400 border-red-800/60",
+          cardBorder: "border-rose-900/50 hover:border-rose-600 bg-slate-900/90 hover:shadow-lg",
+          accentText: "text-rose-400",
+          tagBg: "bg-rose-950/40 border-rose-900/50",
           icon: ShieldAlert,
         };
       case "PASS":
         return {
-          pill: "bg-emerald-100 text-emerald-800 border-emerald-300",
-          cardBorder: "border-emerald-200/90 hover:border-emerald-500 bg-white hover:shadow-lg",
-          accentText: "text-emerald-700",
-          tagBg: "bg-emerald-50",
+          pill: "bg-emerald-950/80 text-emerald-400 border-emerald-800/60",
+          cardBorder: "border-emerald-900/50 hover:border-emerald-600 bg-slate-900/90 hover:shadow-lg",
+          accentText: "text-emerald-400",
+          tagBg: "bg-emerald-950/40 border-emerald-900/50",
           icon: ShieldCheck,
         };
       case "REVIEW":
         return {
-          pill: "bg-amber-100 text-amber-900 border-amber-300",
-          cardBorder: "border-amber-200/90 hover:border-amber-500 bg-white hover:shadow-lg",
-          accentText: "text-amber-800",
-          tagBg: "bg-amber-50",
+          pill: "bg-amber-950/80 text-amber-400 border-amber-800/60",
+          cardBorder: "border-amber-900/50 hover:border-amber-600 bg-slate-900/90 hover:shadow-lg",
+          accentText: "text-amber-400",
+          tagBg: "bg-amber-950/40 border-amber-900/50",
           icon: Scale,
         };
       case "UNABLE_TO_VERIFY":
         return {
-          pill: "bg-purple-100 text-purple-900 border-purple-300",
-          cardBorder: "border-purple-200/90 hover:border-purple-500 bg-white hover:shadow-lg",
-          accentText: "text-purple-800",
-          tagBg: "bg-purple-50",
+          pill: "bg-purple-950/80 text-purple-400 border-purple-800/60",
+          cardBorder: "border-purple-900/50 hover:border-purple-600 bg-slate-900/90 hover:shadow-lg",
+          accentText: "text-purple-400",
+          tagBg: "bg-purple-950/40 border-purple-900/50",
           icon: Compass,
         };
     }
@@ -87,7 +87,7 @@ export const StatutoryDemoShowcase: React.FC<StatutoryDemoShowcaseProps> = ({
     <section
       id="demo-showcase"
       aria-label="Statutory Demonstration Suite"
-      className="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden space-y-4 scroll-mt-24"
+      className="glass-panel rounded-2xl border border-slate-700/60 shadow-sm overflow-hidden space-y-4 scroll-mt-24"
     >
       {/* Top National Header Bar */}
       <div className="bg-gradient-to-r from-govNavy via-govNavy to-slate-900 text-white p-5 sm:p-6 border-b-2 border-amber-500">
@@ -209,12 +209,12 @@ export const StatutoryDemoShowcase: React.FC<StatutoryDemoShowcaseProps> = ({
               >
                 <div className="space-y-3">
                   {/* Card Header: Tag, Counter & Verdict */}
-                  <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+                  <div className="flex items-center justify-between gap-2 border-b border-slate-700/60 pb-2.5">
                     <div className="flex items-center gap-1.5">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-mono font-black bg-slate-100 text-govNavy border border-slate-300">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-mono font-black bg-slate-800 text-cyan-300 border border-slate-700">
                         DEMO #{item.scenarioNumber}
                       </span>
-                      <span className="text-[10px] font-mono font-bold text-slate-500">
+                      <span className="text-[10px] font-mono font-bold text-slate-400">
                         {item.skuId}
                       </span>
                     </div>
@@ -229,7 +229,7 @@ export const StatutoryDemoShowcase: React.FC<StatutoryDemoShowcaseProps> = ({
 
                   {/* Thumbnail & Title Row */}
                   <div className="flex gap-3 items-start">
-                    <div className="w-16 h-16 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-lg bg-slate-800 border border-slate-700 overflow-hidden shrink-0 flex items-center justify-center">
                       <img
                         src={item.imagePath}
                         alt={title}
@@ -242,20 +242,20 @@ export const StatutoryDemoShowcase: React.FC<StatutoryDemoShowcaseProps> = ({
                       />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-extrabold text-sm text-govNavy line-clamp-1" title={title}>
+                      <h3 className="font-extrabold text-sm text-white line-clamp-1" title={title}>
                         {title}
                       </h3>
-                      <p className="text-[11px] text-slate-500 font-medium truncate mt-0.5">
+                      <p className="text-[11px] text-slate-400 font-medium truncate mt-0.5">
                         {category} • {item.packageType}
                       </p>
-                      <span className="inline-block mt-1 text-[10px] font-mono text-slate-400">
+                      <span className="inline-block mt-1 text-[10px] font-mono text-cyan-400">
                         {item.inspectionNumber}
                       </span>
                     </div>
                   </div>
 
                   {/* Headline Infraction Banner */}
-                  <div className={`p-2.5 rounded-lg border text-xs ${theme.tagBg} border-slate-200/90`}>
+                  <div className={`p-2.5 rounded-lg border text-xs ${theme.tagBg}`}>
                     <div className="flex items-start gap-1.5">
                       <VerdictIcon size={14} className={`shrink-0 mt-0.5 ${theme.accentText}`} />
                       <p className={`font-bold leading-snug ${theme.accentText}`}>
@@ -265,20 +265,20 @@ export const StatutoryDemoShowcase: React.FC<StatutoryDemoShowcaseProps> = ({
                   </div>
 
                   {/* Statutory Metric Telemetry Badge */}
-                  <div className="grid grid-cols-2 gap-2 text-[11px] bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                  <div className="grid grid-cols-2 gap-2 text-[11px] bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/60">
                     <div>
-                      <span className="text-[10px] text-slate-500 uppercase font-bold block">
+                      <span className="text-[10px] text-slate-400 uppercase font-bold block">
                         {language === "hi" ? "पीडीपी क्षेत्रफल" : "PDP Area"}
                       </span>
-                      <span className="font-mono font-extrabold text-slate-800">
+                      <span className="font-mono font-extrabold text-slate-200">
                         {item.pdpAreaCm2} cm²
                       </span>
                     </div>
                     <div>
-                      <span className="text-[10px] text-slate-500 uppercase font-bold block">
+                      <span className="text-[10px] text-slate-400 uppercase font-bold block">
                         {language === "hi" ? "तालिका-I न्यूनतम फॉन्ट" : "Table-I Min Font"}
                       </span>
-                      <span className="font-mono font-extrabold text-slate-800">
+                      <span className="font-mono font-extrabold text-slate-200">
                         {item.observedFontMm
                           ? `${item.observedFontMm} mm (Req >= ${item.expectedFontMm} mm)`
                           : `>= ${item.expectedFontMm} mm`}
@@ -287,14 +287,14 @@ export const StatutoryDemoShowcase: React.FC<StatutoryDemoShowcaseProps> = ({
                   </div>
 
                   {/* Primary Statutory Reference */}
-                  <div className="text-[11px] text-slate-600 font-mono truncate">
+                  <div className="text-[11px] text-slate-400 font-mono truncate">
                     <span className="font-bold text-slate-500 mr-1">Rule:</span>
                     <span>{item.statutoryRules[0]}</span>
                   </div>
                 </div>
 
                 {/* Card Actions */}
-                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                <div className="mt-4 pt-3 border-t border-slate-700/60 flex items-center justify-between gap-2">
                   <span className="text-[10.5px] font-mono font-semibold text-slate-400">
                     Sec 63 BSA 2023
                   </span>
@@ -302,10 +302,10 @@ export const StatutoryDemoShowcase: React.FC<StatutoryDemoShowcaseProps> = ({
                   <button
                     type="button"
                     onClick={() => handleOpenCase(item.caseId)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold bg-govNavy text-white hover:bg-govNavy-light transition-all shadow-xs"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold bg-amber-400 text-slate-950 hover:bg-amber-300 transition-all shadow-xs"
                   >
                     <span>{language === "hi" ? "केस एवं परिणाम देखें" : "Inspect Demo"}</span>
-                    <ArrowRight size={13} className="text-amber-400" />
+                    <ArrowRight size={13} className="text-slate-950" />
                   </button>
                 </div>
               </div>

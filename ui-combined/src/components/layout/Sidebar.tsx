@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Home,
   ClipboardCheck,
@@ -13,10 +13,15 @@ import {
   Scale,
   X,
   Sparkles,
+  LogOut,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { StateEmblem } from "../common/StateEmblem";
+import { m, AnimatePresence } from "framer-motion";
+import { useState } from "react";
 
 interface SidebarProps {
   pendingCasesCount?: number;
@@ -31,10 +36,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onCloseMobile,
   onNewInspectionClick,
 }) => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { t, language } = useLanguage();
+  const navigate = useNavigate();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const location = useLocation();
+
+  const isController = user?.officerRole === "CONTROLLER";
+
+  const handleSignOut = () => {
+    onCloseMobile?.();
+    logout();
+    navigate("/login");
+  };
 
   const isItemActive = (path: string): boolean => {
     const current = location.pathname;
@@ -47,12 +62,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
     if (path.includes("/evidence")) {
       return current.includes("/evidence");
     }
+    if (path === "/inspections/SKU-DEMO-01") {
+      return (
+        current.startsWith("/inspections/SKU-DEMO") ||
+        current === "/inspections/demo-fortune-sunlite"
+      );
+    }
     if (path === "/inspections") {
       return (
         current === "/inspections" ||
         (current.startsWith("/inspections/") &&
           current !== "/inspections/new" &&
-          !current.includes("/evidence"))
+          !current.includes("/evidence") &&
+          !current.startsWith("/inspections/SKU-DEMO") &&
+          current !== "/inspections/demo-fortune-sunlite")
       );
     }
     if (path === "/settings") {
@@ -61,10 +84,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
     return current === path || current.startsWith(path + "/");
   };
 
+  const currentCaseMatch = location.pathname.match(/^\/inspections\/([^/]+)/);
+  const currentRouteCaseId = currentCaseMatch && currentCaseMatch[1] !== "new" ? currentCaseMatch[1] : null;
   const lastCaseId =
-    typeof window !== "undefined"
+    currentRouteCaseId ||
+    (typeof window !== "undefined"
       ? window.localStorage?.getItem("nyayadrishti_last_case_id") || "demo-fortune-sunlite"
-      : "demo-fortune-sunlite";
+      : "demo-fortune-sunlite");
 
   const navigation = [
     { label: t("nav.dashboard", "Executive Dashboard"), path: "/dashboard", icon: Home },
@@ -72,7 +98,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     {
       label: language === "hi" ? "डेमो परिदृश्य (7)" : "Demo Scenarios (7)",
       path: "/inspections/SKU-DEMO-01",
-      icon: Sparkles,
+      icon: Scale,
       badge: "7 DEMOS",
     },
     { label: t("nav.new", "New Inspection"), path: "/inspections/new", icon: ClipboardCheck },
@@ -97,42 +123,57 @@ export const Sidebar: React.FC<SidebarProps> = ({
         />
       )}
 
-      <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-72 shrink-0 flex-col border-r border-slate-200 bg-white transition-transform lg:static lg:w-64 lg:translate-x-0 ${
-          mobileOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full lg:shadow-none"
+      <m.aside
+        initial={false}
+        animate={{ width: isCollapsed ? 64 : 240 }}
+        transition={{ duration: 0.2, ease: [0.2, 0, 0, 1] }}
+        className={`fixed inset-y-0 left-0 z-50 flex shrink-0 flex-col border-r border-white/10 glass-panel text-slate-300 transition-transform lg:sticky lg:inset-y-auto lg:top-[70px] lg:h-[calc(100vh-8.25rem)] ${
+          mobileOpen ? "translate-x-0 shadow-2xl w-64" : "-translate-x-full lg:translate-x-0 lg:shadow-none"
         }`}
       >
         {/* Mobile Header */}
-        <div className="flex h-16 items-center justify-between border-b border-slate-200 px-4 lg:hidden bg-govNavy text-white">
+        <div className="flex h-16 items-center justify-between border-b border-white/10 px-4 lg:hidden">
           <div className="flex items-center gap-2.5">
             <StateEmblem size={22} tone="white" showMotto={true} className="shrink-0" />
-            <span className="font-bold text-sm tracking-tight">NIRIKSHAK</span>
+            <span className="font-bold text-sm tracking-tight text-white">NIRIKSHAK</span>
           </div>
           <button
             type="button"
             onClick={onCloseMobile}
-            className="rounded-md p-1.5 text-slate-300 hover:bg-govNavy-light hover:text-white"
+            className="rounded-md p-1.5 text-slate-300 hover:bg-white/10 hover:text-white"
           >
             <X size={20} />
           </button>
         </div>
 
-        {/* Top Primary Action */}
-        <div className="p-4 space-y-3">
+        {/* Desktop Collapse Toggle */}
+        <div className="hidden lg:flex items-center justify-end p-2 border-b border-white/10">
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="p-1.5 rounded-md hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+          >
+            {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+          </button>
+        </div>
+
+        {/* Top Primary Action + Navigation */}
+        <div className="flex-1 min-h-0 overflow-y-auto p-3 space-y-3 custom-scrollbar">
           <Link
             to="/inspections/new"
             onClick={onCloseMobile}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-govNavy hover:bg-govNavy-light text-white text-xs sm:text-sm font-bold rounded-lg shadow-sm transition-colors focus:ring-2 focus:ring-amber-500 focus:outline-none"
+            className={`w-full flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white text-xs sm:text-sm font-bold rounded-lg shadow-lg shadow-amber-500/20 transition-all focus:ring-2 focus:ring-amber-500 focus:outline-none overflow-hidden ${isCollapsed ? 'px-0' : 'px-4'}`}
           >
-            <Plus size={16} />
-            <span>{t("action.new_case", "New Inspection Case")}</span>
+            <Plus size={isCollapsed ? 20 : 16} className="shrink-0" />
+            {!isCollapsed && <span className="truncate">{t("action.new_case", "New Inspection")}</span>}
           </Link>
 
-          <p className="px-1 pt-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-            {language === "hi" ? "नेविगेशन मेनू" : "Navigation Menu"}
-          </p>
+          {!isCollapsed && (
+            <p className="px-1 pt-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+              {language === "hi" ? "नेविगेशन मेनू" : "Navigation Menu"}
+            </p>
+          )}
 
-          <nav className="space-y-1">
+          <nav className="space-y-1 relative">
             {navigation.map((item) => {
               const Icon = item.icon;
               const active = isItemActive(item.path);
@@ -141,18 +182,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   key={item.path}
                   to={item.path}
                   onClick={onCloseMobile}
-                  className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg transition-colors ${
+                  title={isCollapsed ? item.label : undefined}
+                  className={`relative w-full flex items-center justify-between py-2.5 text-xs font-semibold rounded-lg transition-colors overflow-hidden ${
                     active
-                      ? "bg-amber-50 text-govNavy font-bold border-l-4 border-govNavy pl-2 shadow-2xs"
-                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                  }`}
+                      ? "text-white font-bold bg-white/10"
+                      : "text-slate-400 hover:bg-white/5 hover:text-slate-200"
+                  } ${isCollapsed ? 'px-0 justify-center' : 'px-3'}`}
                 >
-                  <div className="flex items-center gap-2.5">
-                    <Icon size={16} className={active ? "text-govNavy" : "text-slate-500"} />
-                    <span>{item.label}</span>
+                  {active && (
+                    <m.div
+                      layoutId="nav-indicator"
+                      className="absolute left-0 top-0 bottom-0 w-[2px] bg-[#e5a93c]"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.2 }}
+                    />
+                  )}
+                  <div className={`flex items-center gap-3 ${isCollapsed ? 'justify-center' : ''}`}>
+                    <Icon size={18} className={`shrink-0 ${active ? "text-amber-400" : "text-slate-500"}`} />
+                    {!isCollapsed && <span className="truncate">{item.label}</span>}
                   </div>
-                  {item.badge !== undefined && (
-                    <span className="px-2 py-0.5 text-[10px] font-mono font-bold rounded-full bg-amber-200 text-amber-900">
+                  {!isCollapsed && item.badge !== undefined && (
+                    <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold rounded-full bg-amber-500/20 text-amber-300 shrink-0">
                       {item.badge}
                     </span>
                   )}
@@ -162,56 +213,91 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </nav>
         </div>
 
-        {/* Bottom Station Settings & Legal Invariants Card */}
-        <div className="mt-auto p-3 space-y-3 border-t border-slate-200 bg-slate-50/50">
+        {/* Bottom */}
+        <div className="shrink-0 mt-auto p-3 space-y-3 border-t border-white/10 bg-black/20">
           <Link
             to="/settings"
             onClick={onCloseMobile}
-            className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-lg transition-colors ${
+            title={isCollapsed ? t("nav.settings", "Station Settings") : undefined}
+            className={`w-full flex items-center gap-3 py-2 text-xs font-semibold rounded-lg transition-colors overflow-hidden ${
               isItemActive("/settings")
-                ? "bg-amber-50 text-govNavy font-bold border-l-4 border-govNavy pl-2"
-                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-            }`}
+                ? "text-white font-bold bg-white/10"
+                : "text-slate-400 hover:bg-white/5 hover:text-slate-200"
+            } ${isCollapsed ? 'px-0 justify-center' : 'px-3'}`}
           >
-            <Settings size={16} className={isItemActive("/settings") ? "text-govNavy" : "text-slate-500"} />
-            <span>{t("nav.settings", "Station Settings")}</span>
+            {isItemActive("/settings") && (
+              <m.div
+                layoutId="nav-indicator"
+                className="absolute left-0 top-0 bottom-0 w-[2px] bg-[#e5a93c]"
+                transition={{ duration: 0.2 }}
+              />
+            )}
+            <Settings size={18} className={`shrink-0 ${isItemActive("/settings") ? "text-amber-400" : "text-slate-500"}`} />
+            {!isCollapsed && <span className="truncate">{t("nav.settings", "Station Settings")}</span>}
           </Link>
 
-          <div className="p-2 rounded-lg bg-amber-50/80 border border-amber-200/80 text-[11px] text-amber-900 space-y-1">
-            <div className="flex items-center gap-1.5 font-bold text-[10px] uppercase tracking-wider text-amber-800">
-              <ShieldCheck size={13} className="text-amber-600" />
-              <span>{language === "hi" ? "विधिक मापविज्ञान अधिनियम, 2009" : "Legal Metrology Act, 2009"}</span>
+          {!isCollapsed && (
+            <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[11px] space-y-1">
+              <div className="flex items-center gap-1.5 font-bold text-[10px] uppercase tracking-wider text-amber-400">
+                <ShieldCheck size={13} className="text-amber-500" />
+                <span className="truncate">{language === "hi" ? "विधिक मापविज्ञान अधिनियम, 2009" : "Legal Metrology Act"}</span>
+              </div>
             </div>
-            <p className="text-[10px] text-amber-800/90 leading-relaxed font-sans">
-              {language === "hi"
-                ? "धारा 63 भारतीय साक्ष्य अधिनियम, 2023 के तहत डिजिटल साक्ष्य प्रमाणन।"
-                : "Section 63 BSA 2023 evidence certification active."}
-            </p>
-          </div>
+          )}
 
-          <div className="p-3 border border-slate-200 bg-white rounded-lg shadow-2xs text-[10.5px] font-mono space-y-1 text-slate-600">
-            <div className="flex items-center justify-between">
-              <span className="font-semibold text-slate-700">{language === "hi" ? "सांविधिक नियम:" : "Statute:"}</span>
-              <span className="text-govNavy font-medium">LMPC 2011</span>
+          {!isCollapsed && (
+            <div className="p-3 border border-white/10 bg-white/5 rounded-lg text-[10.5px] font-mono space-y-1 text-slate-400">
+              <div className="flex items-center justify-between">
+                <span className="font-semibold">{language === "hi" ? "सांविधिक नियम:" : "Statute:"}</span>
+                <span className="text-white font-medium">LMPC 2011</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="font-semibold">{language === "hi" ? "साक्ष्य अधिनियम:" : "Evidence Act:"}</span>
+                <span className="text-emerald-400 font-bold">Sec 63 BSA</span>
+              </div>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="font-semibold text-slate-700">{language === "hi" ? "साक्ष्य अधिनियम:" : "Evidence Act:"}</span>
-              <span className="text-emerald-700 font-bold">Sec 63 BSA 2023</span>
+          )}
+
+          <div
+            className={`flex items-center gap-2.5 rounded-lg border bg-white/5 transition-all overflow-hidden ${
+              isController ? "border-purple-500/30" : "border-amber-500/30"
+            } ${isCollapsed ? 'p-1.5 justify-center' : 'p-2.5'}`}
+            title={`Active Officer: ${user?.name || (isController ? "S.K. Verma" : "Rajesh Sharma")}`}
+          >
+            <div
+              className={`w-7 h-7 rounded-md flex items-center justify-center text-[10px] font-black shrink-0 ${
+                isController ? "bg-purple-600 text-white" : "bg-amber-500 text-govNavy"
+              }`}
+            >
+              {user?.initials || (isController ? "SKV" : "RS")}
             </div>
-            <div className="flex items-center justify-between">
-              <span className="font-semibold text-slate-700">{language === "hi" ? "संदर्भ मार्कर:" : "Fiducial:"}</span>
-              <span>ArUco / ISO 7810</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="font-semibold text-slate-700">{language === "hi" ? "तालिका-I पंक्ति 5:" : "Table-I Row 5:"}</span>
-              <span className="text-amber-700 font-bold">6.0 mm (ADL-01)</span>
-            </div>
-            <div className="pt-1.5 border-t border-slate-100 text-center text-[9.5px] text-slate-400">
-              NIRIKSHAK • v1.0.0-sih26034
-            </div>
+            {!isCollapsed && (
+              <>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span className="text-[11px] font-bold text-white truncate">
+                      {user?.name || (isController ? "S.K. Verma" : "R. Sharma")}
+                    </span>
+                  </div>
+                  <div className="text-[9px] font-mono text-slate-500 truncate">
+                    {user?.badgeNumber || (isController ? "CTRL-DL-0012" : "INSP-DL-0842")}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  title="Sign out"
+                  aria-label="Sign out"
+                  className="p-1 rounded text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors shrink-0"
+                >
+                  <LogOut size={14} />
+                </button>
+              </>
+            )}
           </div>
         </div>
-      </aside>
+      </m.aside>
     </>
   );
 };
+
