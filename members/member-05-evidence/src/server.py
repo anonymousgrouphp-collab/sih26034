@@ -377,7 +377,7 @@ def system_health_status(db: Session = Depends(get_db_session)):
         "repealed_acts_cited": None,
         "audit_chain_valid": chain_valid,
         "database": "CONNECTED",
-        "version": "1.0.0-sih26034",
+        "version": "1.0.1-pipeline-opt",
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),
     }
 
