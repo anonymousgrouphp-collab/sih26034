@@ -6,18 +6,18 @@ services:
   # ---------------------------------------------------------------------------
   db:
     image: postgres:16-alpine
-    container_name: nirikshak-db
+    container_name: nyayadrishti-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: nirikshak
-      POSTGRES_USER: nirikshak_admin
+      POSTGRES_DB: nyayadrishti
+      POSTGRES_USER: nyaya_admin
       POSTGRES_PASSWORD: StatutoryEnforcement@2026
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U nirikshak_admin -d nirikshak"]
+      test: ["CMD-SHELL", "pg_isready -U nyaya_admin -d nyayadrishti"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -29,13 +29,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: nirikshak-backend
+    container_name: nyayadrishti-backend
     restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://nirikshak_admin:StatutoryEnforcement@2026@db:5432/nirikshak
+      DATABASE_URL: postgresql://nyaya_admin:StatutoryEnforcement@2026@db:5432/nyayadrishti
       NIRIKSHAK_SECRET_KEY: Nirikshak-sec63-bsa2023-statutory-secret-key-prod-delhi-01
       PORT: 8000
       HOST: 0.0.0.0
@@ -51,7 +51,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: nirikshak-frontend
+    container_name: nyayadrishti-frontend
     restart: unless-stopped
     depends_on:
       - backend
@@ -60,6 +60,6 @@ services:
 
 volumes:
   pgdata:
-    name: nirikshak_pgdata
+    name: nyayadrishti_pgdata
   storage_data:
-    name: nirikshak_storage
+    name: nyayadrishti_storage

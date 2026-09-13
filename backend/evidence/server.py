@@ -224,7 +224,7 @@ async def lifespan(app: FastAPI):
     keepalive_task = None
     if os.getenv("RENDER") or os.getenv("RENDER_EXTERNAL_URL"):
         async def keep_alive_heartbeat():
-            ext_url = os.getenv("RENDER_EXTERNAL_URL", "https://nirikshak-backend.onrender.com")
+            ext_url = os.getenv("RENDER_EXTERNAL_URL", "https://nyayadrishti-backend.onrender.com")
             while True:
                 await asyncio.sleep(600)  # Ping every 10 minutes to prevent 15-min idle spin-down
                 try:
