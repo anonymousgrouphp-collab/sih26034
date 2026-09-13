@@ -415,11 +415,11 @@ The record is cryptographically hashed and saved in local encrypted storage, rea
 
 #### Stage 3: Fiducial Calibration & Metric Scale
 
-- **What happens:** Detects the 50 mm ArUco 4x4 marker (or ₹5 coin) and calculates the exact pixel-to-millimeter ratio ($S$).
+- **What happens:** Detects standard reference standards—including ISO-7810 debit/credit cards ($85.60\text{ mm} \times 53.98\text{ mm}$) and 50 mm ArUco 4x4 markers (or ₹5 coin)—and calculates the exact pixel-to-millimeter ratio ($S$).
 - **Owner:** Member 1.
-- **Input:** Image with reference marker.
-- **Output:** `px_to_mm` scale factor and marker corner coordinates.
-- **Failure fallback:** If marker is missing, switches to **Uncalibrated Mode**: text rules still execute, but font size checks are routed to `REQUIRES_REVIEW (NO_CALIBRATION_TARGET)`.
+- **Input:** Image with reference marker or card.
+- **Output:** `px_to_mm` scale factor and marker/card bounding coordinates.
+- **Failure fallback:** If marker/card is missing, switches to **Uncalibrated Mode**: text rules still execute, but font size checks are routed to `REQUIRES_REVIEW (NO_CALIBRATION_TARGET)`.
 
 #### Stage 4: Homography Perspective Rectification
 
@@ -445,19 +445,19 @@ The record is cryptographically hashed and saved in local encrypted storage, rea
 - **Output:** List of text polygon coordinates.
 - **Failure fallback:** Merges overlapping bounding boxes if text spacing is tight.
 
-#### Stage 7: Optical Character Recognition (OCR)
+#### Stage 7: Optical Character Recognition (OCR) & Inversion Probing
 
-- **What happens:** Reads text inside each polygon using **PaddleOCR PP-OCRv4 (SVTR)** in English and Devanagari Hindi, outputting text strings and confidence scores.
+- **What happens:** Reads text inside each polygon using **PaddleOCR PP-OCRv4 (SVTR)** in English and Devanagari Hindi, outputting text strings and confidence scores. Includes an **automatic 180° inversion probe**: whenever initial confidence $< 0.92$, the engine probes rotated crop candidates to correctly transcribe upside-down physical packaging labels with $> 0.98$ confidence.
 - **Owner:** Member 2.
 - **Input:** Cropped text polygon patches.
 - **Output:** List of recognized text tokens with confidence values ($0.0$ to $1.0$).
 - **Failure fallback:** If confidence $< 0.65$, runs a secondary consensus pass using Tesseract v5.
 
-#### Stage 8: Semantic Entity Classification
+#### Stage 8: Semantic Entity Classification & Multi-Facet Fusion
 
-- **What happens:** Uses deterministic regex patterns, spatial proximity trees, and Indian postal NER to classify tokens into statutory fields: MRP, Net Quantity, Dates, Address, Country of Origin, Consumer Care.
+- **What happens:** Uses deterministic regex patterns, spatial proximity trees, and Indian postal NER to classify tokens into statutory fields: MRP, Net Quantity, Dates, Address, Country of Origin, Consumer Care. On multi-image packaging, executes **Multi-Facet Cross-Panel Fusion** across panel hierarchies (`FRONT_PDP` $\rightarrow$ `SIDE_PANEL` $\rightarrow$ `MACRO_CLOSE_UP` $\rightarrow$ `STAMP` $\rightarrow$ `BOTTOM_BASE` $\rightarrow$ `BACK_PANEL`) to assemble complete commodity facts without cross-panel text collision.
 - **Owner:** Member 3.
-- **Input:** OCR text tokens and bounding box coordinates.
+- **Input:** OCR text tokens and bounding box coordinates across single or multiple packaging facets.
 - **Output:** `NormalizedCommodityFacts` object.
 - **Failure fallback:** If address cannot be fully parsed, flags missing PIN code while preserving recognized entity lines.
 
@@ -1158,13 +1158,25 @@ $$
 - **1:00 - 2:00 (Members 1 & 6):** Snap live photo with ArUco card. Show quality gate passing, ArUco detection, and live pipeline execution. Show detected violations: font deficit, banned `gms`, and USP math error.
 - **2:00 - 3:00 (Members 4 & 5):** Show officer review canvas. Explain why AI does not issue fines alone. Click "Confirm", show instant Section 63 BSA Merkle DAG generation, and display the official Form-1 Legal Notice PDF.
 
-### 5 Golden Test Packages for Demonstration:
+### 13 Golden Test Packages for Demonstration:
 
-1. `SKU-DEMO-01` (Biscuit Box): Font height violation ($1.84\text{ mm}$ vs $2.50\text{ mm}$) + Banned unit `gms`.
-2. `SKU-DEMO-02` (Curry Pouch): USP math mismatch + Missing customer care email.
-3. `SKU-DEMO-03` (Water Bottle): Fully compliant packaging (Clean `PASS` across all clauses).
-4. `SKU-DEMO-04` (Soap Box): Borderline font height ($2.46\text{ mm}$ vs $2.50\text{ mm}$) triggering `REQUIRES_REVIEW`.
-5. `SKU-DEMO-05` (Chips Pouch): Harsh glare triggering `UNABLE_TO_VERIFY` and recovery advice.
+#### Tier 3A: Statutory Edge Cases & Rule Diagnostic Demonstrators
+1. `DEMO-01` (Sunfeast Butter Cookies 200g): Font height violation ($1.84\text{ mm}$ vs $2.50\text{ mm}$) + Banned unit symbol `gms` (`FAIL`).
+2. `DEMO-02` (Everest Garam Masala 100g): USP math mismatch ($\text{Rs } 0.45/\text{g}$ vs $\text{Rs } 0.52/\text{g}$) + Missing customer care email (`FAIL`).
+3. `DEMO-03` (Himalayan Mineral Water 1L): Fully compliant baseline packaging (Clean `PASS` across all clauses).
+4. `DEMO-04` (Medimix Ayurvedic Soap 75g): Borderline font height ($2.48\text{ mm}$ within $\pm 0.05\text{ mm}$ uncertainty band) triggering `REVIEW`.
+5. `DEMO-05` (Kurkure Masala Munch 90g): Severe specular glare bloom triggering optical quality rejection and recapture advice (`UNABLE_TO_VERIFY`).
+6. `DEMO-06` (Royal Delight Almonds 500g): Digital Marketplace listing missing Country of Origin declaration under Rule 6(10) (`FAIL`).
+7. `DEMO-07` (Fortune Sunlite Oil 1L): Indic Hindi Devanagari Net Qty numeral font deficit ($2.9\text{ mm} < 4.0\text{ mm}$) (`FAIL`).
+
+#### Tier 3B: Certified Real Physical Packaging Cases
+8. `REAL-PKG-WATCH` (Fastrack Wristwatch): Single unit count declaration (`01 NUMBER` $\rightarrow$ `1 N`) statutory exempt from USP under Rule 6(1)(da) Second Proviso; upside-down label auto-rectified via 180° inversion probe (`PASS`).
+9. `REAL-PKG-BRAHMI` (Himalaya Brahmi 60 Tablets): Tri-panel packaging fusion (Front PDP + Side LM panel with rate `Rs. 4.33/TAB.` + Back panel factory PIN `560058`) (`PASS`).
+10. `REAL-PKG-FACEWASH` (Dot & Key Face Wash 100ml): Dual corporate entity decoupling (Manufacturer in Solan HP vs Marketer in Kolkata WB) with volume rate `₹2.49/ml` (`PASS`).
+11. `REAL-PKG-PERFUME` (Bella Vita Perfume 20ml): Bottom carton base stamp batch fusion with volume rate `₹19.95/ml` (`PASS`).
+12. `REAL-PKG-NAMKEEN` (Haldiram's Namkeen 400g): Strict SI metric symbol verification (`400 g` with zero false `gms` flags) and mass rate `Rs. 0.25/g` (`PASS`).
+13. `REAL-PKG-CHIA` (True Elements Chia 250g): Nutritional panel isolation, rate `₹1.40/g`, and verified Pune customer care (`PASS`).
+
 
 ---
 

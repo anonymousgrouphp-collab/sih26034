@@ -482,19 +482,34 @@ export const EvidenceDossier: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
-            {(caseData.evidence_assets || []).map((asset) => (
+            {(caseData.evidence_assets || []).map((asset) => {
+              const apiBase = (import.meta as any).env?.VITE_API_BASE_URL || "https://nyayadrishti-backend.onrender.com/api/v1";
+              const rawSrc = asset.preview_url || asset.file_path || "";
+              const effectiveSrc = (() => {
+                if (asset.image_id && (rawSrc.includes("uploads/202") || rawSrc.startsWith("/storage/uploads/202"))) {
+                  return `${apiBase}/evidence/image/${asset.image_id}`;
+                }
+                return rawSrc;
+              })();
+
+              return (
               <div
                 key={asset.image_id}
                 className="p-3.5 rounded-lg border border-slate-700/60 bg-slate-800/40 space-y-2 text-xs"
               >
                 <div className="flex gap-3 items-start">
-                  {asset.file_path && (
+                  {effectiveSrc && (
                     <img
-                      src={asset.file_path}
+                      src={effectiveSrc}
                       alt={asset.panel_type}
                       className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded border border-slate-700/60 bg-slate-900 shrink-0"
                       onError={(e) => {
-                        (e.currentTarget as HTMLElement).style.display = "none";
+                        const target = e.currentTarget;
+                        if (asset.image_id && !target.src.includes(`/evidence/image/${asset.image_id}`)) {
+                          target.src = `${apiBase}/evidence/image/${asset.image_id}`;
+                        } else {
+                          target.style.display = "none";
+                        }
                       }}
                     />
                   )}
@@ -526,7 +541,8 @@ export const EvidenceDossier: React.FC = () => {
                   </div>
                 </div>
               </div>
-            ))}
+            );
+            })}
           </div>
         </section>
 

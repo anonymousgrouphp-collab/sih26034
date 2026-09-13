@@ -375,14 +375,23 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
 
   const canvasImages: CanvasImageItem[] = useMemo(() => {
     const normalizeUrl = (u?: string, imgId?: string) => {
-      if (!u) return imgId ? `/api/v1/evidence/image/${imgId}` : "";
+      const apiBase = ((import.meta as any)?.env?.VITE_API_BASE_URL as string) || "https://nyayadrishti-backend.onrender.com/api/v1";
+      if (!u) return imgId ? `${apiBase}/evidence/image/${imgId}` : "";
       if (u.startsWith("http://") || u.startsWith("https://") || u.startsWith("data:") || u.startsWith("blob:")) return u;
+      if (imgId && (u.includes("uploads/202") || (!u.includes("sku_demo_") && !u.includes("real_products") && !u.includes("REAL-PKG-")))) {
+        return `${apiBase}/evidence/image/${imgId}`;
+      }
       if (u.startsWith("uploads/") || u.startsWith("/uploads/")) {
-        return imgId ? `/api/v1/evidence/image/${imgId}` : `/storage/${u.replace(/^\//, "")}`;
+        const clean = u.replace(/^\/?(storage\/)?/, "");
+        if (clean.startsWith("uploads/202")) {
+          return imgId ? `${apiBase}/evidence/image/${imgId}` : `https://ihqhfusgkullpbjfmjiy.supabase.co/storage/v1/object/public/evidence-images/${clean}`;
+        }
+        return `/storage/${clean}`;
       }
       if (u.startsWith("/")) return u;
       return `/${u}`;
     };
+
 
     if (caseData.evidence_assets && caseData.evidence_assets.length > 0) {
       const allSame = caseData.evidence_assets.every(
@@ -1317,13 +1326,23 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                     {activeAsset?.preview_url || activeAsset?.file_path ? (
                       <img
                         src={
-                          (activeAsset.preview_url || activeAsset.file_path || "").startsWith("/") ||
-                          (activeAsset.preview_url || activeAsset.file_path || "").startsWith("http")
+                          (activeAsset.preview_url || activeAsset.file_path || "").startsWith("http") ||
+                          (activeAsset.preview_url || activeAsset.file_path || "").startsWith("blob:") ||
+                          (activeAsset.preview_url || activeAsset.file_path || "").startsWith("data:")
                             ? (activeAsset.preview_url || activeAsset.file_path)
-                            : `/${activeAsset.preview_url || activeAsset.file_path}`
+                            : activeAsset.image_id && (activeAsset.preview_url || activeAsset.file_path || "").includes("uploads/202")
+                            ? `${((import.meta as any)?.env?.VITE_API_BASE_URL as string) || "https://nyayadrishti-backend.onrender.com/api/v1"}/evidence/image/${activeAsset.image_id}`
+                            : (activeAsset.preview_url || activeAsset.file_path || "").startsWith("/")
+                            ? (activeAsset.preview_url || activeAsset.file_path)
+                            : `/storage/${activeAsset.preview_url || activeAsset.file_path}`
                         }
                         alt={`Packaging evidence for ${caseData.product_name}`}
                         onError={(e) => {
+                          const apiBase = ((import.meta as any)?.env?.VITE_API_BASE_URL as string) || "https://nyayadrishti-backend.onrender.com/api/v1";
+                          if (activeAsset.image_id && !e.currentTarget.src.includes("/evidence/image/")) {
+                            e.currentTarget.src = `${apiBase}/evidence/image/${activeAsset.image_id}`;
+                            return;
+                          }
                           const p = (caseData.product_name || "").toLowerCase();
                           if (p.includes("water") || p.includes("mineral")) e.currentTarget.src = "/storage/uploads/sku_demo_03_water.jpg";
                           else if (p.includes("cookie") || p.includes("biscuit")) e.currentTarget.src = "/storage/uploads/sku_demo_01_biscuit.jpg";

@@ -57,10 +57,23 @@ class CrossFacetSemanticFusionEngine:
     # Statutory panel precedence hierarchy
     PANEL_PRIORITY = {
         "PDP_FRONT": 10,
+        "FRONT_PDP": 10,
+        "FRONT": 10,
         "BACK_PANEL": 9,
-        "SIDE_PANEL": 6,
+        "BACK": 9,
+        "MACRO_CLOSE_UP": 8,
+        "CLOSE_UP": 8,
+        "STAMP": 8,
+        "SIDE_PANEL": 7,
+        "SIDE_PANEL_LEFT": 7,
+        "SIDE_PANEL_RIGHT": 7,
+        "LEFT_PANEL": 7,
+        "RIGHT_PANEL": 7,
+        "SIDE": 7,
+        "BOTTOM_BASE": 5,
+        "BOTTOM": 5,
         "TOP_LID": 4,
-        "BOTTOM_BASE": 2,
+        "TOP": 4,
         "UNKNOWN": 1,
     }
 
@@ -115,16 +128,19 @@ class CrossFacetSemanticFusionEngine:
                 })
             elif isinstance(f, dict):
                 p_type = str(f.get("panel_type") or "UNKNOWN").upper()
-                facts_data = f.get("facts", {})
+                facts_data = f.get("facts") or f.get("facts_obj") or {}
                 if hasattr(facts_data, "model_dump"):
                     facts_data = facts_data.model_dump()
                 elif hasattr(facts_data, "dict"):
                     facts_data = facts_data.dict()
+                raw_f = f.get("raw_fields")
+                if not raw_f and isinstance(facts_data, dict):
+                    raw_f = facts_data.get("raw_fields", [])
                 normalized_facets.append({
                     "image_id": str(f.get("image_id", "unknown_img")),
                     "panel_type": p_type,
                     "facts": facts_data if isinstance(facts_data, dict) else {},
-                    "raw_fields": f.get("raw_fields", []),
+                    "raw_fields": raw_f or [],
                     "calibration_scale": f.get("calibration_scale"),
                     "pdp_area_cm2": f.get("pdp_area_cm2"),
                     "primary_font_height_mm": f.get("primary_font_height_mm"),
@@ -341,11 +357,20 @@ class CrossFacetSemanticFusionEngine:
             normalized_facets[0]["image_id"] if normalized_facets else "unknown"
         )
 
+        declared_usp_val: Optional[float] = None
+        if resolved_usp and isinstance(resolved_usp, dict):
+            declared_usp_val = resolved_usp.get("price_per_unit")
+
+        mfg_date_str: Optional[str] = None
+        if resolved_year and resolved_month:
+            mfg_date_str = f"{resolved_year:04d}-{resolved_month:02d}-01"
+
         unified_facts = {
             "image_id": composite_image_id,
             "net_quantity": resolved_net_qty,
             "mrp": resolved_mrp,
             "unit_sale_price": resolved_usp,
+            "declared_usp": declared_usp_val,
             "manufacturer": resolved_mfg,
             "packer": resolved_packer,
             "importer": resolved_importer,
@@ -353,6 +378,7 @@ class CrossFacetSemanticFusionEngine:
             "country_of_origin": resolved_origin,
             "mfg_date_month": resolved_month,
             "mfg_date_year": resolved_year,
+            "mfg_date": mfg_date_str,
             "generic_name": resolved_generic_name,
         }
 

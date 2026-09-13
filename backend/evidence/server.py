@@ -700,9 +700,9 @@ async def upload_inspection_image(
     db.add(ev_image)
     db.flush()
 
-    # Retain image bytes in fast memory cache
+    # Retain image bytes in fast memory cache (limit to max 2 items to prevent OOM on 512MB RAM)
     _IMAGE_MEMORY_CACHE[ev_image.id] = raw_bytes
-    if len(_IMAGE_MEMORY_CACHE) > 20:
+    while len(_IMAGE_MEMORY_CACHE) > 2:
         first_k = next(iter(_IMAGE_MEMORY_CACHE))
         _IMAGE_MEMORY_CACHE.pop(first_k, None)
 
@@ -818,10 +818,15 @@ def get_evidence_image(
                     break
 
     if not file_path or not file_path.exists():
+        # Check in-memory LRU cache
+        cached_bytes = _IMAGE_MEMORY_CACHE.get(image_id) or (_IMAGE_MEMORY_CACHE.get(ev_image.raw_sha256) if ev_image.raw_sha256 else None)
+        if cached_bytes:
+            return Response(content=cached_bytes, media_type="image/jpeg")
         raise HTTPException(status_code=404, detail="Physical packaging image file not found on disk.")
 
     media_type = "image/png" if str(file_path).lower().endswith(".png") else "image/jpeg"
     return FileResponse(path=str(file_path), media_type=media_type)
+
 
 
 @app.post(
@@ -1131,6 +1136,29 @@ def execute_pipeline(
                     try:
                         import cv2
                         img_bgr = cv2.imread(str(img_path))
+                    except Exception:
+                        img_bgr = None
+
+            if img_bgr is None:
+                cloud_url = getattr(ev_image, "image_url", None)
+                if not cloud_url and ev_image.file_path:
+                    clean_p = ev_image.file_path.lstrip("/").replace("\\", "/")
+                    if clean_p.startswith("storage/"):
+                        clean_p = clean_p[len("storage/"):]
+                    sb_url = os.getenv("SUPABASE_URL", "").rstrip("/")
+                    sb_bucket = os.getenv("SUPABASE_BUCKET", "evidence-images")
+                    if sb_url:
+                        cloud_url = f"{sb_url}/storage/v1/object/public/{sb_bucket}/{clean_p}"
+                if cloud_url:
+                    try:
+                        import httpx
+                        import numpy as np
+                        import cv2
+                        with httpx.Client(timeout=15.0) as client:
+                            resp = client.get(cloud_url)
+                            if resp.status_code == 200:
+                                nparr = np.frombuffer(resp.content, np.uint8)
+                                img_bgr = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
                     except Exception:
                         img_bgr = None
 
@@ -1537,6 +1565,29 @@ def execute_batch_pipeline(
                     img_bgr = None
 
         if img_bgr is None:
+            image_url = img_meta.get("image_url")
+            if not image_url and file_path_str:
+                clean_path = file_path_str.lstrip("/").replace("\\", "/")
+                if clean_path.startswith("storage/"):
+                    clean_path = clean_path[len("storage/"):]
+                sb_url = os.getenv("SUPABASE_URL", "").rstrip("/")
+                sb_bucket = os.getenv("SUPABASE_BUCKET", "evidence-images")
+                if sb_url:
+                    image_url = f"{sb_url}/storage/v1/object/public/{sb_bucket}/{clean_path}"
+            if image_url:
+                try:
+                    import httpx
+                    import numpy as np
+                    import cv2
+                    with httpx.Client(timeout=15.0) as client:
+                        resp = client.get(image_url)
+                        if resp.status_code == 200:
+                            nparr = np.frombuffer(resp.content, np.uint8)
+                            img_bgr = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                except Exception:
+                    img_bgr = None
+
+        if img_bgr is None:
             return {
                 "image_id": img_id,
                 "panel_type": p_type,
@@ -1622,6 +1673,10 @@ def execute_batch_pipeline(
             extracted_fields = []
             font_mm = None
 
+        del img_bgr
+        import gc
+        gc.collect()
+
         return {
             "image_id": img_id,
             "panel_type": p_type,
@@ -1637,21 +1692,54 @@ def execute_batch_pipeline(
             "tokens_count": len(ocr_output.tokens),
         }
 
-    # Prepare metadata for parallel fan-out
+    # Prioritize facets by statutory likelihood: PDP_FRONT and BACK_PANEL first!
+    PANEL_ORDER = {
+        "PDP_FRONT": 0,
+        "BACK_PANEL": 1,
+        "BOTTOM_PANEL": 2,
+        "TOP_PANEL": 3,
+        "SIDE_PANEL": 4,
+        "UNKNOWN": 5,
+    }
+    sorted_images = sorted(ev_images, key=lambda x: PANEL_ORDER.get(x.panel_type or "UNKNOWN", 99))
+
+    # Prepare metadata for facet processing
     img_metas = []
-    for img in ev_images:
+    for img in sorted_images:
         img_metas.append({
             "id": img.id,
             "panel_type": img.panel_type or "UNKNOWN",
             "file_path": img.file_path,
+            "image_url": getattr(img, "image_url", None),
             "blur_variance": img.blur_laplacian_variance,
             "glare_percentage": img.glare_pixel_percentage,
         })
 
-    # Execute workers in parallel across CPU cores
-    max_workers = min(4, max(1, len(img_metas)))
-    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-        worker_results = list(executor.map(_process_facet_worker, img_metas))
+    # Execute workers sequentially with safety time budget (50s) to never exceed Render's 100s proxy timeout
+    import gc
+    worker_results = []
+    SAFETY_BUDGET_SECONDS = 50.0
+
+    for idx, meta in enumerate(img_metas):
+        elapsed = time.perf_counter() - t0
+        if idx >= 2 and elapsed > SAFETY_BUDGET_SECONDS:
+            logger.info(f"Batch pipeline reached safety time budget ({elapsed:.1f}s) after {idx} facets; proceeding to fusion.")
+            break
+
+        w_res = _process_facet_worker(meta)
+        worker_results.append(w_res)
+        gc.collect()
+
+        # Early completion check: if primary declarations already discovered across processed facets
+        if len(worker_results) >= 2:
+            discovered_fields = set()
+            for r in worker_results:
+                for f in r.get("raw_fields", []):
+                    discovered_fields.add(f.get("field_type"))
+            CORE_FIELDS = {"MRP", "NET_QUANTITY", "MANUFACTURER", "COUNTRY_OF_ORIGIN", "CONSUMER_CARE"}
+            if CORE_FIELDS.issubset(discovered_fields):
+                logger.info(f"All core statutory declarations identified after {len(worker_results)} facets; proceeding to fusion.")
+                break
 
     # Cross-calibrate: If any image successfully detected a scale, inherit to uncalibrated siblings
     best_scale = next((r["px_to_mm"] for r in worker_results if r["px_to_mm"]), None)
@@ -1816,6 +1904,12 @@ def execute_batch_pipeline(
     # Cache fused facts
     if CacheQueueAdapter:
         CacheQueueAdapter.get_instance().set_fused_facts(inspection.id, fused_res)
+
+    # Evict cached raw image bytes for this inspection to free memory immediately
+    for img in ev_images:
+        _IMAGE_MEMORY_CACHE.pop(img.id, None)
+    import gc
+    gc.collect()
 
     return {
         "inspection_id": inspection.id,
@@ -2019,9 +2113,19 @@ def get_inspection_detail(
                 elif isinstance(raw_box, (list, dict)):
                     ref_box = raw_box
 
+            img_public_url = None
+            if storage_manager.supabase and storage_manager.supabase.is_configured and img.file_path:
+                try:
+                    img_public_url = storage_manager.supabase.get_public_url(img.file_path)
+                except Exception:
+                    pass
+
             evidence_images_data.append({
                 "id": img.id,
                 "file_path": img.file_path,
+                "image_url": img_public_url or f"/api/v1/evidence/image/{img.id}",
+                "preview_url": img_public_url or f"/api/v1/evidence/image/{img.id}",
+                "supabase_url": img_public_url,
                 "sha256": img.raw_sha256,
                 "panel_type": img.panel_type,
                 "image_width": img.image_width or 1920,

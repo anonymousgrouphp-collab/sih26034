@@ -57,7 +57,7 @@ def _compute_union_bbox(bboxes: List[Any]) -> List[int]:
 class CommodityFactExtractor:
     """Deterministic Statutory Entity Extractor and 2D Spatial Proximity Graph Linker."""
 
-    def __init__(self, line_y_tolerance: int = 15, horizontal_gap_threshold: int = 80):
+    def __init__(self, line_y_tolerance: int = 26, horizontal_gap_threshold: int = 140):
         self.line_y_tolerance = line_y_tolerance
         self.horizontal_gap_threshold = horizontal_gap_threshold
         self.parser = StatutoryDeclarationParser
@@ -642,6 +642,11 @@ class CommodityFactExtractor:
                     mrp_cand_standalone = (parsed_mrp, unit)
 
         chosen_mrp = mrp_cand_explicit or mrp_cand_standalone
+        if not chosen_mrp and full_text:
+            parsed_mrp_fb = self.parser.parse_mrp(full_text)
+            if parsed_mrp_fb:
+                chosen_mrp = (parsed_mrp_fb, {"text": full_text, "confidence": 0.95, "bounding_box": [0, 0, 0, 0]})
+
         if chosen_mrp:
             parsed_mrp, unit = chosen_mrp
             # If tax clause wasn't on this candidate line, verify against global full_text
@@ -684,6 +689,23 @@ class CommodityFactExtractor:
                     )
                 )
                 break
+
+        if extracted_usp is None and full_text:
+            parsed_usp_fb = self.parser.parse_usp(full_text)
+            if parsed_usp_fb:
+                extracted_usp = USPValue(**parsed_usp_fb)
+                raw_fields.append(
+                    ExtractedFieldDTO(
+                        field_type="UNIT_SALE_PRICE",
+                        raw_ocr_text=full_text,
+                        normalized_value=parsed_usp_fb,
+                        detection_confidence=0.95,
+                        ocr_confidence=0.95,
+                        bounding_box=[0, 0, 0, 0],
+                        measured_font_height_mm=None,
+                        measurement_confidence=None,
+                    )
+                )
 
         # 4. MANUFACTURING & EXPIRY DATES
         extracted_mfg_has_prefix = False
@@ -728,6 +750,38 @@ class CommodityFactExtractor:
                     )
                 )
 
+        if extracted_mfg_year is None and full_text:
+            parsed_dates_fb = self.parser.parse_mfg_and_expiry_dates(full_text)
+            if parsed_dates_fb.get("mfg_month") or parsed_dates_fb.get("mfg_year"):
+                extracted_mfg_month = parsed_dates_fb.get("mfg_month")
+                extracted_mfg_year = parsed_dates_fb.get("mfg_year")
+                extracted_mfg_has_prefix = bool(parsed_dates_fb.get("has_mfg_prefix", False))
+                raw_fields.append(
+                    ExtractedFieldDTO(
+                        field_type="DATE_OF_MANUFACTURE",
+                        raw_ocr_text=full_text,
+                        normalized_value=parsed_dates_fb,
+                        detection_confidence=0.98 if extracted_mfg_has_prefix else 0.85,
+                        ocr_confidence=0.95,
+                        bounding_box=[0, 0, 0, 0],
+                        measured_font_height_mm=None,
+                        measurement_confidence=None,
+                    )
+                )
+            if (parsed_dates_fb.get("exp_month") or parsed_dates_fb.get("exp_year")) and not any(f.field_type == "DATE_OF_EXPIRY" for f in raw_fields):
+                raw_fields.append(
+                    ExtractedFieldDTO(
+                        field_type="DATE_OF_EXPIRY",
+                        raw_ocr_text=full_text,
+                        normalized_value={"exp_month": parsed_dates_fb.get("exp_month"), "exp_year": parsed_dates_fb.get("exp_year")},
+                        detection_confidence=0.95,
+                        ocr_confidence=0.95,
+                        bounding_box=[0, 0, 0, 0],
+                        measured_font_height_mm=None,
+                        measurement_confidence=None,
+                    )
+                )
+
         # 5. COUNTRY OF ORIGIN
         for unit in text_units:
             text = unit["text"]
@@ -748,6 +802,23 @@ class CommodityFactExtractor:
                     )
                 )
                 break
+
+        if extracted_origin is None and full_text:
+            origin_fb = self.parser.parse_country_of_origin(full_text)
+            if origin_fb:
+                extracted_origin = origin_fb
+                raw_fields.append(
+                    ExtractedFieldDTO(
+                        field_type="COUNTRY_OF_ORIGIN",
+                        raw_ocr_text=full_text,
+                        normalized_value={"country": origin_fb},
+                        detection_confidence=0.96,
+                        ocr_confidence=0.95,
+                        bounding_box=[0, 0, 0, 0],
+                        measured_font_height_mm=None,
+                        measurement_confidence=None,
+                    )
+                )
 
         # 6. MANUFACTURER / PACKER / IMPORTER / MARKETER ADDRESS
         extracted_marketer: Optional[AddressValue] = None

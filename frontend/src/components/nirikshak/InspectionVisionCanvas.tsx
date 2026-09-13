@@ -81,13 +81,22 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
   const [showBoxes, setShowBoxes] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<"image" | "annotations" | "calibration">("image");
   const [naturalDimensions, setNaturalDimensions] = useState<{ width: number; height: number } | null>(null);
+  const [isImageLoaded, setIsImageLoaded] = useState<boolean>(false);
+  const [imageError, setImageError] = useState<boolean>(false);
 
   const activeImage = images.find((img) => img.id === (activeImageId || selectedImageId)) || images[0];
+
+  React.useEffect(() => {
+    setIsImageLoaded(false);
+    setImageError(false);
+  }, [activeImage?.url, activeImage?.id]);
 
   const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const img = e.currentTarget;
     if (img.naturalWidth > 0 && img.naturalHeight > 0) {
       setNaturalDimensions({ width: img.naturalWidth, height: img.naturalHeight });
+      setIsImageLoaded(true);
+      setImageError(false);
     }
   };
 
@@ -212,12 +221,34 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
           }}
         >
           {activeImage ? (
-            <img
-              src={activeImage.url}
-              alt={activeImage.filename}
-              onLoad={handleImageLoad}
-              className="h-full w-full rounded-md object-contain pointer-events-none"
-            />
+            <>
+              {!isImageLoaded && !imageError && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/80 backdrop-blur-xs text-white z-10 rounded-md">
+                  <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-400 border-t-transparent mb-2" />
+                  <span className="text-[11px] font-mono text-slate-300">
+                    {language === "hi" ? "साक्ष्य तस्वीर लोड हो रही है..." : "Loading high-resolution evidence..."}
+                  </span>
+                </div>
+              )}
+              <img
+                src={activeImage.url}
+                alt={activeImage.filename}
+                onLoad={handleImageLoad}
+                onError={(e) => {
+                  const apiBase = ((import.meta as any)?.env?.VITE_API_BASE_URL as string) || "https://nyayadrishti-backend.onrender.com/api/v1";
+                  const target = e.currentTarget;
+                  if (activeImage?.id && !target.src.includes(`/evidence/image/${activeImage.id}`)) {
+                    target.src = `${apiBase}/evidence/image/${activeImage.id}`;
+                    return;
+                  }
+                  setImageError(true);
+                  setIsImageLoaded(true);
+                }}
+                className={`h-full w-full rounded-md object-contain pointer-events-none transition-opacity duration-300 ${
+                  isImageLoaded ? "opacity-100" : "opacity-0"
+                }`}
+              />
+            </>
           ) : (
             <div className="h-full w-full rounded-md bg-slate-900 flex items-center justify-center text-slate-400 text-xs">
               {language === "hi" ? "कोई साक्ष्य छवि लोड नहीं है" : "No evidence image loaded"}
@@ -381,7 +412,19 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
                   : "border-slate-700 hover:border-slate-400 opacity-70 hover:opacity-100"
               }`}
             >
-              <img src={img.url} alt={img.filename} className="h-full w-full object-cover" />
+              <img
+                src={img.url}
+                alt={img.filename}
+                loading="lazy"
+                onError={(e) => {
+                  const apiBase = ((import.meta as any)?.env?.VITE_API_BASE_URL as string) || "https://nyayadrishti-backend.onrender.com/api/v1";
+                  const target = e.currentTarget;
+                  if (img.id && !target.src.includes(`/evidence/image/${img.id}`)) {
+                    target.src = `${apiBase}/evidence/image/${img.id}`;
+                  }
+                }}
+                className="h-full w-full object-cover"
+              />
               <span className="absolute inset-x-0 bottom-0 bg-black/70 px-1 py-0.5 text-[8px] font-bold uppercase text-white truncate">
                 {img.type.replace(/_/g, " ")}
               </span>

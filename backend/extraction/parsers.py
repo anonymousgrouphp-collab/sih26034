@@ -563,7 +563,11 @@ class StatutoryDeclarationParser:
             elif u_lower in ("cl", "centilitre", "centilitres"):
                 clean_unit = "cl"
             elif u_lower in ("m", "meter", "meters", "metre", "metres", "मीटर", "मी", "मी."):
-                clean_unit = "m"
+                # Check for optical truncation of 'ml' in liquid/content contexts (e.g. 'Net Content 20m' -> '20 ml')
+                if re.search(r"\b(?:content|contents|volume|vol\.?|perfume|parfum|spray|lotion|oil|serum|drink|liquid|beverage)\b", norm_text, re.IGNORECASE):
+                    clean_unit = "ml"
+                else:
+                    clean_unit = "m"
             elif u_lower in ("cm", "centimeter", "centimeters", "centimetre", "centimetres", "सेंटीमीटर", "सेमी", "से.मी.", "से.मी"):
                 clean_unit = "cm"
             elif u_lower in ("mm", "millimeter", "millimeters"):
@@ -603,11 +607,13 @@ class StatutoryDeclarationParser:
             return None
 
         norm_text = cls.convert_indic_digits(text)
+        # Normalize optical character variations where Rupee symbol ₹ is misrecognized as E, e, f, F after MRP
+        norm_text = re.sub(r"\bMRP[EefF₹]\b", "MRP Rs. ", norm_text, flags=re.IGNORECASE)
 
         # Check mandatory tax inclusivity clause per Rule 6(1)(e)
         tax_inclusive = cls.has_tax_inclusive_clause(norm_text)
 
-        mrp_prefix = r"(?:M\.?\s*R\.?\s*P\.?|Maximum\s*Retail\s*Price|Max\.?\s*Retail\s*Price|अ\.वि\.मू\.?|अधिकतम\s*खुदरा\s*मूल्य)"
+        mrp_prefix = r"(?:M\.?\s*R\.?\s*P\.?[EefF₹]?|Maximum\s*Retail\s*Price|Max\.?\s*Retail\s*Price|अ\.वि\.मू\.?|अधिकतम\s*खुदरा\s*मूल्य)"
         tax_clause_group = (
             r"(?:\([^)]*(?:tax|taxes|gst|कर)[^)]*\)|"
             r"inc[l]?(?:usive|\.)?\s*(?:of)?\s*all\s*(?:taxes?|gst)|"
@@ -713,7 +719,7 @@ class StatutoryDeclarationParser:
         norm_text = cls.convert_indic_digits(text)
 
         usp_prefix = r"(?:Unit\s*Sale\s*Price|USP|इकाई\s*विक्रय\s*मूल्य|इकाई\s*बिक्री\s*मूल्य)"
-        curr = r"(?:Rs\.?|INR|₹|रु\.?|रू\.?|रुपये)?"
+        curr = r"(?:Rs\.?|INR|₹|रु\.?|रू\.?|रुपये|र\.?|र)?"
         amount_re = r"([0-9]+(?:,\s*[0-9]+)*(?:\.[0-9]{1,4})?)"
         # Restrict denominator strictly to recognized statutory metric and count units (with Unicode-safe word boundary for Indic matras)
         denom_re = r"((?:100\s*)?(?:g|kg|mg|ml|l|cl|m|cm|mm|sq\s*m|sq\s*cm|sq\s*mm|n|u|pieces?|pcs|units?|items?|nos?|tablets?|tabs?\.?|tae\.?|capsules?|caps?\.?|sachets?|packs?|ग्राम|किग्रा|मिली|लीटर|मीटर|नग|इकाई))(?!\w|[\u0900-\u097F])"
@@ -725,9 +731,9 @@ class StatutoryDeclarationParser:
         )
         match = p1.search(norm_text)
 
-        # Pattern 1b: Inverted USP rate notation with unit before price (e.g. 'USP ₹/ml : 19.95', 'USP Rs./g : 0.25')
+        # Pattern 1b: Inverted USP rate notation with unit before price (e.g. 'USP ₹/ml : 19.95', 'USP Rs./g : 0.25', 'USP Rs./ml 19.95')
         p1_inv = re.compile(
-            rf"{usp_prefix}\s*[:\-]?\s*{curr}\s*(?:/|per|प्रति)?\s*{denom_re}\s*[:\-]\s*{curr}\s*{amount_re}",
+            rf"{usp_prefix}\s*[:\-]?\s*{curr}\s*(?:/|per|प्रति)?\s*{denom_re}(?:\s*[:\-]\s*|\s+){curr}\s*{amount_re}",
             re.IGNORECASE
         )
         m_inv = p1_inv.search(norm_text) if not match else None
@@ -842,8 +848,8 @@ class StatutoryDeclarationParser:
 
         # Prefixes for Manufacturing and Expiry
         mfg_prefix = (
-            r"(?:Manufactured(?:\s*Date)?|Mfg(?:\s*Date)?|Mfg\.?|Mfd(?:\s*Date)?|Mfd\.?|"
-            r"Packed(?:\s*Date)?|Pkd(?:\s*Date)?|Packaging(?:\s*Date)?|Packing(?:\s*Date)?|"
+            r"(?:Manufactured(?:\s*Date)?|Mfg\.?(?:\s*Date)?|Mfd\.?(?:\s*Date)?|"
+            r"Packed\.?(?:\s*Date)?|Pkd\.?(?:\s*Date)?|Packaging(?:\s*Date)?|Packing(?:\s*Date)?|"
             r"Date\s*of\s*(?:Mfg|Mfd|Manufacture|Packaging|Packing|Pkg\.?|Pkd\.?)|"
             r"Month\s*(?:&|and)?\s*Year\s*of\s*(?:Mfg|Mfd|Manufacture|Manufacturing|Packaging|Packing|Pkg\.?|Pkd\.?)|"
             r"उत्पादन\s*(?:तिथि|माह(?:\s*एवं\s*वर्ष)?|का\s*महीना)?|पैकिंग\s*(?:तिथि|माह)?|निर्माण\s*तिथि)"
@@ -917,6 +923,17 @@ class StatutoryDeclarationParser:
 
                         if month and 2000 <= year <= 2035:
                             return month, year
+
+            # Sub-pattern D: Compact 6-digit MMYYYY without separator (e.g. 'Mfg. Date 072026')
+            compact_re = re.compile(
+                rf"{prefix_re}\s*[:\-]?\s*(0[1-9]|1[0-2])(20[2-3][0-9])(?!\d)",
+                re.IGNORECASE
+            )
+            m_comp = compact_re.search(target_text)
+            if m_comp:
+                m_val, y_val = int(m_comp.group(1)), int(m_comp.group(2))
+                if 1 <= m_val <= 12 and 2000 <= y_val <= 2035:
+                    return m_val, y_val
 
             return None, None
 
@@ -1208,6 +1225,18 @@ class StatutoryDeclarationParser:
         has_email = bool(email_match)
         email_str = email_match.group(0).strip() if email_match else None
 
+        if not email_match:
+            # Fallback for OCR corruption of '@' symbol after 'Email' label (e.g. 'Email: shopabellavitaorganic.com' or 'shop(a)bellavitaorganic.com')
+            fallback_email_re = re.compile(
+                r"(?:email|e-mail|mail)\s*[:\-]?\s*(?:[^\n]+\n)?\s*([a-zA-Z0-9._%+-]+?)(?:@|[a©]|(?:\(a\)))([a-zA-Z0-9.-]+\.(?:com|in|co\.in|org|net|gov|io))\b",
+                re.IGNORECASE
+            )
+            fb_m = fallback_email_re.search(norm_text)
+            if fb_m:
+                user_part, domain_part = fb_m.group(1), fb_m.group(2)
+                email_str = f"{user_part}@{domain_part}"
+                has_email = True
+
         # 2. Phone pattern: Toll-free 1800/1860 or telephone with explicit keyword prefix
         phone_match_str: Optional[str] = None
 
@@ -1218,7 +1247,7 @@ class StatutoryDeclarationParser:
             phone_match_str = tf_match.group(0).strip()
         else:
             std_phone_pattern = re.compile(
-                r"(?:tel|phone|contact|toll[- ]free|helpline|call|care\s*no|customer\s*care(?:\s*(?:executive|manager|officer|desk|cell|helpdesk))?|ph|mob|whatsapp|t:|फोन)\s*[:\-]?\s*"
+                r"(?:tel|phone|contact|toll[- ]free|helpline|call|care\s*(?:no\.?|number)?|customer\s*care(?:\s*(?:no\.?|number|executive|manager|officer|desk|cell|helpdesk))?|ph|mob|whatsapp|t:|फोन)\s*[:\-]?\s*"
                 r"((?:\(\s*0?\d{2,4}\s*\)\s*|\+?91[-\s]?|0\d{2,4}[-\s]?))?([1-9][0-9\s\-]{5,12}[0-9])\b",
                 re.IGNORECASE
             )
@@ -1240,6 +1269,14 @@ class StatutoryDeclarationParser:
                     clean_digits = re.sub(r"\D", "", sa_match.group(0))
                     if 8 <= len(clean_digits) <= 12 and not any(k in norm_text[max(0, sa_match.start() - 15):sa_match.start()].lower() for k in ["fssai", "lic"]):
                         phone_match_str = sa_match.group(0).strip()
+                elif any(k in norm_text.lower() for k in ("customer care", "care no", "helpline", "toll free", "contact us")):
+                    # 10-digit Indian mobile number in consumer care context: e.g. 'Customer Care No: 91 9810154380'
+                    in_mob_pattern = re.compile(r"\b(?:\+?91[\s\-]?)?([6-9]\d{4}\s*\d{5})\b")
+                    m_mob = in_mob_pattern.search(norm_text)
+                    if m_mob:
+                        clean_d = re.sub(r"\D", "", m_mob.group(0))
+                        if 10 <= len(clean_d) <= 12 and not any(k in norm_text[max(0, m_mob.start() - 15):m_mob.start()].lower() for k in ["fssai", "lic", "pin"]):
+                            phone_match_str = m_mob.group(0).strip()
 
         has_phone = bool(phone_match_str)
 
@@ -1313,46 +1350,48 @@ class StatutoryDeclarationParser:
 
         norm_text = cls.convert_indic_digits(text)
         origin_pattern = re.compile(
-            r"(?<![a-zA-Z\u0900-\u097F])(?:Country\s*of\s*Origin|Made\s*in|Product\s*of|Manufactured\s*in|Packed\s*in|Produce\s*of|Imported\s*from|Origin\b|COO\b|मूल\s*देश|उत्पत्ति\s*का\s*देश)\s*[:\-]?\s*([^\n\r,;]+)",
+            r"(?<![a-zA-Z\u0900-\u097F])(?:Country\s*of\s*Origin|Made\s*in|Product\s*of|Manufactured\s*in|Packed\s*in|Produce\s*of|Imported\s*from|Origin\s*[:\-]|C\.?O\.?O\.?\s*[:\-]|मूल\s*देश|उत्पत्ति\s*का\s*देश)\s*[:\-]?\s*([^\n\r,;]+)",
             re.IGNORECASE
         )
-        match = origin_pattern.search(norm_text)
-        if not match:
-            return None
 
-        raw = match.group(1).strip()
+        first_cleaned: Optional[str] = None
 
-        # Check canonical country mappings
-        if "भारत" in raw:
-            return "भारत"
-        if re.search(r"\b(?:India|Bharat)\b", raw, re.IGNORECASE):
-            return "India"
-        if re.search(r"\b(?:U\.?S\.?A\.?|United\s*States(?:\s*of\s*America)?)\b", raw, re.IGNORECASE):
-            return "USA"
-        if re.search(r"\b(?:U\.?K\.?|United\s*Kingdom|Great\s*Britain)\b", raw, re.IGNORECASE):
-            return "United Kingdom"
-        if re.search(r"\b(?:P\.?R\.?C\.?|China|People'?s\s*Republic\s*of\s*China)\b", raw, re.IGNORECASE):
-            return "China"
-        if re.search(r"\b(?:U\.?A\.?E\.?|United\s*Arab\s*Emirates)\b", raw, re.IGNORECASE):
-            return "UAE"
+        for match in origin_pattern.finditer(norm_text):
+            raw = match.group(1).strip()
 
-        # Check recognized country names
-        for country in RECOGNIZED_COUNTRIES:
-            if re.search(r"\b" + re.escape(country) + r"\b", raw, re.IGNORECASE):
-                return country
+            # Check canonical country mappings
+            if "भारत" in raw:
+                return "भारत"
+            if re.search(r"\b(?:India|Bharat)\b", raw, re.IGNORECASE):
+                return "India"
+            if re.search(r"\b(?:U\.?S\.?A\.?|United\s*States(?:\s*of\s*America)?)\b", raw, re.IGNORECASE):
+                return "USA"
+            if re.search(r"\b(?:U\.?K\.?|United\s*Kingdom|Great\s*Britain)\b", raw, re.IGNORECASE):
+                return "United Kingdom"
+            if re.search(r"\b(?:P\.?R\.?C\.?|China|People'?s\s*Republic\s*of\s*China)\b", raw, re.IGNORECASE):
+                return "China"
+            if re.search(r"\b(?:U\.?A\.?E\.?|United\s*Arab\s*Emirates)\b", raw, re.IGNORECASE):
+                return "UAE"
 
-        # Fallback: Strip stop words like 'by ...', 'for ...'
-        cleaned = re.split(r"\b(?:by|for|under|at)\b", raw, flags=re.IGNORECASE)[0].strip()
-        cleaned = cleaned.strip(".- :")
-        # Validate that fallback candidate is a reasonable country name (not a sentence, no digits)
-        if cleaned and len(cleaned.split()) <= 3 and not re.search(r"\d", cleaned):
-            disallowed_words = {
-                "accordance", "compliance", "standard", "facility", "premises",
-                "licence", "license", "place", "dry", "cool", "store", "hygienic", "temperature"
-            }
-            if not any(w in cleaned.lower() for w in disallowed_words):
-                return cleaned
-        return None
+            # Check recognized country names
+            for country in RECOGNIZED_COUNTRIES:
+                if re.search(r"\b" + re.escape(country) + r"\b", raw, re.IGNORECASE):
+                    return country
+
+            if first_cleaned is None:
+                # Fallback: Strip stop words like 'by ...', 'for ...'
+                cleaned = re.split(r"\b(?:by|for|under|at)\b", raw, flags=re.IGNORECASE)[0].strip()
+                cleaned = cleaned.strip(".- :")
+                # Validate that fallback candidate is a reasonable country name (not a sentence, no digits)
+                if cleaned and len(cleaned.split()) <= 3 and not re.search(r"\d", cleaned):
+                    disallowed_words = {
+                        "accordance", "compliance", "standard", "facility", "premises",
+                        "licence", "license", "place", "dry", "cool", "store", "hygienic", "temperature"
+                    }
+                    if not any(w in cleaned.lower() for w in disallowed_words):
+                        first_cleaned = cleaned
+
+        return first_cleaned
 
     @classmethod
     def parse_generic_name(cls, text: str) -> Optional[str]:

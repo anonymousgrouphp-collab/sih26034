@@ -133,6 +133,25 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
 
   // Image error state & resilient fallback
   const [imageError, setImageError] = useState(false);
+  const [retryWithBackend, setRetryWithBackend] = useState(false);
+  const apiBaseUrl = ((import.meta as any)?.env?.VITE_API_BASE_URL as string) || "https://nyayadrishti-backend.onrender.com/api/v1";
+
+  const getEffectiveImageSrc = (): string => {
+    const raw = (asset.preview_url || asset.file_path || "").trim();
+    if (raw.startsWith("http://") || raw.startsWith("https://") || raw.startsWith("data:") || raw.startsWith("blob:")) {
+      return raw;
+    }
+    // Dynamic uploads on Render / Supabase
+    if (asset.image_id && (raw.includes("uploads/202") || (!raw.includes("sku_demo_") && !raw.includes("real_products") && !raw.includes("REAL-PKG-")))) {
+      return `${apiBaseUrl}/evidence/image/${asset.image_id}`;
+    }
+    if (raw.startsWith("uploads/202") || raw.startsWith("/uploads/202") || raw.startsWith("storage/uploads/202") || raw.startsWith("/storage/uploads/202")) {
+      const clean = raw.replace(/^\/?(storage\/)?/, "");
+      return `https://ihqhfusgkullpbjfmjiy.supabase.co/storage/v1/object/public/evidence-images/${clean}`;
+    }
+    if (raw.startsWith("/")) return raw;
+    return raw ? `/storage/${raw}` : "";
+  };
 
   const getSmartFallbackImage = (product?: string, raw?: string): string => {
     const p = (product || "").toLowerCase();
@@ -166,13 +185,21 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
     return "/assets/aashirvaad-atta-demo.svg";
   };
 
-  const rawImageSrc = asset.preview_url || asset.file_path || "";
+  const rawImageSrc = getEffectiveImageSrc();
   const smartFallback = getSmartFallbackImage(productName, rawImageSrc);
-  const imageSrc = !imageError && rawImageSrc ? rawImageSrc : smartFallback;
+  
+  let imageSrc = rawImageSrc;
+  if (retryWithBackend && asset.image_id) {
+    imageSrc = `${apiBaseUrl}/evidence/image/${asset.image_id}`;
+  } else if (imageError) {
+    imageSrc = smartFallback;
+  }
 
   useEffect(() => {
     setImageError(false);
-  }, [asset.preview_url, asset.file_path, productName]);
+    setRetryWithBackend(false);
+  }, [asset.preview_url, asset.file_path, asset.image_id, productName]);
+
 
   return (
     <div className="bg-panelBg rounded-lg border border-slate-700 shadow-sm flex flex-col h-full overflow-hidden">
@@ -355,6 +382,10 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
               alt={`Packaging inspection evidence for ${productName}`}
               onLoad={handleImageLoad}
               onError={() => {
+                if (asset.image_id && !retryWithBackend && !imageSrc.includes("/evidence/image/")) {
+                  setRetryWithBackend(true);
+                  return;
+                }
                 if (!imageError) setImageError(true);
               }}
               className={`block max-h-[520px] w-auto h-auto object-contain rounded transition-all ${

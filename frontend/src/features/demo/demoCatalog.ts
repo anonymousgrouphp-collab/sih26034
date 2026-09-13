@@ -46,7 +46,7 @@ export interface DemoScenarioItem {
 export const DEMO_SCENARIOS: DemoScenarioItem[] = [
   {
     scenarioNumber: 1,
-    totalScenarios: 7,
+    totalScenarios: 13,
     skuId: "SKU-DEMO-01",
     caseId: "SKU-DEMO-01",
     inspectionNumber: "INSP-20260910-B144",
@@ -103,7 +103,7 @@ export const DEMO_SCENARIOS: DemoScenarioItem[] = [
   },
   {
     scenarioNumber: 2,
-    totalScenarios: 7,
+    totalScenarios: 13,
     skuId: "SKU-DEMO-02",
     caseId: "SKU-DEMO-02",
     inspectionNumber: "INSP-20260910-C208",
@@ -158,7 +158,7 @@ export const DEMO_SCENARIOS: DemoScenarioItem[] = [
   },
   {
     scenarioNumber: 3,
-    totalScenarios: 7,
+    totalScenarios: 13,
     skuId: "SKU-DEMO-03",
     caseId: "SKU-DEMO-03",
     inspectionNumber: "INSP-20260910-W312",
@@ -215,7 +215,7 @@ export const DEMO_SCENARIOS: DemoScenarioItem[] = [
   },
   {
     scenarioNumber: 4,
-    totalScenarios: 7,
+    totalScenarios: 13,
     skuId: "SKU-DEMO-04",
     caseId: "SKU-DEMO-04",
     inspectionNumber: "INSP-20260910-S419",
@@ -268,7 +268,7 @@ export const DEMO_SCENARIOS: DemoScenarioItem[] = [
   },
   {
     scenarioNumber: 5,
-    totalScenarios: 7,
+    totalScenarios: 13,
     skuId: "SKU-DEMO-05",
     caseId: "SKU-DEMO-05",
     inspectionNumber: "INSP-20260910-P525",
@@ -320,7 +320,7 @@ export const DEMO_SCENARIOS: DemoScenarioItem[] = [
   },
   {
     scenarioNumber: 6,
-    totalScenarios: 7,
+    totalScenarios: 13,
     skuId: "SKU-DEMO-06",
     caseId: "SKU-DEMO-06",
     inspectionNumber: "INSP-20260910-E631",
@@ -372,7 +372,7 @@ export const DEMO_SCENARIOS: DemoScenarioItem[] = [
   },
   {
     scenarioNumber: 7,
-    totalScenarios: 7,
+    totalScenarios: 13,
     skuId: "demo-fortune-sunlite",
     caseId: "demo-fortune-sunlite",
     inspectionNumber: "INSP-20260910-F001",
@@ -427,6 +427,348 @@ export const DEMO_SCENARIOS: DemoScenarioItem[] = [
     uspDeclared: "₹145.00 / L",
     uspCalculated: "₹145.00 / L",
   },
+  {
+    scenarioNumber: 8,
+    totalScenarios: 13,
+    skuId: "REAL-PKG-WATCH",
+    caseId: "demo-fastrack-watch",
+    inspectionNumber: "INSP-20260912-W001",
+    title: "Fastrack Casual Analog Watch",
+    titleHi: "फास्टट्रैक कैजुअल एनालॉग घड़ी",
+    category: "Watches & Wearables",
+    categoryHi: "घड़ियां एवं वियरेबल्स",
+    packageType: "Tin / Metallic Box",
+    packageTypeHi: "टिन / धातु बॉक्स",
+    targetVerdict: "PASS",
+    verdictLabel: "STATUTORY COMPLIANT",
+    verdictLabelHi: "सांविधिक रूप से अनुपालित (उत्तीर्ण)",
+    headlineViolation: "Compliant Rule 6 Declarations with Rule 6(1)(da) Distinct Unit USP Exemption",
+    headlineViolationHi: "नियम 6(1)(da) विशिष्ट एकल इकाई यूएसपी छूट सहित नियम 6 अनुपालित घोषणाएं",
+    statutoryRules: [
+      "Rule 6(1)(da) Second Proviso (Exemption of Unit Sale Price for Distinct Single Unit)",
+      "Rule 6(1)(a) & (b) Manufacturer & Marketer Declarations (Titan Company Limited)",
+      "Rule 6(1)(p) Country of Origin Mandatory Declaration (CHINA)",
+      "Rule 6(1)(e) Maximum Retail Price (₹ 2425.00 incl. of all taxes)",
+    ],
+    statutoryRulesHi: [
+      "नियम 6(1)(da) द्वितीय परंतुक (विशिष्ट एकल वस्तु हेतु यूएसपी छूट)",
+      "नियम 6(1)(a) एवं (b) निर्माता व विपणक घोषणाएं (टाइटन कंपनी लिमिटेड)",
+      "नियम 6(1)(p) मूल देश की अनिवार्य घोषणा (चीन)",
+      "नियम 6(1)(e) अधिकतम खुदरा मूल्य (₹ 2425.00 सभी कर सहित)",
+    ],
+    testedCapabilities: [
+      "180° Inverted Crop Auto-Detection & Rectification",
+      "Multi-Angle Packaging Tri-Panel Fusion (Front PDP + Back Panel + Macro)",
+      "Rule 6(1)(da) Distinct Wearable USP Exemption Engine",
+      "Section 63 BSA 2023 Digital Panchnama Generation",
+    ],
+    testedCapabilitiesHi: [
+      "180° उल्टे क्रॉप का स्वतः पता लगाना एवं सीधा करना",
+      "बहु-कोणीय पैकेजिंग त्रि-पैनल संलयन (फ्रंट PDP + बैक पैनल + मैक्रो)",
+      "नियम 6(1)(da) विशिष्ट वियरेबल यूएसपी छूट इंजन",
+      "धारा 63 बीएसए 2023 डिजिटल पंचनामा उत्पादन",
+    ],
+    detailedRationale:
+      "Physical examination of real Titan Fastrack packaging. The macro close-up panel was captured upside down in the field; the OCR auto-inversion engine successfully detected 180° rotation, restoring confidence from 0.72 to 0.98. Declarations verified: MRP ₹ 2425.00, Net Qty 01 NUMBER, Country of Origin CHINA, Mfg Date 07/2026. Under Rule 6(1)(da) Second Proviso, packages containing a single distinct unit are statutory exempt from Unit Sale Price declarations.",
+    detailedRationaleHi:
+      "वास्तविक टाइटन फास्टट्रैक पैकेजिंग का भौतिक परीक्षण। फील्ड में मैक्रो क्लोज़-अप पैनल उल्टा कैप्चर हुआ था; ओसीआर ऑटो-इंवर्जन इंजन ने 180° घूर्णन का स्वतः पता लगाकर विश्वसनीयता 0.72 से 0.98 कर दी। सभी घोषणाएं सत्यापित: एमआरपी ₹ 2425.00, शुद्ध मात्रा 01 NUMBER, मूल देश चीन, निर्माण 07/2026। नियम 6(1)(da) के तहत एकल इकाई हेतु यूएसपी छूट लागू है।",
+    evaluatorGuide:
+      "Examine the Multi-Facet selector bar to view Front PDP, Back Panel, and Macro Close-Up. Notice how the auto-inversion engine correctly transcribed upside-down text from the macro shot, and verify the statutory Rule 6(1)(da) USP exemption card.",
+    evaluatorGuideHi:
+      "फ्रंट PDP, बैक पैनल, और मैक्रो क्लोज़-अप देखने के लिए मल्टी-फ़ैसेट चयनकर्ता बार देखें। ध्यान दें कि कैसे इंजन ने उल्टे शॉट को सही किया और नियम 6(1)(da) छूट कार्ड सत्यापित करें।",
+    imagePath: "/storage/uploads/real_products/watch_front.jpg",
+    pdpAreaCm2: 96.0,
+    expectedFontMm: 1.5,
+    observedFontMm: 3.2,
+    mrpInr: 2425.0,
+    uspDeclared: "EXEMPT (Rule 6(1)(da))",
+    uspCalculated: "EXEMPT",
+  },
+  {
+    scenarioNumber: 9,
+    totalScenarios: 13,
+    skuId: "REAL-PKG-BRAHMI",
+    caseId: "demo-himalaya-brahmi",
+    inspectionNumber: "INSP-20260912-B002",
+    title: "Himalaya Pure Herbs Brahmi (60 Tablets)",
+    titleHi: "हिमालया प्योर हर्ब्स ब्राह्मी (60 टैबलेट्स)",
+    category: "Ayurvedic & Health Supplements",
+    categoryHi: "आयुर्वेदिक एवं स्वास्थ्य पूरक",
+    packageType: "Cylindrical HDPE Container",
+    packageTypeHi: "बेलनाकार एचडीपीई कंटेनर",
+    targetVerdict: "PASS",
+    verdictLabel: "STATUTORY COMPLIANT",
+    verdictLabelHi: "सांविधिक रूप से अनुपालित (उत्तीर्ण)",
+    headlineViolation: "Medical Tablets Schedule: Accurate USP Rs. 4.33/TAB & Table-I Height Verified",
+    headlineViolationHi: "चिकित्सीय गोलियां अनुसूची: सटीक यूएसपी रु. 4.33/TAB एवं तालिका-I ऊंचाई सत्यापित",
+    statutoryRules: [
+      "Rule 6(1)(da) Countable Solid Form Unit Sale Price (Rs. 4.33 / TAB.)",
+      "Rule 6(1)(h) read with Table-I (Area <= 50 cm2 mandates >= 1.0 mm)",
+      "Rule 6(1)(d) Month & Year of Manufacture (05/2026) & Expiry (04/2029)",
+      "Rule 6(1)(a) Manufacturer Particulars (The Himalaya Drug Company, Bengaluru)",
+    ],
+    statutoryRulesHi: [
+      "नियम 6(1)(da) गणनीय ठोस रूप इकाई विक्रय मूल्य (रु. 4.33 / TAB.)",
+      "नियम 6(1)(h) सहपठित तालिका-I (क्षेत्रफल <= 50 सेमी² हेतु >= 1.0 मिमी)",
+      "नियम 6(1)(d) निर्माण माह व वर्ष (05/2026) एवं समाप्ति (04/2029)",
+      "नियम 6(1)(a) निर्माता विवरण (द हिमालया ड्रग कंपनी, बेंगलुरु)",
+    ],
+    testedCapabilities: [
+      "Tri-Panel Semantic Fusion (Front PDP + Side LM Panel + Back Panel)",
+      "Tablets Countable Rate Denominator Parsing ('/TAB.')",
+      "Floating-Point USP Math Cross-Check (|4.33 * 60 - 260| <= 0.20)",
+      "Cylindrical Surface Area PDP Projection (Rule 5)",
+    ],
+    testedCapabilitiesHi: [
+      "त्रि-पैनल सिमेंटिक संलयन (फ्रंट PDP + साइड LM पैनल + बैक पैनल)",
+      "टैबलेट्स गणनीय दर विभाजक पार्सिंग ('/TAB.')",
+      "फ्लोटिंग-पॉइंट यूएसपी गणित मिलान (|4.33 * 60 - 260| <= 0.20)",
+      "बेलनाकार सतह क्षेत्रफल PDP प्रक्षेपण (नियम 5)",
+    ],
+    detailedRationale:
+      "Physical sample of Himalaya Brahmi 60 Tablets container. The legal declarations are distributed across facets: Net Qty (60 Tablets), MRP (Rs. 260.00), USP (Rs. 4.33/TAB.), and Mfg Date (05/2026) reside on the left LM panel, while corporate manufacturing premises are on the back panel. CrossFacetSemanticFusion aggregated all panels into unified commodity facts. Unit Sale Price math: 260 / 60 = 4.333 -> Rs. 4.33/TAB., satisfying Rule 6(1)(da) tolerance. Numeral font height of 2.1 mm exceeds Table-I Row 1 (1.0 mm).",
+    detailedRationaleHi:
+      "हिमालया ब्राह्मी 60 टैबलेट्स कंटेनर का भौतिक नमूना। सांविधिक घोषणाएं विभिन्न पैनलों पर वितरित हैं: शुद्ध मात्रा (60 टैबलेट्स), एमआरपी (रु. 260.00), यूएसपी (रु. 4.33/TAB.), और निर्माण (05/2026) बाएं एलएम पैनल पर हैं, जबकि निर्माता का पता पिछले पैनल पर है। क्रॉस-फ़ैसेट फ़्यूज़न ने सभी पैनलों को एकीकृत किया। यूएसपी गणित पूरी तरह सटीक है।",
+    evaluatorGuide:
+      "Click between 'Front PDP', 'Side LM Panel', and 'Back Panel' in the facet bar. Note how the Extracted Declarations card seamlessly pulls Net Qty from the LM panel and Manufacturer address from the Back panel with full audit provenance.",
+    evaluatorGuideHi:
+      "फ़ैसेट बार में 'फ्रंट PDP', 'साइड LM पैनल', और 'बैक पैनल' के बीच क्लिक करें। देखें कि कैसे निकाली गई घोषणाएं कार्ड एलएम पैनल और बैक पैनल दोनों से विवरण प्रदर्शित करता है।",
+    imagePath: "/storage/uploads/real_products/brahmi_front.jpg",
+    pdpAreaCm2: 48.0,
+    expectedFontMm: 1.0,
+    observedFontMm: 2.1,
+    mrpInr: 260.0,
+    uspDeclared: "Rs. 4.33 / TAB.",
+    uspCalculated: "Rs. 4.33 / TAB.",
+  },
+  {
+    scenarioNumber: 10,
+    totalScenarios: 13,
+    skuId: "REAL-PKG-FACEWASH",
+    caseId: "demo-dot-and-key",
+    inspectionNumber: "INSP-20260912-D003",
+    title: "Dot & Key Cica Blemish Clearing Face Wash (100 ml)",
+    titleHi: "डॉट एंड की सिका ब्लेमिश क्लीयरिंग फेस वॉश (100 मिली)",
+    category: "Cosmetics & Personal Care",
+    categoryHi: "प्रसाधन एवं व्यक्तिगत देखभाल",
+    packageType: "Flexible Plastic Tube",
+    packageTypeHi: "लचीली प्लास्टिक ट्यूब",
+    targetVerdict: "PASS",
+    verdictLabel: "STATUTORY COMPLIANT",
+    verdictLabelHi: "सांविधिक रूप से अनुपालित (उत्तीर्ण)",
+    headlineViolation: "Cosmetics Labeling: Strict Unit Sale Price ₹2.49/ml & Dual Address Validated",
+    headlineViolationHi: "प्रसाधन लेबलिंग: सख्त इकाई विक्रय मूल्य ₹2.49/मिली एवं दोहरा पता सत्यापित",
+    statutoryRules: [
+      "Rule 6(1)(da) Liquid Metric Unit Sale Price (₹ 2.49 / ml)",
+      "Rule 6(1)(a) & (b) Manufacturer (RSH Wellness, Baddi) & Marketer (Dot & Key, Kolkata)",
+      "Rule 6(1)(h) read with Table-I Row 2 (Area 50-100 cm2 mandates >= 1.5 mm)",
+      "Rule 6(1)(n) Consumer Care Contact Details (care@dotandkey.com)",
+    ],
+    statutoryRulesHi: [
+      "नियम 6(1)(da) तरल मीट्रिक इकाई विक्रय मूल्य (₹ 2.49 / मिली)",
+      "नियम 6(1)(a) एवं (b) निर्माता (आरएसएच वेलनेस, बद्दी) एवं विपणक (डॉट एंड की, कोलकाता)",
+      "नियम 6(1)(h) सहपठित तालिका-I पंक्ति 2 (क्षेत्रफल 50-100 सेमी² हेतु >= 1.5 मिमी)",
+      "नियम 6(1)(n) उपभोक्ता सेवा संपर्क विवरण (care@dotandkey.com)",
+    ],
+    testedCapabilities: [
+      "Dual Address Parser (Differentiates Manufacturer in HP vs Marketer in WB)",
+      "Exact Liquid Unit Sale Price Math (249 INR / 100 ml = 2.49 INR/ml)",
+      "Macro Close-Up Panel Alignment & Text Box Calibration",
+      "Cosmetics Rule 6 Invariant Verification",
+    ],
+    testedCapabilitiesHi: [
+      "दोहरा पता पार्सर (हिमाचल में निर्माता बनाम पं. बंगाल में विपणक का पृथक्करण)",
+      "सटीक तरल यूएसपी गणित (249 INR / 100 ml = 2.49 INR/ml)",
+      "मैक्रो क्लोज़-अप पैनल संरेखण एवं टेक्स्ट बॉक्स अंशांकन",
+      "प्रसाधन नियम 6 अपरिवर्तनीय सत्यापन",
+    ],
+    detailedRationale:
+      "Physical sample of Dot & Key Cica Face Wash flexible tube. The packaging contains both manufacturing premises in Baddi, Himachal Pradesh (173205) and marketing registered office in Kolkata, West Bengal (700019). The extractor correctly differentiated both entities. Unit Sale Price math: ₹ 249.00 / 100 ml = ₹ 2.49 / ml, exactly matching declared USP. Numeral height on the macro stamp measures 2.8 mm against 1.5 mm Table-I threshold.",
+    detailedRationaleHi:
+      "डॉट एंड की सिका फेस वॉश ट्यूब का भौतिक नमूना। पैकेजिंग में बद्दी, हिमाचल प्रदेश में निर्माता और कोलकाता में विपणक दोनों पते हैं। निष्कर्षण इंजन ने दोनों संस्थाओं को सही ढंग से अलग किया। यूएसपी गणित 249 / 100 = ₹2.49/मिली एकदम सटीक है। अंक ऊंचाई 2.8 मिमी तालिका-I के 1.5 मिमी से अधिक है।",
+    evaluatorGuide:
+      "Examine the 'Manufacturer & Marketer' field in the Adjudication Canvas to verify both RSH Wellness (Manufacturer) and Dot & Key (Marketer) are captured with their respective state and PIN boundaries.",
+    evaluatorGuideHi:
+      "कैनवास में 'निर्माता व विपणक' फ़ील्ड की जांच करें ताकि सत्यापित हो सके कि आरएसएच वेलनेस (निर्माता) और डॉट एंड की (विपणक) दोनों को उनके राज्य व पिन कोड सहित सही ढंग से कैप्चर किया गया है।",
+    imagePath: "/storage/uploads/real_products/facewash_back.jpg",
+    pdpAreaCm2: 75.0,
+    expectedFontMm: 1.5,
+    observedFontMm: 2.8,
+    mrpInr: 249.0,
+    uspDeclared: "₹ 2.49 / ml",
+    uspCalculated: "₹ 2.49 / ml",
+  },
+  {
+    scenarioNumber: 11,
+    totalScenarios: 13,
+    skuId: "REAL-PKG-PERFUME",
+    caseId: "demo-bella-vita",
+    inspectionNumber: "INSP-20260912-P004",
+    title: "Bella Vita Luxury Rosé Eau De Parfum (20 ml)",
+    titleHi: "बेला वीटा लक्ज़री रोज़ ईयू डी परफ्यूम (20 मिली)",
+    category: "Fragrances & Cosmetics",
+    categoryHi: "सुगंध एवं प्रसाधन",
+    packageType: "Mono-Carton Glass Vial",
+    packageTypeHi: "मोनो-कार्टन ग्लास शीशी",
+    targetVerdict: "PASS",
+    verdictLabel: "STATUTORY COMPLIANT",
+    verdictLabelHi: "सांविधिक रूप से अनुपालित (उत्तीर्ण)",
+    headlineViolation: "Luxury Fragrance: Rate Inversion Normalization & Base Panel Fusion Verified",
+    headlineViolationHi: "लक्ज़री परफ्यूम: दर व्युत्क्रम सामान्यीकरण एवं आधार पैनल संलयन सत्यापित",
+    statutoryRules: [
+      "Rule 6(1)(da) Unit Sale Price Inversion Normalization (₹ 19.95 / ml)",
+      "Rule 6(1)(a) Manufacturer Premises (Stella Industries Ltd, Gurugram 122050)",
+      "Rule 6(1)(h) read with Table-I Row 1 (Area <= 50 cm2 mandates >= 1.0 mm)",
+      "Rule 6(1)(e) MRP ₹ 399.00 (inclusive of all taxes)",
+    ],
+    statutoryRulesHi: [
+      "नियम 6(1)(da) इकाई विक्रय मूल्य व्युत्क्रम सामान्यीकरण (₹ 19.95 / मिली)",
+      "नियम 6(1)(a) निर्माता परिसर (स्टेला इंडस्ट्रीज लिमिटेड, गुरुग्राम 122050)",
+      "नियम 6(1)(h) सहपठित तालिका-I पंक्ति 1 (क्षेत्रफल <= 50 सेमी² हेतु >= 1.0 मिमी)",
+      "नियम 6(1)(e) एमआरपी ₹ 399.00 (सभी कर सहित)",
+    ],
+    testedCapabilities: [
+      "Rate Inversion Defense (Correctly maps '₹19.95 per ml' from micro-stamp)",
+      "Bottom-Base Panel Parsing & Metric Fusion",
+      "High-Density Numeral Font Height Extraction (1.8 mm)",
+      "Consumer Care Hotline & Email Validation",
+    ],
+    testedCapabilitiesHi: [
+      "दर व्युत्क्रम रक्षा (माइक्रो-स्टैम्प से '₹19.95 per ml' का सटीक मानचित्रण)",
+      "निचले आधार पैनल पार्सिंग एवं मीट्रिक संलयन",
+      "उच्च घनत्व अंक ऊंचाई निष्कर्षण (1.8 मिमी)",
+      "उपभोक्ता सेवा हेल्पलाइन व ईमेल सत्यापन",
+    ],
+    detailedRationale:
+      "Physical sample of Bella Vita Luxury Rosé Eau De Parfum 20 ml carton. The legal metrology stamp resides on the bottom/back flap. Extracted MRP is ₹ 399.00 and declared Net Qty is 20 ml. The rate normalizer calculated 399 / 20 = 19.95 INR/ml, perfectly matching declared USP '₹ 19.95 / ml'. Numeral font height on the small carton base measures 1.8 mm, safely surpassing Table-I Row 1 requirement of 1.0 mm.",
+    detailedRationaleHi:
+      "बेला वीटा लक्ज़री रोज़ 20 मिली कार्टन का भौतिक नमूना। मापविज्ञान विवरण नीचे/पिछले फ्लैप पर स्थित है। निकाली गई एमआरपी ₹ 399.00 और घोषित मात्रा 20 मिली है। दर सामान्यीकरण ने 399 / 20 = 19.95 रुपये/मिली का परिकलन किया जो घोषित यूएसपी से मेल खाता है। अंक ऊंचाई 1.8 मिमी तालिका-I के 1.0 मिमी से अधिक है।",
+    evaluatorGuide:
+      "Switch to 'Bottom Flap' facet to observe the small-form batch stamping. Note how the USP math card validates the high unit price (₹ 19.95/ml) without false positive rounding warnings.",
+    evaluatorGuideHi:
+      "छोटे रूप वाले बैच अंकन को देखने के लिए 'बॉटम फ्लैप' फ़ैसेट पर स्विच करें। देखें कि कैसे यूएसपी कार्ड बिना किसी गलत चेतावनी के ₹ 19.95/मिली का सत्यापन करता है।",
+    imagePath: "/storage/uploads/real_products/perfume_front.jpg",
+    pdpAreaCm2: 36.0,
+    expectedFontMm: 1.0,
+    observedFontMm: 1.8,
+    mrpInr: 399.0,
+    uspDeclared: "₹ 19.95 / ml",
+    uspCalculated: "₹ 19.95 / ml",
+  },
+  {
+    scenarioNumber: 12,
+    totalScenarios: 13,
+    skuId: "REAL-PKG-NAMKEEN",
+    caseId: "demo-haldiram-namkeen",
+    inspectionNumber: "INSP-20260912-N005",
+    title: "Haldiram's Nagpur Navrattan Mixture (400g)",
+    titleHi: "हल्दीराम नागपुर नवरत्न नमकीन (400 ग्राम)",
+    category: "Packaged Food & Snacks",
+    categoryHi: "पैकेजबंद खाद्य एवं स्नैक्स",
+    packageType: "Flexible Nitrogen-Flushed Pouch",
+    packageTypeHi: "लचीला नाइट्रोजन-युक्त पाउच",
+    targetVerdict: "PASS",
+    verdictLabel: "STATUTORY COMPLIANT",
+    verdictLabelHi: "सांविधिक रूप से अनुपालित (उत्तीर्ण)",
+    headlineViolation: "Multi-Panel Food Packaging: Accurate USP Rs. 0.25/g & Standard 'g' Unit",
+    headlineViolationHi: "मल्टी-पैनल खाद्य पैकेजिंग: सटीक यूएसपी रु. 0.25/g एवं मानक 'g' इकाई",
+    statutoryRules: [
+      "Rule 6(1)(da) Unit Sale Price Verification (Rs. 0.25 / g)",
+      "Section 11 LM Act SI Unit Adherence (Standard symbol 'g' verified)",
+      "Rule 6(1)(h) read with Table-I Row 3 (Area 100-500 cm2 mandates >= 2.5 mm)",
+      "Rule 6(1)(d) Manufacturing Date (24/08/2026) & Expiry Window",
+    ],
+    statutoryRulesHi: [
+      "नियम 6(1)(da) इकाई विक्रय मूल्य सत्यापन (रु. 0.25 / ग्राम)",
+      "धारा 11 एलएम अधिनियम एसआई मात्रक अनुपालन (मानक 'g' सत्यापित)",
+      "नियम 6(1)(h) सहपठित तालिका-I पंक्ति 3 (क्षेत्रफल 100-500 सेमी² हेतु >= 2.5 मिमी)",
+      "नियम 6(1)(d) निर्माण तिथि (24/08/2026) एवं उपयोग अवधि",
+    ],
+    testedCapabilities: [
+      "Tri-Facet Packaging Fusion (Front PDP + Back Nutrition Panel + Macro Stamp)",
+      "Banned Unit Check (Confirmed standard 'g' used, zero 'gms' false positive)",
+      "Exact Gram-Level USP Math Cross-Check (100 INR / 400 g = 0.25 INR/g)",
+      "Flexible Pouch Area Calculation with 40% PDP Ratio (Rule 5(1))",
+    ],
+    testedCapabilitiesHi: [
+      "त्रि-फ़ैसेट पैकेजिंग संलयन (फ्रंट PDP + बैक पोषण पैनल + मैक्रो स्टैम्प)",
+      "प्रतिबंधित मात्रक जांच (मानक 'g' की पुष्टि, शून्य 'gms' गलत चेतावनी)",
+      "सटीक ग्राम-स्तरीय यूएसपी गणित (100 INR / 400 g = 0.25 INR/g)",
+      "40% PDP अनुपात सहित लचीले पाउच का क्षेत्रफल परिकलन (नियम 5(1))",
+    ],
+    detailedRationale:
+      "Physical sample of Haldiram's Nagpur Navrattan 400g flexible snack pouch. In this category, manufacturers frequently misprint prohibited 'gms'; this certified sample strictly adheres to standard 'g'. The legal stamp on the macro panel clearly declares MRP Rs. 100.00, Net Qty 400 g, and USP Rs. 0.25 / g. The USP engine confirms 100 / 400 = 0.25 INR/g (deviation 0.00). Numeral font height on the white stamp block measures 3.4 mm against Table-I Row 3 threshold of 2.5 mm.",
+    detailedRationaleHi:
+      "हल्दीराम नागपुर नवरत्न 400 ग्राम लचीले नमकीन पाउच का भौतिक नमूना। इस श्रेणी में निर्माता अक्सर प्रतिबंधित 'gms' लिखते हैं; इस प्रमाणित नमूने में मानक 'g' का विधिवत पालन किया गया है। मैक्रो पैनल पर एमआरपी रु. 100.00, शुद्ध मात्रा 400 ग्राम, और यूएसपी रु. 0.25/g है। यूएसपी इंजन ने 100 / 400 = 0.25 की पुष्टि की। अंक ऊंचाई 3.4 मिमी तालिका-I के 2.5 मिमी से अधिक है।",
+    evaluatorGuide:
+      "Toggle between 'Front PDP' and 'Macro Close-Up'. Inspect the Rule 12 / Section 11 unit validator to verify the SI symbol 'g' is green/passed, and check the Table-I 3.4 mm font measurement.",
+    evaluatorGuideHi:
+      "'फ्रंट PDP' और 'मैक्रो क्लोज़-अप' के बीच टॉगल करें। नियम 12 / धारा 11 मात्रक सत्यापनकर्ता की जांच करें कि एसआई प्रतीक 'g' हरा/उत्तीर्ण है और 3.4 मिमी फॉन्ट माप देखें।",
+    imagePath: "/storage/uploads/real_products/namkeen_front.jpg",
+    pdpAreaCm2: 210.0,
+    expectedFontMm: 2.5,
+    observedFontMm: 3.4,
+    mrpInr: 100.0,
+    uspDeclared: "Rs. 0.25 / g",
+    uspCalculated: "Rs. 0.25 / g",
+  },
+  {
+    scenarioNumber: 13,
+    totalScenarios: 13,
+    skuId: "REAL-PKG-CHIA",
+    caseId: "demo-true-elements",
+    inspectionNumber: "INSP-20260912-C006",
+    title: "True Elements Raw Chia Seeds (250g)",
+    titleHi: "ट्रू एलिमेंट्स रॉ चिया सीड्स (250 ग्राम)",
+    category: "Organic & Health Foods",
+    categoryHi: "जैविक एवं स्वास्थ्य खाद्य पदार्थ",
+    packageType: "Stand-Up Zip Pouch",
+    packageTypeHi: "स्टैंड-अप ज़िप पाउच",
+    targetVerdict: "PASS",
+    verdictLabel: "STATUTORY COMPLIANT",
+    verdictLabelHi: "सांविधिक रूप से अनुपालित (उत्तीर्ण)",
+    headlineViolation: "Stand-Up Pouch: Accurate USP ₹1.40/g & Table-I 3.1mm Font Schedule Verified",
+    headlineViolationHi: "स्टैंड-अप पाउच: सटीक यूएसपी ₹1.40/g एवं तालिका-I 3.1 मिमी फॉन्ट अनुसूची सत्यापित",
+    statutoryRules: [
+      "Rule 6(1)(da) Unit Sale Price Calculation (₹ 1.40 / g)",
+      "Rule 6(1)(h) read with Table-I Row 3 (Area 100-500 cm2 mandates >= 2.5 mm)",
+      "Rule 6(1)(d) Date of Packaging & Manufacturing (28-05-2026)",
+      "Rule 6(1)(a) Manufacturer Premises (HW Wellness Solutions Pvt Ltd, Mumbai / Pune)",
+    ],
+    statutoryRulesHi: [
+      "नियम 6(1)(da) इकाई विक्रय मूल्य परिकलन (₹ 1.40 / ग्राम)",
+      "नियम 6(1)(h) सहपठित तालिका-I पंक्ति 3 (क्षेत्रफल 100-500 सेमी² हेतु >= 2.5 मिमी)",
+      "नियम 6(1)(d) पैकेजिंग एवं निर्माण तिथि (28-05-2026)",
+      "नियम 6(1)(a) निर्माता परिसर (एचडब्ल्यू वेलनेस सॉल्यूशंस प्राइवेट लिमिटेड, मुंबई / पुणे)",
+    ],
+    testedCapabilities: [
+      "Bi-Panel Packaging Fusion (Front PDP + Back Declarations Panel)",
+      "Stand-Up Zip Pouch Effective Surface Area Computation",
+      "Metric Decimal Rate Verification (350 INR / 250 g = 1.40 INR/g)",
+      "Customer Support Hotline & Web URL Extraction",
+    ],
+    testedCapabilitiesHi: [
+      "द्वि-पैनल पैकेजिंग संलयन (फ्रंट PDP + बैक घोषणाएं पैनल)",
+      "स्टैंड-अप ज़िप पाउच प्रभावी सतह क्षेत्रफल गणना",
+      "मीट्रिक दशमलव दर सत्यापन (350 INR / 250 g = 1.40 INR/g)",
+      "ग्राहक सेवा हेल्पलाइन एवं वेब यूआरएल निष्कर्षण",
+    ],
+    detailedRationale:
+      "Physical sample of True Elements Raw Chia Seeds 250g stand-up zip pouch. Both front branding and comprehensive back legal metrology declarations were captured. Extracted declarations: MRP ₹ 350.00, Net Qty 250 g, USP ₹ 1.40 / g, Mfg Date 28-05-2026. The mathematical engine verifies |(1.40 * 250) - 350| = 0.00 INR. Numeral font height on the declared quantity measures 3.1 mm, comfortably satisfying Table-I Row 3 (2.5 mm). Full Section 63 BSA 2023 evidence chain recorded.",
+    detailedRationaleHi:
+      "ट्रू एलिमेंट्स रॉ चिया सीड्स 250 ग्राम स्टैंड-अप ज़िप पाउच का भौतिक नमूना। फ्रंट ब्रांडिंग और बैक पैनल दोनों को कैप्चर किया गया। निकाली गई घोषणाएं: एमआरपी ₹ 350.00, शुद्ध मात्रा 250 ग्राम, यूएसपी ₹ 1.40/g, निर्माण 28-05-2026। गणितीय इंजन ने शत-प्रतिशत मिलान की पुष्टि की। अंक ऊंचाई 3.1 मिमी तालिका-I के 2.5 मिमी से अधिक है।",
+    evaluatorGuide:
+      "Examine the 'Back Panel' facet to inspect the comprehensive statutory declaration matrix, verifying font height, SI metric units, and the exact ₹ 1.40/g USP calculation.",
+    evaluatorGuideHi:
+      "फॉन्ट ऊंचाई, एसआई मात्रक और सटीक ₹ 1.40/g यूएसपी गणना का सत्यापन करने के लिए 'बैक पैनल' फ़ैसेट का निरीक्षण करें।",
+    imagePath: "/storage/uploads/real_products/chia_front.jpg",
+    pdpAreaCm2: 175.0,
+    expectedFontMm: 2.5,
+    observedFontMm: 3.1,
+    mrpInr: 350.0,
+    uspDeclared: "₹ 1.40 / g",
+    uspCalculated: "₹ 1.40 / g",
+  },
 ];
 
 export const getDemoScenarioById = (id: string): DemoScenarioItem | undefined => {
@@ -460,6 +802,24 @@ export const getDemoScenarioById = (id: string): DemoScenarioItem | undefined =>
       }
       if (lower.includes("fortune") || lower.includes("sunlite") || lower.includes("oil") || lower === "7") {
         return s.skuId === "demo-fortune-sunlite";
+      }
+      if (lower.includes("watch") || lower.includes("fastrack") || lower === "8") {
+        return s.skuId === "REAL-PKG-WATCH";
+      }
+      if (lower.includes("brahmi") || lower.includes("himalaya") || lower === "9") {
+        return s.skuId === "REAL-PKG-BRAHMI";
+      }
+      if (lower.includes("facewash") || lower.includes("dotkey") || lower.includes("dot-and-key") || lower === "10") {
+        return s.skuId === "REAL-PKG-FACEWASH";
+      }
+      if (lower.includes("perfume") || lower.includes("bellavita") || lower.includes("bella-vita") || lower === "11") {
+        return s.skuId === "REAL-PKG-PERFUME";
+      }
+      if (lower.includes("namkeen") || lower.includes("haldiram") || lower === "12") {
+        return s.skuId === "REAL-PKG-NAMKEEN";
+      }
+      if (lower.includes("chia") || lower.includes("true-elements") || lower === "13") {
+        return s.skuId === "REAL-PKG-CHIA";
       }
       return false;
     })
