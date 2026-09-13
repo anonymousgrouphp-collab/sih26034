@@ -943,6 +943,54 @@ Monitor field usage and verify further real packaging test cases.
 ### Signing Note
 SIGNED OFF BY: Parmarth Kumar (parmarth@example.com) & Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-13 20:25 IST [VERIFIED]
 
+---
+
+## [13 September 2026] [21:55] IST
+
+### Task / Chunk
+Render 512MB RAM Ceiling Optimization, 90-Degree Multi-Angle OCR, Vertical Price Sticker Parsing & Multi-Facet Semantic Fusion — Case `insp_7328e38b-e61c-453e-8ea8-4344a88ef6a9`.
+
+### Status
+COMPLETE
+
+### Completed
+- **Eliminated Render 512 MB OOM Crashes:**
+  - Downscaled high-resolution images in `MultilingualOCREngine` to max dimension 1920, reducing uncompressed memory footprint by 83% from 48.3 MB down to 8.2 MB per frame.
+  - Switched `execute_batch_pipeline` in `server.py` from multi-worker threading to sequential execution with explicit `del img_bgr` and `gc.collect()` after each facet.
+  - Reduced `_IMAGE_MEMORY_CACHE` to max 2 items with prompt cache eviction upon batch completion. Total memory usage remains strictly under 160 MB throughout 9-facet batches.
+- **Multi-Angle 90-Degree Clockwise OCR Probing (`members/member-02-ocr/src/engine.py`):**
+  - Added 90-degree probe triggered when economic declarations (MRP, USP, ₹) are missing or text is sparse.
+  - Inverted 90-degree clockwise bounding boxes and polygons back to canonical 0-degree image coordinates with integer casting conforming to `OCRToken` schema.
+- **Robust Semantic Extraction & Parser Hardening (`members/member-03-extraction/src/parsers.py` & `extractor.py`):**
+  - Normalized optical Rupee variations (`MRPE`, `MRPf`) to `MRP Rs.`.
+  - Added Devanagari character `र` to USP currency regex to match shorthand Rupee `USP र/ml : 19.95`.
+  - In `parse_net_quantity`, added contextual normalization of optical truncation (`20m` -> `20 ml`) for liquid, cosmetics, and perfume packages.
+  - In `parse_mfg_and_expiry_dates`, updated `mfg_prefix` to match `Mfg. Date` with period, and added compact 6-digit MMYYYY regex (`072026` -> 07/2026).
+  - In `parse_country_of_origin`, restricted `COO` acronym to require colon/punctuation, and used `finditer` to locate genuine declarations (e.g. `MADE IN INDIA`) without false rejection from words like `store in a cool place`.
+  - In `check_consumer_care_completeness`, added fallback regex for OCR `@` corruption (`shopabellavitaorganic.com` -> `shop@bellavitaorganic.com`).
+  - In `extractor.py`, added `full_text` fallbacks for MRP, USP, Mfg Date, and Country of Origin for vertically rotated labels.
+  - In `fusion.py`, supported `facts_obj` in facet dictionary and added `declared_usp` and `mfg_date` aliases in `unified_facts`.
+
+### Tests
+- `python scratch/test_bella_e2e.py`: 9 packaging facets processed in 61.09s, peak RAM < 160 MB, all 7 statutory rules passed (MRP: ₹399.00, USP: ₹19.95/ml, Net Qty: 20 ml, Mfg Date: 07/2026, Manufacturer: Krigler Fragrance / IDAM, Country of Origin: India, Consumer Care: shop@bellavitaorganic.com) -> Overall Verdict: PASS!
+- `pytest members/member-01-cv-metrology/tests/ -q`: 43 passed in 0.90s.
+- `pytest members/member-02-ocr/tests/ -q`: 77 passed, 1 skipped in 72.29s.
+- `pytest members/member-03-extraction/tests/ -q`: 171 passed in 4.07s.
+- `pytest members/member-04-rule-engine/tests/ -q`: 53 passed in 0.74s.
+- `pytest members/member-05-evidence/tests/ -q`: 81 passed in 37.95s.
+- `npm test -- --run` in `ui-combined/`: 146 passed in 1.54s.
+- Total: 571 tests passed, 0 failures.
+
+### Decisions
+1. Free-tier cloud instances with 512 MB RAM require sequential facet execution and prompt garbage collection; ThreadPool parallel processing on 4000x3000 images is strictly prohibited.
+2. Vertical price and batch stickers must be detected via 90-degree OCR rotation and projected back to canonical 0-degree space with `full_text` fallback preservation.
+
+### Next Step
+Commit, push to `main` and `dev`, and trigger pipeline batch re-analysis for case `insp_7328e38b-e61c-453e-8ea8-4344a88ef6a9`.
+
+### Signing Note
+SIGNED OFF BY: Harsh Patel (anonymousgrouphp@gmail.com) & Parmarth Kumar (parmarth@example.com) — 2026-09-13 21:55 IST [VERIFIED]
+
 
 
 

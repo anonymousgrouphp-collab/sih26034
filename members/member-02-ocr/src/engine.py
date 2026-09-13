@@ -126,12 +126,76 @@ class MultilingualOCREngine:
 
         return np.ascontiguousarray(img)
 
+    def _extract_tokens_from_mat(self, mat: np.ndarray, img_w: int, img_h: int) -> List[Dict[str, Any]]:
+        """Internal helper to detect and recognize text tokens on an oriented image buffer."""
+        detections = self.detector.detect(mat)
+        extracted: List[Dict[str, Any]] = []
+
+        for det in detections:
+            # Validate polygon area and bounds
+            is_valid, _ = PolygonNormalizer.validate_polygon(det.polygon, img_w, img_h)
+            if not is_valid:
+                continue
+
+            # Extract perspective-rectified crop
+            try:
+                crop = PolygonNormalizer.extract_crop(mat, det.polygon, target_height=48)
+            except Exception:
+                continue
+
+            # Multilingual recognition (PP-OCRv4)
+            p_text, p_conf, p_lang = self.recognizer.recognize(crop)
+
+            # Inversion probe: if initial confidence is sub-optimal (< 0.92), test 180-degree flipped crop
+            if crop is not None and crop.size > 0 and p_conf < 0.92:
+                try:
+                    crop_180 = cv2.rotate(crop, cv2.ROTATE_180)
+                    p_text_180, p_conf_180, p_lang_180 = self.recognizer.recognize(crop_180)
+                    if p_conf_180 > p_conf + 0.05 or (p_conf < 0.60 and p_conf_180 > p_conf):
+                        p_text, p_conf, p_lang = p_text_180, p_conf_180, p_lang_180
+                except Exception:
+                    pass
+
+            # Consensus fallback on low confidence
+            final_text = p_text
+            final_conf = p_conf
+            final_lang = p_lang
+
+            if self.fallback_threshold > 0 and PolygonNormalizer.requires_consensus_fallback(p_conf, self.fallback_threshold):
+                if self.fallback.is_available():
+                    fb_res = self.fallback.recognize(crop)
+                    if fb_res is not None:
+                        fb_text, fb_conf = fb_res
+                        final_text, final_conf, _ = OCRConsensusEngine.resolve(
+                            p_text, p_conf, fb_text, fb_conf
+                        )
+                        final_lang = PPOCRv4Recognizer.detect_language(final_text)
+
+            canonical_polygon = PolygonNormalizer.canonicalize_polygon(det.polygon)
+            bbox = PolygonNormalizer.polygon_to_axis_aligned_box(canonical_polygon, img_w, img_h)
+            bounded_conf = float(min(max(final_conf, 0.0), 1.0))
+
+            extracted.append({
+                "text": final_text,
+                "confidence": bounded_conf,
+                "polygon": canonical_polygon,
+                "bounding_box": bbox,
+                "language": final_lang,
+            })
+
+        return extracted
+
     def process_image(
         self,
         image_input: Union[np.ndarray, str, Path],
         image_id: str = "img_01"
     ) -> OCROutput:
         """Executes end-to-end multilingual text detection and recognition on rectified image.
+
+        Optimizations:
+        1. Memory-safe downsampling: caps input to max 1920 dimension to maintain < 180MB RAM on free containers.
+        2. Multi-angle 90-degree clockwise probe: extracts vertical packaging declarations (e.g. cosmetics/stickers).
+        3. Inverse coordinate scaling: maps all polygon and bounding box vertices back to original image dimensions.
 
         Args:
             image_input: BGR/RGB NumPy array or filesystem path to image
@@ -155,85 +219,105 @@ class MultilingualOCREngine:
 
         orig_h, orig_w = image.shape[:2]
 
-        # 1. Multi-oriented text detection (DBNet++)
-        detections = self.detector.detect(image)
+        # Memory-safe downsample: cap max dimension to 1920
+        scale = 1.0
+        proc_image = image
+        if max(orig_h, orig_w) > 1920:
+            scale = 1920.0 / max(orig_h, orig_w)
+            proc_w = max(int(round(orig_w * scale)), 16)
+            proc_h = max(int(round(orig_h * scale)), 16)
+            proc_image = cv2.resize(image, (proc_w, proc_h), interpolation=cv2.INTER_AREA)
 
-        tokens: List[OCRToken] = []
-        for i, det in enumerate(detections):
-            token_id = f"tok_{i + 1:02d}"
+        curr_h, curr_w = proc_image.shape[:2]
 
-            # Validate polygon area and bounds
-            is_valid, _ = PolygonNormalizer.validate_polygon(det.polygon, orig_w, orig_h)
-            if not is_valid:
-                continue
+        # 1. Primary pass at 0 degrees
+        tokens_0 = self._extract_tokens_from_mat(proc_image, curr_w, curr_h)
 
-            # 2. Extract perspective-rectified crop
-            try:
-                crop = PolygonNormalizer.extract_crop(image, det.polygon, target_height=48)
-            except Exception as e:
-                logger.warning(f"Crop extraction failed for token {token_id}: {e}")
-                continue
+        STATUTORY_KEYWORDS = (
+            "mrp", "₹", "rs.", "net", "qty", "content", "mfg", "pkd", "usp", "exp", "batch",
+            "customer", "care", "consumer", "marketed", "manufactured", "imported", "origin", "india"
+        )
+        stat_0 = sum(1 for t in tokens_0 if any(k in t["text"].lower() for k in STATUTORY_KEYWORDS))
 
-            # 3. Multilingual recognition (PP-OCRv4)
-            p_text, p_conf, p_lang = self.recognizer.recognize(crop)
+        has_economic_0 = any(
+            any(k in t["text"].lower() for k in ("mrp", "₹", "rs.", "usp"))
+            and any(c.isdigit() for c in t["text"])
+            for t in tokens_0
+        )
 
-            # Inversion probe: if initial confidence is sub-optimal (< 0.92), test 180-degree flipped crop
-            if crop is not None and crop.size > 0 and p_conf < 0.92:
-                try:
-                    crop_180 = cv2.rotate(crop, cv2.ROTATE_180)
-                    p_text_180, p_conf_180, p_lang_180 = self.recognizer.recognize(crop_180)
-                    if p_conf_180 > p_conf + 0.05 or (p_conf < 0.60 and p_conf_180 > p_conf):
-                        p_text, p_conf, p_lang = p_text_180, p_conf_180, p_lang_180
-                except Exception:
-                    pass
+        raw_candidates = list(tokens_0)
 
-            # 4. Consensus fallback on low confidence
-            final_text = p_text
-            final_conf = p_conf
-            final_lang = p_lang
+        # 2. Multi-angle 90-degree clockwise probe if initial pass lacks economic markers, has sparse tokens, or lacks statutory markers
+        if not has_economic_0 or len(tokens_0) < 30 or stat_0 < 3:
+            img_90 = cv2.rotate(proc_image, cv2.ROTATE_90_CLOCKWISE)
+            # In img_90: width is curr_h, height is curr_w
+            tokens_90 = self._extract_tokens_from_mat(img_90, curr_h, curr_w)
+            stat_90 = sum(1 for t in tokens_90 if any(k in t["text"].lower() for k in STATUTORY_KEYWORDS))
 
-            if self.fallback_threshold > 0 and PolygonNormalizer.requires_consensus_fallback(p_conf, self.fallback_threshold):
-                if self.fallback.is_available():
-                    fb_res = self.fallback.recognize(crop)
-                    if fb_res is not None:
-                        fb_text, fb_conf = fb_res
-                        final_text, final_conf, _ = OCRConsensusEngine.resolve(
-                            p_text, p_conf, fb_text, fb_conf
-                        )
-                        final_lang = PPOCRv4Recognizer.detect_language(final_text)
+            if stat_90 > 0 or len(tokens_90) > len(tokens_0):
+                mapped_90 = []
+                for t in tokens_90:
+                    # Invert 90-degree CW rotation back to 0-degree: x_0 = y_90, y_0 = curr_h - 1 - x_90
+                    poly_90 = t["polygon"]
+                    poly_0 = [[float(pt[1]), float(curr_h - 1 - pt[0])] for pt in poly_90]
+                    canon_poly_0 = PolygonNormalizer.canonicalize_polygon(poly_0)
+                    bbox_0 = PolygonNormalizer.polygon_to_axis_aligned_box(canon_poly_0, curr_w, curr_h)
+                    mapped_90.append({
+                        "text": t["text"],
+                        "confidence": t["confidence"],
+                        "polygon": canon_poly_0,
+                        "bounding_box": bbox_0,
+                        "language": t["language"],
+                    })
 
-            # Ensure polygon is canonicalized and bounding box is computed
-            canonical_polygon = PolygonNormalizer.canonicalize_polygon(det.polygon)
-            bbox = PolygonNormalizer.polygon_to_axis_aligned_box(canonical_polygon)
+                if stat_90 > stat_0:
+                    # 90-degree orientation captured significantly more statutory text
+                    existing_lower = {m["text"].lower().strip() for m in mapped_90}
+                    raw_candidates = mapped_90 + [t for t in tokens_0 if t["text"].lower().strip() not in existing_lower]
+                else:
+                    existing_lower = {t["text"].lower().strip() for t in tokens_0}
+                    raw_candidates = tokens_0 + [m for m in mapped_90 if m["text"].lower().strip() not in existing_lower]
 
-            # Clamp confidence to [0.0, 1.0]
-            bounded_conf = float(min(max(final_conf, 0.0), 1.0))
+        # 3. Inverse scale mapping back to original image dimensions
+        inv_scale = 1.0 / scale if abs(scale - 1.0) > 1e-4 else 1.0
+        final_tokens: List[OCRToken] = []
+
+        for i, item in enumerate(raw_candidates):
+            poly = item["polygon"]
+            scaled_poly = [
+                [int(round(pt[0] * inv_scale)), int(round(pt[1] * inv_scale))]
+                for pt in poly
+            ]
+            canon_scaled = PolygonNormalizer.canonicalize_polygon(scaled_poly)
+            int_scaled = [[int(round(p[0])), int(round(p[1]))] for p in canon_scaled]
+            bbox = PolygonNormalizer.polygon_to_axis_aligned_box(int_scaled, orig_w, orig_h)
+            int_bbox = [int(round(b)) for b in bbox]
 
             token = OCRToken(
-                token_id=token_id,
-                text=final_text,
-                confidence=round(bounded_conf, 4),
-                polygon=canonical_polygon,
-                bounding_box=bbox,
-                language=final_lang
+                token_id=f"tok_{i + 1:02d}",
+                text=item["text"],
+                confidence=round(item["confidence"], 4),
+                polygon=int_scaled,
+                bounding_box=int_bbox,
+                language=item["language"]
             )
-            tokens.append(token)
+            final_tokens.append(token)
 
         # Compute aggregate metrics
-        total_tokens = len(tokens)
+        total_tokens = len(final_tokens)
         mean_conf = (
-            float(round(float(np.mean([t.confidence for t in tokens])), 4))
-            if tokens
+            float(round(float(np.mean([t.confidence for t in final_tokens])), 4))
+            if final_tokens
             else 0.0
         )
-        full_text = "\n".join(t.text for t in tokens if t.text.strip())
+        full_text = "\n".join(t.text for t in final_tokens if t.text.strip())
         execution_time_ms = int(round((time.perf_counter() - start_time) * 1000))
 
         return OCROutput(
             image_id=image_id,
             total_tokens=total_tokens,
             mean_confidence=mean_conf,
-            tokens=tokens,
+            tokens=final_tokens,
             full_text=full_text,
             execution_time_ms=execution_time_ms
         )

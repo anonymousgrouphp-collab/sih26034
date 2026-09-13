@@ -694,9 +694,9 @@ async def upload_inspection_image(
     db.add(ev_image)
     db.flush()
 
-    # Retain image bytes in fast memory cache
+    # Retain image bytes in fast memory cache (limit to max 2 items to prevent OOM on 512MB RAM)
     _IMAGE_MEMORY_CACHE[ev_image.id] = raw_bytes
-    if len(_IMAGE_MEMORY_CACHE) > 20:
+    while len(_IMAGE_MEMORY_CACHE) > 2:
         first_k = next(iter(_IMAGE_MEMORY_CACHE))
         _IMAGE_MEMORY_CACHE.pop(first_k, None)
 
@@ -1619,6 +1619,10 @@ def execute_batch_pipeline(
             extracted_fields = []
             font_mm = None
 
+        del img_bgr
+        import gc
+        gc.collect()
+
         return {
             "image_id": img_id,
             "panel_type": p_type,
@@ -1634,7 +1638,7 @@ def execute_batch_pipeline(
             "tokens_count": len(ocr_output.tokens),
         }
 
-    # Prepare metadata for parallel fan-out
+    # Prepare metadata for facet processing
     img_metas = []
     for img in ev_images:
         img_metas.append({
@@ -1645,10 +1649,13 @@ def execute_batch_pipeline(
             "glare_percentage": img.glare_pixel_percentage,
         })
 
-    # Execute workers in parallel across CPU cores
-    max_workers = min(4, max(1, len(img_metas)))
-    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-        worker_results = list(executor.map(_process_facet_worker, img_metas))
+    # Execute workers sequentially with explicit garbage collection to prevent Render 512MB OOM
+    import gc
+    worker_results = []
+    for meta in img_metas:
+        w_res = _process_facet_worker(meta)
+        worker_results.append(w_res)
+        gc.collect()
 
     # Cross-calibrate: If any image successfully detected a scale, inherit to uncalibrated siblings
     best_scale = next((r["px_to_mm"] for r in worker_results if r["px_to_mm"]), None)
@@ -1813,6 +1820,12 @@ def execute_batch_pipeline(
     # Cache fused facts
     if CacheQueueAdapter:
         CacheQueueAdapter.get_instance().set_fused_facts(inspection.id, fused_res)
+
+    # Evict cached raw image bytes for this inspection to free memory immediately
+    for img in ev_images:
+        _IMAGE_MEMORY_CACHE.pop(img.id, None)
+    import gc
+    gc.collect()
 
     return {
         "inspection_id": inspection.id,
