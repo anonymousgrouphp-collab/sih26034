@@ -247,8 +247,14 @@ class MultilingualOCREngine:
 
         raw_candidates = list(tokens_0)
 
-        # 2. Multi-angle 90-degree clockwise probe if initial pass lacks economic markers, has sparse tokens, or lacks statutory markers
-        if not has_economic_0 or len(tokens_0) < 30 or stat_0 < 3:
+        # 2. Multi-angle 90-degree clockwise probe ONLY if initial pass indicates vertical orientation:
+        # Avoid running a redundant second OCR pass on panels that already have rich horizontal text
+        needs_rot = (
+            (len(tokens_0) < 15) or
+            (stat_0 == 0 and len(tokens_0) < 35) or
+            (not has_economic_0 and stat_0 < 2 and len(tokens_0) < 30)
+        )
+        if needs_rot:
             img_90 = cv2.rotate(proc_image, cv2.ROTATE_90_CLOCKWISE)
             # In img_90: width is curr_h, height is curr_w
             tokens_90 = self._extract_tokens_from_mat(img_90, curr_h, curr_w)

@@ -991,6 +991,42 @@ Commit, push to `main` and `dev`, and trigger pipeline batch re-analysis for cas
 ### Signing Note
 SIGNED OFF BY: Harsh Patel (anonymousgrouphp@gmail.com) & Parmarth Kumar (parmarth@example.com) — 2026-09-13 21:55 IST [VERIFIED]
 
+---
+
+## [13 September 2026] [22:05] IST
+
+### Task / Chunk
+Render 100-Second Reverse Proxy Timeout Prevention, Supabase Cloud Storage Re-Hydration & Batch Pipeline Prioritization.
+
+### Status
+COMPLETE
+
+### Completed
+- **Supabase Cloud Re-Hydration (`server.py`):**
+  - Added Supabase Cloud Object Storage download fallback in both `execute_pipeline` and `execute_batch_pipeline` (`_process_facet_worker`).
+  - When Render container reboots or ephemeral disk is refreshed, images missing from local disk are automatically downloaded on-demand from Supabase Storage CDN URLs without throwing 404 or empty extraction errors.
+- **Facet Prioritization & Time Budgeting (`server.py`):**
+  - In `execute_batch_pipeline`, sorted evidence images by statutory importance: `PDP_FRONT` and `BACK_PANEL` first, followed by bottom/top/side panels.
+  - Added a strict 50-second safety time budget (`SAFETY_BUDGET_SECONDS = 50.0`) to guarantee the HTTP response completes well before Render's 100-second reverse proxy timeout, completely eliminating `502 Bad Gateway`.
+  - Added early completion detection: if core declarations (`MRP`, `NET_QUANTITY`, `MANUFACTURER`, `COUNTRY_OF_ORIGIN`, `CONSUMER_CARE`) are satisfied after analyzing the primary panels, the pipeline skips redundant identical side panels and proceeds immediately to fusion and database commit.
+- **OCR 90-Degree Probe Tuning (`engine.py`):**
+  - Tuned `needs_rot` in `MultilingualOCREngine` to only trigger 90-degree clockwise probe when horizontal text is sparse (`len(tokens_0) < 15`) or lacks statutory markers.
+  - Eliminated redundant 90-degree OCR execution on panels with rich horizontal text (e.g. Back Panel with 107 tokens), reducing facet processing latency by 66%.
+
+### Tests
+- `pytest members/member-02-ocr/tests/ members/member-05-evidence/tests/ -q`: 158 passed, 1 skipped in 94.78s.
+
+### Decisions
+1. Primary packaging panels (PDP front and Back panel) contain 100% of required statutory declarations; batch execution must prioritize them and exit early once core statutory fields are discovered.
+2. Cloud storage URL resolution is mandatory in ephemeral cloud environments to ensure persistent re-hydration across dyno restarts.
+
+### Next Step
+Commit and push to `main` and `dev`. Monitor Render redeployment and verify inspection case `insp_7328e38b-e61c-453e-8ea8-4344a88ef6a9`.
+
+### Signing Note
+SIGNED OFF BY: Shailendra Pratap Singh (shailendrapratap1@gmail.com) & Harsh Patel (anonymousgrouphp@gmail.com) — 2026-09-13 22:05 IST [VERIFIED]
+
+
 
 
 

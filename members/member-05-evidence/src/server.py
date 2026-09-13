@@ -1133,6 +1133,29 @@ def execute_pipeline(
                     except Exception:
                         img_bgr = None
 
+            if img_bgr is None:
+                cloud_url = getattr(ev_image, "image_url", None)
+                if not cloud_url and ev_image.file_path:
+                    clean_p = ev_image.file_path.lstrip("/").replace("\\", "/")
+                    if clean_p.startswith("storage/"):
+                        clean_p = clean_p[len("storage/"):]
+                    sb_url = os.getenv("SUPABASE_URL", "").rstrip("/")
+                    sb_bucket = os.getenv("SUPABASE_BUCKET", "evidence-images")
+                    if sb_url:
+                        cloud_url = f"{sb_url}/storage/v1/object/public/{sb_bucket}/{clean_p}"
+                if cloud_url:
+                    try:
+                        import httpx
+                        import numpy as np
+                        import cv2
+                        with httpx.Client(timeout=15.0) as client:
+                            resp = client.get(cloud_url)
+                            if resp.status_code == 200:
+                                nparr = np.frombuffer(resp.content, np.uint8)
+                                img_bgr = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                    except Exception:
+                        img_bgr = None
+
             if img_bgr is not None:
                 # 1. Real Optical Quality Gate verification on loaded image
                 qg_passed_real = True
@@ -1534,6 +1557,29 @@ def execute_batch_pipeline(
                     img_bgr = None
 
         if img_bgr is None:
+            image_url = img_meta.get("image_url")
+            if not image_url and file_path_str:
+                clean_path = file_path_str.lstrip("/").replace("\\", "/")
+                if clean_path.startswith("storage/"):
+                    clean_path = clean_path[len("storage/"):]
+                sb_url = os.getenv("SUPABASE_URL", "").rstrip("/")
+                sb_bucket = os.getenv("SUPABASE_BUCKET", "evidence-images")
+                if sb_url:
+                    image_url = f"{sb_url}/storage/v1/object/public/{sb_bucket}/{clean_path}"
+            if image_url:
+                try:
+                    import httpx
+                    import numpy as np
+                    import cv2
+                    with httpx.Client(timeout=15.0) as client:
+                        resp = client.get(image_url)
+                        if resp.status_code == 200:
+                            nparr = np.frombuffer(resp.content, np.uint8)
+                            img_bgr = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                except Exception:
+                    img_bgr = None
+
+        if img_bgr is None:
             return {
                 "image_id": img_id,
                 "panel_type": p_type,
@@ -1638,24 +1684,54 @@ def execute_batch_pipeline(
             "tokens_count": len(ocr_output.tokens),
         }
 
+    # Prioritize facets by statutory likelihood: PDP_FRONT and BACK_PANEL first!
+    PANEL_ORDER = {
+        "PDP_FRONT": 0,
+        "BACK_PANEL": 1,
+        "BOTTOM_PANEL": 2,
+        "TOP_PANEL": 3,
+        "SIDE_PANEL": 4,
+        "UNKNOWN": 5,
+    }
+    sorted_images = sorted(ev_images, key=lambda x: PANEL_ORDER.get(x.panel_type or "UNKNOWN", 99))
+
     # Prepare metadata for facet processing
     img_metas = []
-    for img in ev_images:
+    for img in sorted_images:
         img_metas.append({
             "id": img.id,
             "panel_type": img.panel_type or "UNKNOWN",
             "file_path": img.file_path,
+            "image_url": getattr(img, "image_url", None),
             "blur_variance": img.blur_laplacian_variance,
             "glare_percentage": img.glare_pixel_percentage,
         })
 
-    # Execute workers sequentially with explicit garbage collection to prevent Render 512MB OOM
+    # Execute workers sequentially with safety time budget (50s) to never exceed Render's 100s proxy timeout
     import gc
     worker_results = []
-    for meta in img_metas:
+    SAFETY_BUDGET_SECONDS = 50.0
+
+    for idx, meta in enumerate(img_metas):
+        elapsed = time.perf_counter() - t0
+        if idx >= 2 and elapsed > SAFETY_BUDGET_SECONDS:
+            logger.info(f"Batch pipeline reached safety time budget ({elapsed:.1f}s) after {idx} facets; proceeding to fusion.")
+            break
+
         w_res = _process_facet_worker(meta)
         worker_results.append(w_res)
         gc.collect()
+
+        # Early completion check: if primary declarations already discovered across processed facets
+        if len(worker_results) >= 2:
+            discovered_fields = set()
+            for r in worker_results:
+                for f in r.get("raw_fields", []):
+                    discovered_fields.add(f.get("field_type"))
+            CORE_FIELDS = {"MRP", "NET_QUANTITY", "MANUFACTURER", "COUNTRY_OF_ORIGIN", "CONSUMER_CARE"}
+            if CORE_FIELDS.issubset(discovered_fields):
+                logger.info(f"All core statutory declarations identified after {len(worker_results)} facets; proceeding to fusion.")
+                break
 
     # Cross-calibrate: If any image successfully detected a scale, inherit to uncalibrated siblings
     best_scale = next((r["px_to_mm"] for r in worker_results if r["px_to_mm"]), None)
