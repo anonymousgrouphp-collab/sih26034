@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { GovTopBar } from "../../components/layout/GovTopBar";
 import { GovFooter } from "../../components/layout/GovFooter";
-import { NirikshakBrandLogo } from "../../components/common/nirikshakBrandLogo";
+import { NirikshakBrandLogo } from "../../components/common/NirikshakBrandLogo";
 import { useLanguage } from "../../context/LanguageContext";
 import type { LegalBlock, LegalDoc, LegalSection } from "./legalDocTypes";
 import { CATEGORY_LABELS, docUrl, docsForFooter, getLegalDoc } from "./legalDocRegistry";
