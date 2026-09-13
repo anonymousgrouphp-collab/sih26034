@@ -898,10 +898,51 @@ COMPLETE
 1. In Mode B (local monolith), `/storage/` continues to serve local files. In Mode A / distributed deployment, dynamic uploads automatically route to backend evidence streaming and Supabase CDN.
 
 ### Next Step
-Deploy and verify live on Vercel and Render.
+Continuous monitoring and real physical dataset batch processing.
 
 ### Signing Note
 SIGNED OFF BY: Parmarth Kumar (parmarth@example.com) & Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-13 19:57 IST [VERIFIED]
+
+---
+
+## [13 September 2026] [20:25] IST
+
+### Task / Chunk
+Resolution of Main Inspection Vision Canvas Loading & Lazy Thumbnail Stream Optimization — Case `insp_7328e38b-e61c-453e-8ea8-4344a88ef6a9`.
+
+### Status
+COMPLETE
+
+### Completed
+- **InspectionVisionCanvas Root Cause Resolution:**
+  - Identified that the black screen on Tab 0 (Inspection Overview) occurred because `InspectionVisionCanvas.tsx` lacked image loading state, spinner feedback, and automatic failover retries.
+  - Furthermore, the multi-image thumbnail carousel was rendering 9 full-size uncompressed JPEGs (35MB+) simultaneously without lazy loading, saturating browser network bandwidth and delaying the primary canvas image render.
+- **Frontend Architecture Enhancements:**
+  - Added `isImageLoaded` and `imageError` state hooks with an elegant animated loading indicator overlay.
+  - Implemented automatic `onError` failover retry directing to the backend streaming endpoint (`${apiBase}/evidence/image/${activeImage.id}`).
+  - Added `loading="lazy"` and `onError` retry to the thumbnail image strip.
+- **Verification & Deployment:**
+  - `npm test -- --run` in `ui-combined`: 146/146 tests passed.
+  - `python -m pytest members/member-05-evidence/tests/ -v`: 81/81 tests passed.
+  - `node build-root.cjs`: Built and populated `dist/` cleanly in 8.41s.
+  - Synced and pushed to both `main` (`accb196`) and `dev` branches.
+  - Verified live on Vercel (`https://sih26034.vercel.app/inspections/insp_7328e38b-e61c-453e-8ea8-4344a88ef6a9`) via Chrome DevTools Protocol: verified 4640x3472 Bella Vita evidence photo rendered with 100% opacity, crisp bounding boxes, and statutory declarations.
+
+### Tests
+- `npm test -- --run` in `ui-combined`: 146 passed.
+- `pytest members/member-05-evidence/tests/ -v`: 81 passed.
+- Chrome Headless E2E Verification: 4640x3472 image loaded with `complete: true`, screenshot saved to `scratch/insp_7328_final_canvas.png`.
+
+### Decisions
+1. High-resolution multi-view packaging captures must always use `loading="lazy"` on thumbnails so the primary PDP canvas image receives first-priority network bandwidth.
+2. All canvas components implement automatic dual-tier URL resolution (Supabase CDN primary, Render streaming endpoint secondary failover).
+
+### Next Step
+Monitor field usage and verify further real packaging test cases.
+
+### Signing Note
+SIGNED OFF BY: Parmarth Kumar (parmarth@example.com) & Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-13 20:25 IST [VERIFIED]
+
 
 
 
