@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Static Post-Training Quantization (PTQ) Harness for Member 2 OCR Models.
 
-SIH26034 — NyayaDrishti-LM
+SIH26034 — Nirikshak
 Architecture: DBNet++ Detection -> PP-OCRv4 English Rec -> PP-OCRv3 Devanagari Rec
 Method: ONNX Runtime Static Quantization (QDQ format, Int8 weights and activations)
 

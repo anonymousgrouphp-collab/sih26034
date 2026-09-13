@@ -14,7 +14,7 @@ import {
   Sparkles,
   ExternalLink,
 } from "lucide-react";
-import { NirikshakBrandLogo } from "../components/common/NirikshakBrandLogo";
+import { NirikshakBrandLogo } from "../components/common/nirikshakBrandLogo";
 import { GovTopBar } from "../components/layout/GovTopBar";
 import { GovFooter } from "../components/layout/GovFooter";
 import { StatutoryPipelineInfographic } from "../components/common/StatutoryPipelineInfographic";

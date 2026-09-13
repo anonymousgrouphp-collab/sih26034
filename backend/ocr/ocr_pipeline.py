@@ -1,4 +1,4 @@
-"""Member 2 OCR Pipeline Entrypoint (SIH26034 - NyayaDrishti-LM)
+"""Member 2 OCR Pipeline Entrypoint (SIH26034 - Nirikshak)
 
 Usage:
     python -m backend.ocr.ocr_pipeline [image_path]
@@ -28,7 +28,7 @@ logger = logging.getLogger("OCR_Pipeline")
 
 
 def main():
-    logger.info("Initializing NyayaDrishti-LM Multilingual OCR Engine...")
+    logger.info("Initializing Nirikshak Multilingual OCR Engine...")
     engine = MultilingualOCREngine()
 
     if len(sys.argv) > 1:

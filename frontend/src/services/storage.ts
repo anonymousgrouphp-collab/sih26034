@@ -36,11 +36,11 @@ const DEFAULT_PREFERENCES: UserPreferences = {
 };
 
 const STORAGE_KEYS = {
-  DRAFT_CASE: "nyayadrishti_draft_inspection_v1",
-  PREFERENCES: "nyayadrishti_user_prefs_v1",
-  TOKEN: "nyayadrishti_auth_token_v1",
-  CONTROLLER_TOKEN: "nyayadrishti_controller_token_v1",
-  ACTIVE_DEMO_SKU: "nyayadrishti_active_demo_sku_v1",
+  DRAFT_CASE: "Nirikshak_draft_inspection_v1",
+  PREFERENCES: "Nirikshak_user_prefs_v1",
+  TOKEN: "Nirikshak_auth_token_v1",
+  CONTROLLER_TOKEN: "Nirikshak_controller_token_v1",
+  ACTIVE_DEMO_SKU: "Nirikshak_active_demo_sku_v1",
 };
 
 export class StorageService {

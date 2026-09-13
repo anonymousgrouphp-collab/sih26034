@@ -1,4 +1,4 @@
-"""Metric Scale Calibration & Planar Homography Engine (SIH26034 - NyayaDrishti-LM)
+"""Metric Scale Calibration & Planar Homography Engine (SIH26034 - Nirikshak)
 Member 1 — Computer Vision, Optics & Metrology
 
 Resolves physical metric scale (pixels per millimeter) and rectifies perspective distortion

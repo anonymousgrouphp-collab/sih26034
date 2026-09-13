@@ -1,4 +1,4 @@
-"""Benchmark Script for Member 2 OCR Pipeline (SIH26034 - NyayaDrishti-LM)
+"""Benchmark Script for Member 2 OCR Pipeline (SIH26034 - Nirikshak)
 
 Measures:
 - DBNet++ multi-oriented text detection latency

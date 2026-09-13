@@ -1,4 +1,4 @@
-"""Resilient In-Memory & Redis Cache/Queue Layer (SIH26034 - NyayaDrishti-LM)
+"""Resilient In-Memory & Redis Cache/Queue Layer (SIH26034 - Nirikshak)
 
 Provides high-throughput caching and job status queuing to minimize database lock contention
 and disk I/O when multiple officers conduct simultaneous multi-facet package inspections.

@@ -55,7 +55,7 @@ class Section63CertificateGenerator:
         secret_key: Optional[str] = None
     ) -> str:
         """Derives cryptographic signature token for officer attestation (ADL-16)."""
-        key = (secret_key or os.getenv("OFFICER_SIGNING_KEY", "NyayaDrishti-LM-Officer-Attestation-Key")).encode("utf-8")
+        key = (secret_key or os.getenv("OFFICER_SIGNING_KEY", "Nirikshak-Officer-Attestation-Key")).encode("utf-8")
         message = f"{officer_id}:{merkle_root}".encode("utf-8")
         return hmac.new(key, message, hashlib.sha256).hexdigest()
 

@@ -1,4 +1,4 @@
-"""Tesseract v5 Fallback & Deterministic OCR Consensus Engine (SIH26034 - NyayaDrishti-LM)
+"""Tesseract v5 Fallback & Deterministic OCR Consensus Engine (SIH26034 - Nirikshak)
 
 Architecture & Specification Compliance:
 - ADR-06 & Stage 7: Secondary consensus fallback on low-confidence crops (conf < 0.65)

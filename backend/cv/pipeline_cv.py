@@ -1,7 +1,7 @@
-"""Unified Computer Vision & Metrology Pipeline (SIH26034 - NyayaDrishti-LM)
+"""Unified Computer Vision & Metrology Pipeline (SIH26034 - Nirikshak)
 Member 1 — Computer Vision, Optics & Metrology
 
-Executes Stages 2 through 5 of the 12-stage NyayaDrishti-LM pipeline:
+Executes Stages 2 through 5 of the 12-stage Nirikshak pipeline:
 - Stage 2: Optical Quality Gate (Sharpness, Glare, Tilt)
 - Stage 3: Fiducial Calibration (ArUco 4x4_50 / ISO 7810 Card)
 - Stage 4: Perspective Rectification (Planar Homography)

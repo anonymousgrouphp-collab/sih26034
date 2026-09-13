@@ -1,4 +1,4 @@
-"""Model Provisioning & Verification Script (SIH26034 - NyayaDrishti-LM)
+"""Model Provisioning & Verification Script (SIH26034 - Nirikshak)
 
 Downloads and verifies SHA-256 checksums for all Member 2 OCR neural models.
 All models are licensed under Apache-2.0 or BSD/MIT.

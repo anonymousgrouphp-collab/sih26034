@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "CalibrationContract",
-  "description": "Metric Scale Calibration and PDP Geometry Contract for SIH26034 NyayaDrishti-LM",
+  "description": "Metric Scale Calibration and PDP Geometry Contract for SIH26034 Nirikshak",
   "type": "object",
   "required": ["is_calibrated", "calibration", "principal_display_panel"],
   "properties": {

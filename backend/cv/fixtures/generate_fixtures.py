@@ -1,4 +1,4 @@
-"""Deterministic Synthetic Test Fixture Generator (SIH26034 - NyayaDrishti-LM)
+"""Deterministic Synthetic Test Fixture Generator (SIH26034 - Nirikshak)
 Member 1 — Computer Vision, Optics & Metrology
 Generates reproducible test images for Optical Quality Gate, Calibration, and Packaging Geometry.
 """

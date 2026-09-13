@@ -193,7 +193,7 @@ class Form1NoticePDFGenerator:
 
         # 3. Notice Reference & Metadata Table + QR Code
         qr_data = (
-            f"https://nyayadrishti.doca.gov.in/verify?"
+            f"https://nirikshak.doca.gov.in/verify?"
             f"notice={notice_ref}&cert={bsa_cert.certificate_number}&merkle={bsa_cert.raw_images_merkle_root}"
         )
         qr_buf = cls._create_qr_image(qr_data)

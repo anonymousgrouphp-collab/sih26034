@@ -16,7 +16,7 @@ import time
 from typing import Any, Dict, List, Optional
 import uuid
 
-logger = logging.getLogger("nyayadrishti_server")
+logger = logging.getLogger("nirikshak_server")
 
 
 from fastapi import (
@@ -224,7 +224,7 @@ async def lifespan(app: FastAPI):
     keepalive_task = None
     if os.getenv("RENDER") or os.getenv("RENDER_EXTERNAL_URL"):
         async def keep_alive_heartbeat():
-            ext_url = os.getenv("RENDER_EXTERNAL_URL", "https://nyayadrishti-backend.onrender.com")
+            ext_url = os.getenv("RENDER_EXTERNAL_URL", "https://nirikshak-backend.onrender.com")
             while True:
                 await asyncio.sleep(600)  # Ping every 10 minutes to prevent 15-min idle spin-down
                 try:
@@ -243,7 +243,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="NyayaDrishti-LM Compliance API",
+    title="Nirikshak Compliance API",
     version="1.0.0",
     description="Statutory Legal Metrology Compliance API governed by Section 63 Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023).",
     lifespan=lifespan,

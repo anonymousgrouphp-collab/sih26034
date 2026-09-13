@@ -1,4 +1,4 @@
-"""SQLAlchemy 2.0 Datastore & Cryptographic Audit Ledger (SIH26034 - NyayaDrishti-LM)
+"""SQLAlchemy 2.0 Datastore & Cryptographic Audit Ledger (SIH26034 - Nirikshak)
 Complete Relational DDL & Models conforming to 08_DATABASE_SPECIFICATION.md.
 Dual-Engine compatibility: PostgreSQL 16+ (Mode A Server) & SQLite 3.45+ (Mode B Local).
 """
@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Any, Dict, Generator, List, Optional, Tuple, Type
 import uuid
 
-logger = logging.getLogger("nyayadrishti.database")
+logger = logging.getLogger("Nirikshak.database")
 
 from sqlalchemy import (
     BigInteger,
@@ -443,7 +443,7 @@ def seed_default_platform_data(session: Session):
 
     existing_user = session.execute(select(User)).first()
     if not existing_user:
-        # Default pass: 'Officer@2026' -> hashed via hash_password('Officer@2026', salt_bytes=b'nyayadrishti_salt')
+        # Default pass: 'Officer@2026' -> hashed via hash_password('Officer@2026', salt_bytes=b'nirikshak_salt')
         pwd_hash = "pbkdf2_sha256$100000$6e79617961647269736874695f73616c74$037d6171d6dbc02d8740de592b43fb7c38f1844d238b1d719295a7900fcedd81"
 
         users = [

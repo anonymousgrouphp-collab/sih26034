@@ -1,4 +1,4 @@
-"""NyayaDrishti-LM — Standalone Local Runner for Resilient Mode B (SIH26034).
+"""Nirikshak — Standalone Local Runner for Resilient Mode B (SIH26034).
 
 Executes the complete 12-stage legal metrology compliance pipeline locally on laptop CPU
 using embedded SQLite (SQLCipher-compatible) with zero network connectivity (0 bytes transmitted).
@@ -24,7 +24,7 @@ import uuid
 
 # Force Mode B Offline Environment Configuration
 REPO_ROOT = Path(__file__).resolve().parent.parent
-os.environ.setdefault("NYAYADRISHTI_MODE", "MODE_B_OFFLINE")
+os.environ.setdefault("NIRIKSHAK_MODE", "MODE_B_OFFLINE")
 os.environ.setdefault("DATABASE_URL", f"sqlite:///{REPO_ROOT / 'storage' / 'legal_metrology_mode_b.db'}")
 os.environ.setdefault("CLOCK_SOURCE", "LOCAL_DEVICE_MONOTONIC")
 
@@ -255,7 +255,7 @@ class ModeBOfflineEngine:
 def run_offline_verification() -> bool:
     """Executes deterministic offline self-test across sample commodities and prints report."""
     print("=" * 72)
-    print("  NYAYADRISHTI-LM — RESILIENT MODE B (OFFLINE RUNNER) VERIFICATION")
+    print("  Nirikshak — RESILIENT MODE B (OFFLINE RUNNER) VERIFICATION")
     print("  Mode: STANDALONE LOCAL EXECUTION (0 bytes transmitted)")
     print("  Clock: LOCAL_DEVICE_MONOTONIC (Section 63 BSA 2023)")
     print("=" * 72)
@@ -342,7 +342,7 @@ def start_server(host: str = "127.0.0.1", port: int = 8000):
     from backend.integration.test_ui.test_ui_server import app
 
     print("=" * 72)
-    print(f"  NYAYADRISHTI-LM — LOCAL MODE B RESILIENT RUNNER")
+    print(f"  Nirikshak — LOCAL MODE B RESILIENT RUNNER")
     print(f"  Host: http://{host}:{port}")
     print(f"  Officer HUD: http://{host}:{port}/test-ui")
     print(f"  Swagger API: http://{host}:{port}/docs")
@@ -353,7 +353,7 @@ def start_server(host: str = "127.0.0.1", port: int = 8000):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="NyayaDrishti-LM Standalone Local Mode B Runner")
+    parser = argparse.ArgumentParser(description="Nirikshak Standalone Local Mode B Runner")
     parser.add_argument("--verify-offline", action="store_true", help="Run automated offline 7-stage pipeline verification")
     parser.add_argument("--host", default="127.0.0.1", help="Host address for local runner")
     parser.add_argument("--port", type=int, default=8000, help="Port for local runner")

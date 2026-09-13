@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { NirikshakBrandLogo } from "../common/NirikshakBrandLogo";
+import { NirikshakBrandLogo } from "../common/nirikshakBrandLogo";
 import { OfficerRole } from "../../types/inspection";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
@@ -39,7 +39,7 @@ export const Header: React.FC<HeaderProps> = ({
       if (operatingMode === "MOCK" || operatingMode === "DEMO_FIXTURE") {
         return "LOCAL_RESILIENT";
       }
-      const stored = localStorage.getItem("nyayadrishti_mode");
+      const stored = localStorage.getItem("Nirikshak_mode");
       return stored === "LOCAL_RESILIENT" ? "LOCAL_RESILIENT" : "ONLINE";
     } catch {
       return "ONLINE";
@@ -83,7 +83,7 @@ export const Header: React.FC<HeaderProps> = ({
   const handleModeSwitch = (mode: "ONLINE" | "LOCAL_RESILIENT") => {
     setCurrentMode(mode);
     try {
-      localStorage.setItem("nyayadrishti_mode", mode);
+      localStorage.setItem("Nirikshak_mode", mode);
       if (mode === "ONLINE") {
         ApiService.setOperatingMode("LIVE");
       } else {

@@ -1,4 +1,4 @@
-"""Member 2: Multilingual OCR Module (SIH26034 - NyayaDrishti-LM)"""
+"""Member 2: Multilingual OCR Module (SIH26034 - Nirikshak)"""
 
 from .polygon_normalizer import PolygonNormalizer
 from .detector import DBNetTextDetector, TextDetectionResult

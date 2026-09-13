@@ -1,4 +1,4 @@
-"""Optical Quality Gate Implementation (SIH26034 - NyayaDrishti-LM)
+"""Optical Quality Gate Implementation (SIH26034 - Nirikshak)
 Member 1 — Computer Vision, Optics & Metrology
 
 Evaluates incoming packaging frames against statutory and technical optical criteria:

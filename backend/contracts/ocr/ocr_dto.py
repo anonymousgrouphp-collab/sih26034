@@ -1,4 +1,4 @@
-"""OCR Interface Contract (SIH26034 - NyayaDrishti-LM)
+"""OCR Interface Contract (SIH26034 - Nirikshak)
 DBNet++ text detection polygons + PP-OCRv4 multilingual recognition
 Target CER <= 2.5%, Apache-2.0 permissive licensing only
 Frozen per 07_API_AND_INTERFACE_CONTRACTS.md and 05_TECHNOLOGY_DECISION_RECORD.md (ADR-03, ADR-05, ADR-06)

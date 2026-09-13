@@ -1,4 +1,4 @@
-"""Accuracy, Calibration, and Performance Benchmark Harness (SIH26034 - NyayaDrishti-LM)
+"""Accuracy, Calibration, and Performance Benchmark Harness (SIH26034 - Nirikshak)
 Member 1 — Computer Vision, Optics & Metrology
 
 Evaluates metric scale derivation accuracy, resolution sensitivity, angle robustness,

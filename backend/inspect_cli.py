@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""NyayaDrishti-LM — Interactive Field Inspector CLI & SIH Live-Demo Harness (inspect_cli.py).
+"""Nirikshak — Interactive Field Inspector CLI & SIH Live-Demo Harness (inspect_cli.py).
 
 Department of Consumer Affairs (DoCA), Government of India
 Enforces statutory labeling standards under Legal Metrology Act, 2009 & LMPC Rules, 2011.
@@ -221,14 +221,14 @@ class FieldInspectorCLI:
         """Renders government institutional header."""
         if not HAS_RICH:
             print("=" * 80)
-            print("  NYAYADRISHTI-LM — LEGAL METROLOGY FIELD INSPECTOR CLI (SIH26034)")
+            print("  Nirikshak — LEGAL METROLOGY FIELD INSPECTOR CLI (SIH26034)")
             print("  Department of Consumer Affairs (DoCA), Government of India")
             print("  Mode: RESILIENT MODE B (Local Monotonic Clock | 0 Bytes Transmitted)")
             print("=" * 80)
             return
 
         banner_text = Text()
-        banner_text.append("⚖️  NYAYADRISHTI-LM — LEGAL METROLOGY INSPECTION CLI\n", style="bold white")
+        banner_text.append("⚖️  Nirikshak — LEGAL METROLOGY INSPECTION CLI\n", style="bold white")
         banner_text.append("Department of Consumer Affairs (DoCA), Government of India\n", style="bold yellow")
         banner_text.append("Statutory Engine: LMPC Rules, 2011 & Legal Metrology Act, 2009 (Amended 2023)\n", style="italic cyan")
         banner_text.append("Evidentiary Standard: Section 63 Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)\n", style="dim white")
@@ -1059,7 +1059,7 @@ def prompt_demo_selection() -> str:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="NyayaDrishti-LM — Interactive Field Inspector CLI & SIH Demo Harness",
+        description="Nirikshak — Interactive Field Inspector CLI & SIH Demo Harness",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("--image", help="Path to packaging photograph on disk")

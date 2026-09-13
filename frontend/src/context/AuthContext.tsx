@@ -50,7 +50,7 @@ export const roleMeta: Record<UserRole, { label: string; designation: string; la
 export const demoUsers: Record<UserRole, SessionUser> = {
   inspector: {
     name: "Rajesh Sharma",
-    email: "inspector@metrolens.gov.in",
+    email: "inspector@nirikshak.gov.in",
     role: "inspector",
     officerRole: "INSPECTOR",
     department: "Department of Consumer Affairs",
@@ -60,7 +60,7 @@ export const demoUsers: Record<UserRole, SessionUser> = {
   },
   controller: {
     name: "S.K. Verma",
-    email: "controller@metrolens.gov.in",
+    email: "controller@nirikshak.gov.in",
     role: "controller",
     officerRole: "CONTROLLER",
     department: "Directorate of Legal Metrology",
@@ -70,7 +70,7 @@ export const demoUsers: Record<UserRole, SessionUser> = {
   },
   administrator: {
     name: "Rohan Verma",
-    email: "admin@metrolens.gov.in",
+    email: "admin@nirikshak.gov.in",
     role: "administrator",
     officerRole: "CONTROLLER",
     department: "National Informatics / DoCA",
@@ -80,7 +80,7 @@ export const demoUsers: Record<UserRole, SessionUser> = {
   },
   auditor: {
     name: "Neha Gupta",
-    email: "audit@metrolens.gov.in",
+    email: "audit@nirikshak.gov.in",
     role: "auditor",
     officerRole: "INSPECTOR",
     department: "Legal Metrology Audit Cell",
@@ -103,7 +103,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<SessionUser | null>(() => {
     try {
-      const stored = localStorage.getItem("nyayadrishti_session");
+      const stored = localStorage.getItem("Nirikshak_session");
       return stored ? JSON.parse(stored) : demoUsers.inspector; // Default to inspector for instant demo
     } catch {
       return demoUsers.inspector;
@@ -112,12 +112,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   useEffect(() => {
     if (user) {
-      localStorage.setItem("nyayadrishti_session", JSON.stringify(user));
+      localStorage.setItem("Nirikshak_session", JSON.stringify(user));
       // Pre-warm Bearer JWT authentication for live Render backend in the background
       const targetRole = user.officerRole === "CONTROLLER" ? "controller" : "inspector";
       LiveApiService.getInstance().ensureAuthenticated(targetRole).catch(() => {});
     } else {
-      localStorage.removeItem("nyayadrishti_session");
+      localStorage.removeItem("Nirikshak_session");
       StorageService.clearAuthToken();
     }
   }, [user]);

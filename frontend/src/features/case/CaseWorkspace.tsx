@@ -107,7 +107,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
   useEffect(() => {
     if (caseData?.id) {
       try {
-        localStorage.setItem("nyayadrishti_last_case_id", caseData.id);
+        localStorage.setItem("Nirikshak_last_case_id", caseData.id);
       } catch {
         // ignore
       }

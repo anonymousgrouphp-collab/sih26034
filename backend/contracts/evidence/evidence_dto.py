@@ -1,4 +1,4 @@
-"""Evidence & Cryptographic Dossier Interface Contract (SIH26034 - NyayaDrishti-LM)
+"""Evidence & Cryptographic Dossier Interface Contract (SIH26034 - Nirikshak)
 Section 63 Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023) Electronic Evidence Certificate
 SHA-256 Merkle DAG Chain of Custody and Form-1 Legal Notice Bundling
 Frozen per 07_API_AND_INTERFACE_CONTRACTS.md, 08_DATABASE_SPECIFICATION.md, 10_SECURITY_AND_AUDIT_SPECIFICATION.md

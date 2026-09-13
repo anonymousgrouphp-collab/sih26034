@@ -139,7 +139,7 @@ Open browser at:
 | Variable | Default Value | Purpose |
 | :--- | :--- | :--- |
 | `DATABASE_URL` | `sqlite:///legal_metrology.db` | PostgreSQL connection string (Mode A) or SQLite URI (Mode B). Auto-normalizes `postgres://` to `postgresql://`. |
-| `NYAYADRISHTI_SECRET_KEY` | *(Internal Default Salt)* | Cryptographic key used to sign JWT auth tokens per Section 63 BSA 2023. |
+| `NIRIKSHAK_SECRET_KEY` | *(Internal Default Salt)* | Cryptographic key used to sign JWT auth tokens per Section 63 BSA 2023. |
 | `PORT` | `8000` | Port for the Uvicorn web server. |
 | `HOST` | `0.0.0.0` | Bind host address. |
 | `VITE_API_BASE_URL` | `/api/v1` | Base URL used by the React client to contact the API (e.g. `https://api.example.com/api/v1`). |

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "manifest_version": "1.0.0",
-  "system": "NyayaDrishti-LM (SIH26034)",
+  "system": "Nirikshak (SIH26034)",
   "subsystem": "Stage 6 & 7 Multilingual OCR (Member 2)",
   "canonical_architecture": {
     "detection": "DBNet++ / PP-OCRv4 detection",

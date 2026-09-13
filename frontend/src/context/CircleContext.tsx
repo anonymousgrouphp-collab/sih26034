@@ -54,7 +54,7 @@ export const getJurisdictionCircle = (id?: string, extra?: JurisdictionCircle[])
    Pure, storage-injected helpers so the logic stays deterministic and unit-testable
    without a browser environment. */
 
-const CUSTOM_CIRCLES_KEY = "nyayadrishti_custom_circles";
+const CUSTOM_CIRCLES_KEY = "Nirikshak_custom_circles";
 
 /** Circle IDs follow the statutory registry style: CIRCLE_<REGION>_<NN>. */
 export const CIRCLE_ID_PATTERN = /^[A-Z0-9]+(_[A-Z0-9]+)*$/;
@@ -157,7 +157,7 @@ const CircleContext = createContext<CircleContextType | undefined>(undefined);
 export const CircleProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [activeCircle, setActiveCircleState] = useState<string>(() => {
     try {
-      return localStorage.getItem("nyayadrishti_active_circle") || "CIRCLE_DL_SOUTH_01";
+      return localStorage.getItem("Nirikshak_active_circle") || "CIRCLE_DL_SOUTH_01";
     } catch {
       return "CIRCLE_DL_SOUTH_01";
     }
@@ -172,7 +172,7 @@ export const CircleProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const setActiveCircle = (circleId: string) => {
     setActiveCircleState(circleId);
     try {
-      localStorage.setItem("nyayadrishti_active_circle", circleId);
+      localStorage.setItem("Nirikshak_active_circle", circleId);
     } catch {
       // ignore
     }

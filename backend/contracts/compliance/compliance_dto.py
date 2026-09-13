@@ -1,4 +1,4 @@
-"""Statutory Compliance Interface Contract (SIH26034 - NyayaDrishti-LM)
+"""Statutory Compliance Interface Contract (SIH26034 - Nirikshak)
 Deterministic AST Rule Engine findings under Legal Metrology (Packaged Commodities) Rules, 2011
 Frozen per 07_API_AND_INTERFACE_CONTRACTS.md, 16_DECISION_LOG.md (ADL-01, ADL-07, ADL-12)
 """

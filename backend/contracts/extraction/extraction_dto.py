@@ -1,4 +1,4 @@
-"""Semantic Extraction Interface Contract (SIH26034 - NyayaDrishti-LM)
+"""Semantic Extraction Interface Contract (SIH26034 - Nirikshak)
 Extracts statutory packaging declarations (Rule 6 LMPC Rules 2011) without LLM hallucinations
 Frozen per 07_API_AND_INTERFACE_CONTRACTS.md and 02_FINAL_REQUIREMENTS_SPECIFICATION.md
 """

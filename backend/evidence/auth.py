@@ -23,8 +23,8 @@ except ImportError:
 
 # Security Configuration
 SECRET_KEY = os.environ.get(
-    "NYAYADRISHTI_SECRET_KEY",
-    "nyayadrishti-sec63-bsa2023-statutory-secret-key-prod-delhi-01"
+    "NIRIKSHAK_SECRET_KEY",
+    "Nirikshak-sec63-bsa2023-statutory-secret-key-prod-delhi-01"
 )
 ALGORITHM = "HS256"
 DEFAULT_TOKEN_EXPIRY_HOURS = 8
@@ -167,7 +167,7 @@ def extract_request_headers(
     """Extracts standard forensic telemetry headers per 07_API_AND_INTERFACE_CONTRACTS.md."""
     return RequestHeaders(
         request_id=x_request_id or str(uuid.uuid4()),
-        client_version=x_client_version or "NyayaDrishti-Web/1.0.0",
+        client_version=x_client_version or "Nirikshak-Web/1.0.0",
         device_fingerprint=x_device_fingerprint or "UNKNOWN-DEVICE-FINGERPRINT",
     )
 
@@ -184,7 +184,7 @@ async def get_current_user(
 ) -> UserContext:
     """Extracts and verifies the current authenticated user from Bearer JWT."""
     if not auth_header or not auth_header.credentials:
-        if os.environ.get("NYAYADRISHTI_ALLOW_ANON_LOCAL", "false").lower() in ("true", "1"):
+        if os.environ.get("Nirikshak_ALLOW_ANON_LOCAL", "false").lower() in ("true", "1"):
             return UserContext(
                 user_id="usr_01_rajesh",
                 username="inspector_rajesh",

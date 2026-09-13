@@ -89,7 +89,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const lastCaseId =
     currentRouteCaseId ||
     (typeof window !== "undefined"
-      ? window.localStorage?.getItem("nyayadrishti_last_case_id") || "demo-fortune-sunlite"
+      ? window.localStorage?.getItem("Nirikshak_last_case_id") || "demo-fortune-sunlite"
       : "demo-fortune-sunlite");
 
   const navigation = [

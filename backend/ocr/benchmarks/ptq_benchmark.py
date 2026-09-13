@@ -1,5 +1,5 @@
 """Full Comprehensive Benchmark & Validation for Member 2 FP32 vs INT8 PTQ.
-SIH26034 NyayaDrishti-LM
+SIH26034 Nirikshak
 """
 
 import os

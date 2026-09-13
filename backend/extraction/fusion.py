@@ -1,4 +1,4 @@
-"""Cross-Facet Semantic Fusion Engine (SIH26034 - NyayaDrishti-LM)
+"""Cross-Facet Semantic Fusion Engine (SIH26034 - Nirikshak)
 
 Reconciles and aggregates statutory declarations across multiple packaging panels
 (e.g., Front PDP, Back Panel, Side Panels, Top Lid, Bottom Base).

@@ -1,4 +1,4 @@
-"""DBNet++ Multi-Oriented Text Detection Engine (SIH26034 - NyayaDrishti-LM)
+"""DBNet++ Multi-Oriented Text Detection Engine (SIH26034 - Nirikshak)
 
 Architecture & Specification Compliance:
 - Stage 6: DBNet++ Real-Time Scene Text Detection (ADR-05, ADR-06)

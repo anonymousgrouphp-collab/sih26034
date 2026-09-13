@@ -773,7 +773,7 @@ class JanVishwasCompoundingCalculator:
 
 
 class LegalMetrologyRuleEngine:
-    """Composite Deterministic AST Rule Engine (Member 4 - NyayaDrishti-LM).
+    """Composite Deterministic AST Rule Engine (Member 4 - Nirikshak).
 
     Orchestrates:
     - Temporal Statutory Epoch Dispatcher

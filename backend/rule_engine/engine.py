@@ -1,4 +1,4 @@
-"""Deterministic Rule Engine CLI Entrypoint (SIH26034 - NyayaDrishti-LM)"""
+"""Deterministic Rule Engine CLI Entrypoint (SIH26034 - Nirikshak)"""
 
 import json
 import sys
@@ -29,7 +29,7 @@ except Exception:
 
 def run_demo() -> None:
     print("=" * 70)
-    print("NyayaDrishti-LM — Deterministic Legal Metrology Rule Engine (SIH26034)")
+    print("Nirikshak — Deterministic Legal Metrology Rule Engine (SIH26034)")
     print("=" * 70)
 
     # Demo 1: Compliant Pack

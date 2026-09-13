@@ -1,1 +1,1 @@
-"""Integration Adapters for NyayaDrishti-LM Pipeline (SIH26034)"""
+"""Integration Adapters for Nirikshak Pipeline (SIH26034)"""

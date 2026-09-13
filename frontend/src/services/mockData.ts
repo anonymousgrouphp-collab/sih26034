@@ -2042,8 +2042,8 @@ export const MOCK_DASHBOARD_SUMMARY: DashboardSummary = {
   })),
 };
 
-export const USER_CASES_STORAGE_KEY = "nyayadrishti_persisted_cases_v2";
-export const DELETED_CASES_STORAGE_KEY = "nyayadrishti_deleted_case_ids_v1";
+export const USER_CASES_STORAGE_KEY = "Nirikshak_persisted_cases_v2";
+export const DELETED_CASES_STORAGE_KEY = "Nirikshak_deleted_case_ids_v1";
 
 const inMemoryDeletedIds = new Set<string>();
 
@@ -2510,9 +2510,9 @@ export function deleteMockCase(id: string): boolean {
       } catch {}
     }
     try {
-      const lastCaseId = storage.getItem("nyayadrishti_last_case_id");
+      const lastCaseId = storage.getItem("Nirikshak_last_case_id");
       if (lastCaseId && deletedIdentifiers.has(lastCaseId)) {
-        storage.removeItem("nyayadrishti_last_case_id");
+        storage.removeItem("Nirikshak_last_case_id");
       }
     } catch {}
   }

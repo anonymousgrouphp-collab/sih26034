@@ -1,4 +1,4 @@
-"""Central Pipeline Adapter (SIH26034 - NyayaDrishti-LM)
+"""Central Pipeline Adapter (SIH26034 - Nirikshak)
 Orchestrates independent member modules using frozen contracts and adapter pattern.
 Avoids tight coupling or direct imports across member working directories.
 """

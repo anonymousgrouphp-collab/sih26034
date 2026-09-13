@@ -21,14 +21,14 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [language, setLanguage] = useState<Language>(() => {
-    return (localStorage.getItem("nyayadrishti_lang") as Language) || "en";
+    return (localStorage.getItem("Nirikshak_lang") as Language) || "en";
   });
 
   const [fontSize, setFontSize] = useState<"sm" | "md" | "lg">("md");
   const [highContrast, setHighContrast] = useState<boolean>(false);
 
   useEffect(() => {
-    localStorage.setItem("nyayadrishti_lang", language);
+    localStorage.setItem("Nirikshak_lang", language);
   }, [language]);
 
   // Adjust root HTML font size based on A- / A / A+

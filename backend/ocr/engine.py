@@ -1,4 +1,4 @@
-"""Multilingual OCR Pipeline Engine (SIH26034 - NyayaDrishti-LM)
+"""Multilingual OCR Pipeline Engine (SIH26034 - Nirikshak)
 
 Architecture & Specification Compliance:
 - Stages 6 & 7: DBNet++ Detection -> PP-OCRv4 Multilingual Recognition -> Tesseract Fallback

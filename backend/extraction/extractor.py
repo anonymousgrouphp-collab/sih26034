@@ -1,4 +1,4 @@
-"""Commodity Fact Extractor (SIH26034 - NyayaDrishti-LM)
+"""Commodity Fact Extractor (SIH26034 - Nirikshak)
 
 Transforms raw OCR tokens into verified NormalizedCommodityFacts
 conforming strictly to contracts/extraction/extraction_dto.py.

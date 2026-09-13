@@ -1,4 +1,4 @@
-"""PaddleOCR Multilingual Recognition Engine (SIH26034 - NyayaDrishti-LM)
+"""PaddleOCR Multilingual Recognition Engine (SIH26034 - Nirikshak)
 
 Architecture & Specification Compliance:
 - Stage 7: Multilingual Text Recognition (ADR-06)

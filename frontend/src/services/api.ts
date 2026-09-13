@@ -46,14 +46,14 @@ export { DemoFixtureService } from "./demoFixtures";
 export class ApiService {
   private static operatingMode: ApiOperatingMode = (() => {
     try {
-      const stored = typeof window !== "undefined" ? window.localStorage?.getItem("nyayadrishti_operating_mode") : null;
+      const stored = typeof window !== "undefined" ? window.localStorage?.getItem("Nirikshak_operating_mode") : null;
       if (stored === "DEMO_FIXTURE") return "DEMO_FIXTURE";
       if (stored === "MOCK") {
         // Clear accidental mock latch so the user always connects to the live sitewide database
-        window.localStorage?.removeItem("nyayadrishti_operating_mode");
+        window.localStorage?.removeItem("Nirikshak_operating_mode");
       }
       // Purge corrupted mock cases with real live UUIDs (insp_...) from localStorage so stale mock data never overrides live backend data
-      const persistedRaw = window.localStorage?.getItem("nyayadrishti_persisted_cases_v2");
+      const persistedRaw = window.localStorage?.getItem("Nirikshak_persisted_cases_v2");
       if (persistedRaw) {
         try {
           const parsed = JSON.parse(persistedRaw);
@@ -65,7 +65,7 @@ export class ApiService {
             }
           }
           if (modified) {
-            window.localStorage?.setItem("nyayadrishti_persisted_cases_v2", JSON.stringify(parsed));
+            window.localStorage?.setItem("Nirikshak_persisted_cases_v2", JSON.stringify(parsed));
           }
         } catch {}
       }
@@ -91,7 +91,7 @@ export class ApiService {
     }
     try {
       if (typeof window !== "undefined" && window.localStorage) {
-        window.localStorage.setItem("nyayadrishti_operating_mode", mode);
+        window.localStorage.setItem("Nirikshak_operating_mode", mode);
       }
     } catch {
       // Ignore storage write errors in restricted or test environments

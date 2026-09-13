@@ -1,5 +1,5 @@
 # =============================================================================
-# NyayaDrishti-LM (SIH26034) - Production Backend Dependencies
+# Nirikshak (SIH26034) - Production Backend Dependencies
 # Strictly Permissive Licenses Only (Apache-2.0, MIT, BSD-3, HPND)
 # Zero AGPL-3.0 Dependencies (Per ADR-03 / AGENTS.md)
 # =============================================================================

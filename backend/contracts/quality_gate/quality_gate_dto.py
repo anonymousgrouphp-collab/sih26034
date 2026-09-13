@@ -1,4 +1,4 @@
-"""Quality Gate Interface Contract (SIH26034 - NyayaDrishti-LM)
+"""Quality Gate Interface Contract (SIH26034 - Nirikshak)
 Statutory / Technical Standard: Laplacian Blur >= 150, Glare <= 3%, Tilt <= 15 deg
 Frozen per 07_API_AND_INTERFACE_CONTRACTS.md and 03_FINAL_ARCHITECTURE.md
 """

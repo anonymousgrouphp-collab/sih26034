@@ -10,10 +10,10 @@ jobs:
   keep-alive:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping NyayaDrishti Live Health Endpoint
+      - name: Ping Nirikshak Live Health Endpoint
         run: |
-          echo "Pinging https://nyayadrishti-backend.onrender.com/api/v1/health ..."
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" -m 30 "https://nyayadrishti-backend.onrender.com/api/v1/health")
+          echo "Pinging https://nirikshak-backend.onrender.com/api/v1/health ..."
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" -m 30 "https://nirikshak-backend.onrender.com/api/v1/health")
           echo "Received HTTP status: $STATUS"
           if [ "$STATUS" -eq 200 ]; then
             echo "Render Backend is ACTIVE, WARM, and ALIVE!"

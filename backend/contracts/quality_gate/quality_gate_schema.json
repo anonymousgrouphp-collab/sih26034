@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "QualityGateContract",
-  "description": "Optical Quality Gate contract for SIH26034 NyayaDrishti-LM",
+  "description": "Optical Quality Gate contract for SIH26034 Nirikshak",
   "type": "object",
   "required": ["passed", "blur_variance", "glare_percentage", "skew_angle_deg"],
   "properties": {

@@ -1,4 +1,4 @@
-"""Calibration & Metrology Interface Contract (SIH26034 - NyayaDrishti-LM)
+"""Calibration & Metrology Interface Contract (SIH26034 - Nirikshak)
 Statutory / Technical Standard: ArUco 4x4 50mm / ISO 7810 card fiducial calibration
 Planar homography perspective rectification and metric mm/pixel scaling
 Frozen per 07_API_AND_INTERFACE_CONTRACTS.md and 05_TECHNOLOGY_DECISION_RECORD.md (ADR-06)
