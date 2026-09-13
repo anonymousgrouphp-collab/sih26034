@@ -368,6 +368,17 @@ export class ApiService {
     return await LiveApiService.getInstance().executePipeline(imageId, inspectionId, scenario);
   }
 
+  public static async executeBatchPipeline(
+    inspectionId: string
+  ): Promise<InspectionCase> {
+    if (this.operatingMode === "MOCK") {
+      return await MockApiService.getInstance().executeBatchPipeline(inspectionId);
+    }
+
+    // In LIVE mode, always execute against live backend
+    return await LiveApiService.getInstance().executeBatchPipeline(inspectionId);
+  }
+
   // ---------------------------------------------------------------------------
   // 6. Human-in-the-Loop Adjudication
   // ---------------------------------------------------------------------------

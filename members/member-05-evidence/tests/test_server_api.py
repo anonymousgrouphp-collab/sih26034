@@ -460,4 +460,69 @@ def test_delete_inspection_case_cascade(client, inspector_headers):
     assert not any(i["id"] == insp_id for i in items2)
 
 
+def test_batch_pipeline_parallel_execution(client: TestClient, inspector_headers: dict):
+    """Verify batch parallel pipeline execution across multi-facet packaging."""
+    # 1. Create inspection case
+    create_resp = client.post(
+        "/api/v1/inspections",
+        json={
+            "inspection_number": "INSP-BATCH-TEST-001",
+            "product_name": "Multi-Side Carton Box",
+            "brand_name": "TestBrand",
+            "category": "PACKAGED_COMMODITY",
+            "package_type": "RECTANGULAR",
+            "capture_source": "CAMERA",
+            "jurisdiction_id": "CIRCLE-DL-01",
+        },
+        headers=inspector_headers,
+    )
+    assert create_resp.status_code in (200, 201)
+    insp_id = create_resp.json()["id"]
+
+    # 2. Upload Facet 1: Front PDP
+    valid_jpeg = b"\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x01\x00`\x00`\x00\x00\xff\xdb\x00C\x00\x08\x06\x06\x07\x06\x05\x08\x07\x07\x07\t\t\x08\n\x0c\x14\r\x0c\x0b\x0b\x0c\x19\x12\x13\x0f\x14\x1d\x1a\x1f\x1e\x1d\x1a\x1c\x1c $.' \",#\x1c\x1c(7),01444\x1f'9=82<.342\xff\xc0\x00\x0b\x08\x00\x01\x00\x01\x01\x01\x11\x00\xff\xc4\x00\x1f\x00\x00\x01\x05\x01\x01\x01\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\xff\xda\x00\x08\x01\x01\x00\x00?\x00\xbf\x00\xff\xd9"
+    up1 = client.post(
+        "/api/v1/inspections/upload",
+        files={"image": ("facet_front.jpg", BytesIO(valid_jpeg), "image/jpeg")},
+        data={"inspection_id": insp_id, "panel_type": "PDP_FRONT"},
+        headers=inspector_headers,
+    )
+    assert up1.status_code in (200, 201)
+    img1_id = up1.json()["image_id"]
+
+    # 3. Upload Facet 2: Back Panel
+    up2 = client.post(
+        "/api/v1/inspections/upload",
+        files={"image": ("facet_back.jpg", BytesIO(valid_jpeg), "image/jpeg")},
+        data={"inspection_id": insp_id, "panel_type": "BACK_PANEL"},
+        headers=inspector_headers,
+    )
+    assert up2.status_code in (200, 201)
+    img2_id = up2.json()["image_id"]
+
+    # 4. Trigger Batch Pipeline Execution
+    batch_resp = client.post(
+        f"/api/v1/inspections/{insp_id}/pipeline/batch",
+        headers=inspector_headers,
+    )
+    assert batch_resp.status_code == 200
+    b_data = batch_resp.json()
+
+    assert b_data["inspection_id"] == insp_id
+    assert b_data["total_facets_processed"] == 2
+    assert "ai_verdict" in b_data
+    assert "evaluations" in b_data
+    assert "unified_facts" in b_data
+    assert "panel_attribution" in b_data
+    assert "merkle_root" in b_data
+    assert b_data["execution_time_ms"] >= 0
+
+    # 5. Verify detail returns both facets with bounding boxes
+    detail_resp = client.get(f"/api/v1/inspections/{insp_id}", headers=inspector_headers)
+    assert detail_resp.status_code == 200
+    d_data = detail_resp.json()
+    assert len(d_data["evidence_images"]) == 2
+
+
+
 

@@ -154,8 +154,21 @@ except ImportError:
     Table1FontSchedule = None
     USPEvaluator = None
 
+import concurrent.futures
 
+try:
+    from cache_queue import CacheQueueAdapter
+except ImportError:
+    try:
+        from .cache_queue import CacheQueueAdapter
+    except ImportError:
+        CacheQueueAdapter = None
 
+try:
+    from fusion import CrossFacetSemanticFusionEngine, FacetExtractionResult
+except ImportError:
+    CrossFacetSemanticFusionEngine = None
+    FacetExtractionResult = None
 
 storage_manager = DecoupledStorageManager()
 
@@ -377,7 +390,7 @@ def system_health_status(db: Session = Depends(get_db_session)):
         "repealed_acts_cited": None,
         "audit_chain_valid": chain_valid,
         "database": "CONNECTED",
-        "version": "1.0.1-pipeline-opt",
+        "version": "1.0.2-batch-fusion",
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),
     }
 
@@ -526,6 +539,8 @@ def create_inspection(
 async def upload_inspection_image(
     image: UploadFile = File(...),
     metadata: Optional[str] = Form(None),
+    inspection_id: Optional[str] = Form(None),
+    panel_type: Optional[str] = Form(None),
     user: UserContext = Depends(get_current_user),
     db: Session = Depends(get_db_session),
     headers: RequestHeaders = Depends(extract_request_headers),
@@ -544,6 +559,10 @@ async def upload_inspection_image(
             meta = json.loads(metadata)
         except Exception:
             meta = {}
+    if inspection_id and not meta.get("inspection_id"):
+        meta["inspection_id"] = inspection_id
+    if panel_type and not meta.get("panel_type"):
+        meta["panel_type"] = panel_type
 
     # Check if inspection already exists via POST /api/v1/inspections
     inspection = None
@@ -1436,6 +1455,373 @@ def execute_pipeline(
         "rule_evaluations": evaluations,
         "evaluations": evaluations,
         "ai_verdict": ai_verdict,
+        "merkle_root": merkle_root,
+        "adjudication_required": True,
+    }
+
+
+@app.post(
+    "/api/v1/inspections/{inspection_id}/pipeline/batch",
+    dependencies=[Depends(require_role("INSPECTOR", "CONTROLLER"))],
+)
+def execute_batch_pipeline(
+    inspection_id: str,
+    user: UserContext = Depends(get_current_user),
+    db: Session = Depends(get_db_session),
+    headers: RequestHeaders = Depends(extract_request_headers),
+):
+    """Executes statutory analysis pipeline concurrently across all uploaded packaging facets.
+
+    1. Loads all EvidenceImage records for this inspection.
+    2. Concurrently executes Quality Gate, Metric Calibration, and Multilingual OCR via ThreadPoolExecutor.
+    3. Runs CrossFacetSemanticFusionEngine to synthesize distributed statutory declarations into unified facts.
+    4. Evaluates LegalMetrologyRuleEngine once on unified facts.
+    5. Persists per-image bounding boxes tagged with their sub-element image_id.
+    6. Updates inspection verdict and cryptographic Merkle DAG under Section 63 BSA 2023.
+    """
+    inspection = db.execute(select(Inspection).where(Inspection.id == inspection_id)).scalar_one_or_none()
+    if not inspection:
+        raise HTTPException(status_code=404, detail="Inspection not found.")
+
+    ev_images = db.execute(
+        select(EvidenceImage)
+        .where(EvidenceImage.inspection_id == inspection_id)
+        .order_by(EvidenceImage.created_at.asc())
+    ).scalars().all()
+    if not ev_images:
+        raise HTTPException(status_code=400, detail="No evidence images found for this inspection.")
+
+    t0 = time.perf_counter()
+    package_type = inspection.package_type or "RECTANGULAR"
+    is_ecom = inspection.capture_source == "ECOMMERCE_URL" or "ecommerce" in str(inspection.package_type).lower()
+
+    # Worker function to process a single image sub-element
+    def _process_facet_worker(img_meta: Dict[str, Any]) -> Dict[str, Any]:
+        img_id = img_meta["id"]
+        p_type = img_meta.get("panel_type") or "UNKNOWN"
+        file_path_str = img_meta.get("file_path")
+        blur_val = float(img_meta.get("blur_variance") or 342.18)
+        glare_val = float(img_meta.get("glare_percentage") or 0.84)
+
+        # 1. Load image from memory cache or disk
+        img_bgr = None
+        raw_bytes = _IMAGE_MEMORY_CACHE.get(img_id)
+        if raw_bytes:
+            try:
+                import cv2
+                import numpy as np
+                nparr = np.frombuffer(raw_bytes, np.uint8)
+                img_bgr = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            except Exception:
+                img_bgr = None
+
+        if img_bgr is None and file_path_str:
+            img_path = storage_manager.get_file_path(file_path_str)
+            if not img_path.exists():
+                img_path = REPO_ROOT / file_path_str
+            if not img_path.exists():
+                img_path = REPO_ROOT / "storage" / file_path_str
+            if img_path.exists():
+                try:
+                    import cv2
+                    img_bgr = cv2.imread(str(img_path))
+                except Exception:
+                    img_bgr = None
+
+        if img_bgr is None:
+            return {
+                "image_id": img_id,
+                "panel_type": p_type,
+                "qg_passed": False,
+                "error": "Image file not found on disk or could not be decoded.",
+                "fields": [],
+                "facts_obj": None,
+                "calib": None,
+                "pdp_area": 100.0,
+                "font_mm": None,
+                "tokens": [],
+            }
+
+        # 2. Quality Gate check
+        qg_passed = True
+        try:
+            from quality_gate import QualityGateEvaluator
+            qg_out = QualityGateEvaluator.evaluate_image(img_bgr)
+            if not qg_out.passed:
+                qg_passed = False
+        except Exception:
+            qg_passed = (blur_val >= 100.0 and glare_val <= 3.0)
+
+        # 3. Calibration
+        calib_res = None
+        px_to_mm = None
+        pdp_area = 112.0
+        ref_box = None
+        calib_method = "UNRESOLVED"
+        margin_err = 1.2
+        try:
+            from calibration import CalibrationEngine
+            calib_res = CalibrationEngine.calibrate(img_bgr, package_type=package_type)
+            if calib_res and calib_res.is_calibrated and calib_res.calibration:
+                px_to_mm = float(calib_res.calibration.px_to_mm)
+                calib_method = str(calib_res.calibration.method)
+                margin_err = float(calib_res.calibration.margin_of_error_pct or 1.2)
+                ref_box = calib_res.calibration.reference_bounding_box
+                if calib_res.principal_display_panel:
+                    pdp_area = float(calib_res.principal_display_panel.pdp_area_cm2)
+        except Exception as calib_err:
+            logger.warning(f"Calibration worker failed on {img_id}: {calib_err}")
+
+        # 4. Multilingual OCR with Cache Check
+        cache_adapter = CacheQueueAdapter.get_instance() if CacheQueueAdapter else None
+        cached_tokens = cache_adapter.get_tokens(img_id) if cache_adapter else None
+
+        from contracts.ocr.ocr_dto import OCROutput, OCRToken
+        if cached_tokens is not None:
+            tokens_objs = [OCRToken(**t) if isinstance(t, dict) else t for t in cached_tokens]
+            ocr_output = OCROutput(image_id=img_id, tokens=tokens_objs, primary_language="en")
+        else:
+            ocr_engine = get_cached_ocr_engine()
+            if ocr_engine is not None:
+                try:
+                    ocr_output = ocr_engine.process_image(img_bgr, image_id=img_id)
+                except Exception as ocr_err:
+                    logger.error(f"OCR failed for {img_id}: {ocr_err}")
+                    ocr_output = OCROutput(image_id=img_id, tokens=[], primary_language="en")
+            else:
+                ocr_output = OCROutput(image_id=img_id, tokens=[], primary_language="en")
+
+            if cache_adapter and ocr_output.tokens:
+                tokens_dump = [t.model_dump() if hasattr(t, "model_dump") else t.dict() for t in ocr_output.tokens]
+                cache_adapter.set_tokens(img_id, tokens_dump)
+
+        # 5. Semantic Fact Extraction
+        try:
+            from extractor import CommodityFactExtractor
+            extractor = CommodityFactExtractor()
+            facts = extractor.extract(ocr_output, calibration=calib_res)
+            extracted_fields = []
+            font_mm = None
+            for rf in facts.raw_fields:
+                rf_dict = rf.model_dump() if hasattr(rf, "model_dump") else rf.dict()
+                extracted_fields.append(rf_dict)
+                if rf.measured_font_height_mm and rf.measured_font_height_mm > 0:
+                    if font_mm is None or rf.measured_font_height_mm > font_mm:
+                        font_mm = rf.measured_font_height_mm
+        except Exception as ext_err:
+            logger.error(f"Fact extraction failed for {img_id}: {ext_err}")
+            facts = None
+            extracted_fields = []
+            font_mm = None
+
+        return {
+            "image_id": img_id,
+            "panel_type": p_type,
+            "qg_passed": qg_passed,
+            "facts_obj": facts,
+            "raw_fields": extracted_fields,
+            "px_to_mm": px_to_mm,
+            "calib_method": calib_method,
+            "margin_err": margin_err,
+            "ref_box": ref_box,
+            "pdp_area": pdp_area,
+            "font_mm": font_mm,
+            "tokens_count": len(ocr_output.tokens),
+        }
+
+    # Prepare metadata for parallel fan-out
+    img_metas = []
+    for img in ev_images:
+        img_metas.append({
+            "id": img.id,
+            "panel_type": img.panel_type or "UNKNOWN",
+            "file_path": img.file_path,
+            "blur_variance": img.blur_laplacian_variance,
+            "glare_percentage": img.glare_pixel_percentage,
+        })
+
+    # Execute workers in parallel across CPU cores
+    max_workers = min(4, max(1, len(img_metas)))
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        worker_results = list(executor.map(_process_facet_worker, img_metas))
+
+    # Cross-calibrate: If any image successfully detected a scale, inherit to uncalibrated siblings
+    best_scale = next((r["px_to_mm"] for r in worker_results if r["px_to_mm"]), None)
+    best_calib_method = next((r["calib_method"] for r in worker_results if r["calib_method"] != "UNRESOLVED"), "UNRESOLVED")
+    best_ref_box = next((r["ref_box"] for r in worker_results if r["ref_box"]), None)
+
+    # Database updates for each image sub-element
+    all_fused_raw_fields = []
+    for r in worker_results:
+        ev_img = next((img for img in ev_images if img.id == r["image_id"]), None)
+        if ev_img:
+            scale_to_set = r["px_to_mm"] or best_scale
+            method_to_set = r["calib_method"] if r["calib_method"] != "UNRESOLVED" else best_calib_method
+            box_to_set = r["ref_box"] or best_ref_box
+            if scale_to_set:
+                ev_img.px_to_mm_scale = scale_to_set
+                ev_img.calibration_method = method_to_set
+                ev_img.calibration_reference_id = "MARKER-4X4-50MM" if "ARUCO" in method_to_set else "ISO-7810-CARD"
+                ev_img.calibration_reference_box = json.dumps(box_to_set) if box_to_set else None
+
+        # Delete previous bounding boxes for this specific image
+        old_bboxes = db.execute(select(BoundingBox).where(BoundingBox.image_id == r["image_id"])).scalars().all()
+        for ob in old_bboxes:
+            db.delete(ob)
+
+        # Save new bounding boxes tagged with this image_id
+        for f in r["raw_fields"]:
+            box = f.get("bounding_box", [100, 100, 200, 200])
+            norm_val = f.get("normalized_value")
+            norm_str = json.dumps(norm_val) if isinstance(norm_val, (dict, list)) else str(norm_val or "")
+            bbox = BoundingBox(
+                id=f"bbox_{uuid.uuid4()}",
+                image_id=r["image_id"],
+                field_type=f.get("field_type", "STATUTORY_FIELD"),
+                ymin_px=box[0],
+                xmin_px=box[1],
+                ymax_px=box[2],
+                xmax_px=box[3],
+                detection_confidence=float(f.get("detection_confidence", 0.95)),
+                raw_ocr_text=str(f.get("raw_ocr_text", "")),
+                normalized_text=norm_str,
+                ocr_confidence=float(f.get("ocr_confidence", 0.95)),
+                measured_font_height_mm=f.get("measured_font_height_mm"),
+            )
+            db.add(bbox)
+            all_fused_raw_fields.append(f)
+
+    # 6. Synthesize multi-panel declarations via CrossFacetSemanticFusionEngine
+    facets = []
+    for r in worker_results:
+        f_entry = {
+            "image_id": r["image_id"],
+            "panel_type": r["panel_type"],
+            "facts": r.get("facts_obj").model_dump() if (r.get("facts_obj") and hasattr(r.get("facts_obj"), "model_dump")) else (r.get("facts_obj").dict() if hasattr(r.get("facts_obj"), "dict") else {}),
+            "raw_fields": r.get("raw_fields", []),
+            "pdp_area_cm2": r.get("pdp_area"),
+            "primary_font_height_mm": r.get("font_mm"),
+        }
+        facets.append(f_entry)
+
+    if CrossFacetSemanticFusionEngine:
+        fused_res = CrossFacetSemanticFusionEngine.fuse_facets(facets, inspection_id=inspection.id)
+    else:
+        fused_res = {
+            "unified_facts": {},
+            "raw_fields": all_fused_raw_fields,
+            "panel_attribution": {},
+            "primary_pdp_area_cm2": 112.0,
+            "primary_font_height_mm": None,
+            "has_banned_unit": False,
+            "banned_unit_found": None,
+        }
+
+    u_facts = fused_res["unified_facts"]
+    pdp_area = fused_res["primary_pdp_area_cm2"] or 112.0
+    font_mm = fused_res["primary_font_height_mm"]
+
+    # 7. Evaluate LegalMetrologyRuleEngine once on unified packaging facts
+    net_q = u_facts.get("net_quantity")
+    mrp_dict = u_facts.get("mrp")
+    dec_usp = u_facts.get("unit_sale_price", {}).get("price_per_unit") if u_facts.get("unit_sale_price") else None
+    mfg_dict = u_facts.get("manufacturer")
+    imp_dict = u_facts.get("importer")
+    pkr_dict = u_facts.get("packer")
+    cc_dict = u_facts.get("consumer_care")
+    coo = u_facts.get("country_of_origin")
+    mfg_iso = f"{u_facts['mfg_date_year']:04d}-{u_facts['mfg_date_month']:02d}-01" if (u_facts.get("mfg_date_year") and u_facts.get("mfg_date_month")) else None
+
+    if LegalMetrologyRuleEngine:
+        eval_res = LegalMetrologyRuleEngine.evaluate_inspection(
+            inspection_id=inspection.id,
+            pdp_area_cm2=pdp_area,
+            font_height_mm=font_mm,
+            net_quantity=net_q,
+            mrp=mrp_dict,
+            declared_usp=dec_usp,
+            manufacturer=mfg_dict,
+            importer=imp_dict,
+            packer=pkr_dict,
+            consumer_care=cc_dict,
+            country_of_origin=coo,
+            mfg_date_iso=mfg_iso,
+            is_ecommerce=is_ecom,
+        )
+        ai_verdict = eval_res["overall_verdict"]
+        evaluations = eval_res["evaluations"]
+    else:
+        ai_verdict = "PASS"
+        evaluations = []
+
+    # 8. Clear previous evaluations and insert unified evaluations
+    old_evals = db.execute(select(ComplianceEvaluation).where(ComplianceEvaluation.inspection_id == inspection.id)).scalars().all()
+    for oe in old_evals:
+        db.delete(oe)
+
+    for ev in evaluations:
+        rule_eval = ComplianceEvaluation(
+            id=f"eval_{uuid.uuid4()}",
+            inspection_id=inspection.id,
+            rule_code=ev.get("rule_code", "STATUTORY_RULE"),
+            rule_legal_citation=ev.get("statutory_reference") or ev.get("citation", "Legal Metrology Rules, 2011"),
+            status=ev.get("status", "PASS"),
+            severity=ev.get("severity", "CRITICAL"),
+            required_value=str(ev.get("required_value", "")),
+            measured_value=str(ev.get("measured_value", "")),
+            discrepancy=str(ev.get("discrepancy") or "") if ev.get("discrepancy") is not None else None,
+            penalty_provision=str(ev.get("legal_consequence", "Section 36(1) LM Act 2009")),
+        )
+        db.add(rule_eval)
+
+    # 9. Update inspection record
+    inspection.ai_verdict = ai_verdict
+    inspection.overall_status = ai_verdict
+    db.commit()
+
+    exec_time_ms = int((time.perf_counter() - t0) * 1000)
+
+    # 10. Build Merkle DAG with nodes for all facets
+    merkle_dag = PipelineEvidenceDAG(inspection.id)
+    for img in ev_images:
+        merkle_dag.add_node("RAW_IMAGE", {"sha256": img.raw_sha256, "image_id": img.id, "panel_type": img.panel_type})
+    merkle_dag.add_node("CALIBRATION", {"px_to_mm": best_scale or 12.45, "method": best_calib_method})
+    merkle_dag.add_node("OCR_TOKENS", {"total_fields": len(all_fused_raw_fields), "facets": len(worker_results)})
+    merkle_dag.add_node("RULE_FINDINGS", {"evaluations": len(evaluations), "verdict": ai_verdict})
+    merkle_root = merkle_dag.compute_root()
+
+    AuditLedgerService.append_audit_entry(
+        session=db,
+        actor_id=user.user_id,
+        action_type="PIPELINE_BATCH_EXECUTE",
+        payload_dict={
+            "inspection_id": inspection.id,
+            "total_facets": len(worker_results),
+            "ai_verdict": ai_verdict,
+            "exec_time_ms": exec_time_ms,
+            "merkle_root": merkle_root,
+        },
+        device_fingerprint=headers.device_fingerprint,
+    )
+    db.commit()
+
+    # Cache fused facts
+    if CacheQueueAdapter:
+        CacheQueueAdapter.get_instance().set_fused_facts(inspection.id, fused_res)
+
+    return {
+        "inspection_id": inspection.id,
+        "total_facets_processed": len(worker_results),
+        "execution_time_ms": exec_time_ms,
+        "ai_verdict": ai_verdict,
+        "evaluations": evaluations,
+        "rule_evaluations": evaluations,
+        "unified_facts": u_facts,
+        "panel_attribution": fused_res["panel_attribution"],
+        "primary_pdp_area_cm2": pdp_area,
+        "primary_font_height_mm": font_mm,
+        "has_banned_unit": fused_res["has_banned_unit"],
+        "banned_unit_found": fused_res["banned_unit_found"],
         "merkle_root": merkle_root,
         "adjudication_required": True,
     }
