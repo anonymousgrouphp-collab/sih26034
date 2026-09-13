@@ -217,7 +217,7 @@ export const DemoCaseTourBanner: React.FC<DemoCaseTourBannerProps> = ({
           <div
             role="dialog"
             aria-modal="true"
-            className="bg-white rounded-2xl shadow-2xl border border-slate-300 w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+            className="bg-white rounded-2xl shadow-2xl border border-slate-300 w-full max-w-2xl overflow-hidden animate-pop-in"
           >
             {/* Modal Header */}
             <div className="bg-govNavy text-white px-6 py-4 flex items-center justify-between border-b-2 border-amber-500">

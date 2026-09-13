@@ -87,7 +87,7 @@ export const StatutoryDemoShowcase: React.FC<StatutoryDemoShowcaseProps> = ({
     <section
       id="demo-showcase"
       aria-label="Statutory Demonstration Suite"
-      className="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden space-y-4"
+      className="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden space-y-4 scroll-mt-24"
     >
       {/* Top National Header Bar */}
       <div className="bg-gradient-to-r from-govNavy via-govNavy to-slate-900 text-white p-5 sm:p-6 border-b-2 border-amber-500">

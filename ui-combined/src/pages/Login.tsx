@@ -17,7 +17,6 @@ import { StateEmblem } from "../components/common/StateEmblem";
 import { GovTopBar } from "../components/layout/GovTopBar";
 import { GovFooter } from "../components/layout/GovFooter";
 import { useLanguage } from "../context/LanguageContext";
-import { motion } from "framer-motion";
 
 export const Login: React.FC = () => {
   const { login } = useAuth();

@@ -1,5 +1,5 @@
-import React, { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useRef, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
   ArrowRight,
@@ -113,6 +113,15 @@ export const NewInspection: React.FC = () => {
   const [declaredNetQty, setDeclaredNetQty] = useState("");
   const [packageType, setPackageType] = useState<PackagingType>("RECTANGULAR");
   const [inspectionType, setInspectionType] = useState<InspectionType>("ROUTINE_MARKET_SURVEILLANCE");
+
+  // Dashboard "E-Commerce Listing Audit" quick action deep-links here with
+  // ?mode=ecommerce — preset the packaging type to the canonical Rule 6(10) value.
+  const [searchParams] = useSearchParams();
+  useEffect(() => {
+    if (searchParams.get("mode") === "ecommerce") {
+      setPackageType("ECOMMERCE_LISTING");
+    }
+  }, [searchParams]);
 
   const getPersistentPreview = (file: File, fallbackPreview?: string): Promise<string> => {
     if (fallbackPreview && fallbackPreview.startsWith("data:image/")) {
@@ -714,7 +723,9 @@ export const NewInspection: React.FC = () => {
                   >
                     <option value="RECTANGULAR">{language === "hi" ? "आयताकार डिब्बा / पाउच" : "Rectangular Box / Pouch"}</option>
                     <option value="CYLINDRICAL">{language === "hi" ? "बेलनाकार बोतल / कैन" : "Cylindrical Bottle / Can"}</option>
+                    <option value="FLEXIBLE_POUCH">{language === "hi" ? "लचीला पाउच" : "Flexible Pouch"}</option>
                     <option value="SPECIAL">{language === "hi" ? "विशेष / अनियमित आकार का पैकेज" : "Special / Irregular Contoured Package"}</option>
+                    <option value="ECOMMERCE_LISTING">{language === "hi" ? "ई-कॉमर्स लिस्टिंग (नियम 6(10))" : "E-Commerce Listing (Rule 6(10))"}</option>
                   </select>
                 </div>
 
@@ -728,8 +739,9 @@ export const NewInspection: React.FC = () => {
                     className="input text-xs w-full"
                   >
                     <option value="ROUTINE_MARKET_SURVEILLANCE">{language === "hi" ? "नियमित बाजार निगरानी" : "Routine Market Surveillance"}</option>
-                    <option value="CONSUMER_COMPLAINT">{language === "hi" ? "उपभोक्ता शिकायत / निवारण" : "Consumer Grievance / Complaint"}</option>
-                    <option value="PORT_OF_ENTRY_IMPORT">{language === "hi" ? "सीमा शुल्क / प्रवेश बंदरगाह ऑडिट" : "Customs / Port of Entry Audit"}</option>
+                    <option value="COMPLAINT_VERIFICATION">{language === "hi" ? "उपभोक्ता शिकायत / निवारण" : "Consumer Grievance / Complaint"}</option>
+                    <option value="MANUFACTURER_PACKER_DEPOT">{language === "hi" ? "निर्माता / पैकर / डिपो ऑडिट" : "Manufacturer / Packer / Depot Audit"}</option>
+                    <option value="SURPRISE_ENFORCEMENT_RAID">{language === "hi" ? "औचक प्रवर्तन छापा" : "Surprise Enforcement Raid"}</option>
                   </select>
                 </div>
               </div>

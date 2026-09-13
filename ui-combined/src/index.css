@@ -80,6 +80,64 @@
   animation: fadeInUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* Motion Design: Modal overlay fade + dialog pop (MD3 emphasized easing) */
+@keyframes overlayIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-overlay-in {
+  animation: overlayIn 0.15s cubic-bezier(0.2, 0, 0, 1) both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s cubic-bezier(0.2, 0, 0, 1) both;
+}
+
+.animate-pop-in {
+  animation: popIn 0.18s cubic-bezier(0.05, 0.7, 0.1, 1) both;
+}
+
+/* Motion Design: Card hover lift (secondary layer — shadow arrives with motion) */
+.card-lift {
+  transition:
+    transform 0.2s cubic-bezier(0.2, 0, 0, 1),
+    box-shadow 0.2s cubic-bezier(0.2, 0, 0, 1),
+    border-color 0.2s ease;
+  will-change: transform;
+}
+
+.card-lift:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 2px 4px rgba(15, 35, 55, 0.08),
+    0 10px 24px rgba(15, 35, 55, 0.12);
+}
+
 /* Accessibility: Reduced Motion Support */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -125,15 +183,15 @@
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-govNavy px-4 py-2.5 text-xs sm:text-sm font-bold text-white transition-colors hover:bg-govNavy-light focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-govNavy px-4 py-2.5 text-xs sm:text-sm font-bold text-white transition duration-150 hover:bg-govNavy-light active:scale-[0.97] focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-300 shadow-sm;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-700 transition duration-150 hover:bg-slate-50 active:scale-[0.97] focus:outline-none focus:ring-2 focus:ring-slate-300 shadow-sm;
   }
 
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-xs sm:text-sm font-semibold text-red-700 transition-colors hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-400;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-xs sm:text-sm font-semibold text-red-700 transition duration-150 hover:bg-red-100 active:scale-[0.97] focus:outline-none focus:ring-2 focus:ring-red-400;
   }
 
   .input {

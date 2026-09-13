@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, ReactNode } from "react";
+import { AnimatePresence, m } from "framer-motion";
 import { GovTopBar } from "./GovTopBar";
 import { Header } from "./Header";
 import { Sidebar } from "./Sidebar";
@@ -85,7 +86,6 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
           loadCases();
         }}
         onRefresh={loadCases}
-        onNewInspectionClick={() => setIsNewModalOpen(true)}
         onToggleSidebar={() => setMobileSidebarOpen((prev) => !prev)}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
       />
@@ -104,26 +104,32 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
           role="main"
           className="flex-1 p-3 sm:p-5 lg:p-6 overflow-y-auto min-w-0 focus:outline-none"
         >
-          {notification && (
-            <div
-              role="status"
-              className="mb-4 p-3 bg-emerald-50 border border-emerald-300 rounded-lg text-xs text-emerald-800 flex items-center justify-between shadow-xs animate-fade-in"
-            >
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span>{notification}</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setNotification(null)}
-                className="text-emerald-700 hover:text-emerald-950 font-bold"
+          <AnimatePresence>
+            {notification && (
+              <m.div
+                role="status"
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2, ease: [0.2, 0, 0, 1] }}
+                className="mb-4 p-3 bg-emerald-50 border border-emerald-300 rounded-lg text-xs text-emerald-800 flex items-center justify-between shadow-xs"
               >
-                ✕
-              </button>
-            </div>
-          )}
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>{notification}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setNotification(null)}
+                  className="text-emerald-700 hover:text-emerald-950 font-bold"
+                >
+                  ✕
+                </button>
+              </m.div>
+            )}
+          </AnimatePresence>
 
           {children}
         </main>

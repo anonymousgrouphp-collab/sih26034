@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { StateEmblem } from "../common/StateEmblem";
 import { ShieldCheck, ExternalLink, Scale, CheckCircle2, Lock } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext";
@@ -188,25 +189,25 @@ export const GovFooter: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3 text-slate-400 text-xs font-sans flex-wrap justify-center">
-            <span className="hover:text-white cursor-pointer">
+            <Link to="/policies/terms-and-conditions" className="hover:text-white hover:underline underline-offset-2 transition-colors">
               {language === "hi" ? "नियम एवं शर्तें" : "Terms & Conditions"}
-            </span>
+            </Link>
             <span>•</span>
-            <span className="hover:text-white cursor-pointer">
+            <Link to="/policies/privacy-policy" className="hover:text-white hover:underline underline-offset-2 transition-colors">
               {language === "hi" ? "गोपनीयता नीति" : "Privacy Policy"}
-            </span>
+            </Link>
             <span>•</span>
-            <span className="hover:text-white cursor-pointer">
+            <Link to="/policies/hyperlink-policy" className="hover:text-white hover:underline underline-offset-2 transition-colors">
               {language === "hi" ? "हाइपरलिंक नीति" : "Hyperlink Policy"}
-            </span>
+            </Link>
             <span>•</span>
-            <span className="hover:text-white cursor-pointer">
+            <Link to="/policies/copyright-policy" className="hover:text-white hover:underline underline-offset-2 transition-colors">
               {language === "hi" ? "कॉपीराइट नीति" : "Copyright Policy"}
-            </span>
+            </Link>
             <span>•</span>
-            <span className="hover:text-white cursor-pointer">
+            <Link to="/policies/accessibility-statement" className="hover:text-white hover:underline underline-offset-2 transition-colors">
               {language === "hi" ? "पहुंच-योग्यता विवरण" : "Accessibility Statement"}
-            </span>
+            </Link>
           </div>
         </div>
 

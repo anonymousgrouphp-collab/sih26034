@@ -24,7 +24,7 @@ import {
 import { ConflictResolutionCard, EvidenceConflict } from "./ConflictResolutionCard";
 import { StateEmblem } from "../../components/common/StateEmblem";
 import { GovStampSeal } from "../../components/common/GovStampSeal";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { useLanguage } from "../../context/LanguageContext";
 
 interface AdjudicationCanvasProps {
@@ -732,7 +732,7 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
 
       {/* 4. Completed Adjudication Record Display (Audit Integrity) */}
       {caseData.adjudication && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, ease: "easeOut" }}
@@ -805,7 +805,7 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
               </span>
             </div>
           </div>
-        </motion.div>
+        </m.div>
       )}
 
       {/* 5. Adjudication Dialog Modal */}

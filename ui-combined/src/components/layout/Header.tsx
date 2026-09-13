@@ -12,7 +12,6 @@ interface HeaderProps {
   activeCircle: string;
   onCircleChange: (circleId: string) => void;
   onRefresh?: () => void;
-  onNewInspectionClick?: () => void;
   onToggleSidebar?: () => void;
   onOpenCommandPalette?: () => void;
 }
@@ -49,7 +48,6 @@ export const Header: React.FC<HeaderProps> = ({
   activeCircle,
   onCircleChange,
   onRefresh,
-  onNewInspectionClick,
   onToggleSidebar,
   onOpenCommandPalette,
 }) => {
@@ -168,7 +166,7 @@ export const Header: React.FC<HeaderProps> = ({
 
               {demoMenuOpen && (
                 <div
-                  className="absolute right-0 mt-2 w-80 sm:w-88 rounded-xl bg-white text-slate-900 shadow-2xl border border-slate-200 p-2 z-50 animate-in fade-in zoom-in-95"
+                  className="absolute right-0 mt-2 w-80 sm:w-88 rounded-xl bg-white text-slate-900 shadow-2xl border border-slate-200 p-2 z-50 animate-pop-in"
                 >
                   <div className="px-3 py-2 border-b border-slate-100 flex items-center justify-between">
                     <div>

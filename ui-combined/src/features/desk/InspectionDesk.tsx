@@ -655,8 +655,8 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
 
       {/* Deletion Confirmation Modal */}
       {caseToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
-          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-overlay-in">
+          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4 animate-pop-in">
             <div className="flex items-start gap-3">
               <div className="p-2.5 bg-rose-100 text-rose-700 rounded-full shrink-0">
                 <Trash2 size={22} />

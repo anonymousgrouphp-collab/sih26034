@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { LazyMotion, domAnimation, MotionConfig } from "framer-motion";
 import App from "./App";
 import "./index.css";
 
@@ -10,6 +11,12 @@ if (!rootElement) {
 
 ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
-    <App />
+    {/* LazyMotion keeps the motion bundle lean; MotionConfig honours the
+        user's prefers-reduced-motion setting across every animation. */}
+    <LazyMotion features={domAnimation} strict>
+      <MotionConfig reducedMotion="user">
+        <App />
+      </MotionConfig>
+    </LazyMotion>
   </React.StrictMode>
 );

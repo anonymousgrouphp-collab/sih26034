@@ -19,7 +19,8 @@ import { GovTopBar } from "../components/layout/GovTopBar";
 import { GovFooter } from "../components/layout/GovFooter";
 import { StatutoryPipelineInfographic } from "../components/common/StatutoryPipelineInfographic";
 import { useLanguage } from "../context/LanguageContext";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
+import { Reveal } from "../components/common/motion";
 import { IndiaGateHeroBackdrop } from "../components/common/IndiaGateHeroBackdrop";
 import { NationalLeadershipBanner } from "../components/common/NationalLeadershipBanner";
 import { StatutoryOmnibox } from "../components/common/StatutoryOmnibox";
@@ -184,8 +185,8 @@ export const Landing: React.FC = () => {
             </div>
 
             {/* 4 Trust Pillar Badges */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-4xl mx-auto pt-6 border-t border-white/15 text-xs">
-              <div className="p-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs">
+            <Reveal className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-4xl mx-auto pt-6 border-t border-white/15 text-xs" delay={0.12}>
+              <div className="p-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs card-lift">
                 <p className="text-lg sm:text-xl font-black text-amber-300">
                   {t("hero.trust_verdicts", "4-State")}
                 </p>
@@ -193,7 +194,7 @@ export const Landing: React.FC = () => {
                   {t("hero.trust_verdicts_sub", "Epistemic Verdicts")}
                 </p>
               </div>
-              <div className="p-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs">
+              <div className="p-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs card-lift">
                 <p className="text-lg sm:text-xl font-black text-emerald-400">
                   {t("hero.trust_evidence", "Sec 63 BSA")}
                 </p>
@@ -201,7 +202,7 @@ export const Landing: React.FC = () => {
                   {t("hero.trust_evidence_sub", "Electronic Evidence")}
                 </p>
               </div>
-              <div className="p-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs">
+              <div className="p-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs card-lift">
                 <p className="text-lg sm:text-xl font-black text-amber-300">
                   {t("hero.trust_font", "Table-I")}
                 </p>
@@ -209,7 +210,7 @@ export const Landing: React.FC = () => {
                   {t("hero.trust_font_sub", "Font Height (6.0 mm)")
                 }</p>
               </div>
-              <div className="p-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs">
+              <div className="p-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs card-lift">
                 <p className="text-lg sm:text-xl font-black text-cyan-300">
                   {t("hero.trust_offline", "Mode B")}
                 </p>
@@ -217,7 +218,7 @@ export const Landing: React.FC = () => {
                   {t("hero.trust_offline_sub", "Offline Resilient")}
                 </p>
               </div>
-            </div>
+            </Reveal>
           </div>
         </section>
 
@@ -227,7 +228,7 @@ export const Landing: React.FC = () => {
         {/* Live Demonstration Snapshot & Packaging Calibration Preview */}
         <section className="py-12 bg-slate-50 border-b border-slate-200">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-md">
+            <Reveal className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-md">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 pb-4 gap-3">
                 <div>
                   <div className="flex items-center gap-2">
@@ -309,7 +310,7 @@ export const Landing: React.FC = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </Reveal>
           </div>
         </section>
 
@@ -318,7 +319,7 @@ export const Landing: React.FC = () => {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               {/* Officer Visual with Official Stamp Caption */}
-              <div className="lg:col-span-6 space-y-3">
+              <Reveal className="lg:col-span-6 space-y-3">
                 <div className="relative rounded-2xl overflow-hidden shadow-xl border-2 border-slate-300 bg-slate-900 group">
                   <img
                     src="/assets/goi_metrology_inspection_hero.jpg"
@@ -377,10 +378,10 @@ export const Landing: React.FC = () => {
                     ? "चित्र 1.0: उपभोक्ता मामले विभाग के क्षेत्रीय मापविज्ञान कार्यस्थान पर वास्तविक समय में भौतिक वस्तु का निरीक्षण।"
                     : "Figure 1.0: Real-time physical commodity inspection at the Department of Consumer Affairs field metrology workstation."}
                 </p>
-              </div>
+              </Reveal>
 
               {/* National Interoperability Matrix */}
-              <div className="lg:col-span-6 space-y-6">
+              <Reveal className="lg:col-span-6 space-y-6" delay={0.08}>
                 <div>
                   <div className="inline-flex items-center gap-2 rounded-full border border-amber-600/30 bg-amber-50 px-3 py-1 text-xs font-bold text-amber-800">
                     <Landmark size={14} className="text-amber-600" />
@@ -490,7 +491,7 @@ export const Landing: React.FC = () => {
                     <ExternalLink size={13} />
                   </a>
                 </div>
-              </div>
+              </Reveal>
             </div>
           </div>
         </section>
@@ -552,14 +553,14 @@ export const Landing: React.FC = () => {
                     "Human Legal Metrology Officer reviews evidence in split canvas and dispatches Form-1 Notice with Section 63 BSA certificate."
                   ),
                 },
-              ].map((item) => (
-                <div key={item.step} className="card p-5 relative space-y-3">
+              ].map((item, idx) => (
+                <Reveal key={item.step} delay={idx * 0.06} className="card card-lift p-5 relative space-y-3">
                   <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-govNavy text-white font-black text-xs">
                     {item.step}
                   </div>
                   <h4 className="font-extrabold text-sm text-slate-900">{item.title}</h4>
                   <p className="text-xs text-slate-600 leading-relaxed">{item.desc}</p>
-                </div>
+                </Reveal>
               ))}
             </div>
           </div>
@@ -569,16 +570,16 @@ export const Landing: React.FC = () => {
         <section className="py-16 bg-slate-50">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid gap-6 md:grid-cols-3">
-              {highlights.map((item) => {
+              {highlights.map((item, idx) => {
                 const Icon = item.icon;
                 return (
-                  <div key={item.title} className="card p-6 space-y-3 bg-white">
+                  <Reveal key={item.title} delay={idx * 0.06} className="card card-lift p-6 space-y-3 bg-white">
                     <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-govNavy/10 text-govNavy">
                       <Icon size={22} />
                     </div>
                     <h4 className="font-extrabold text-base text-slate-900">{item.title}</h4>
                     <p className="text-xs text-slate-600 leading-relaxed">{item.desc}</p>
-                  </div>
+                  </Reveal>
                 );
               })}
             </div>

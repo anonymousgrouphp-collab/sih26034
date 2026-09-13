@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { ApiService } from "../services/api";
 import { InspectionSummary } from "../types/inspection";
 import { KPICard } from "../components/common/KPICard";
@@ -30,7 +30,7 @@ import { StatutorySurveillanceTicker } from "../components/common/StatutorySurve
 import { StatutoryOmnibox } from "../components/common/StatutoryOmnibox";
 import { StateEmblem } from "../components/common/StateEmblem";
 import { StatutoryDemoShowcase } from "../features/demo/StatutoryDemoShowcase";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 
 export const Dashboard: React.FC = () => {
   const [cases, setCases] = useState<InspectionSummary[]>([]);
@@ -108,6 +108,19 @@ export const Dashboard: React.FC = () => {
   };
 
   const [currentDateTime, setCurrentDateTime] = useState<string>("");
+
+  // Hash deep-links (e.g. /dashboard#demo-showcase from the header demo menu):
+  // native anchor scrolling fires before async content renders, so re-scroll
+  // once loading settles.
+  const location = useLocation();
+  useEffect(() => {
+    if (!location.hash) return;
+    const id = location.hash.slice(1);
+    const timer = setTimeout(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [location.hash, isLoading]);
 
   useEffect(() => {
     const updateTime = () => {
@@ -272,7 +285,7 @@ export const Dashboard: React.FC = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Link
           to="/inspections/new"
-          className="group p-3.5 rounded-xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md hover:border-amber-400 transition-all text-left"
+          className="group p-3.5 rounded-xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md hover:-translate-y-0.5 hover:border-amber-400 transition-all text-left"
         >
           <div className="flex items-center justify-between mb-1.5">
             <div className="p-2 rounded-lg bg-amber-50 text-amber-700 group-hover:bg-amber-500 group-hover:text-govNavy transition-colors">
@@ -290,7 +303,7 @@ export const Dashboard: React.FC = () => {
 
         <Link
           to="/inspections/new?mode=ecommerce"
-          className="group p-3.5 rounded-xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md hover:border-blue-400 transition-all text-left"
+          className="group p-3.5 rounded-xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md hover:-translate-y-0.5 hover:border-blue-400 transition-all text-left"
         >
           <div className="flex items-center justify-between mb-1.5">
             <div className="p-2 rounded-lg bg-blue-50 text-blue-700 group-hover:bg-blue-600 group-hover:text-white transition-colors">
@@ -308,7 +321,7 @@ export const Dashboard: React.FC = () => {
 
         <Link
           to="/inspections"
-          className="group p-3.5 rounded-xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md hover:border-emerald-400 transition-all text-left"
+          className="group p-3.5 rounded-xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md hover:-translate-y-0.5 hover:border-emerald-400 transition-all text-left"
         >
           <div className="flex items-center justify-between mb-1.5">
             <div className="p-2 rounded-lg bg-emerald-50 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
@@ -326,7 +339,7 @@ export const Dashboard: React.FC = () => {
 
         <Link
           to="/rules"
-          className="group p-3.5 rounded-xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md hover:border-amber-400 transition-all text-left"
+          className="group p-3.5 rounded-xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md hover:-translate-y-0.5 hover:border-amber-400 transition-all text-left"
         >
           <div className="flex items-center justify-between mb-1.5">
             <div className="p-2 rounded-lg bg-purple-50 text-purple-700 group-hover:bg-purple-600 group-hover:text-white transition-colors">
@@ -344,7 +357,7 @@ export const Dashboard: React.FC = () => {
       </div>
 
       {/* 4 Stat KPI Cards with motion */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
@@ -394,7 +407,7 @@ export const Dashboard: React.FC = () => {
           tone="warning"
           onClick={() => navigate("/review-queue")}
         />
-      </motion.div>
+      </m.div>
 
       {/* Main Grid: Recent Inspections Table + Human-in-the-Loop Triage */}
       <div className="grid gap-6 lg:grid-cols-12">

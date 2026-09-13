@@ -1,9 +1,11 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { LanguageProvider } from "./context/LanguageContext";
 import { CircleProvider } from "./context/CircleContext";
 import { AppShell } from "./components/layout/AppShell";
+import { AnimatedPage } from "./components/common/motion";
 
 // Pages
 import Landing from "./pages/Landing";
@@ -19,6 +21,8 @@ import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Unauthorized from "./pages/Unauthorized";
+import PolicyPage from "./pages/PolicyPage";
+import { POLICY_SLUGS } from "./pages/policyContent";
 
 // Protected Workstation Route Wrapper
 const ProtectedWorkstation: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -26,19 +30,32 @@ const ProtectedWorkstation: React.FC<{ children: React.ReactNode }> = ({ childre
   if (!user) {
     return <Navigate to="/login" replace />;
   }
-  return <AppShell>{children}</AppShell>;
+  return (
+    <AppShell>
+      <AnimatedPage>{children}</AnimatedPage>
+    </AppShell>
+  );
 };
 
-export const App: React.FC = () => {
+// Route transitions: the keyed Routes keeps the outgoing page mounted just
+// long enough for its exit variant to play (AnimatePresence mode="wait").
+const AnimatedRoutes: React.FC = () => {
+  const location = useLocation();
   return (
-    <BrowserRouter>
-      <LanguageProvider>
-        <AuthProvider>
-          <CircleProvider>
-            <Routes>
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
           {/* Public Portal & Login */}
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<AnimatedPage><Landing /></AnimatedPage>} />
+          <Route path="/login" element={<AnimatedPage><Login /></AnimatedPage>} />
+
+          {/* GIGW 3.0 Mandatory Policy Pages */}
+          {POLICY_SLUGS.map((slug) => (
+            <Route
+              key={slug}
+              path={`/policies/${slug}`}
+              element={<AnimatedPage><PolicyPage slug={slug} /></AnimatedPage>}
+            />
+          ))}
 
           {/* Authenticated Inspection Workstation */}
           <Route
@@ -114,12 +131,23 @@ export const App: React.FC = () => {
             }
           />
 
-          <Route path="/unauthorized" element={<Unauthorized />} />
-          <Route path="/404" element={<NotFound />} />
+          <Route path="/unauthorized" element={<AnimatedPage><Unauthorized /></AnimatedPage>} />
+          <Route path="/404" element={<AnimatedPage><NotFound /></AnimatedPage>} />
 
           {/* Fallback 404 Not Found Page */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+          <Route path="*" element={<AnimatedPage><NotFound /></AnimatedPage>} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
+
+export const App: React.FC = () => {
+  return (
+    <BrowserRouter>
+      <LanguageProvider>
+        <AuthProvider>
+          <CircleProvider>
+            <AnimatedRoutes />
           </CircleProvider>
       </AuthProvider>
     </LanguageProvider>

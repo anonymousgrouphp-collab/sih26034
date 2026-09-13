@@ -1,0 +1,49 @@
+[    1691ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5174/node_modules/.vite/deps/chunk-SVG7M4VJ.js?v=498883fe:21606
+[    1970ms] [WARNING] ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition. @ http://localhost:5174/node_modules/.vite/deps/react-router-dom.js?v=498883fe:4414
+[    1970ms] [WARNING] ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath. @ http://localhost:5174/node_modules/.vite/deps/react-router-dom.js?v=498883fe:4414
+[    8455ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) @ http://localhost:5174/login:0
+[   12300ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:5174/api/v1/auth/login:0
+[   28683ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5174/api/v1/inspections/demo-fortune-sunlite:0
+[   28695ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5174/api/v1/inspections/demo-fortune-sunlite:0
+[   43073ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5174/api/v1/inspections/SKU-DEMO-01:0
+[   43092ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5174/api/v1/inspections/SKU-DEMO-01:0
+[   45320ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5174/api/v1/inspections/SKU-DEMO-02:0
+[   45339ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5174/api/v1/inspections/SKU-DEMO-02:0
+[   46360ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5174/api/v1/inspections/SKU-DEMO-03:0
+[   46379ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5174/api/v1/inspections/SKU-DEMO-03:0
+[   51624ms] [ERROR] Warning: Each child in a list should have a unique "key" prop.%s%s See https://reactjs.org/link/warning-keys for more information.%s 
+
+Check the render method of `StatutoryDeclarationsCard`.  
+    at div
+    at StatutoryDeclarationsCard (http://localhost:5174/src/components/nirikshak/StatutoryDeclarationsCard.tsx:141:3)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at CaseWorkspace (http://localhost:5174/src/features/case/CaseWorkspace.tsx?t=1789248490635:59:3)
+    at div
+    at InspectionDetails (http://localhost:5174/src/pages/InspectionDetails.tsx?t=1789248490635:27:18)
+    at div
+    at MotionDOMComponent (http://localhost:5174/node_modules/.vite/deps/framer-motion.js?v=498883fe:9418:40)
+    at AnimatedPage (http://localhost:5174/src/components/common/motion.tsx:65:32)
+    at main
+    at div
+    at div
+    at AppShell (http://localhost:5174/src/components/layout/AppShell.tsx?t=1789249329402:30:28)
+    at ProtectedWorkstation (http://localhost:5174/src/App.tsx?t=1789249481502:40:33)
+    at RenderedRoute (http://localhost:5174/node_modules/.vite/deps/react-router-dom.js?v=498883fe:4110:5)
+    at Routes (http://localhost:5174/node_modules/.vite/deps/react-router-dom.js?v=498883fe:4580:5)
+    at PopChildMeasure (http://localhost:5174/node_modules/.vite/deps/framer-motion.js?v=498883fe:8547:23)
+    at PopChild (http://localhost:5174/node_modules/.vite/deps/framer-motion.js?v=498883fe:8575:21)
+    at PresenceChild (http://localhost:5174/node_modules/.vite/deps/framer-motion.js?v=498883fe:8627:24)
+    at AnimatePresence (http://localhost:5174/node_modules/.vite/deps/framer-motion.js?v=498883fe:8714:26)
+    at AnimatedRoutes (http://localhost:5174/src/App.tsx?t=1789249481502:66:20)
+    at CircleProvider (http://localhost:5174/src/context/CircleContext.tsx:20:34)
+    at AuthProvider (http://localhost:5174/src/context/AuthContext.tsx?t=1789245942213:94:32)
+    at LanguageProvider (http://localhost:5174/src/context/LanguageContext.tsx:21:36)
+    at Router (http://localhost:5174/node_modules/.vite/deps/react-router-dom.js?v=498883fe:4523:15)
+    at BrowserRouter (http://localhost:5174/node_modules/.vite/deps/react-router-dom.js?v=498883fe:5261:5)
+    at App
+    at MotionConfig (http://localhost:5174/node_modules/.vite/deps/framer-motion.js?v=498883fe:8940:25)
+    at LazyMotion (http://localhost:5174/node_modules/.vite/deps/framer-motion.js?v=498883fe:8914:23) @ http://localhost:5174/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=498883fe:61
