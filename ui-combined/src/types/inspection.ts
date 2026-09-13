@@ -563,6 +563,9 @@ export interface IInspectionApiService {
     inspectionId?: string,
     scenario?: "PASS" | "FAIL" | "REVIEW" | "UNABLE_TO_VERIFY"
   ): Promise<InspectionCase>;
+  executeBatchPipeline(
+    inspectionId: string
+  ): Promise<InspectionCase>;
   submitAdjudication(
     inspectionId: string,
     request: AdjudicationRequest

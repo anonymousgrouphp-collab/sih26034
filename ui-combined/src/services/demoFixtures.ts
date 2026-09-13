@@ -217,6 +217,17 @@ export class DemoFixtureService implements IInspectionApiService {
     };
   }
 
+  public async executeBatchPipeline(
+    inspectionId: string
+  ): Promise<InspectionCase> {
+    const targetCase = await this.getInspection(inspectionId);
+    return {
+      ...targetCase,
+      pipeline_source: "DEMO_FIXTURES",
+      is_mock_fixture: true,
+    };
+  }
+
   public async submitAdjudication(
     inspectionId: string,
     _request: AdjudicationRequest

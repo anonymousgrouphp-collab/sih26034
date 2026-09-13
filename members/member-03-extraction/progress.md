@@ -629,6 +629,43 @@ Multi-facet pipeline integration and frontend canvas verification.
 ### Signing Note
 SIGNED OFF BY: Harsh Patel (anonymousgrouphp@gmail.com) — 2026-09-13 10:25 IST [VERIFIED]
 
+---
+
+## [13 September 2026] [12:45] IST
+
+### Task / Chunk
+Chunk 1: Cross-Facet Semantic Fusion Engine (`CrossFacetSemanticFusionEngine` in `src/fusion.py` and `tests/test_fusion.py`).
+
+### Status
+COMPLETE
+
+### Completed
+- Implemented `CrossFacetSemanticFusionEngine` to resolve and aggregate statutory declarations across multi-panel packaging (Front PDP, Back Panel, Side Panels, Top Lid, Bottom Base).
+- Implemented statutory panel precedence hierarchy (`PDP_FRONT` priority for generic name/brand; `BACK_PANEL` for MRP, Net Qty, Mfg Date, Address, Consumer Care).
+- Implemented cross-panel corporate address merger: seamlessly reconciles corporate entity name from one panel with street address, state, and 6-digit PIN code from another panel.
+- Implemented cross-panel consumer care reconciliation: merges phone, email, contact name, and physical redressal address across multiple facets.
+- Implemented packaging-wide prohibited unit propagation: if any panel declares a banned unit (`gms`, `ML`, `gm`), flags `has_banned_unit=True` across the synthesized commodity facts.
+- Preserved exact source panel and image provenance (`source_image_id`, `panel_type`) under Section 63 BSA 2023 evidentiary defense.
+- Created standalone unit test suite `test_fusion.py` covering multi-facet packaging, prohibited unit propagation, split address merging, consumer care channel aggregation, and single/empty facet edge cases.
+
+### Tests
+- `python -m pytest members/member-03-extraction/tests/test_fusion.py -v` (5 passed in 0.19s)
+- `python -m pytest members/member-03-extraction/tests/ -q` (156 passed in 2.74s)
+
+### Problems
+None. All 156 tests passing with zero regressions.
+
+### Decisions
+1. In multi-panel packaging, no single facet is assumed to hold 100% of statutory declarations. The fusion engine aggregates candidate entities and tags each with its source `image_id` for courtroom auditability under Section 63 BSA 2023.
+2. A prohibited unit detected on any panel (e.g. side panel declaration of `gms`) must propagate to the top-level packaging facts to prevent manufacturers from hiding violations on non-primary faces.
+
+### Next Step
+Chunk 2: Resilient Caching & Queue Layer (`members/member-05-evidence/src/cache_queue.py`).
+
+### Signing Note
+SIGNED OFF BY: Harsh Patel (anonymousgrouphp@gmail.com) — 2026-09-13 12:45 IST [VERIFIED]
+
+
 
 
 

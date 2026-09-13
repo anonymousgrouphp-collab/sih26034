@@ -49,6 +49,9 @@ export class LiveApiService implements IInspectionApiService {
     bsa_certificate?: any;
     ocr?: any;
     preview_url?: string;
+    unified_facts?: any;
+    panel_attribution?: any;
+    merkle_root?: any;
   }>();
 
   public static getInstance(): LiveApiService {
@@ -685,6 +688,37 @@ export class LiveApiService implements IInspectionApiService {
       return pipelineData;
     } catch (e: any) {
       throw this.normalizeError(e, "12-stage AI pipeline execution failed on live server.");
+    }
+  }
+
+  public async executeBatchPipeline(
+    inspectionId: string
+  ): Promise<InspectionCase> {
+    try {
+      const res = await this.fetchWithAuth(`${this.baseUrl}/inspections/${inspectionId}/pipeline/batch`, {
+        method: "POST",
+      });
+
+      if (!res.ok) {
+        throw await res.json();
+      }
+
+      const batchData = await res.json();
+
+      // Cache returned pipeline outputs to bridge session persistence
+      const prevCache = this.pipelineArtifactCache.get(inspectionId) || {};
+      this.pipelineArtifactCache.set(inspectionId, {
+        ...prevCache,
+        extracted_fields: batchData.extracted_fields || [],
+        rule_evaluations: batchData.rule_evaluations || batchData.evaluations || [],
+        unified_facts: batchData.unified_facts,
+        panel_attribution: batchData.panel_attribution,
+        merkle_root: batchData.merkle_root,
+      });
+
+      return await this.getInspection(inspectionId);
+    } catch (e: any) {
+      throw this.normalizeError(e, "Parallel multi-facet AI pipeline execution failed on live server.");
     }
   }
 

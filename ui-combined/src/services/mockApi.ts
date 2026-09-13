@@ -824,6 +824,15 @@ export class MockApiService implements IInspectionApiService {
     };
   }
 
+  public async executeBatchPipeline(
+    inspectionId: string
+  ): Promise<InspectionCase> {
+    const mockCases = getMockCases();
+    const targetCase = mockCases[inspectionId] || mockCases["SKU-DEMO-01"];
+    const firstImgId = targetCase?.evidence_assets?.[0]?.image_id || "img_mock_01";
+    return await this.executePipeline(firstImgId, inspectionId);
+  }
+
   public async submitAdjudication(
     inspectionId: string,
     request: AdjudicationRequest

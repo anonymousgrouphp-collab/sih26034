@@ -318,6 +318,12 @@ export const StatutoryDeclarationsCard: React.FC<StatutoryDeclarationsCardProps>
                                 {language === "hi" ? "मिमी" : "mm"}
                               </span>
                             )}
+                            {((field as any).panel_type || (field as any).source_panel) && (
+                              <span className="ml-2 px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-sans font-bold text-[9px] border border-slate-200">
+                                {language === "hi" ? "पैनल: " : "Panel: "}
+                                {String((field as any).panel_type || (field as any).source_panel).replace(/_/g, " ")}
+                              </span>
+                            )}
                           </span>
                         );
                       })()}
