@@ -39,15 +39,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copy backend application code, contracts, and integration
+# Copy backend application code
 COPY backend/ ./backend/
-COPY contracts/ ./contracts/
-COPY integration/ ./integration/
-COPY main.py .
 
 # Verify or provision OCR neural models during container build
 RUN python backend/ocr/scripts/download_models.py --verify || python backend/ocr/scripts/download_models.py || true
@@ -56,7 +53,7 @@ RUN python backend/ocr/scripts/download_models.py --verify || python backend/ocr
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
 # Ensure storage directories exist
-RUN mkdir -p storage/evidence storage/uploads
+RUN mkdir -p backend/storage/evidence backend/storage/uploads
 
 EXPOSE 8000
 
@@ -64,4 +61,4 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD curl -f http://localhost:8000/api/v1/health || exit 1
 
-CMD ["python", "main.py"]
+CMD ["python", "backend/main.py"]

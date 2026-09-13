@@ -18,7 +18,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent.parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from contracts.extraction.extraction_dto import (
+from backend.contracts.extraction.extraction_dto import (
     AddressValue,
     ConsumerCareValue,
     ExtractedFieldDTO,
@@ -29,7 +29,7 @@ from contracts.extraction.extraction_dto import (
 )
 
 try:
-    from contracts.calibration.calibration_dto import CalibrationDTO, CalibrationResult
+    from backend.contracts.calibration.calibration_dto import CalibrationDTO, CalibrationResult
 except ImportError:
     CalibrationDTO = None  # type: ignore
     CalibrationResult = None  # type: ignore

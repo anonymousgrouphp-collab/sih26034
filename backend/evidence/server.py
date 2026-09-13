@@ -120,7 +120,7 @@ except ImportError as e:
     )
 
 try:
-    from contracts.evidence.evidence_dto import LegalNoticeRecipientDTO, Section63CertificateDTO
+    from backend.contracts.evidence.evidence_dto import LegalNoticeRecipientDTO, Section63CertificateDTO
 except ImportError:
     pass
 
@@ -129,7 +129,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 try:
-    from contracts.evidence.evidence_dto import LegalNoticeRecipientDTO, Section63CertificateDTO
+    from backend.contracts.evidence.evidence_dto import LegalNoticeRecipientDTO, Section63CertificateDTO
 except ImportError:
     pass
 
@@ -141,10 +141,10 @@ if _backend_dir.is_dir():
         if _subdir.is_dir() and str(_subdir) not in sys.path:
             sys.path.insert(0, str(_subdir))
 
-FIXTURES_DIR = REPO_ROOT / "integration" / "fixtures"
+FIXTURES_DIR = REPO_ROOT / "backend" / "integration" / "fixtures"
 
 try:
-    from integration.adapters.pipeline_adapter import CentralPipelineAdapter
+    from backend.integration.adapters.pipeline_adapter import CentralPipelineAdapter
 except ImportError:
     CentralPipelineAdapter = None
 
@@ -1126,7 +1126,7 @@ def execute_pipeline(
                 if not img_path.exists():
                     img_path = REPO_ROOT / ev_image.file_path
                 if not img_path.exists():
-                    img_path = REPO_ROOT / "storage" / ev_image.file_path
+                    img_path = REPO_ROOT / "backend" / "storage" / ev_image.file_path
                 if img_path.exists():
                     try:
                         import cv2
@@ -1219,10 +1219,10 @@ def execute_pipeline(
                             logger.info(f"Multilingual OCR processed {len(ocr_output.tokens)} tokens using {getattr(ocr_engine, 'execution_mode', 'INT8')}")
                         except Exception as ocr_proc_err:
                             logger.error(f"OCR process_image failed: {ocr_proc_err}")
-                            from contracts.ocr.ocr_dto import OCROutput
+                            from backend.contracts.ocr.ocr_dto import OCROutput
                             ocr_output = OCROutput(image_id=ev_image.id, tokens=[], primary_language="en")
                     else:
-                        from contracts.ocr.ocr_dto import OCROutput
+                        from backend.contracts.ocr.ocr_dto import OCROutput
                         ocr_output = OCROutput(image_id=ev_image.id, tokens=[], primary_language="en")
 
                     # 4. Real Semantic Extractor (Member 3)
@@ -1528,7 +1528,7 @@ def execute_batch_pipeline(
             if not img_path.exists():
                 img_path = REPO_ROOT / file_path_str
             if not img_path.exists():
-                img_path = REPO_ROOT / "storage" / file_path_str
+                img_path = REPO_ROOT / "backend" / "storage" / file_path_str
             if img_path.exists():
                 try:
                     import cv2
@@ -1584,7 +1584,7 @@ def execute_batch_pipeline(
         cache_adapter = CacheQueueAdapter.get_instance() if CacheQueueAdapter else None
         cached_tokens = cache_adapter.get_tokens(img_id) if cache_adapter else None
 
-        from contracts.ocr.ocr_dto import OCROutput, OCRToken
+        from backend.contracts.ocr.ocr_dto import OCROutput, OCRToken
         if cached_tokens is not None:
             tokens_objs = [OCRToken(**t) if isinstance(t, dict) else t for t in cached_tokens]
             ocr_output = OCROutput(image_id=img_id, tokens=tokens_objs, primary_language="en")

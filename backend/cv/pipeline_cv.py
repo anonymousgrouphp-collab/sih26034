@@ -20,8 +20,8 @@ REPO_ROOT = Path(__file__).resolve().parent.parent.parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from contracts.calibration.calibration_dto import CalibrationResult
-from contracts.quality_gate.quality_gate_dto import QualityGateResult
+from backend.contracts.calibration.calibration_dto import CalibrationResult
+from backend.contracts.quality_gate.quality_gate_dto import QualityGateResult
 
 # Member 1 local modules
 SRC_DIR = Path(__file__).resolve().parent

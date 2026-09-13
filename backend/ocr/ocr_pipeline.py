@@ -21,7 +21,7 @@ from polygon_normalizer import PolygonNormalizer
 from detector import DBNetTextDetector
 from recognizer import PPOCRv4Recognizer
 from fallback import TesseractFallback, OCRConsensusEngine
-from contracts.ocr.ocr_dto import OCROutput
+from backend.contracts.ocr.ocr_dto import OCROutput
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("OCR_Pipeline")

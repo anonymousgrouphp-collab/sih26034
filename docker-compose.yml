@@ -42,7 +42,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - storage_data:/app/storage
+      - storage_data:/app/backend/storage
 
   # ---------------------------------------------------------------------------
   # 3. React 18 + Nginx Production Frontend Workstation

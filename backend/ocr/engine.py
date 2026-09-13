@@ -26,7 +26,7 @@ SRC_DIR = Path(__file__).resolve().parent
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
-from contracts.ocr.ocr_dto import OCROutput, OCRToken
+from backend.contracts.ocr.ocr_dto import OCROutput, OCRToken
 from polygon_normalizer import PolygonNormalizer
 from detector import DBNetTextDetector, TextDetectionResult
 from recognizer import PPOCRv4Recognizer

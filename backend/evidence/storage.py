@@ -28,7 +28,7 @@ class PayloadTooLargeError(StorageSecurityError):
 try:
     from dotenv import load_dotenv
     load_dotenv()
-    _repo_root = Path(__file__).resolve().parent.parent.parent.parent
+    _repo_root = Path(__file__).resolve().parent.parent.parent
     if (_repo_root / ".env").exists():
         load_dotenv(_repo_root / ".env")
 except Exception:
@@ -143,8 +143,8 @@ class DecoupledStorageManager:
             self.base_dir = Path(base_dir).resolve()
         else:
             # Default to repo/storage
-            repo_root = Path(__file__).resolve().parent.parent.parent.parent
-            self.base_dir = (repo_root / "storage").resolve()
+            repo_root = Path(__file__).resolve().parent.parent.parent
+            self.base_dir = (repo_root / "backend" / "storage").resolve()
 
         self.uploads_dir = self.base_dir / "uploads"
         self.evidence_dir = self.base_dir / "evidence"

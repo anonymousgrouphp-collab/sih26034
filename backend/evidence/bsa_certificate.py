@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Literal, Optional
 
 # Import shared frozen contracts
 try:
-    from contracts.evidence.evidence_dto import (
+    from backend.contracts.evidence.evidence_dto import (
         BSAEvidenceBundleDTO,
         MerkleNodeDTO,
         Section63CertificateDTO,
@@ -22,7 +22,7 @@ except ImportError:
     REPO_ROOT = Path(__file__).resolve().parent.parent.parent.parent
     if str(REPO_ROOT) not in sys.path:
         sys.path.insert(0, str(REPO_ROOT))
-    from contracts.evidence.evidence_dto import (
+    from backend.contracts.evidence.evidence_dto import (
         BSAEvidenceBundleDTO,
         MerkleNodeDTO,
         Section63CertificateDTO,

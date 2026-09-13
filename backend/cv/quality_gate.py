@@ -24,7 +24,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 try:
-    from contracts.quality_gate.quality_gate_dto import QualityCheckDTO, QualityGateResult
+    from backend.contracts.quality_gate.quality_gate_dto import QualityCheckDTO, QualityGateResult
 except ImportError:
     QualityCheckDTO = None  # type: ignore
     QualityGateResult = None  # type: ignore
