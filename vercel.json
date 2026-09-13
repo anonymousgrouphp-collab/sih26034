@@ -1,6 +1,6 @@
 {
-  "buildCommand": "node build-root.cjs",
-  "outputDirectory": "dist",
+  "buildCommand": "cd frontend && npm ci && npm run build",
+  "outputDirectory": "frontend/dist",
   "headers": [
     {
       "source": "/index.html",

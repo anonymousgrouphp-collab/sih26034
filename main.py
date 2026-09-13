@@ -1,4 +1,4 @@
-"""NyayaDrishti-LM (SIH26034) - Production Monolith Application Server.
+"""Nirikshak (SIH26034) — Production Monolith Application Server.
 Orchestrates FastAPI REST API (Mode A & B), Central Pipeline, and React 18 Production Web App.
 Governed by Section 63 Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023).
 """
@@ -7,17 +7,19 @@ import os
 from pathlib import Path
 import sys
 
-# 1. Register repository root and member src packages in sys.path
+# 1. Register repository root and backend module paths in sys.path
 REPO_ROOT = Path(__file__).resolve().parent
-for member_dir in (REPO_ROOT / "members").iterdir():
-    src_dir = member_dir / "src"
-    if src_dir.is_dir() and str(src_dir) not in sys.path:
-        sys.path.insert(0, str(src_dir))
+BACKEND_DIR = REPO_ROOT / "backend"
+
+# Add each backend subdirectory (cv, ocr, extraction, rule_engine, evidence) to sys.path
+for subdir in BACKEND_DIR.iterdir():
+    if subdir.is_dir() and str(subdir) not in sys.path:
+        sys.path.insert(0, str(subdir))
 
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-# 2. Import FastAPI application from Member 5 Evidence & Backend
+# 2. Import FastAPI application from backend/evidence/server.py
 from server import app
 
 # 3. Mount Test UI HUD at /test-ui for lightweight diagnostics
@@ -33,10 +35,8 @@ STORAGE_DIR = REPO_ROOT / "storage"
 STORAGE_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/storage", StaticFiles(directory=str(STORAGE_DIR)), name="storage")
 
-# 4. Mount React 18 Production Build (from ui-combined/dist)
-DIST_DIR = REPO_ROOT / "ui-combined" / "dist"
-if not DIST_DIR.is_dir():
-    DIST_DIR = REPO_ROOT / "members" / "member-06-ui" / "dist"
+# 4. Mount React 18 Production Build (from frontend/dist)
+DIST_DIR = REPO_ROOT / "frontend" / "dist"
 if DIST_DIR.is_dir():
     # Mount assets folder
     assets_dir = DIST_DIR / "assets"
@@ -58,7 +58,7 @@ if DIST_DIR.is_dir():
             if storage_file.is_file():
                 return FileResponse(storage_file)
             # Check public storage directory
-            pub_storage = (REPO_ROOT / "ui-combined" / "public" / full_path).resolve()
+            pub_storage = (REPO_ROOT / "frontend" / "public" / full_path).resolve()
             if pub_storage.is_file():
                 return FileResponse(pub_storage)
             from fastapi import HTTPException

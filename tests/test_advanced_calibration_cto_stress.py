@@ -21,15 +21,15 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-m1_src = str(REPO_ROOT / "members" / "member-01-cv-metrology" / "src")
+m1_src = str(REPO_ROOT / "backend" / "cv")
 if m1_src not in sys.path:
     sys.path.insert(0, m1_src)
 
-m4_src = str(REPO_ROOT / "members" / "member-04-rule-engine" / "src")
+m4_src = str(REPO_ROOT / "backend" / "rule_engine")
 if m4_src not in sys.path:
     sys.path.insert(0, m4_src)
 
-m5_src = str(REPO_ROOT / "members" / "member-05-evidence" / "src")
+m5_src = str(REPO_ROOT / "backend" / "evidence")
 if m5_src not in sys.path:
     sys.path.insert(0, m5_src)
 

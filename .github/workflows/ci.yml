@@ -48,7 +48,6 @@ jobs:
                       CONTRIBUTING.md \
                       CODE_OF_CONDUCT.md \
                       SECURITY.md \
-                      CLAIMS_WE_MUST_NOT_MAKE.md \
                       docs/COMPLETE_PROJECT_END_TO_END_GUIDE.md \
                       docs/design/09_UI_UX_BLUEPRINT.md \
                       docs/specifications/01_MASTER_PROJECT_BLUEPRINT.md \
@@ -68,25 +67,29 @@ jobs:
                       docs/specifications/16_DECISION_LOG.md \
                       docs/specifications/17_OPEN_QUESTIONS.md \
                       docs/specifications/CONNECTIVITY_REQUIREMENTS.md \
-                      docs/specifications/SYSTEM_MODES_AND_CONNECTIVITY.md \
-                      audit/FINAL_AUTHENTICITY_AND_ACCURACY_AUDIT.md; do
+                      docs/specifications/SYSTEM_MODES_AND_CONNECTIVITY.md; do
             if [ ! -f "$file" ]; then
               echo "::error::Missing critical specification file: $file"
               exit 1
             fi
           done
-          echo "All 27 core specifications and governance documents verified."
+          echo "All 25 core specifications and governance documents verified."
 
-      - name: Verify Research Reports & Bilingual Dossiers
+      - name: Verify Backend Module Structure
         run: |
-          for dossier in docs/research/PHASE_1_Domain_Research_Dossier.md \
-                         docs/research/PHASE_1_Domain_Research_Dossier_HINGLISH.md \
-                         docs/research/PHASE_2_Research_Report.md \
-                         docs/research/PHASE_2_Research_Report_HINGLISH.md \
-                         docs/research/PHASE_3_Solution_Blueprint.md; do
-            if [ ! -f "$dossier" ]; then
-              echo "::error::Missing research dossier: $dossier"
+          echo "Verifying backend module directories..."
+          for module in backend/cv backend/ocr backend/extraction backend/rule_engine backend/evidence; do
+            if [ ! -d "$module" ]; then
+              echo "::error::Missing backend module directory: $module"
               exit 1
             fi
           done
-          echo "All 5 bilingual research dossiers verified."
+          echo "All 5 backend modules present."
+
+      - name: Verify Frontend Structure
+        run: |
+          if [ ! -f "frontend/package.json" ]; then
+            echo "::error::Missing frontend/package.json"
+            exit 1
+          fi
+          echo "Frontend structure verified."

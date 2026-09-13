@@ -18,14 +18,14 @@ The development of **Nirikshak (SIH26034)** is driven by a specialized six-membe
 ---
 
 ### ⚖️ Statutory Legal Metrology Rule Engine Collaborative Delivery
-The deterministic compliance engine (`members/member-04-rule-engine/`) was co-engineered for 100% legal determinism and courtroom defensibility under BSA 2023:
+The deterministic compliance engine (`backend/rule_engine/`) was co-engineered for 100% legal determinism and courtroom defensibility under BSA 2023:
 - **Lead Statutory Rule Architecture & Table-I Schedules:** Ambika Bansal ([@bansalambika12-ship-it](https://github.com/bansalambika12-ship-it))
 - **AST Compliance Hardening, IEEE 754 Precision Guard & Statutory Provisos:** Harsh Patel ([@anonymousgrouphp-collab](https://github.com/anonymousgrouphp-collab))
 
 ---
 
 ### 🎨 Frontend & Adjudication Workstation Collaborative Delivery
-The production web platform (`ui-combined/`) is a unified collaborative achievement:
+The production web platform (`frontend/`) is a unified collaborative achievement:
 - **Lead Frontend Architecture & Inspection HUD:** Parmarth Kumar ([@parmarth-kumar](https://github.com/parmarth-kumar))
 - **Full-Pipeline Integration & Verification:** Harsh Patel ([@anonymousgrouphp-collab](https://github.com/anonymousgrouphp-collab))
 - **Metrology Canvas & Calibration Overlay:** Kunal Raj ([@kunal-raj-dev](https://github.com/kunal-raj-dev))

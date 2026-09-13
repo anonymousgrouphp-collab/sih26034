@@ -1,5 +1,5 @@
 # =============================================================================
-# NyayaDrishti-LM (SIH26034) - Multi-Stage Production Container
+# Nirikshak (SIH26034) - Multi-Stage Production Container
 # Governed by Section 63 Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)
 # Permissive Licenses Only (Apache-2.0, MIT, BSD-3) - Zero AGPL-3.0
 # =============================================================================
@@ -10,11 +10,10 @@
 FROM node:20-alpine AS frontend-builder
 WORKDIR /app/frontend
 
-COPY ui-combined/package*.json ./
+COPY frontend/package*.json ./
 RUN npm ci --prefer-offline --no-audit || npm install --prefer-offline --no-audit
 
-
-COPY ui-combined/ ./
+COPY frontend/ ./
 RUN npm run build
 
 # -----------------------------------------------------------------------------
@@ -44,18 +43,17 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copy backend application code, contracts, members, and integration
+# Copy backend application code, contracts, and integration
+COPY backend/ ./backend/
 COPY contracts/ ./contracts/
-COPY members/ ./members/
 COPY integration/ ./integration/
 COPY main.py .
 
 # Verify or provision OCR neural models during container build
-RUN python members/member-02-ocr/scripts/download_models.py --verify || python members/member-02-ocr/scripts/download_models.py || true
-
+RUN python backend/ocr/scripts/download_models.py --verify || python backend/ocr/scripts/download_models.py || true
 
 # Copy built React frontend assets into destination served by main.py
-COPY --from=frontend-builder /app/frontend/dist ./ui-combined/dist
+COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
 # Ensure storage directories exist
 RUN mkdir -p storage/evidence storage/uploads

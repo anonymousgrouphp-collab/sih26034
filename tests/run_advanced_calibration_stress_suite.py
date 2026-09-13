@@ -29,14 +29,14 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 # Member 1 CV & Metrology
-m1_src = str(REPO_ROOT / "members" / "member-01-cv-metrology" / "src")
+m1_src = str(REPO_ROOT / "backend" / "cv")
 if m1_src not in sys.path:
     sys.path.insert(0, m1_src)
 from quality_gate import QualityGateEvaluator
 from calibration import CalibrationEngine
 
 # Member 2 Multilingual OCR
-m2_src = str(REPO_ROOT / "members" / "member-02-ocr" / "src")
+m2_src = str(REPO_ROOT / "backend" / "ocr")
 if m2_src not in sys.path:
     sys.path.insert(0, m2_src)
 import importlib.util
@@ -46,20 +46,20 @@ spec_ocr.loader.exec_module(ocr_engine_mod)
 MultilingualOCREngine = ocr_engine_mod.MultilingualOCREngine
 
 # Member 3 Semantic Extraction
-m3_src = str(REPO_ROOT / "members" / "member-03-extraction" / "src")
+m3_src = str(REPO_ROOT / "backend" / "extraction")
 if m3_src not in sys.path:
     sys.path.insert(0, m3_src)
 from extractor import CommodityFactExtractor
 from parsers import StatutoryDeclarationParser
 
 # Member 4 Rule Engine
-m4_src = str(REPO_ROOT / "members" / "member-04-rule-engine" / "src")
+m4_src = str(REPO_ROOT / "backend" / "rule_engine")
 if m4_src not in sys.path:
     sys.path.insert(0, m4_src)
 from evaluators import LegalMetrologyRuleEngine, Table1FontSchedule, USPEvaluator, Rule6DeclarationsEvaluator
 
 # Member 5 Evidence & Cryptography
-m5_src = str(REPO_ROOT / "members" / "member-05-evidence" / "src")
+m5_src = str(REPO_ROOT / "backend" / "evidence")
 if m5_src not in sys.path:
     sys.path.insert(0, m5_src)
 from merkle_dag import MerkleAuditLedger

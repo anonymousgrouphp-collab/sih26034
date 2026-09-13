@@ -13,13 +13,13 @@ import uuid
 
 # Path discovery
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-M5_SRC = REPO_ROOT / "members" / "member-05-evidence" / "src"
-M1_SRC = REPO_ROOT / "members" / "member-01-cv-metrology" / "src"
-M2_SRC = REPO_ROOT / "members" / "member-02-ocr" / "src"
-M3_SRC = REPO_ROOT / "members" / "member-03-extraction" / "src"
-M4_SRC = REPO_ROOT / "members" / "member-04-rule-engine" / "src"
+M5_SRC = REPO_ROOT / "backend" / "evidence"
+M1_SRC = REPO_ROOT / "backend" / "cv"
+M2_SRC = REPO_ROOT / "backend" / "ocr"
+M3_SRC = REPO_ROOT / "backend" / "extraction"
+M4_SRC = REPO_ROOT / "backend" / "rule_engine"
 FIXTURES_DIR = REPO_ROOT / "integration" / "fixtures"
-M1_FIXTURES = REPO_ROOT / "members" / "member-01-cv-metrology" / "fixtures"
+M1_FIXTURES = REPO_ROOT / "backend" / "cv" / "fixtures"
 TEST_UI_DIR = REPO_ROOT / "integration" / "test_ui"
 
 for p in [str(REPO_ROOT), str(M5_SRC), str(M1_SRC), str(M2_SRC), str(M3_SRC), str(M4_SRC)]:

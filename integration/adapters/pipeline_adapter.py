@@ -7,15 +7,15 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-# Dynamically add repository root and member src paths for adapter orchestration
+# Dynamically add repository root and backend module paths for adapter orchestration
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-for member_dir in (REPO_ROOT / "members").iterdir():
-    src_dir = member_dir / "src"
-    if src_dir.is_dir() and str(src_dir) not in sys.path:
-        sys.path.insert(0, str(src_dir))
+BACKEND_DIR = REPO_ROOT / "backend"
+for subdir in BACKEND_DIR.iterdir():
+    if subdir.is_dir() and str(subdir) not in sys.path:
+        sys.path.insert(0, str(subdir))
 
 from quality_gate import QualityGateEvaluator
 from parsers import StatutoryDeclarationParser

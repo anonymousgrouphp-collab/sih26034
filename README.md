@@ -273,10 +273,10 @@ flowchart LR
 ├── inspect_cli.py                      # Headless CLI inspection utility
 ├── requirements.txt                    # Root Python dependencies
 │
-├── members/                            # CV, OCR, extraction, rules, evidence subsystems
+├── backend/                            # CV, OCR, extraction, rules, evidence subsystems
 ├── contracts/                          # Frozen interfaces and schemas
 ├── integration/                        # Cross-subsystem fixtures and tests
-├── ui-combined/                        # Inspector workstation frontend (React 18 + Vite)
+├── frontend/                        # Inspector workstation frontend (React 18 + Vite)
 ├── docs/                               # Technical specifications and guides
 ├── audit/                              # Validation and ground-truth evidence
 └── Legal Metrology real product images/# 75 Physical packaging test photos & collection notes
@@ -321,7 +321,7 @@ python main.py
 #### 2. Frontend Setup
 ```bash
 # In a new terminal, navigate to the frontend directory
-cd ui-combined
+cd frontend
 
 # Install frontend packages
 npm install
@@ -333,10 +333,10 @@ npm run dev
 
 #### 3. Production Build
 ```bash
-cd ui-combined
+cd frontend
 npm run build
 ```
-*The production build compiles into `ui-combined/dist`, which is served directly by `main.py` at `http://localhost:8000`.*
+*The production build compiles into `frontend/dist`, which is served directly by `main.py` at `http://localhost:8000`.*
 
 ---
 
@@ -370,21 +370,21 @@ Nirikshak enforces strict automated test verification across frontend, backend, 
 
 ```bash
 # 1. Run all Frontend Tests (142 passing tests across 18 test files)
-cd ui-combined && npm test
+cd frontend && npm test
 
 # 2. Run Evidence & Backend + Integration Tests (95 passing tests)
-python -m pytest members/member-05-evidence/tests/ integration/tests/ -v
+python -m pytest backend/evidence/tests/ integration/tests/ -v
 
 # 3. Run Computer Vision, OCR & Rule Engine Unit Tests (174 passing tests)
-python -m pytest members/member-01-cv-metrology/tests/ members/member-02-ocr/tests/ members/member-04-rule-engine/tests/ -v
+python -m pytest backend/cv/tests/ backend/ocr/tests/ backend/rule_engine/tests/ -v
 
 # 4. Run Semantic Extraction Test Suite (151 passing tests)
-python -m pytest members/member-03-extraction/tests/ -v
+python -m pytest backend/extraction/tests/ -v
 ```
 
 ### Authoritative Test Summary
-- **Frontend Test Suite (`ui-combined`):** **142 passing tests** across 18 test files (0 failed, 0 skipped)
-- **Backend & Subsystem Suites (`members/` & `integration/`):** **420 passing tests** across 37 test files (0 failed, 0 skipped)
+- **Frontend Test Suite (`frontend`):** **142 passing tests** across 18 test files (0 failed, 0 skipped)
+- **Backend & Subsystem Suites (`backend/` & `integration/`):** **420 passing tests** across 37 test files (0 failed, 0 skipped)
 - **Platform Total:** **562 passing tests across 55 standard test files** (0 failed, 0 skipped)
 
 ---

@@ -16,7 +16,7 @@ import urllib.request
 
 # Setup paths
 REPO_ROOT = Path(__file__).resolve().parent.parent
-for member_dir in (REPO_ROOT / "members").iterdir():
+for member_dir in (REPO_ROOT / "backend").iterdir():
     src_dir = member_dir / "src"
     if src_dir.is_dir() and str(src_dir) not in sys.path:
         sys.path.insert(0, str(src_dir))

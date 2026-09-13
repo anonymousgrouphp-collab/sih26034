@@ -10,7 +10,6 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
 downloads/
 eggs/
 .eggs/
@@ -85,11 +84,17 @@ pnpm-debug.log*
 dist/
 dist-ssr/
 *.local
+*.tsbuildinfo
 
-# Database files
+# Database files (runtime artifacts — never commit)
 *.sqlite3
 *.db
 *.db-journal
+*.sql
+
+# Generated audit/report outputs (runtime artifacts)
+audit_results*.json
+audit_results*.csv
 
 # Temporary / Scratch files
 scratch/
@@ -97,13 +102,15 @@ tmp/
 temp/
 *.tmp
 
-# Exclude scripts directory
-scripts/
-!members/*/scripts/
+# Runtime evidence storage (contents are runtime, dirs tracked via .gitkeep)
+storage/evidence/*
+storage/uploads/*
+!storage/evidence/.gitkeep
+!storage/uploads/.gitkeep
 
-# Runtime evidence storage
-/storage/
-!ui-combined/public/storage/
+# Dev-phase AI agent directories
+.agents/
+.playwright-mcp/
 
 # Archives & compressed blobs
 *.zip
@@ -115,5 +122,3 @@ scripts/
 # Backups & scratch images
 *.bak
 page_*_img_*.png
-
-

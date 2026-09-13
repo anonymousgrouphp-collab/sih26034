@@ -39,16 +39,14 @@ if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
     except Exception:
         pass
 
-# Path discovery for all member modules and integration layers
+# Path discovery for all backend modules and integration layers
 REPO_ROOT = Path(__file__).resolve().parent
-M1_SRC = REPO_ROOT / "members" / "member-01-cv-metrology" / "src"
-M2_SRC = REPO_ROOT / "members" / "member-02-ocr" / "src"
-M3_SRC = REPO_ROOT / "members" / "member-03-extraction" / "src"
-M4_SRC = REPO_ROOT / "members" / "member-04-rule-engine" / "src"
-M5_SRC = REPO_ROOT / "members" / "member-05-evidence" / "src"
+BACKEND_DIR = REPO_ROOT / "backend"
 INTEGRATION_SRC = REPO_ROOT / "integration"
 
-for p in [str(REPO_ROOT), str(M1_SRC), str(M2_SRC), str(M3_SRC), str(M4_SRC), str(M5_SRC), str(INTEGRATION_SRC)]:
+backend_paths = [str(subdir) for subdir in BACKEND_DIR.iterdir() if subdir.is_dir()]
+
+for p in [str(REPO_ROOT)] + backend_paths + [str(INTEGRATION_SRC)]:
     if p not in sys.path:
         sys.path.insert(0, p)
 
