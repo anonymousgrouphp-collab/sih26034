@@ -25,6 +25,108 @@ class PayloadTooLargeError(StorageSecurityError):
     pass
 
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+    _repo_root = Path(__file__).resolve().parent.parent.parent.parent
+    if (_repo_root / ".env").exists():
+        load_dotenv(_repo_root / ".env")
+except Exception:
+    pass
+
+
+class SupabaseStorageAdapter:
+    """Cloud Object Storage Adapter for Supabase Storage (S3-compatible).
+    Provides permanent, resilient cloud storage for packaging evidence images,
+    preventing data loss across container restarts on ephemeral platforms like Render.
+    """
+    def __init__(
+        self,
+        url: Optional[str] = None,
+        key: Optional[str] = None,
+        bucket: Optional[str] = None,
+    ):
+        self.url = (url or os.getenv("SUPABASE_URL", "")).rstrip("/")
+        self.key = key or os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY") or ""
+        self.bucket = bucket or os.getenv("SUPABASE_BUCKET", "evidence-images")
+        self.is_configured = bool(self.url and self.key and self.bucket)
+        self._headers = {
+            "apikey": self.key,
+            "Authorization": f"Bearer {self.key}",
+        } if self.key else {}
+
+    def upload_file(self, rel_path: str, raw_bytes: bytes, content_type: str = "image/jpeg") -> Optional[str]:
+        """Uploads file to Supabase Storage. Returns public CDN URL or None on failure."""
+        if not self.is_configured or not raw_bytes:
+            return None
+        clean_path = rel_path.lstrip("/").replace("\\", "/")
+        if clean_path.startswith("storage/"):
+            clean_path = clean_path[len("storage/"):]
+        endpoint = f"{self.url}/storage/v1/object/{self.bucket}/{clean_path}"
+        headers = {
+            **self._headers,
+            "Content-Type": content_type,
+            "x-upsert": "true",
+        }
+        try:
+            import httpx
+            with httpx.Client(timeout=15.0) as client:
+                res = client.post(endpoint, headers=headers, content=raw_bytes)
+                if res.status_code in (200, 201):
+                    return f"{self.url}/storage/v1/object/public/{self.bucket}/{clean_path}"
+        except Exception:
+            pass
+        return None
+
+    def delete_file(self, rel_path: str) -> bool:
+        """Deletes file from Supabase Storage bucket."""
+        if not self.is_configured or not rel_path:
+            return False
+        clean_path = rel_path.lstrip("/").replace("\\", "/")
+        if clean_path.startswith("storage/"):
+            clean_path = clean_path[len("storage/"):]
+        endpoint = f"{self.url}/storage/v1/object/{self.bucket}"
+        try:
+            import httpx
+            with httpx.Client(timeout=10.0) as client:
+                res = client.request(
+                    "DELETE",
+                    endpoint,
+                    headers={**self._headers, "Content-Type": "application/json"},
+                    json={"prefixes": [clean_path]},
+                )
+                return res.status_code in (200, 204)
+        except Exception:
+            pass
+        return False
+
+    def download_file(self, rel_path: str) -> Optional[bytes]:
+        """Downloads file bytes from Supabase Storage if missing locally."""
+        if not self.is_configured or not rel_path:
+            return None
+        clean_path = rel_path.lstrip("/").replace("\\", "/")
+        if clean_path.startswith("storage/"):
+            clean_path = clean_path[len("storage/"):]
+        pub_url = f"{self.url}/storage/v1/object/public/{self.bucket}/{clean_path}"
+        try:
+            import httpx
+            with httpx.Client(timeout=15.0) as client:
+                res = client.get(pub_url)
+                if res.status_code == 200:
+                    return res.content
+        except Exception:
+            pass
+        return None
+
+    def get_public_url(self, rel_path: str) -> Optional[str]:
+        if not self.is_configured or not rel_path:
+            return None
+        clean_path = rel_path.lstrip("/").replace("\\", "/")
+        if clean_path.startswith("storage/"):
+            clean_path = clean_path[len("storage/"):]
+        return f"{self.url}/storage/v1/object/public/{self.bucket}/{clean_path}"
+
+
 class DecoupledStorageManager:
     """Manages secure filesystem storage decoupled from relational datastore."""
 
@@ -50,6 +152,9 @@ class DecoupledStorageManager:
         # Ensure directories exist
         self.uploads_dir.mkdir(parents=True, exist_ok=True)
         self.evidence_dir.mkdir(parents=True, exist_ok=True)
+
+        # Cloud storage adapter (Supabase)
+        self.supabase = SupabaseStorageAdapter()
 
     @classmethod
     def detect_and_validate_mime(cls, data: bytes) -> Tuple[str, str]:
@@ -112,6 +217,14 @@ class DecoupledStorageManager:
                 f.write(raw_bytes)
 
         relative_path = str(target_file.relative_to(self.base_dir)).replace("\\", "/")
+
+        # Cloud sync to Supabase Storage bucket
+        if self.supabase and self.supabase.is_configured:
+            try:
+                self.supabase.upload_file(relative_path, raw_bytes, content_type=mime_type)
+            except Exception:
+                pass
+
         return relative_path, file_hash, mime_type
 
     def compress_for_archival_lossless(self, raw_bytes: bytes) -> bytes:
@@ -146,15 +259,39 @@ class DecoupledStorageManager:
             f.write(doc_bytes)
 
         relative_path = str(target_file.relative_to(self.base_dir)).replace("\\", "/")
+
+        # Cloud sync notice PDF to Supabase Storage
+        if self.supabase and self.supabase.is_configured:
+            try:
+                self.supabase.upload_file(relative_path, doc_bytes, content_type="application/pdf")
+            except Exception:
+                pass
+
         return relative_path, file_hash
 
     def resolve_absolute_path(self, relative_path: str) -> Path:
-        """Resolves a stored relative path to its absolute filesystem location."""
+        """Resolves a stored relative path to its absolute filesystem location.
+        If the file is missing locally (e.g. after container restart), automatically
+        re-hydrates and restores it from Supabase Storage without 404 disruption.
+        """
         clean_rel = relative_path.lstrip("/").replace("\\", "/")
+        if clean_rel.startswith("storage/"):
+            clean_rel = clean_rel[len("storage/"):]
         resolved = (self.base_dir / clean_rel).resolve()
         # Path traversal guard
         if not str(resolved).startswith(str(self.base_dir)):
             raise StorageSecurityError("Illegal path traversal detected.")
+
+        if not resolved.exists() and self.supabase and self.supabase.is_configured:
+            try:
+                cloud_bytes = self.supabase.download_file(clean_rel)
+                if cloud_bytes:
+                    resolved.parent.mkdir(parents=True, exist_ok=True)
+                    with open(resolved, "wb") as f:
+                        f.write(cloud_bytes)
+            except Exception:
+                pass
+
         return resolved
 
     def get_file_path(self, relative_path: str) -> Path:
@@ -162,17 +299,28 @@ class DecoupledStorageManager:
         return self.resolve_absolute_path(relative_path)
 
     def delete_file(self, relative_path: str) -> bool:
-        """Permanently unlinks an evidence or upload file from storage."""
+        """Permanently unlinks an evidence or upload file from both local storage and Supabase bucket."""
         if not relative_path:
             return False
+        deleted = False
         try:
             clean_rel = relative_path.replace("\\", "/").lstrip("/")
             if clean_rel.startswith("storage/"):
                 clean_rel = clean_rel[len("storage/"):]
-            resolved = self.resolve_absolute_path(clean_rel)
+            resolved = (self.base_dir / clean_rel).resolve()
             if resolved.exists() and resolved.is_file():
                 resolved.unlink()
-                return True
+                deleted = True
         except Exception:
             pass
-        return False
+
+        # Also permanently delete from Supabase cloud storage bucket
+        if self.supabase and self.supabase.is_configured:
+            try:
+                sb_deleted = self.supabase.delete_file(relative_path)
+                if sb_deleted:
+                    deleted = True
+            except Exception:
+                pass
+
+        return deleted
