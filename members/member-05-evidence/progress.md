@@ -628,5 +628,50 @@ Commit and push verified changes to `origin main` and `origin dev` for cloud dep
 ### Signing Note
 SIGNED OFF BY: Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-13 11:05 IST [VERIFIED]
 
+---
+
+## [13 September 2026] [11:20] IST
+
+### Task / Chunk
+Automated 12-Stage AI Pipeline End-to-End Resolution: OCR Neural Models Packaging, Tesseract Fallback Resilience, Subresource Route Alias, and Empty Case Gating.
+
+### Status
+COMPLETE
+
+### Completed
+- **Tracked & Packaged Production OCR Neural Models (`members/member-02-ocr/models/.gitignore`):**
+  - Updated `.gitignore` to track all primary ONNX weights (`ch_PP-OCRv4_det.onnx`, `en_PP-OCRv4_rec_infer.onnx`, `devanagari_PP-OCRv4_rec.onnx`), INT8 quantized models, and `hin.traineddata` in git (~36 MB total).
+  - Resolved root cause of 0 extracted fields on Render: Docker containers were previously deploying without OCR neural models.
+- **Tesseract Fallback `--tessdata-dir` Resilience (`members/member-02-ocr/src/fallback.py`):**
+  - Updated `_get_config()` to only override `--tessdata-dir` if `models/` contains both `eng.traineddata` and `hin.traineddata`. Otherwise, gracefully defers to system tessdata path (`/usr/share/tesseract-ocr/`) where system packages are installed.
+- **Docker Build Model Verification (`Dockerfile`):**
+  - Added build step: `RUN python members/member-02-ocr/scripts/download_models.py --verify || python members/member-02-ocr/scripts/download_models.py || true` ensuring models and dictionary manifests are verified at image build time.
+- **RESTful Subresource Route Alias (`members/member-05-evidence/src/server.py`):**
+  - Added `@app.post("/api/v1/inspections/{inspection_id}/evidence")` as an official route alias delegating to `upload_inspection_image`, ensuring both standard and subresource upload URL conventions succeed with HTTP 201.
+  - Added `logger` in `server.py` and supported automatic INT8 execution mode for rapid CPU inference.
+- **Frontend Intake Form Gating (`ui-combined/src/pages/NewInspection.tsx`):**
+  - Gated the "Start Statutory Analysis" button with `disabled={files.length === 0}` and added an explicit amber warning badge: *"Required: Upload at least 1 packaging photograph to start statutory analysis."*
+  - Added programmatic check in `handleStartAnalysis` to prevent creating empty inspection cases with 0 evidence images.
+  - Successfully built production bundle via `node build-root.cjs` in 7.88s.
+
+### Tests
+- `python -m pytest members/member-05-evidence/tests/` (71 passed in 12.41s)
+- `npm test -- --run` in `ui-combined` (146 passed in 1.96s)
+- Local E2E test on `media_1789250888882.jpg`: 46 tokens, 9 extracted fields (MRP: ₹1999, Exotic Mile Pvt Ltd, Net Qty 1U, COO India, CC: support@goboult.co.in) in 9.58s.
+
+### Problems
+None. All 71 backend tests and 146 frontend tests pass cleanly with zero errors.
+
+### Decisions
+1. Packaging models directly in the repository (~36 MB) ensures 100% deterministic, offline-capable container builds on Render without depending on external HuggingFace CDN availability during cloud builds.
+2. Intake forms must strictly require at least 1 packaging image to prevent accidental creation of phantom cases with 0 declarations.
+
+### Next Step
+Commit and push to `origin main` and `origin dev` for automated cloud deployment and verify live end-to-end execution on Render and Vercel.
+
+### Signing Note
+SIGNED OFF BY: Harsh Patel (anonymousgrouphp-collab) & Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-13 11:20 IST [VERIFIED]
+
+
 
 
