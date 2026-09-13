@@ -18,6 +18,7 @@ import {
   Square,
   AlertCircle,
   HelpCircle,
+  RefreshCw,
 } from "lucide-react";
 import { ApiService } from "../services/api";
 import { GoldenSkuQuickSelector } from "../features/desk/GoldenSkuQuickSelector";
@@ -737,20 +738,33 @@ export const NewInspection: React.FC = () => {
                       {language === "hi" ? "निरीक्षण विश्लेषण प्रारंभ करने में समस्या" : "Inspection Pipeline Issue"}
                     </div>
                     <p className="text-[11px] leading-relaxed text-rose-700">{errorMessage}</p>
-                    {ApiService.getOperatingMode() === "LIVE" && (
+                    <div className="flex flex-wrap items-center gap-3 mt-1.5">
                       <button
                         type="button"
                         onClick={() => {
-                          ApiService.setOperatingMode("MOCK");
                           setErrorMessage(null);
                           handleStartAnalysis();
                         }}
-                        className="mt-1 text-[11px] font-bold text-govNavy underline hover:text-blue-900 flex items-center gap-1"
+                        className="text-[11px] font-bold text-govNavy bg-white border border-slate-300 px-2.5 py-1 rounded-md hover:bg-slate-50 flex items-center gap-1 shadow-2xs"
                       >
-                        <span>{language === "hi" ? "मोड बी (स्थानीय लचीला मोड) में पुनः प्रयास करें" : "Switch to Mode B (Local Resilient) & Retry Analysis"}</span>
-                        <ArrowRight size={12} />
+                        <RefreshCw size={12} />
+                        <span>{language === "hi" ? "लाइव पुनः प्रयास करें" : "Retry Live Analysis"}</span>
                       </button>
-                    )}
+                      {ApiService.getOperatingMode() === "LIVE" && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            ApiService.setOperatingMode("MOCK", { persist: false });
+                            setErrorMessage(null);
+                            handleStartAnalysis();
+                          }}
+                          className="text-[11px] font-bold text-slate-600 underline hover:text-govNavy flex items-center gap-1"
+                        >
+                          <span>{language === "hi" ? "मोड बी (स्थानीय मोड) में आज़माएं" : "Try Mode B (Local Resilient)"}</span>
+                          <ArrowRight size={12} />
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <button
                     type="button"

@@ -52,6 +52,23 @@ export class ApiService {
         // Clear accidental mock latch so the user always connects to the live sitewide database
         window.localStorage?.removeItem("nyayadrishti_operating_mode");
       }
+      // Purge corrupted mock cases with real live UUIDs (insp_...) from localStorage so stale mock data never overrides live backend data
+      const persistedRaw = window.localStorage?.getItem("nyayadrishti_persisted_cases_v2");
+      if (persistedRaw) {
+        try {
+          const parsed = JSON.parse(persistedRaw);
+          let modified = false;
+          for (const k of Object.keys(parsed)) {
+            if (k.startsWith("insp_") && !k.includes("demo")) {
+              delete parsed[k];
+              modified = true;
+            }
+          }
+          if (modified) {
+            window.localStorage?.setItem("nyayadrishti_persisted_cases_v2", JSON.stringify(parsed));
+          }
+        } catch {}
+      }
     } catch {}
     return (((import.meta as any)?.env?.VITE_OPERATING_MODE as ApiOperatingMode) || "LIVE");
   })();
@@ -200,8 +217,6 @@ export class ApiService {
 
   public static async createInspection(payload: CreateInspectionPayload): Promise<InspectionCase> {
     if (this.operatingMode === "DEMO_FIXTURE") {
-      // If a new commodity inspection is created while viewing golden demo fixtures,
-      // dynamically engage Mode B (Local Resilient Mock) so the inspection proceeds.
       this.setOperatingMode("MOCK", { persist: false });
     }
 
@@ -216,8 +231,11 @@ export class ApiService {
       } catch {}
       return liveCase;
     } catch (err: any) {
-      console.warn("Live server unreachable for createInspection. Seamlessly activating Mode B local failover:", err);
-      return await MockApiService.getInstance().createInspection(payload);
+      if (err?.is_network_error || String(err?.message || "").includes("Failed to parse URL")) {
+        console.warn("Live server unreachable for createInspection. Seamlessly activating Mode B local failover:", err);
+        return await MockApiService.getInstance().createInspection(payload);
+      }
+      throw err;
     }
   }
 
@@ -291,10 +309,9 @@ export class ApiService {
           return await DemoFixtureService.getInstance().getInspection(id);
         } catch {}
       }
-      // If live server explicitly responded with 404 (Not Found), the case does not exist or was deleted.
-      // Do not resurrect or fall back to mock cases when a real case is not found.
-      const isNotFound = liveErr?.status === 404 || String(liveErr?.message || "").includes("404");
-      if (isNotFound && !this.isDemoId(id)) {
+      // If it's a real live inspection ID (starts with "insp_"), NEVER fall back to MockApiService!
+      // Throw the real error so the UI displays the true backend status without hallucinating mock data.
+      if (id.startsWith("insp_")) {
         throw liveErr;
       }
       console.warn(`Live database retrieval for '${id}' failed. Engaging Mode B local fallback:`, liveErr);
@@ -330,12 +347,8 @@ export class ApiService {
       return await MockApiService.getInstance().uploadEvidence(file, metadata);
     }
 
-    try {
-      return await LiveApiService.getInstance().uploadEvidence(file, metadata);
-    } catch (err: any) {
-      console.warn("Live server evidence upload failed due to network. Seamlessly engaging Mode B fallback:", err);
-      return await MockApiService.getInstance().uploadEvidence(file, metadata);
-    }
+    // In LIVE mode, always transmit to live backend
+    return await LiveApiService.getInstance().uploadEvidence(file, metadata);
   }
 
   // ---------------------------------------------------------------------------
@@ -351,12 +364,8 @@ export class ApiService {
       return await MockApiService.getInstance().executePipeline(imageId, inspectionId, scenario);
     }
 
-    try {
-      return await LiveApiService.getInstance().executePipeline(imageId, inspectionId, scenario);
-    } catch (err: any) {
-      console.warn("Live server pipeline execution failed due to network. Seamlessly engaging Mode B fallback:", err);
-      return await MockApiService.getInstance().executePipeline(imageId, inspectionId, scenario);
-    }
+    // In LIVE mode, always execute against live backend
+    return await LiveApiService.getInstance().executePipeline(imageId, inspectionId, scenario);
   }
 
   // ---------------------------------------------------------------------------

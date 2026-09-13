@@ -728,31 +728,51 @@ export class MockApiService implements IInspectionApiService {
         };
       });
 
-      // Adapt fields to whatever commodity the officer registered
+      // Adapt fields to whatever commodity the officer registered, NEVER leaking Alkaline 88 or Aqua Pure into custom packaging
+      const isCustomCommodity = targetCase.product_name && !targetCase.product_name.toLowerCase().includes("alkaline") && !targetCase.product_name.toLowerCase().includes("water");
+      const effectiveBrand = targetCase.brand_name || (isCustomCommodity && targetCase.product_name !== "Statutory Seized Commodity" ? targetCase.product_name.split(" ")[0] : "Statutory Brand");
+      const effectiveMfg = targetCase.manufacturer_name || (isCustomCommodity ? `${effectiveBrand} Consumer Products Pvt. Ltd.` : "Responsible Manufacturer / Packer");
+      const isFood = targetCase.category?.includes("FOOD") || targetCase.category?.includes("SNACK");
+      const defaultQty = isFood ? "200 g" : "1 N";
+      const effectiveQty = targetCase.declared_net_quantity?.trim() || defaultQty;
+      const numMatch = effectiveQty.match(/^([\d.]+)\s*([a-zA-Z]+)?/);
+      const mag = numMatch ? parseFloat(numMatch[1]) : (isFood ? 200.0 : 1.0);
+      const unit = numMatch && numMatch[2] ? numMatch[2] : (isFood ? "g" : "N");
+
       adaptedExtractedFields = sourceTemplate.extracted_fields.map((f) => {
-        if (f.field_type === "NET_QUANTITY" && targetCase.declared_net_quantity) {
-          const qtyStr = targetCase.declared_net_quantity.trim();
-          const numMatch = qtyStr.match(/^([\d.]+)\s*([a-zA-Z]+)?/);
-          const mag = numMatch ? parseFloat(numMatch[1]) : 100.0;
-          const unit = numMatch && numMatch[2] ? numMatch[2] : "g";
+        if (f.field_type === "NET_QUANTITY") {
           return {
             ...f,
-            raw_ocr_text: `Net Qty: ${qtyStr}`,
+            raw_ocr_text: `Net Qty: ${effectiveQty}`,
             normalized_value: { magnitude: mag, unit: unit },
           };
         }
-        if (f.field_type === "BRAND_NAME" && targetCase.brand_name) {
+        if (f.field_type === "BRAND_NAME") {
           return {
             ...f,
-            raw_ocr_text: targetCase.brand_name,
-            normalized_value: { brand: targetCase.brand_name },
+            raw_ocr_text: effectiveBrand,
+            normalized_value: { brand: effectiveBrand },
           };
         }
-        if (f.field_type === "MANUFACTURER" && targetCase.manufacturer_name) {
+        if (f.field_type === "MANUFACTURER") {
           return {
             ...f,
-            raw_ocr_text: targetCase.manufacturer_name,
-            normalized_value: { name: targetCase.manufacturer_name },
+            raw_ocr_text: `${effectiveMfg}, Industrial Area, New Delhi - 110020`,
+            normalized_value: { name: effectiveMfg, address: `${effectiveMfg}, Industrial Area, New Delhi - 110020`, state: "Delhi", pin_code: "110020" },
+          };
+        }
+        if (f.field_type === "UNIT_SALE_PRICE" && isFood) {
+          return {
+            ...f,
+            raw_ocr_text: "Unit Sale Price: ₹ 0.20 / g",
+            normalized_value: { price_per_unit_inr: 0.2, denominator_unit: "g" },
+          };
+        }
+        if (f.field_type === "MRP" && isFood) {
+          return {
+            ...f,
+            raw_ocr_text: "MRP ₹40.00 (incl. of all taxes)",
+            normalized_value: { amount_inr: 40.0, is_tax_inclusive: true },
           };
         }
         return f;

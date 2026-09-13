@@ -716,8 +716,42 @@ Resolved 502 Bad Gateway timeout by eliminating sequential Tesseract noise loops
 ### Next Step
 Verify real browser rendering via Vercel frontend and present live inspection evidence dossier to the user.
 
+---
+
+## [13 September 2026] [11:58] IST
+
+### Task / Chunk
+Elimination of Silent Mock Fallback, Prevention of Hardcoded Mock Template Contamination (Alkaline 88 / Aqua Pure), and LocalStorage Mock Cache Sanitization.
+
+### Status
+COMPLETE
+
+### Completed
+- **Eliminated Silent Mock Fallback (`ui-combined/src/services/api.ts`):** Removed automatic catch blocks that silently swapped failed live pipeline executions or uploads with `MockApiService`. Network or server errors in `LIVE` mode now surface honestly with clear remediation, preventing false mock data hallucinations from misleading users.
+- **Protected Live Inspection Case Retrieval (`ApiService.getInspection`):** Gated inspection case retrieval so real backend cases (`insp_...`) never fall back to `MockApiService`.
+- **Dynamic Commodity Adaptation in Mock Mode (`ui-combined/src/services/mockApi.ts`):** Replaced hardcoded `SKU-DEMO-03` fallback values so that non-water packaged commodities dynamically adapt their generic name, brand, manufacturer, and net quantity rather than leaking "Alkaline 88 Smooth Hydration", "Aqua Pure Beverages", and "Net Volume: 1 L".
+- **LocalStorage Mock Cache Purging (`ApiService` init):** Automatically purges stale mock entries keyed by live `insp_` UUIDs from `nyayadrishti_persisted_cases_v2` upon startup.
+- **New Inspection UI Gating & Retry (`ui-combined/src/pages/NewInspection.tsx`):** Added a direct "Retry Live Analysis" button and ensured that trying Mode B does not permanently latch the session into mock mode.
+- **Root Build & Test Validation:** Ran `npm test -- --run` (all 146 tests passing) and `node build-root.cjs` (dist successfully populated in 4.09s).
+
+### Tests
+- `npm test -- --run` in `ui-combined` (146 passed in 1.52s)
+- `node build-root.cjs` (built successfully in 4.09s)
+
+### Problems
+Root cause of user-reported error (`insp_834c45ce-2c8d-4a2f-8368-09d1694e7ee8` showing Alkaline 88 for Haldiram Navrattan) diagnosed: created prior to the OCR throughput optimization, the live server timed out, which silently engaged `MockApiService` and stored `SKU-DEMO-03` (Alkaline 88) into the browser's localStorage.
+
+### Decisions
+1. In `LIVE` mode, the application must never silently mask backend errors with mock data.
+2. In `MOCK` mode, fallback commodities must dynamically reflect the user's entered particulars rather than copying bottled water attributes onto food/snack packages.
+3. Coins placed as reference objects are statutorily uncalibrated under ADL-03; only ArUco markers and ISO-7810 cards provide certified millimeter calibration.
+
+### Next Step
+Commit changes, push to `dev` and `main` branches, and trigger Vercel deployment.
+
 ### Signing Note
-SIGNED OFF BY: Harsh Patel (anonymousgrouphp-collab) & Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-13 11:45 IST [VERIFIED]
+SIGNED OFF BY: Harsh Patel (anonymousgrouphp-collab) & Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-13 11:58 IST [VERIFIED]
+
 
 
 
