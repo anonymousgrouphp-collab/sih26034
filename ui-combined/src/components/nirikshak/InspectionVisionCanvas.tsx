@@ -99,15 +99,15 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
   const handleResetZoom = () => setZoom(1);
 
   return (
-    <div className={`overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs ${className}`}>
+    <div className={`overflow-hidden rounded-xl border border-slate-700 bg-slate-900/70 shadow-xs ${className}`}>
       {/* Top Controls Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-3 bg-slate-50/80">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-700 px-4 py-3 bg-slate-800/60">
         <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-md bg-govNavy/10 text-govNavy">
+          <div className="p-1.5 rounded-md bg-govNavy/10 text-cyan-300">
             <ScanSearch size={17} />
           </div>
           <div>
-            <h3 className="text-xs font-bold text-slate-800">
+            <h3 className="text-xs font-bold text-slate-100">
               {activeImage?.filename || (language === "hi" ? "भौतिक पैकेजिंग छायाचित्र" : "Physical Packaging Photograph")}
             </h3>
             <p className="text-[10px] text-slate-400">
@@ -121,12 +121,12 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
         </div>
 
         {/* View Mode Tabs */}
-        <div className="flex items-center gap-1 rounded-lg bg-slate-200/70 p-1">
+        <div className="flex items-center gap-1 rounded-lg bg-slate-700 p-1">
           <button
             type="button"
             onClick={() => setActiveTab("image")}
             className={`rounded-md px-3 py-1 text-xs font-bold transition-all ${
-              activeTab === "image" ? "bg-white text-govNavy shadow-xs" : "text-slate-600 hover:text-slate-900"
+              activeTab === "image" ? "bg-slate-900/70 text-cyan-300 shadow-xs" : "text-slate-400 hover:text-white"
             }`}
           >
             {language === "hi" ? "छवि दृश्य" : "Image View"}
@@ -138,7 +138,7 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
               setShowBoxes(true);
             }}
             className={`rounded-md px-3 py-1 text-xs font-bold transition-all ${
-              activeTab === "annotations" ? "bg-white text-govNavy shadow-xs" : "text-slate-600 hover:text-slate-900"
+              activeTab === "annotations" ? "bg-slate-900/70 text-cyan-300 shadow-xs" : "text-slate-400 hover:text-white"
             }`}
           >
             {language === "hi" ? "एनोटेशन" : "Annotations"}
@@ -147,7 +147,7 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
             type="button"
             onClick={() => setActiveTab("calibration")}
             className={`rounded-md px-3 py-1 text-xs font-bold transition-all ${
-              activeTab === "calibration" ? "bg-white text-govNavy shadow-xs" : "text-slate-600 hover:text-slate-900"
+              activeTab === "calibration" ? "bg-slate-900/70 text-cyan-300 shadow-xs" : "text-slate-400 hover:text-white"
             }`}
           >
             {language === "hi" ? "अंशांकन दृश्य" : "Calibration View"}
@@ -158,12 +158,12 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
       {/* Main Viewport */}
       <div className="relative min-h-[480px] bg-slate-950 flex items-center justify-center overflow-auto p-6 sm:min-h-[540px]">
         {/* Floating Zoom Toolbar */}
-        <div className="absolute left-4 top-4 z-20 flex flex-col gap-1 rounded-lg bg-white/95 p-1 shadow-lg backdrop-blur-xs border border-slate-200">
+        <div className="absolute left-4 top-4 z-20 flex flex-col gap-1 rounded-lg bg-slate-900/70/95 p-1 shadow-lg backdrop-blur-xs border border-slate-700">
           <button
             type="button"
             onClick={handleZoomIn}
             title={language === "hi" ? "ज़ूम इन करें" : "Zoom In"}
-            className="rounded p-1.5 text-slate-700 hover:bg-slate-100 transition-colors"
+            className="rounded p-1.5 text-slate-200 hover:bg-slate-800/70 transition-colors"
           >
             <ZoomIn size={16} />
           </button>
@@ -171,7 +171,7 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
             type="button"
             onClick={handleZoomOut}
             title={language === "hi" ? "ज़ूम आउट करें" : "Zoom Out"}
-            className="rounded p-1.5 text-slate-700 hover:bg-slate-100 transition-colors"
+            className="rounded p-1.5 text-slate-200 hover:bg-slate-800/70 transition-colors"
           >
             <ZoomOut size={16} />
           </button>
@@ -179,7 +179,7 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
             type="button"
             onClick={handleResetZoom}
             title={language === "hi" ? "ज़ूम रीसेट करें (1:1)" : "Reset Zoom (1:1)"}
-            className="rounded p-1.5 text-slate-700 hover:bg-slate-100 transition-colors"
+            className="rounded p-1.5 text-slate-200 hover:bg-slate-800/70 transition-colors"
           >
             <RotateCcw size={16} />
           </button>
@@ -196,7 +196,7 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
                 : "Show Detection Overlays"
             }
             className={`rounded p-1.5 transition-colors ${
-              showBoxes ? "bg-govNavy text-white" : "text-slate-700 hover:bg-slate-100"
+              showBoxes ? "bg-govNavy text-white" : "text-slate-200 hover:bg-slate-800/70"
             }`}
           >
             {showBoxes ? <Eye size={16} /> : <EyeOff size={16} />}
@@ -219,7 +219,7 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
               className="h-full w-full rounded-md object-contain pointer-events-none"
             />
           ) : (
-            <div className="h-full w-full rounded-md bg-slate-900 flex items-center justify-center text-slate-500 text-xs">
+            <div className="h-full w-full rounded-md bg-slate-900 flex items-center justify-center text-slate-400 text-xs">
               {language === "hi" ? "कोई साक्ष्य छवि लोड नहीं है" : "No evidence image loaded"}
             </div>
           )}
@@ -366,7 +366,7 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
 
       {/* Thumbnail Selector Strip (Multi-Image packages) */}
       {images.length > 1 && (
-        <div className="flex items-center gap-3 overflow-x-auto border-t border-slate-200 p-3 bg-slate-50">
+        <div className="flex items-center gap-3 overflow-x-auto border-t border-slate-700 p-3 bg-slate-800/60">
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 shrink-0">
             {language === "hi" ? "दृश्य:" : "Views:"}
           </span>
@@ -378,7 +378,7 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
               className={`group relative h-14 w-20 shrink-0 overflow-hidden rounded-lg border-2 transition-all cursor-pointer ${
                 img.id === activeImage?.id
                   ? "border-govNavy ring-2 ring-govNavy/30"
-                  : "border-slate-200 hover:border-slate-400 opacity-70 hover:opacity-100"
+                  : "border-slate-700 hover:border-slate-400 opacity-70 hover:opacity-100"
               }`}
             >
               <img src={img.url} alt={img.filename} className="h-full w-full object-cover" />

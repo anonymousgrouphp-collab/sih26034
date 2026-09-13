@@ -7,7 +7,10 @@ export default {
   theme: {
     extend: {
       colors: {
-        base: "#0b1320",
+        // NOTE: never name a color `base` — it collides with Tailwind's
+        // `text-base` font-size utility (23 usages in src) and hijacks it
+        // into a color utility. The page canvas uses #0b1320 directly
+        // (surfaceBg below now carries the same value).
         surface: "#132238",
         saffron: "#e5a93c",
         // NOTE: assigning a single string to `cyan` would replace Tailwind's

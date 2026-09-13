@@ -54,24 +54,24 @@ export const InspectionTable: React.FC<InspectionTableProps> = ({ inspections, c
   const formatDate = formatDateTime;
 
   return (
-    <div className={`overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs ${className}`}>
+    <div className={`overflow-hidden rounded-xl border border-slate-700 bg-slate-900/70 shadow-xs ${className}`}>
       <div className="overflow-x-auto custom-scrollbar relative max-h-[600px]">
         <table className="w-full min-w-[850px] text-left border-collapse">
-          <thead className="border-b border-slate-200 bg-slate-50/75 sticky top-0 z-20 glass backdrop-blur-md">
+          <thead className="border-b border-slate-700 bg-slate-800/60 sticky top-0 z-20 glass backdrop-blur-md">
             <tr>
-              <th className="px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500 sticky left-0 bg-slate-50/90 z-10 backdrop-blur-sm shadow-[1px_0_0_rgba(226,232,240,1)]">
+              <th className="px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 sticky left-0 bg-slate-800/60 z-10 backdrop-blur-sm shadow-[1px_0_0_rgba(226,232,240,1)]">
                 {language === "hi" ? "प्रकरण एवं वस्तु" : "Case & Commodity"}
               </th>
-              <th className="px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <th className="px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-400">
                 {language === "hi" ? "निरीक्षण स्थल" : "Inspection Location"}
               </th>
-              <th className="px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <th className="px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-400">
                 {language === "hi" ? "तिथि एवं समय" : "Date & Time"}
               </th>
-              <th className="px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <th className="px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-400">
                 {language === "hi" ? "विश्वसनीयता" : "Confidence"}
               </th>
-              <th className="px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <th className="px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-400">
                 {language === "hi" ? "सांविधिक स्थिति" : "Statutory Status"}
               </th>
               <th className="px-5 py-3 text-right"></th>
@@ -81,21 +81,21 @@ export const InspectionTable: React.FC<InspectionTableProps> = ({ inspections, c
             {isLoading && (
               Array.from({ length: 3 }).map((_, i) => (
                 <tr key={i} className="animate-pulse">
-                  <td className="px-5 py-4 sticky left-0 bg-white z-10 shadow-[1px_0_0_rgba(226,232,240,1)]">
-                    <div className="h-4 bg-slate-200 rounded skeleton w-3/4 mb-2"></div>
-                    <div className="h-3 bg-slate-200 rounded skeleton w-1/2"></div>
+                  <td className="px-5 py-4 sticky left-0 bg-slate-900/70 z-10 shadow-[1px_0_0_rgba(226,232,240,1)]">
+                    <div className="h-4 bg-slate-700 rounded skeleton w-3/4 mb-2"></div>
+                    <div className="h-3 bg-slate-700 rounded skeleton w-1/2"></div>
                   </td>
-                  <td className="px-5 py-4"><div className="h-4 bg-slate-200 rounded skeleton w-full"></div></td>
-                  <td className="px-5 py-4"><div className="h-4 bg-slate-200 rounded skeleton w-24"></div></td>
-                  <td className="px-5 py-4"><div className="h-4 bg-slate-200 rounded skeleton w-16"></div></td>
-                  <td className="px-5 py-4"><div className="h-6 bg-slate-200 rounded-full skeleton w-20"></div></td>
-                  <td className="px-5 py-4 text-right"><div className="h-6 bg-slate-200 rounded skeleton w-8 ml-auto"></div></td>
+                  <td className="px-5 py-4"><div className="h-4 bg-slate-700 rounded skeleton w-full"></div></td>
+                  <td className="px-5 py-4"><div className="h-4 bg-slate-700 rounded skeleton w-24"></div></td>
+                  <td className="px-5 py-4"><div className="h-4 bg-slate-700 rounded skeleton w-16"></div></td>
+                  <td className="px-5 py-4"><div className="h-6 bg-slate-700 rounded-full skeleton w-20"></div></td>
+                  <td className="px-5 py-4 text-right"><div className="h-6 bg-slate-700 rounded skeleton w-8 ml-auto"></div></td>
                 </tr>
               ))
             )}
             {!isLoading && inspections.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-5 py-8 text-center text-slate-500 font-mono text-xs">
+                <td colSpan={6} className="px-5 py-8 text-center text-slate-400 font-mono text-xs">
                   {language === "hi" ? "कोई निरीक्षण मामले उपलब्ध नहीं।" : "No inspection cases found."}
                 </td>
               </tr>
@@ -115,23 +115,23 @@ export const InspectionTable: React.FC<InspectionTableProps> = ({ inspections, c
                 <tr
                   key={item.id}
                   onClick={() => navigate(`/inspections/${item.id}`)}
-                  className="group hover:bg-slate-50/80 transition-all duration-200 cursor-pointer row-expand-enter-active hover:shadow-sm"
+                  className="group hover:bg-slate-800/60 transition-all duration-200 cursor-pointer row-expand-enter-active hover:shadow-sm"
                 >
-                  <td className="px-5 py-3.5 sticky left-0 bg-white group-hover:bg-slate-50/90 z-10 transition-colors shadow-[1px_0_0_rgba(226,232,240,1)]">
+                  <td className="px-5 py-3.5 sticky left-0 bg-slate-900/70 group-hover:bg-slate-800/60 z-10 transition-colors shadow-[1px_0_0_rgba(226,232,240,1)]">
                     <div className="flex items-start gap-2">
                       <div>
                         <div className="flex items-center gap-2">
-                          <p className="font-bold text-xs text-slate-900 group-hover:text-govNavy transition-colors">
+                          <p className="font-bold text-xs text-white group-hover:text-cyan-300 transition-colors">
                             {item.productName}
                           </p>
                           {item.hasConflicts && (
-                            <span className="inline-flex items-center gap-0.5 rounded bg-amber-100 px-1.5 py-0.2 text-[9px] font-black text-amber-800 border border-amber-300">
+                            <span className="inline-flex items-center gap-0.5 rounded bg-amber-900/40 px-1.5 py-0.2 text-[9px] font-black text-amber-300 border border-amber-300">
                               <AlertTriangle size={10} />
                               {language === "hi" ? "विसंगति" : "CONFLICT"}
                             </span>
                           )}
                         </div>
-                        <p className="mt-0.5 text-[11px] font-mono text-slate-500">{item.caseNumber}</p>
+                        <p className="mt-0.5 text-[11px] font-mono text-slate-400">{item.caseNumber}</p>
                         <p className="text-[10px] text-slate-400">
                           {item.packSize || (language === "hi" ? "पैक" : "Pack")} · {language === "hi" ? "बैच" : "Batch"}{" "}
                           {item.batchNumber || (language === "hi" ? "लागू नहीं" : "N/A")} · {item.mrp || ""}
@@ -140,7 +140,7 @@ export const InspectionTable: React.FC<InspectionTableProps> = ({ inspections, c
                     </div>
                   </td>
                   <td className="px-5 py-3.5">
-                    <div className="flex items-center gap-1.5 text-xs text-slate-600">
+                    <div className="flex items-center gap-1.5 text-xs text-slate-400">
                       <MapPin size={13} className="text-slate-400 shrink-0" />
                       <span className="truncate max-w-[200px]" title={item.location}>
                         {item.location}
@@ -148,20 +148,20 @@ export const InspectionTable: React.FC<InspectionTableProps> = ({ inspections, c
                     </div>
                   </td>
                   <td className="px-5 py-3.5">
-                    <div className="flex items-center gap-1.5 text-xs text-slate-600 tabular-nums">
+                    <div className="flex items-center gap-1.5 text-xs text-slate-400 tabular-nums">
                       <CalendarDays size={13} className="text-slate-400 shrink-0" />
                       <span>{formatDate(item.createdAt)}</span>
                     </div>
                   </td>
                   <td className="px-5 py-3.5">
                     <div className="w-24">
-                      <div className="flex items-center justify-between text-[10px] font-bold text-slate-700">
+                      <div className="flex items-center justify-between text-[10px] font-bold text-slate-200">
                         <span className="tabular-nums">{confPct}%</span>
                         <span className="text-[9px] font-normal text-slate-400">
                           {language === "hi" ? "सेंसर" : "sensor"}
                         </span>
                       </div>
-                      <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-slate-100 border border-slate-200">
+                      <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-slate-800/80 border border-slate-700">
                         <div
                           className={`h-full rounded-full transition-all duration-700 ease-out ${
                             confPct >= 90
@@ -186,7 +186,7 @@ export const InspectionTable: React.FC<InspectionTableProps> = ({ inspections, c
                           e.stopPropagation();
                           setCaseToDelete(item);
                         }}
-                        className="rounded-lg p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-colors btn-press"
+                        className="rounded-lg p-1.5 text-slate-400 hover:bg-rose-900/30 hover:text-rose-400 transition-colors btn-press"
                         title={language === "hi" ? "मामला डेटाबेस से हटाएं" : "Dispose & Delete Case from Database"}
                         aria-label={`Delete case ${item.caseNumber}`}
                       >
@@ -198,7 +198,7 @@ export const InspectionTable: React.FC<InspectionTableProps> = ({ inspections, c
                           e.stopPropagation();
                           navigate(`/inspections/${item.id}`);
                         }}
-                        className="rounded-lg p-1.5 text-slate-400 hover:bg-govNavy/10 hover:text-govNavy transition-colors btn-press"
+                        className="rounded-lg p-1.5 text-slate-400 hover:bg-govNavy/10 hover:text-cyan-300 transition-colors btn-press"
                         title={language === "hi" ? "निरीक्षण प्रकरण खोलें" : "Open Inspection Case"}
                       >
                         <ArrowRight size={16} />
@@ -215,16 +215,16 @@ export const InspectionTable: React.FC<InspectionTableProps> = ({ inspections, c
       {/* Deletion Confirmation Modal */}
       {caseToDelete && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-overlay-in">
-          <div className="bg-white rounded-2xl border border-rose-200 shadow-2xl max-w-md w-full p-6 space-y-4 text-left animate-pop-in">
+          <div className="bg-slate-900/70 rounded-2xl border border-rose-800 shadow-2xl max-w-md w-full p-6 space-y-4 text-left animate-pop-in">
             <div className="flex items-start gap-3">
-              <div className="p-2.5 bg-rose-100 text-rose-700 rounded-full shrink-0">
+              <div className="p-2.5 bg-rose-900/40 text-rose-400 rounded-full shrink-0">
                 <Trash2 size={22} />
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-900">
+                <h3 className="text-base font-bold text-white">
                   {language === "hi" ? "मामला निरस्त एवं स्थायी निष्कासन" : "Dispose & Permanently Delete Case"}
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-slate-400 mt-0.5">
                   {language === "hi"
                     ? "डेटाबेस से यह मामला एवं सभी संबंधित विधिक विवरण पूरी तरह हटा दिए जाएंगे।"
                     : "This inspection case and all related statutory details will be permanently removed from the database sitewide."}
@@ -232,22 +232,22 @@ export const InspectionTable: React.FC<InspectionTableProps> = ({ inspections, c
               </div>
             </div>
 
-            <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs space-y-1.5">
+            <div className="p-3 bg-slate-800/60 rounded-lg border border-slate-700 text-xs space-y-1.5">
               <div className="flex justify-between">
-                <span className="text-slate-500">{language === "hi" ? "केस संख्या:" : "Case Number:"}</span>
-                <span className="font-mono font-bold text-slate-800">{caseToDelete.caseNumber}</span>
+                <span className="text-slate-400">{language === "hi" ? "केस संख्या:" : "Case Number:"}</span>
+                <span className="font-mono font-bold text-slate-100">{caseToDelete.caseNumber}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">{language === "hi" ? "उत्पाद / वस्तु:" : "Product / Commodity:"}</span>
-                <span className="font-semibold text-slate-800 truncate max-w-[220px]">{caseToDelete.productName}</span>
+                <span className="text-slate-400">{language === "hi" ? "उत्पाद / वस्तु:" : "Product / Commodity:"}</span>
+                <span className="font-semibold text-slate-100 truncate max-w-[220px]">{caseToDelete.productName}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">{language === "hi" ? "दिनांक एवं समय:" : "Date & Time:"}</span>
-                <span className="font-mono text-slate-700">{formatDateTime(caseToDelete.createdAt)}</span>
+                <span className="text-slate-400">{language === "hi" ? "दिनांक एवं समय:" : "Date & Time:"}</span>
+                <span className="font-mono text-slate-200">{formatDateTime(caseToDelete.createdAt)}</span>
               </div>
             </div>
 
-            <p className="text-[11px] text-rose-700 bg-rose-50 p-2.5 rounded border border-rose-200">
+            <p className="text-[11px] text-rose-400 bg-rose-900/30 p-2.5 rounded border border-rose-800">
               <b>{language === "hi" ? "सांविधिक चेतावनी: " : "Statutory Warning: "}</b>
               {language === "hi"
                 ? "यह कार्रवाई पूर्ववत नहीं की जा सकती। सभी साक्ष्य छवियां, नियम निष्कर्ष एवं नोटिस स्थायी रूप से नष्ट हो जाएंगे। धारा 63 बीएसए 2023 के तहत ऑडिट बहीखाते में एक 'CASE_DISPOSED' इवेंट दर्ज किया जाएगा।"

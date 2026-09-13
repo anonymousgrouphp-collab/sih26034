@@ -264,7 +264,7 @@ export const ReviewQueue: React.FC = () => {
               className="w-36 h-32 mx-auto object-contain"
             />
             <div>
-              <p className="text-sm font-bold text-slate-800">
+              <p className="text-sm font-bold text-slate-100">
                 {language === "hi" ? "इस श्रेणी में कोई लंबित मामला नहीं है" : "No Pending Cases in this Category"}
               </p>
               <p className="text-xs text-slate-400 max-w-sm mx-auto mt-0.5">
@@ -291,7 +291,7 @@ export const ReviewQueue: React.FC = () => {
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-overlay-in">
           <div className="glass-panel rounded-2xl border border-rose-700/60 shadow-2xl overflow-hidden">
             <div className="flex items-start gap-3">
-              <div className="p-2.5 bg-rose-100 text-rose-700 rounded-full shrink-0">
+              <div className="p-2.5 bg-rose-900/40 text-rose-400 rounded-full shrink-0">
                 <Trash2 size={22} />
               </div>
               <div>
@@ -306,22 +306,22 @@ export const ReviewQueue: React.FC = () => {
               </div>
             </div>
 
-            <div className="p-3 bg-slate-50 rounded-lg border border-slate-700/60 text-xs space-y-1.5">
+            <div className="p-3 bg-slate-800/60 rounded-lg border border-slate-700/60 text-xs space-y-1.5">
               <div className="flex justify-between">
                 <span className="text-slate-400">{language === "hi" ? "केस संख्या:" : "Case Number:"}</span>
-                <span className="font-mono font-bold text-slate-800">{caseToDelete.inspection_number}</span>
+                <span className="font-mono font-bold text-slate-100">{caseToDelete.inspection_number}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-400">{language === "hi" ? "उत्पाद / वस्तु:" : "Product / Commodity:"}</span>
-                <span className="font-semibold text-slate-800 truncate max-w-[220px]">{caseToDelete.product_name}</span>
+                <span className="font-semibold text-slate-100 truncate max-w-[220px]">{caseToDelete.product_name}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-400">{language === "hi" ? "दिनांक एवं समय:" : "Date & Time:"}</span>
-                <span className="font-mono text-slate-700">{formatDateTime(caseToDelete.created_at || (caseToDelete as any).inspection_timestamp)}</span>
+                <span className="font-mono text-slate-200">{formatDateTime(caseToDelete.created_at || (caseToDelete as any).inspection_timestamp)}</span>
               </div>
             </div>
 
-            <p className="text-[11px] text-rose-700 bg-rose-50 p-2.5 rounded border border-rose-200">
+            <p className="text-[11px] text-rose-400 bg-rose-900/30 p-2.5 rounded border border-rose-800">
               <b>{language === "hi" ? "सांविधिक चेतावनी: " : "Statutory Warning: "}</b>
               {language === "hi"
                 ? "यह कार्रवाई पूर्ववत नहीं की जा सकती। सभी साक्ष्य छवियां, नियम निष्कर्ष एवं नोटिस स्थायी रूप से नष्ट हो जाएंगे। धारा 63 बीएसए 2023 के तहत ऑडिट बहीखाते में एक 'CASE_DISPOSED' इवेंट दर्ज किया जाएगा।"

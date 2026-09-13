@@ -255,7 +255,7 @@ export const EvidenceDossier: React.FC = () => {
     return (
       <div className="glass-panel p-12 text-center space-y-3 border border-slate-700/60 rounded-xl">
         <div className="w-8 h-8 border-4 border-govNavy border-t-transparent rounded-full animate-spin mx-auto" />
-        <p className="text-xs font-bold text-slate-600">
+        <p className="text-xs font-bold text-slate-400">
           {language === "hi"
             ? "इलेक्ट्रॉनिक साक्ष्य संचिका (डोज़ियर) संकलित की जा रही है..."
             : "Compiling electronic evidence dossier..."}
@@ -271,7 +271,7 @@ export const EvidenceDossier: React.FC = () => {
           <div className="w-12 h-12 rounded-full bg-slate-700/50 text-slate-400 flex items-center justify-center mx-auto">
             <FileArchive size={24} />
           </div>
-          <h2 className="text-base font-bold text-slate-800">
+          <h2 className="text-base font-bold text-slate-100">
             {language === "hi" ? "कोई साक्ष्य संचिका उपलब्ध नहीं है" : "No Evidence Dossier Available"}
           </h2>
           <p className="text-xs text-slate-500 max-w-sm mx-auto">
@@ -293,10 +293,10 @@ export const EvidenceDossier: React.FC = () => {
 
     return (
       <div className="glass-panel p-10 text-center space-y-4 max-w-xl mx-auto border border-slate-700/60 rounded-xl">
-        <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto">
+        <div className="w-12 h-12 rounded-full bg-rose-900/30 text-rose-400 flex items-center justify-center mx-auto">
           <FileArchive size={24} />
         </div>
-        <h2 className="text-base font-bold text-slate-800">
+        <h2 className="text-base font-bold text-slate-100">
           {language === "hi" ? "साक्ष्य संचिका लोड करने में असमर्थ" : "Unable to Load Evidence Dossier"}
         </h2>
         <p className="text-xs text-slate-500">
@@ -333,7 +333,7 @@ export const EvidenceDossier: React.FC = () => {
         <div className="text-xs font-semibold text-slate-200">
           Under Section 63 of Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)
         </div>
-        <div className="flex justify-between items-center text-[10px] font-mono text-slate-600 mt-3 pt-2 border-t border-slate-300">
+        <div className="flex justify-between items-center text-[10px] font-mono text-slate-400 mt-3 pt-2 border-t border-slate-600">
           <span>CERT NO: {certificateNumber}</span>
           <span>DATE: {new Date().toLocaleDateString("en-IN")}</span>
           <span>MERKLE ROOT: {merkleRoot.slice(0, 24)}...</span>
@@ -346,7 +346,7 @@ export const EvidenceDossier: React.FC = () => {
           <button
             type="button"
             onClick={() => navigate(`/inspections/${caseData.id}`)}
-            className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors mt-0.5"
+            className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-900/70/10/10 transition-colors mt-0.5"
             title={language === "hi" ? "निरीक्षण कार्यक्षेत्र पर वापस जाएं" : "Back to Inspection Workspace"}
           >
             <ArrowLeft size={18} />
@@ -405,8 +405,8 @@ export const EvidenceDossier: React.FC = () => {
       </div>
 
       {exportNotice && (
-        <div className="p-3 bg-emerald-50 border border-emerald-300 rounded-lg text-xs text-emerald-800 flex items-center gap-2 shadow-xs print:hidden">
-          <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+        <div className="p-3 bg-emerald-900/30 border border-emerald-700 rounded-lg text-xs text-emerald-300 flex items-center gap-2 shadow-xs print:hidden">
+          <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />
           <span>{exportNotice}</span>
         </div>
       )}

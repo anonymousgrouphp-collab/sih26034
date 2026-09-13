@@ -166,7 +166,7 @@ export const InspectionCameraModal: React.FC<InspectionCameraModalProps> = ({
             </>
           ) : (
             /* State 3: Permission Request / Educational Prompt / Error Card */
-            <div className="flex-1 flex items-center justify-center p-4 bg-white sm:rounded-b-2xl">
+            <div className="flex-1 flex items-center justify-center p-4 bg-slate-900/70 sm:rounded-b-2xl">
               <CameraPermissionCard
                 error={error}
                 onRequestPermission={() => requestCamera("environment")}

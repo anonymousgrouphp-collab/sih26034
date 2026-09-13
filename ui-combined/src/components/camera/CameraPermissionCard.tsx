@@ -45,7 +45,7 @@ export const CameraPermissionCard: React.FC<CameraPermissionCardProps> = ({
         <button
           type="button"
           onClick={onClose}
-          className="p-2 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+          className="p-2 rounded-full text-slate-400 hover:text-slate-400 hover:bg-slate-800/70 transition-colors"
           title={language === "hi" ? "कैमरा बंद करें" : "Close camera"}
           aria-label={language === "hi" ? "कैमरा बंद करें" : "Close camera"}
         >
@@ -56,16 +56,16 @@ export const CameraPermissionCard: React.FC<CameraPermissionCardProps> = ({
       {error ? (
         /* State 2: Error / Denied State */
         <>
-          <div className="w-16 h-16 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shadow-xs">
+          <div className="w-16 h-16 rounded-2xl bg-rose-900/30 border border-rose-800 text-rose-400 flex items-center justify-center shadow-xs">
             <AlertCircle size={32} />
           </div>
 
           <div className="space-y-1.5">
-            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-rose-400 bg-rose-900/30 px-2.5 py-0.5 rounded-full border border-rose-800">
               {getLocalizedErrorCode(error.code)}
             </span>
-            <h3 className="text-lg font-black text-slate-900">{error.message}</h3>
-            <p className="text-xs text-slate-600 leading-relaxed max-w-sm">
+            <h3 className="text-lg font-black text-white">{error.message}</h3>
+            <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
               {error.userGuidance}
             </p>
           </div>
@@ -93,7 +93,7 @@ export const CameraPermissionCard: React.FC<CameraPermissionCardProps> = ({
             <button
               type="button"
               onClick={onFallbackToUpload}
-              className="w-full py-3 px-4 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-colors flex items-center justify-center gap-2"
+              className="w-full py-3 px-4 rounded-xl border border-slate-600 bg-slate-900/70 hover:bg-slate-800/60 text-slate-200 text-xs font-bold transition-colors flex items-center justify-center gap-2"
             >
               <UploadCloud size={15} className="text-slate-500" />
               <span>{language === "hi" ? "इसके बजाय पैकेजिंग फोटो अपलोड करें" : "Upload Packaging Photo Instead"}</span>
@@ -103,18 +103,18 @@ export const CameraPermissionCard: React.FC<CameraPermissionCardProps> = ({
       ) : (
         /* State 1: Pre-Permission Educational Explanation */
         <>
-          <div className="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-200 text-govNavy flex items-center justify-center shadow-xs">
+          <div className="w-16 h-16 rounded-2xl bg-blue-900/30 border border-blue-800 text-govNavy flex items-center justify-center shadow-xs">
             <Camera size={32} />
           </div>
 
           <div className="space-y-1.5">
-            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-govNavy bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-govNavy bg-blue-900/30 px-2.5 py-0.5 rounded-full border border-blue-800">
               {language === "hi" ? "सांविधिक साक्ष्य अंतर्ग्रहण" : "Statutory Evidence Intake"}
             </span>
-            <h3 className="text-lg font-black text-slate-900">
+            <h3 className="text-lg font-black text-white">
               {language === "hi" ? "फील्ड कैमरा एक्सेस आवश्यक" : "Field Camera Access Required"}
             </h3>
-            <p className="text-xs text-slate-600 leading-relaxed max-w-sm">
+            <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
               {language === "hi"
                 ? "विधिक मापविज्ञान अधिनियम, 2009 के तहत सांविधिक अनुपालन सत्यापन हेतु पैकेज्ड वस्तु एवं अरूको मार्कर का फोटो लेने के लिए कैमरा एक्सेस आवश्यक है।"
                 : "Camera access is needed to photograph the packaged commodity and ArUco fiducial marker for statutory compliance verification under the Legal Metrology Act, 2009."}
@@ -122,9 +122,9 @@ export const CameraPermissionCard: React.FC<CameraPermissionCardProps> = ({
           </div>
 
           {/* Privacy & Evidentiary Assurance Badges */}
-          <div className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-left space-y-2 text-[11px] text-slate-700">
+          <div className="w-full bg-slate-800/60 border border-slate-700 rounded-xl p-3 text-left space-y-2 text-[11px] text-slate-200">
             <div className="flex items-center gap-2">
-              <ShieldCheck size={16} className="text-emerald-600 shrink-0" />
+              <ShieldCheck size={16} className="text-emerald-400 shrink-0" />
               <span>
                 {language === "hi" ? (
                   <><strong>केवल वीडियो:</strong> कोई माइक्रोफ़ोन या ऑडियो रिकॉर्डिंग नहीं।</>
@@ -134,7 +134,7 @@ export const CameraPermissionCard: React.FC<CameraPermissionCardProps> = ({
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <ShieldCheck size={16} className="text-emerald-600 shrink-0" />
+              <ShieldCheck size={16} className="text-emerald-400 shrink-0" />
               <span>
                 {language === "hi" ? (
                   <><strong>गोपनीयता की गारंटी:</strong> कैप्चर के तुरंत बाद कैमरा बंद हो जाता है।</>
@@ -144,7 +144,7 @@ export const CameraPermissionCard: React.FC<CameraPermissionCardProps> = ({
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <ShieldCheck size={16} className="text-emerald-600 shrink-0" />
+              <ShieldCheck size={16} className="text-emerald-400 shrink-0" />
               <span>
                 {language === "hi" ? (
                   <><strong>धारा 63 बीएसए 2023:</strong> मूल साक्ष्य को क्रिप्टोग्राफ़िक रूप से हैश किया जाता है।</>
@@ -178,7 +178,7 @@ export const CameraPermissionCard: React.FC<CameraPermissionCardProps> = ({
             <button
               type="button"
               onClick={onFallbackToUpload}
-              className="w-full py-2.5 px-4 text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors flex items-center justify-center gap-1.5"
+              className="w-full py-2.5 px-4 text-xs font-semibold text-slate-400 hover:text-white transition-colors flex items-center justify-center gap-1.5"
             >
               <UploadCloud size={14} className="text-slate-400" />
               <span>{language === "hi" ? "मौजूदा फ़ाइल / गैलरी से चुनें" : "Choose Existing File / Gallery"}</span>

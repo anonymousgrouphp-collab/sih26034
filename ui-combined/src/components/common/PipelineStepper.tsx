@@ -14,7 +14,7 @@ interface PipelineStepperProps {
 
 export const PipelineStepper: React.FC<PipelineStepperProps> = ({ steps }) => {
   return (
-    <div className="card p-3 sm:p-4 bg-white overflow-x-auto">
+    <div className="card p-3 sm:p-4 bg-slate-900/70 overflow-x-auto">
       <div className="flex min-w-[720px] items-center justify-between">
         {steps.map((step, idx) => {
           const isLast = idx === steps.length - 1;
@@ -30,7 +30,7 @@ export const PipelineStepper: React.FC<PipelineStepperProps> = ({ steps }) => {
                       ? "bg-emerald-600 text-white shadow-xs"
                       : isActive
                       ? "bg-govNavy text-white ring-4 ring-govNavy/20 animate-pulse"
-                      : "bg-slate-100 text-slate-400 border border-slate-300"
+                      : "bg-slate-800/80 text-slate-400 border border-slate-600"
                   }`}
                 >
                   {isDone ? <CheckCircle2 size={16} /> : idx + 1}
@@ -39,7 +39,7 @@ export const PipelineStepper: React.FC<PipelineStepperProps> = ({ steps }) => {
                   <p
                     className={`text-xs font-bold leading-tight ${
                       isDone
-                        ? "text-emerald-900"
+                        ? "text-emerald-300"
                         : isActive
                         ? "text-govNavy"
                         : "text-slate-500"
@@ -56,7 +56,7 @@ export const PipelineStepper: React.FC<PipelineStepperProps> = ({ steps }) => {
               {!isLast && (
                 <div
                   className={`mx-2 h-0.5 flex-1 transition-colors ${
-                    isDone ? "bg-emerald-400" : "bg-slate-200"
+                    isDone ? "bg-emerald-400" : "bg-slate-700"
                   }`}
                 />
               )}

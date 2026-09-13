@@ -62,7 +62,7 @@ export const VerdictBadge: React.FC<VerdictBadgeProps> = ({
     default:
       return (
         <span
-          className={`inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-slate-100 text-slate-700 ${sizeClasses}`}
+          className={`inline-flex items-center gap-1.5 rounded-full border border-slate-600 bg-slate-800/80 text-slate-200 ${sizeClasses}`}
           title={language === "hi" ? "पाइपलाइन निष्पादन अथवा अधिकारी समीक्षा लंबित" : "Awaiting pipeline execution or officer review"}
         >
           {showDot && <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />}
@@ -87,37 +87,37 @@ export const WorkflowBadge: React.FC<WorkflowBadgeProps> = ({
   switch (status) {
     case "DRAFT":
       return (
-        <span className={`inline-flex items-center rounded border border-slate-200 bg-slate-50 text-slate-600 ${sizeClasses}`}>
+        <span className={`inline-flex items-center rounded border border-slate-700 bg-slate-800/60 text-slate-400 ${sizeClasses}`}>
           {language === "hi" ? "प्रारूप (DRAFT)" : "DRAFT"}
         </span>
       );
     case "OPEN":
       return (
-        <span className={`inline-flex items-center rounded border border-blue-200 bg-blue-50 text-blue-700 ${sizeClasses}`}>
+        <span className={`inline-flex items-center rounded border border-blue-800 bg-blue-900/30 text-blue-400 ${sizeClasses}`}>
           {language === "hi" ? "सक्रिय (OPEN)" : "OPEN"}
         </span>
       );
     case "PROCESSING":
       return (
-        <span className={`inline-flex items-center rounded border border-purple-200 bg-purple-50 text-purple-700 animate-pulse ${sizeClasses}`}>
+        <span className={`inline-flex items-center rounded border border-purple-800 bg-purple-900/30 text-purple-400 animate-pulse ${sizeClasses}`}>
           {language === "hi" ? "प्रक्रियाधीन" : "PROCESSING"}
         </span>
       );
     case "PENDING_REVIEW":
       return (
-        <span className={`inline-flex items-center rounded border border-amber-200 bg-amber-50 text-amber-800 ${sizeClasses}`}>
+        <span className={`inline-flex items-center rounded border border-amber-200 bg-amber-900/30 text-amber-300 ${sizeClasses}`}>
           {language === "hi" ? "निर्णय लंबित" : "PENDING ADJUDICATION"}
         </span>
       );
     case "COMPLETED":
       return (
-        <span className={`inline-flex items-center rounded border border-slate-300 bg-slate-100 text-slate-800 ${sizeClasses}`}>
+        <span className={`inline-flex items-center rounded border border-slate-600 bg-slate-800/80 text-slate-100 ${sizeClasses}`}>
           {language === "hi" ? "समाप्त (CLOSED)" : "CLOSED"}
         </span>
       );
     default:
       return (
-        <span className={`inline-flex items-center rounded border border-slate-200 bg-slate-50 text-slate-600 ${sizeClasses}`}>
+        <span className={`inline-flex items-center rounded border border-slate-700 bg-slate-800/60 text-slate-400 ${sizeClasses}`}>
           {status}
         </span>
       );

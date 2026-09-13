@@ -185,7 +185,7 @@ export const Dashboard: React.FC = () => {
                 {/* Official Underline Accent */}
                 <div className="flex items-center gap-0.5 mt-1.5 w-28">
                   <div className="h-1 flex-1 bg-[#FF9933] rounded-full" />
-                  <div className="h-1 w-1 bg-white rounded-full" />
+                  <div className="h-1 w-1 bg-slate-900/70 rounded-full" />
                   <div className="h-1 w-6 bg-[#138808] rounded-full" />
                 </div>
               </div>
@@ -555,9 +555,9 @@ export const Dashboard: React.FC = () => {
                             </div>
                             <div className="text-[11px] font-mono text-slate-400 flex items-center gap-1.5 mt-0.5 min-w-0 flex-wrap">
                               <span className="shrink-0 text-amber-500/80">{c.inspection_number}</span>
-                              <span className="text-slate-600">•</span>
+                              <span className="text-slate-400">•</span>
                               <span className="truncate max-w-[120px] text-slate-300">{c.establishment_name || c.brand_name || (language === "hi" ? "सामान्य खुदरा" : "General Retail")}</span>
-                              <span className="text-slate-600">•</span>
+                              <span className="text-slate-400">•</span>
                               <span className="inline-block px-1.5 py-0.2 text-[9.5px] font-sans font-medium rounded bg-slate-800 text-slate-300 border border-slate-700 shrink-0">
                                 {formatCategory(c.category)}
                               </span>
@@ -636,7 +636,7 @@ export const Dashboard: React.FC = () => {
                       <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 pt-0.5">
                         <div className="flex items-center gap-1.5 truncate min-w-0">
                           <span className="shrink-0 text-amber-500/80">{c.inspection_number}</span>
-                          <span className="text-slate-600">•</span>
+                          <span className="text-slate-400">•</span>
                           <span className="inline-block px-1.5 py-0.2 text-[9.5px] font-sans font-medium rounded bg-slate-800 text-slate-300 border border-slate-700 shrink-0">
                             {formatCategory(c.category)}
                           </span>

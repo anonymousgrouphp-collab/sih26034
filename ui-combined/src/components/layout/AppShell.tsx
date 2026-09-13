@@ -70,7 +70,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   ).length;
 
   return (
-    <div className="min-h-screen bg-surfaceBg flex flex-col font-sans relative overflow-x-clip">
+    <div className="min-h-screen bg-[#0b1320] flex flex-col font-sans relative overflow-x-clip">
       {/* WCAG 2.1 AA Accessible Skip Link */}
       <a href="#main-content" className="skip-link">
         {language === "hi" ? "मुख्य वैधानिक सामग्री पर जाएं" : "Skip to main statutory content"}

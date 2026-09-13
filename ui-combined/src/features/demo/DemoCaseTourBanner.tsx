@@ -55,29 +55,29 @@ export const DemoCaseTourBanner: React.FC<DemoCaseTourBannerProps> = ({
       case "FAIL":
         return {
           pill: "bg-rose-600 text-white border-rose-700",
-          border: "border-rose-400/80 bg-gradient-to-r from-rose-50/90 via-white to-amber-50/40",
-          accent: "text-rose-700",
+          border: "border-rose-400/80 bg-gradient-to-r from-rose-950/60 via-slate-900 to-amber-950/40",
+          accent: "text-rose-400",
           icon: ShieldAlert,
         };
       case "PASS":
         return {
           pill: "bg-emerald-600 text-white border-emerald-700",
-          border: "border-emerald-400/80 bg-gradient-to-r from-emerald-50/90 via-white to-sky-50/40",
-          accent: "text-emerald-700",
+          border: "border-emerald-400/80 bg-gradient-to-r from-emerald-950/60 via-slate-900 to-sky-950/40",
+          accent: "text-emerald-400",
           icon: ShieldCheck,
         };
       case "REVIEW":
         return {
           pill: "bg-amber-600 text-white border-amber-700",
-          border: "border-amber-400/80 bg-gradient-to-r from-amber-50/90 via-white to-orange-50/40",
-          accent: "text-amber-800",
+          border: "border-amber-400/80 bg-gradient-to-r from-amber-950/60 via-slate-900 to-orange-950/40",
+          accent: "text-amber-300",
           icon: Scale,
         };
       case "UNABLE_TO_VERIFY":
         return {
           pill: "bg-purple-600 text-white border-purple-700",
-          border: "border-purple-400/80 bg-gradient-to-r from-purple-50/90 via-white to-slate-50/40",
-          accent: "text-purple-800",
+          border: "border-purple-400/80 bg-gradient-to-r from-purple-950/60 via-slate-900 to-slate-900/40",
+          accent: "text-purple-300",
           icon: Compass,
         };
     }
@@ -120,7 +120,7 @@ export const DemoCaseTourBanner: React.FC<DemoCaseTourBannerProps> = ({
                 </span>
 
                 {/* Scenario Counter */}
-                <span className="text-[11px] font-mono font-bold text-slate-600 bg-white/80 px-2 py-0.5 rounded border border-slate-200">
+                <span className="text-[11px] font-mono font-bold text-slate-400 bg-slate-900/70/80 px-2 py-0.5 rounded border border-slate-700">
                   {language === "hi"
                     ? `परिदृश्य ${scenario.scenarioNumber} / ${scenario.totalScenarios}`
                     : `Scenario ${scenario.scenarioNumber} of ${scenario.totalScenarios}`}
@@ -134,14 +134,14 @@ export const DemoCaseTourBanner: React.FC<DemoCaseTourBannerProps> = ({
                   <span>{label}</span>
                 </span>
 
-                <span className="text-xs font-mono font-bold text-govNavy hidden md:inline">
+                <span className="text-xs font-mono font-bold text-cyan-300 hidden md:inline">
                   [{scenario.skuId}]
                 </span>
               </div>
 
               {/* Title & Headline Infraction */}
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-sm sm:text-base font-black text-govNavy truncate" title={title}>
+                <h2 className="text-sm sm:text-base font-black text-white truncate" title={title}>
                   {title}
                 </h2>
                 <span className="text-slate-300 hidden sm:inline">•</span>
@@ -159,15 +159,15 @@ export const DemoCaseTourBanner: React.FC<DemoCaseTourBannerProps> = ({
           </div>
 
           {/* Right: Quick Tour Navigation Controls */}
-          <div className="flex flex-wrap items-center justify-between lg:justify-end gap-2 shrink-0 pt-2 lg:pt-0 border-t lg:border-t-0 border-slate-200/60">
+          <div className="flex flex-wrap items-center justify-between lg:justify-end gap-2 shrink-0 pt-2 lg:pt-0 border-t lg:border-t-0 border-slate-700/60">
             {/* Previous Scenario Button */}
             <button
               type="button"
               onClick={() => handleNavigateTo(prevScenario.caseId)}
-              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 hover:border-govNavy shadow-2xs transition-all"
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-200 bg-slate-900/70 hover:bg-slate-800/70 border border-slate-600 hover:border-govNavy shadow-2xs transition-all"
               title={`Previous: Scenario ${prevScenario.scenarioNumber} - ${prevScenario.title}`}
             >
-              <ChevronLeft size={16} className="text-govNavy" />
+              <ChevronLeft size={16} className="text-slate-300" />
               <span className="hidden sm:inline">{language === "hi" ? "पिछला" : "Prev"}</span>
             </button>
 
@@ -189,7 +189,7 @@ export const DemoCaseTourBanner: React.FC<DemoCaseTourBannerProps> = ({
             <button
               type="button"
               onClick={() => handleNavigateTo(nextScenario.caseId)}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-black text-slate-900 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 border border-amber-600 shadow-xs transition-all ring-1 ring-amber-400/50"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-black text-white bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 border border-amber-600 shadow-xs transition-all ring-1 ring-amber-400/50"
               title={`Next: Scenario ${nextScenario.scenarioNumber} - ${nextScenario.title}`}
             >
               <span>{language === "hi" ? "अगला डेमो" : "Next Demo"}</span>
@@ -200,10 +200,10 @@ export const DemoCaseTourBanner: React.FC<DemoCaseTourBannerProps> = ({
             <button
               type="button"
               onClick={() => setShowGuideModal(true)}
-              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold text-govNavy bg-amber-100 hover:bg-amber-200 border border-amber-300 transition-colors shadow-2xs"
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold text-amber-200 bg-amber-900/40 hover:bg-amber-900/70 border border-amber-700 transition-colors shadow-2xs"
               title="View Demonstration Objectives & Statutory Rules"
             >
-              <BookOpen size={14} className="text-govNavy" />
+              <BookOpen size={14} className="text-amber-300" />
               <span className="hidden md:inline">{language === "hi" ? "डेमो गाइड" : "Scenario Guide"}</span>
             </button>
           </div>
@@ -216,7 +216,7 @@ export const DemoCaseTourBanner: React.FC<DemoCaseTourBannerProps> = ({
           <div
             role="dialog"
             aria-modal="true"
-            className="bg-white rounded-2xl shadow-2xl border border-slate-300 w-full max-w-2xl overflow-hidden animate-pop-in"
+            className="bg-slate-900/70 rounded-2xl shadow-2xl border border-slate-600 w-full max-w-2xl overflow-hidden animate-pop-in"
           >
             {/* Modal Header */}
             <div className="bg-govNavy text-white px-6 py-4 flex items-center justify-between border-b-2 border-amber-500">
@@ -234,7 +234,7 @@ export const DemoCaseTourBanner: React.FC<DemoCaseTourBannerProps> = ({
               <button
                 type="button"
                 onClick={() => setShowGuideModal(false)}
-                className="text-slate-300 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors"
+                className="text-slate-300 hover:text-white p-1 rounded-lg hover:bg-slate-900/70/10/10 transition-colors"
                 aria-label="Close modal"
               >
                 <X size={20} />
@@ -244,8 +244,8 @@ export const DemoCaseTourBanner: React.FC<DemoCaseTourBannerProps> = ({
             {/* Modal Body */}
             <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto text-xs">
               {/* Expected Statutory Verdict */}
-              <div className="p-3.5 rounded-xl border bg-slate-50 flex items-start gap-3">
-                <div className="p-2 rounded-lg bg-white border border-slate-200 shrink-0">
+              <div className="p-3.5 rounded-xl border bg-slate-800/60 flex items-start gap-3">
+                <div className="p-2 rounded-lg bg-slate-900/70 border border-slate-700 shrink-0">
                   <VerdictIcon size={20} className={theme.accent} />
                 </div>
                 <div>
@@ -257,10 +257,10 @@ export const DemoCaseTourBanner: React.FC<DemoCaseTourBannerProps> = ({
                       {label}
                     </span>
                   </div>
-                  <p className="font-extrabold text-slate-900 mt-1 text-xs">
+                  <p className="font-extrabold text-white mt-1 text-xs">
                     {headline}
                   </p>
-                  <p className="text-slate-600 mt-1 leading-relaxed">
+                  <p className="text-slate-400 mt-1 leading-relaxed">
                     {language === "hi" ? scenario.detailedRationaleHi : scenario.detailedRationale}
                   </p>
                 </div>
@@ -268,8 +268,8 @@ export const DemoCaseTourBanner: React.FC<DemoCaseTourBannerProps> = ({
 
               {/* Statutory Rules Verified */}
               <div className="space-y-2">
-                <h4 className="font-extrabold text-govNavy uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                  <Scale size={14} className="text-amber-600" />
+                <h4 className="font-extrabold text-amber-300 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                  <Scale size={14} className="text-amber-400" />
                   <span>{language === "hi" ? "परीक्षित सांविधिक नियम" : "Statutory Rules Evaluated"}</span>
                 </h4>
                 <ul className="space-y-1.5">
@@ -277,9 +277,9 @@ export const DemoCaseTourBanner: React.FC<DemoCaseTourBannerProps> = ({
                     (rule, idx) => (
                       <li
                         key={idx}
-                        className="flex items-start gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200 font-mono text-[11px] text-slate-800"
+                        className="flex items-start gap-2 bg-slate-800/60 p-2 rounded-lg border border-slate-700 font-mono text-[11px] text-slate-100"
                       >
-                        <span className="text-amber-600 font-bold">§</span>
+                        <span className="text-amber-400 font-bold">§</span>
                         <span>{rule}</span>
                       </li>
                     )
@@ -289,8 +289,8 @@ export const DemoCaseTourBanner: React.FC<DemoCaseTourBannerProps> = ({
 
               {/* What Capabilities are Tested */}
               <div className="space-y-2">
-                <h4 className="font-extrabold text-govNavy uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                  <FileCheck size={14} className="text-emerald-600" />
+                <h4 className="font-extrabold text-amber-300 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                  <FileCheck size={14} className="text-emerald-400" />
                   <span>{language === "hi" ? "सत्यापित मॉड्यूल क्षमताएं" : "Subsystem Capabilities Demonstrated"}</span>
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -300,7 +300,7 @@ export const DemoCaseTourBanner: React.FC<DemoCaseTourBannerProps> = ({
                   ).map((cap, idx) => (
                     <div
                       key={idx}
-                      className="p-2 rounded-lg border border-slate-200 bg-white flex items-center gap-2 text-[11px] text-slate-700"
+                      className="p-2 rounded-lg border border-slate-700 bg-slate-900/70 flex items-center gap-2 text-[11px] text-slate-200"
                     >
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                       <span className="truncate">{cap}</span>
@@ -310,9 +310,9 @@ export const DemoCaseTourBanner: React.FC<DemoCaseTourBannerProps> = ({
               </div>
 
               {/* Evaluator / Officer Instructions */}
-              <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-950 space-y-1">
-                <div className="font-extrabold text-[11px] flex items-center gap-1.5 text-amber-900">
-                  <Info size={14} className="text-amber-700" />
+              <div className="p-3.5 rounded-xl bg-amber-900/30 border border-amber-700 text-amber-200 space-y-1">
+                <div className="font-extrabold text-[11px] flex items-center gap-1.5 text-amber-300">
+                  <Info size={14} className="text-amber-400" />
                   <span>{language === "hi" ? "मूल्यांकनकर्ता / अधिकारी निर्देश" : "How to Inspect this Demonstration Scenario"}</span>
                 </div>
                 <p className="text-[11.5px] leading-relaxed">
@@ -322,7 +322,7 @@ export const DemoCaseTourBanner: React.FC<DemoCaseTourBannerProps> = ({
             </div>
 
             {/* Modal Footer */}
-            <div className="bg-slate-50 border-t border-slate-200 px-6 py-3 flex items-center justify-between">
+            <div className="bg-slate-800/60 border-t border-slate-700 px-6 py-3 flex items-center justify-between">
               <span className="text-[11px] text-slate-500 font-mono">
                 Section 63 BSA 2023 Digital Evidence Invariant Active
               </span>

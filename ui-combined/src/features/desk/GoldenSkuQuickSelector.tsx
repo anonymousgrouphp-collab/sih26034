@@ -269,7 +269,7 @@ export const GoldenSkuQuickSelector: React.FC<GoldenSkuQuickSelectorProps> = ({
             FAIL: "bg-red-950/80 text-red-400 border-red-800/60",
             PASS: "bg-emerald-950/80 text-emerald-400 border-emerald-800/60",
             REVIEW: "bg-amber-950/80 text-amber-400 border-amber-800/60",
-            UNABLE: "bg-purple-950/80 text-purple-400 border-purple-800/60",
+            UNABLE: "bg-slate-800/80 text-slate-300 border-slate-600/60",
           };
 
           const cardStyles = isSelected

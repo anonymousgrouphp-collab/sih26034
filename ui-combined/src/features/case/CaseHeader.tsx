@@ -25,14 +25,14 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
   const isMock = caseData.is_mock_fixture || ApiService.isMockMode();
 
   return (
-    <div className="case-header screen-only no-print bg-panelBg border border-slate-200 rounded-lg p-4 shadow-sm space-y-3">
+    <div className="case-header screen-only no-print bg-panelBg border border-slate-700 rounded-lg p-4 shadow-sm space-y-3">
       {/* Top Row: Navigation + Statuses */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-800 pb-3">
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={onBack}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold text-govNavy hover:bg-slate-100 border border-slate-300 transition-colors focus:outline-none focus:ring-1 focus:ring-govNavy"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold text-slate-200 hover:bg-white/10 hover:text-white border border-slate-600 transition-colors focus:outline-none focus:ring-1 focus:ring-cyan-400"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -41,11 +41,11 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
           </button>
           <div className="h-4 w-px bg-slate-300 hidden sm:block" />
           <div className="flex items-center gap-2">
-            <span className="text-xs font-mono font-bold text-govNavy">
+            <span className="text-xs font-mono font-bold text-cyan-300">
               {caseData.inspection_number}
             </span>
             {isMock && (
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-300 font-semibold" title="Running in Standalone Demo / Local Mode">
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-900/30 text-amber-300 border border-amber-300 font-semibold" title="Running in Standalone Demo / Local Mode">
                 {language === "hi" ? "डेमो / स्थानीय मोड" : "DEMO / LOCAL MODE"}
               </span>
             )}
@@ -55,7 +55,7 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
         <div className="flex items-center gap-2 flex-wrap">
           <WorkflowBadge status={isProcessing ? "PROCESSING" : (caseData.workflow_status || "OPEN")} />
           {caseData.workflow_status === "DRAFT" || caseData.evidence_assets.length === 0 ? (
-            <span className="text-xs font-mono text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded border border-slate-200">
+            <span className="text-xs font-mono text-slate-400 bg-slate-800/80 px-2.5 py-0.5 rounded border border-slate-700">
               {language === "hi" ? "[कोई साक्ष्य प्रस्तुत नहीं]" : "[NO EVIDENCE SUBMITTED]"}
             </span>
           ) : (
@@ -65,7 +65,7 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
             <button
               type="button"
               onClick={onDeleteCase}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold text-rose-700 hover:text-white bg-rose-50 hover:bg-rose-600 border border-rose-200 hover:border-rose-600 transition-all shadow-2xs focus:outline-none focus:ring-1 focus:ring-rose-500 ml-1"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold text-rose-400 hover:text-white bg-rose-900/30 hover:bg-rose-600 border border-rose-800 hover:border-rose-600 transition-all shadow-2xs focus:outline-none focus:ring-1 focus:ring-rose-500 ml-1"
               title={language === "hi" ? "मामला स्थायी रूप से हटाएं" : "Permanently Dispose & Delete Case"}
               aria-label="Dispose and delete case"
             >
@@ -78,7 +78,7 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
 
       {/* Quick Demo Scenario Switcher (Compact Bar) */}
       {onSelectSku && (
-        <div className="pt-0.5 pb-1 border-b border-slate-100">
+        <div className="pt-0.5 pb-1 border-b border-slate-800">
           <GoldenSkuQuickSelector
             onSelectSku={onSelectSku}
             activeSkuId={caseData.sku_demo_id || caseData.id}
@@ -90,22 +90,22 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
       {/* Details Row: Commodity, Trader, Registration Date */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
         <div>
-          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
             {language === "hi" ? "पैकेज्ड वस्तु" : "Packaged Commodity"}
           </span>
-          <div className="font-bold text-slate-900 truncate" title={caseData.product_name}>
+          <div className="font-bold text-white truncate" title={caseData.product_name}>
             {caseData.product_name}
           </div>
-          <div className="text-[11px] text-slate-500">
-            {language === "hi" ? "ब्रांड:" : "Brand:"} <span className="font-semibold text-slate-700">{caseData.brand_name || (language === "hi" ? "गैर-ब्रांडेड / सामान्य" : "Unbranded / Generics")}</span>
+          <div className="text-[11px] text-slate-400">
+            {language === "hi" ? "ब्रांड:" : "Brand:"} <span className="font-semibold text-slate-200">{caseData.brand_name || (language === "hi" ? "गैर-ब्रांडेड / सामान्य" : "Unbranded / Generics")}</span>
           </div>
         </div>
 
         <div>
-          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
             {language === "hi" ? "प्रतिष्ठान / परिसर" : "Establishment / Premises"}
           </span>
-          <div className="font-semibold text-slate-800 truncate" title={caseData.establishment_name || "Field Seizure"}>
+          <div className="font-semibold text-slate-100 truncate" title={caseData.establishment_name || "Field Seizure"}>
             {caseData.establishment_name || (language === "hi" ? "क्षेत्र जब्ती / खुदरा दुकान" : "Field Seizure / Retail Store")}
           </div>
           <div className="text-[11px] text-slate-400 truncate">
@@ -114,22 +114,22 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
         </div>
 
         <div>
-          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
             {language === "hi" ? "श्रेणी एवं ज्यामिति" : "Category & Geometry"}
           </span>
-          <div className="font-semibold text-slate-800">
+          <div className="font-semibold text-slate-100">
             {caseData.category}
           </div>
-          <div className="text-[11px] text-slate-500">
-            {language === "hi" ? "आकार:" : "Shape:"} <span className="font-mono text-slate-700">{caseData.package_type}</span>
+          <div className="text-[11px] text-slate-400">
+            {language === "hi" ? "आकार:" : "Shape:"} <span className="font-mono text-slate-200">{caseData.package_type}</span>
           </div>
         </div>
 
         <div>
-          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
             {language === "hi" ? "अधिकार क्षेत्र एवं दिनांक" : "Jurisdiction & Date"}
           </span>
-          <div className="font-mono text-slate-800">
+          <div className="font-mono text-slate-100">
             {caseData.jurisdiction_id}
           </div>
           <div className="text-[11px] text-slate-400 font-mono">

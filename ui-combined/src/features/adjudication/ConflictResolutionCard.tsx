@@ -35,12 +35,12 @@ export const ConflictResolutionCard: React.FC<ConflictResolutionCardProps> = ({
   return (
     <div
       data-testid="conflict-resolution-card"
-      className="overflow-hidden rounded-lg border border-amber-300 bg-amber-50 shadow-workstation"
+      className="overflow-hidden rounded-lg border border-amber-300 bg-amber-900/30 shadow-workstation"
     >
       {/* Header */}
-      <div className="flex items-start gap-3 border-b border-amber-200 bg-amber-100/60 px-5 py-3.5">
-        <div className="rounded-md bg-white p-2 text-amber-700 shadow-xs shrink-0">
-          <AlertTriangle className="w-5 h-5 text-amber-600" />
+      <div className="flex items-start gap-3 border-b border-amber-200 bg-amber-900/40 px-5 py-3.5">
+        <div className="rounded-md bg-slate-900/70 p-2 text-amber-400 shadow-xs shrink-0">
+          <AlertTriangle className="w-5 h-5 text-amber-400" />
         </div>
         <div className="flex-1">
           <div className="flex items-center justify-between gap-2 flex-wrap">
@@ -49,11 +49,11 @@ export const ConflictResolutionCard: React.FC<ConflictResolutionCardProps> = ({
                 ? `मानवीय समीक्षा आवश्यक (${conflicts.length} विरोधाभासी अंकन)`
                 : `Human Review Required (${conflicts.length} Contradictory ${conflicts.length === 1 ? "Marking" : "Markings"})`}
             </h3>
-            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-amber-200/80 text-amber-900 border border-amber-300">
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-amber-200/80 text-amber-300 border border-amber-300">
               {language === "hi" ? "धारा 63 बीएसए 2023 · एचआईटीएल गेट" : "SECTION 63 BSA 2023 · HITL GATE"}
             </span>
           </div>
-          <p className="mt-0.5 text-xs text-amber-900/90 leading-relaxed">
+          <p className="mt-0.5 text-xs text-amber-300/90 leading-relaxed">
             {language === "hi"
               ? "स्वचालित प्रसंस्करण द्वारा विरोधाभासी घोषणाएं अथवा दोहरे मूल्य अंकन पहचाने गए हैं जिनका समाधान विधिक अधिकारी निर्णय के बिना नहीं किया जा सकता।"
               : "Automated processing identified contradictory declarations or dual markings that cannot be deterministically resolved without human officer adjudication."}
@@ -64,14 +64,14 @@ export const ConflictResolutionCard: React.FC<ConflictResolutionCardProps> = ({
       {/* Conflict Items List */}
       <div className="divide-y divide-amber-200/70">
         {conflicts.map((c) => (
-          <div key={c.id} className="p-4 sm:p-5 hover:bg-amber-100/30 transition-colors">
+          <div key={c.id} className="p-4 sm:p-5 hover:bg-amber-900/40 transition-colors">
             <div className="grid gap-3 sm:grid-cols-[140px_1fr] items-start">
               <div>
-                <span className="inline-block text-xs font-bold uppercase tracking-wider text-amber-900 bg-white px-2.5 py-1 rounded border border-amber-200 shadow-xs">
+                <span className="inline-block text-xs font-bold uppercase tracking-wider text-amber-300 bg-slate-900/70 px-2.5 py-1 rounded border border-amber-200 shadow-xs">
                   {c.field}
                 </span>
                 {c.resolved && (
-                  <span className="mt-1.5 inline-flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 w-fit">
+                  <span className="mt-1.5 inline-flex items-center gap-1.5 text-[10px] font-semibold text-emerald-400 bg-emerald-900/30 px-2 py-0.5 rounded border border-emerald-800 w-fit">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0 mt-0.5"></span>
                     <span className="break-words">
                       {c.resolutionNote || c.selectedDecision
@@ -86,15 +86,15 @@ export const ConflictResolutionCard: React.FC<ConflictResolutionCardProps> = ({
                 {(c.expected || c.observed) && (
                   <div className="flex flex-wrap items-center gap-2">
                     {c.expected && (
-                      <span className="rounded bg-white px-2.5 py-1 text-xs font-semibold text-slate-800 border border-amber-200/80 shadow-xs font-mono">
+                      <span className="rounded bg-slate-900/70 px-2.5 py-1 text-xs font-semibold text-slate-100 border border-amber-200/80 shadow-xs font-mono">
                         {language === "hi" ? "अपेक्षित:" : "Expected:"} {c.expected}
                       </span>
                     )}
                     {c.expected && c.observed && (
-                      <ArrowRight className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+                      <ArrowRight className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                     )}
                     {c.observed && (
-                      <span className="rounded bg-rose-50 border border-rose-200 px-2.5 py-1 text-xs font-semibold text-rose-800 shadow-xs font-mono">
+                      <span className="rounded bg-rose-900/30 border border-rose-800 px-2.5 py-1 text-xs font-semibold text-rose-300 shadow-xs font-mono">
                         {language === "hi" ? "प्राप्त:" : "Observed:"} {c.observed}
                       </span>
                     )}

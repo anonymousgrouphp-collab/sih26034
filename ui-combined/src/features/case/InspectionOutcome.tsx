@@ -73,45 +73,45 @@ export const InspectionOutcome: React.FC<InspectionOutcomeProps> = ({
   return (
     <div className="space-y-4">
       {/* 1. Header & Top Action Bar */}
-      <div className="bg-panelBg rounded-lg border border-slate-200 shadow-sm p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-panelBg rounded-lg border border-slate-700 shadow-sm p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
             <span className="px-2 py-0.5 rounded bg-govNavy text-white text-[10px] font-bold uppercase tracking-wider">
               {language === "hi" ? "मामला परिणाम समीक्षा" : "Case Outcome Review"}
             </span>
-            <span className="font-mono text-xs text-slate-500 font-bold">
+            <span className="font-mono text-xs text-slate-400 font-bold">
               {caseData.inspection_number}
             </span>
             <span
               className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
                 caseData.workflow_status === "COMPLETED"
-                  ? "bg-slate-200 text-slate-800"
-                  : "bg-blue-100 text-blue-900"
+                  ? "bg-slate-700 text-slate-100"
+                  : "bg-blue-900/40 text-blue-300"
               }`}
             >
               {language === "hi" ? "कार्यप्रवाह:" : "Workflow:"} {caseData.workflow_status}
             </span>
           </div>
-          <h2 className="text-base font-bold text-govNavy mt-1">
+          <h2 className="text-base font-bold text-cyan-300 mt-1">
             {caseData.product_name}
           </h2>
-          <div className="flex items-center gap-3 text-xs text-slate-500 mt-0.5 flex-wrap">
+          <div className="flex items-center gap-3 text-xs text-slate-400 mt-0.5 flex-wrap">
             {caseData.brand_name && (
               <span>
-                {language === "hi" ? "ब्रांड:" : "Brand:"} <strong className="text-slate-700">{caseData.brand_name}</strong>
+                {language === "hi" ? "ब्रांड:" : "Brand:"} <strong className="text-slate-200">{caseData.brand_name}</strong>
               </span>
             )}
             {caseData.establishment_name && (
               <span>
-                {language === "hi" ? "प्रतिष्ठान:" : "Establishment:"} <strong className="text-slate-700">{caseData.establishment_name}</strong>
+                {language === "hi" ? "प्रतिष्ठान:" : "Establishment:"} <strong className="text-slate-200">{caseData.establishment_name}</strong>
               </span>
             )}
             <span>
-              {language === "hi" ? "अधिकार क्षेत्र:" : "Jurisdiction:"} <strong className="text-slate-700">{caseData.jurisdiction_id}</strong>
+              {language === "hi" ? "अधिकार क्षेत्र:" : "Jurisdiction:"} <strong className="text-slate-200">{caseData.jurisdiction_id}</strong>
             </span>
             <span>
               {language === "hi" ? "दिनांक:" : "Date:"}{" "}
-              <strong className="text-slate-700">
+              <strong className="text-slate-200">
                 {caseData.created_at
                   ? new Date(caseData.created_at).toLocaleDateString(language === "hi" ? "hi-IN" : "en-IN")
                   : (language === "hi" ? "अनुपलब्ध" : "Not available")}
@@ -125,9 +125,9 @@ export const InspectionOutcome: React.FC<InspectionOutcomeProps> = ({
           <button
             type="button"
             onClick={onOpenCanvas}
-            className="px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 transition-colors flex items-center gap-1.5 shadow-sm"
+            className="px-3 py-1.5 text-xs font-semibold text-slate-200 bg-slate-900/70 border border-slate-600 rounded-md hover:bg-slate-800/60 transition-colors flex items-center gap-1.5 shadow-sm"
           >
-            <svg className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             <span>{language === "hi" ? "अधिनिर्णय कैनवास" : "Adjudication Canvas"}</span>
@@ -149,35 +149,35 @@ export const InspectionOutcome: React.FC<InspectionOutcomeProps> = ({
       {/* 2. Key Telemetry Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card A: Automated Findings Summary */}
-        <div className="bg-panelBg p-4 rounded-lg border border-slate-200 shadow-sm space-y-3">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-600">
+        <div className="bg-panelBg p-4 rounded-lg border border-slate-700 shadow-sm space-y-3">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
               {language === "hi" ? "स्वचालित निष्कर्ष" : "Automated Findings"}
             </span>
-            <span className="font-mono text-xs font-bold text-govNavy bg-slate-100 px-2 py-0.5 rounded">
+            <span className="font-mono text-xs font-bold text-cyan-300 bg-slate-800/80 px-2 py-0.5 rounded">
               {evaluations.length} {language === "hi" ? "कुल" : "total"}
             </span>
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-xs">
-            <div className="p-2 rounded bg-rose-50 border border-rose-200 flex items-center justify-between">
-              <span className="font-semibold text-rose-800">{language === "hi" ? "उल्लंघन (FAIL)" : "FAIL"}</span>
-              <span className="font-mono font-bold text-rose-900 text-sm">{countFail}</span>
+            <div className="p-2 rounded bg-rose-900/30 border border-rose-800 flex items-center justify-between">
+              <span className="font-semibold text-rose-300">{language === "hi" ? "उल्लंघन (FAIL)" : "FAIL"}</span>
+              <span className="font-mono font-bold text-rose-300 text-sm">{countFail}</span>
             </div>
-            <div className="p-2 rounded bg-amber-50 border border-amber-200 flex items-center justify-between">
-              <span className="font-semibold text-amber-800">{language === "hi" ? "समीक्षा (REVIEW)" : "REVIEW"}</span>
-              <span className="font-mono font-bold text-amber-900 text-sm">{countReview}</span>
+            <div className="p-2 rounded bg-amber-900/30 border border-amber-200 flex items-center justify-between">
+              <span className="font-semibold text-amber-300">{language === "hi" ? "समीक्षा (REVIEW)" : "REVIEW"}</span>
+              <span className="font-mono font-bold text-amber-300 text-sm">{countReview}</span>
             </div>
-            <div className="p-2 rounded bg-emerald-50 border border-emerald-200 flex items-center justify-between">
-              <span className="font-semibold text-emerald-800">{language === "hi" ? "उत्तीर्ण (PASS)" : "PASS"}</span>
-              <span className="font-mono font-bold text-emerald-900 text-sm">{countPass}</span>
+            <div className="p-2 rounded bg-emerald-900/30 border border-emerald-800 flex items-center justify-between">
+              <span className="font-semibold text-emerald-300">{language === "hi" ? "उत्तीर्ण (PASS)" : "PASS"}</span>
+              <span className="font-mono font-bold text-emerald-300 text-sm">{countPass}</span>
             </div>
-            <div className="p-2 rounded bg-slate-100 border border-slate-200 flex items-center justify-between">
-              <span className="font-semibold text-slate-700">{language === "hi" ? "अस्पष्ट (UNABLE)" : "UNABLE"}</span>
-              <span className="font-mono font-bold text-slate-800 text-sm">{countUnable}</span>
+            <div className="p-2 rounded bg-slate-800/80 border border-slate-700 flex items-center justify-between">
+              <span className="font-semibold text-slate-200">{language === "hi" ? "अस्पष्ट (UNABLE)" : "UNABLE"}</span>
+              <span className="font-mono font-bold text-slate-100 text-sm">{countUnable}</span>
             </div>
           </div>
-          <p className="text-[10px] text-slate-500 italic">
+          <p className="text-[10px] text-slate-400 italic">
             {language === "hi"
               ? "बैकएंड AST नियम मूल्यांकन द्वारा प्रदान की गई टेलीमेट्री गणना।"
               : "Telemetry counts supplied by backend AST rule evaluation."}
@@ -185,65 +185,65 @@ export const InspectionOutcome: React.FC<InspectionOutcomeProps> = ({
         </div>
 
         {/* Card B: Officer Adjudication Summary */}
-        <div className="bg-panelBg p-4 rounded-lg border border-slate-200 shadow-sm space-y-3">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-600">
+        <div className="bg-panelBg p-4 rounded-lg border border-slate-700 shadow-sm space-y-3">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
               {language === "hi" ? "अधिकारी न्यायिक निर्णय" : "Officer Adjudication"}
             </span>
-            <span className="font-mono text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+            <span className="font-mono text-xs font-bold text-emerald-300 bg-emerald-900/30 px-2 py-0.5 rounded border border-emerald-800">
               {language === "hi" ? "एचआईटीएल सत्यापित" : "HITL Verified"}
             </span>
           </div>
 
           <div className="space-y-1.5 text-xs">
             <div className="flex justify-between items-center py-0.5">
-              <span className="text-slate-600">{language === "hi" ? "पुष्टीकृत उल्लंघन:" : "Confirmed Violations:"}</span>
-              <span className="font-mono font-bold text-rose-700">{countConfirmed}</span>
+              <span className="text-slate-400">{language === "hi" ? "पुष्टीकृत उल्लंघन:" : "Confirmed Violations:"}</span>
+              <span className="font-mono font-bold text-rose-400">{countConfirmed}</span>
             </div>
             <div className="flex justify-between items-center py-0.5">
-              <span className="text-slate-600">{language === "hi" ? "खारिज निष्कर्ष:" : "Dismissed Findings:"}</span>
-              <span className="font-mono font-bold text-emerald-700">{countDismissed}</span>
+              <span className="text-slate-400">{language === "hi" ? "खारिज निष्कर्ष:" : "Dismissed Findings:"}</span>
+              <span className="font-mono font-bold text-emerald-400">{countDismissed}</span>
             </div>
             <div className="flex justify-between items-center py-0.5">
-              <span className="text-slate-600">{language === "hi" ? "पुनः परीक्षण अनुरोध:" : "Retest Requested:"}</span>
-              <span className="font-mono font-bold text-amber-700">{countRetestReq}</span>
+              <span className="text-slate-400">{language === "hi" ? "पुनः परीक्षण अनुरोध:" : "Retest Requested:"}</span>
+              <span className="font-mono font-bold text-amber-400">{countRetestReq}</span>
             </div>
-            <div className="flex justify-between items-center py-0.5 border-t border-slate-100 pt-1">
-              <span className="text-slate-500">{language === "hi" ? "अधिकारी समीक्षा लंबित:" : "Pending Officer Review:"}</span>
-              <span className="font-mono font-bold text-slate-600">{countPendingAdjudication}</span>
+            <div className="flex justify-between items-center py-0.5 border-t border-slate-800 pt-1">
+              <span className="text-slate-400">{language === "hi" ? "अधिकारी समीक्षा लंबित:" : "Pending Officer Review:"}</span>
+              <span className="font-mono font-bold text-slate-400">{countPendingAdjudication}</span>
             </div>
           </div>
         </div>
 
         {/* Card C: Evidence Health & Custody */}
-        <div className="bg-panelBg p-4 rounded-lg border border-slate-200 shadow-sm space-y-3">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-600">
+        <div className="bg-panelBg p-4 rounded-lg border border-slate-700 shadow-sm space-y-3">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
               {language === "hi" ? "साक्ष्य स्थिति" : "Evidence Health"}
             </span>
-            <span className="text-[10px] font-bold text-govNavy bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+            <span className="text-[10px] font-bold text-cyan-300 bg-blue-900/30 px-2 py-0.5 rounded border border-blue-800">
               {language === "hi" ? "अपरिवर्तित" : "UNTOUCHED"}
             </span>
           </div>
 
           <div className="space-y-1.5 text-xs font-mono">
             <div className="flex justify-between items-center">
-              <span className="text-slate-500 font-sans">{language === "hi" ? "साक्ष्य संपत्ति:" : "Evidence Asset:"}</span>
-              <span className="font-bold text-slate-800 truncate max-w-[120px]">
+              <span className="text-slate-400 font-sans">{language === "hi" ? "साक्ष्य संपत्ति:" : "Evidence Asset:"}</span>
+              <span className="font-bold text-slate-100 truncate max-w-[120px]">
                 {primaryAsset ? primaryAsset.image_id : (language === "hi" ? "अनुपलब्ध" : "Not available")}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-slate-500 font-sans">{language === "hi" ? "अंशांकन:" : "Calibration:"}</span>
-              <span className="text-slate-800">
+              <span className="text-slate-400 font-sans">{language === "hi" ? "अंशांकन:" : "Calibration:"}</span>
+              <span className="text-slate-100">
                 {primaryAsset?.calibration?.is_calibrated
                   ? (language === "hi" ? "अरुको 50 मिमी" : "ArUco 50mm")
                   : (language === "hi" ? "अनांशांकित" : "Uncalibrated")}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-slate-500 font-sans">{language === "hi" ? "गुणवत्ता द्वार:" : "Quality Gate:"}</span>
-              <span className={primaryAsset?.quality_gate.passed ? "text-emerald-700 font-bold" : "text-rose-700 font-bold"}>
+              <span className="text-slate-400 font-sans">{language === "hi" ? "गुणवत्ता द्वार:" : "Quality Gate:"}</span>
+              <span className={primaryAsset?.quality_gate.passed ? "text-emerald-400 font-bold" : "text-rose-400 font-bold"}>
                 {primaryAsset
                   ? (primaryAsset.quality_gate.passed
                     ? (language === "hi" ? "उत्तीर्ण" : "PASSED")
@@ -251,9 +251,9 @@ export const InspectionOutcome: React.FC<InspectionOutcomeProps> = ({
                   : (language === "hi" ? "प्रतीक्षारत" : "Awaiting")}
               </span>
             </div>
-            <div className="flex justify-between items-center text-[10px] pt-1 border-t border-slate-100">
-              <span className="text-slate-500 font-sans">{language === "hi" ? "डाइजेस्ट:" : "Digest:"}</span>
-              <span className="truncate max-w-[130px] text-slate-500" title={primaryAsset?.raw_sha256}>
+            <div className="flex justify-between items-center text-[10px] pt-1 border-t border-slate-800">
+              <span className="text-slate-400 font-sans">{language === "hi" ? "डाइजेस्ट:" : "Digest:"}</span>
+              <span className="truncate max-w-[130px] text-slate-400" title={primaryAsset?.raw_sha256}>
                 {primaryAsset ? primaryAsset.raw_sha256.slice(0, 16) + "..." : (language === "hi" ? "अनुपलब्ध" : "Not available")}
               </span>
             </div>
@@ -261,15 +261,15 @@ export const InspectionOutcome: React.FC<InspectionOutcomeProps> = ({
         </div>
 
         {/* Card D: Audit Trail Integrity */}
-        <div className="bg-panelBg p-4 rounded-lg border border-slate-200 shadow-sm space-y-3">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-600">
+        <div className="bg-panelBg p-4 rounded-lg border border-slate-700 shadow-sm space-y-3">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
               {language === "hi" ? "अंकेक्षण इतिहास" : "Audit History"}
             </span>
             <button
               type="button"
               onClick={onOpenAudit}
-              className="text-[10px] text-govNavy hover:underline font-bold"
+              className="text-[10px] text-cyan-300 hover:underline font-bold"
             >
               {language === "hi" ? "पूर्ण समयरेखा देखें →" : "View Full Trail →"}
             </button>
@@ -277,20 +277,20 @@ export const InspectionOutcome: React.FC<InspectionOutcomeProps> = ({
 
           <div className="space-y-1.5 text-xs">
             <div className="flex justify-between items-center">
-              <span className="text-slate-600">{language === "hi" ? "श्रृंखलाबद्ध घटनाएं:" : "Chained Events:"}</span>
-              <span className="font-mono font-bold text-slate-800">{auditEvents.length}</span>
+              <span className="text-slate-400">{language === "hi" ? "श्रृंखलाबद्ध घटनाएं:" : "Chained Events:"}</span>
+              <span className="font-mono font-bold text-slate-100">{auditEvents.length}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-slate-600">{language === "hi" ? "केवल-जोड़ें मोड:" : "Append-Only Mode:"}</span>
-              <span className="text-emerald-700 font-bold text-[11px]">{language === "hi" ? "सक्रिय" : "ACTIVE"}</span>
+              <span className="text-slate-400">{language === "hi" ? "केवल-जोड़ें मोड:" : "Append-Only Mode:"}</span>
+              <span className="text-emerald-400 font-bold text-[11px]">{language === "hi" ? "सक्रिय" : "ACTIVE"}</span>
             </div>
             <div className="flex justify-between items-center text-[11px]">
-              <span className="text-slate-500">{language === "hi" ? "नवीनतम घटना:" : "Latest Event:"}</span>
-              <span className="text-slate-700 truncate max-w-[120px]">
+              <span className="text-slate-400">{language === "hi" ? "नवीनतम घटना:" : "Latest Event:"}</span>
+              <span className="text-slate-200 truncate max-w-[120px]">
                 {latestAuditEvent ? latestAuditEvent.event_label : (language === "hi" ? "कोई नहीं" : "None")}
               </span>
             </div>
-            <div className="text-[10px] text-slate-400 pt-1 border-t border-slate-100">
+            <div className="text-[10px] text-slate-400 pt-1 border-t border-slate-800">
               {language === "hi"
                 ? "ऐतिहासिक बही प्रविष्टियों को बदला या हटाया नहीं जा सकता।"
                 : "Historical ledger entries cannot be altered or removed."}
@@ -300,13 +300,13 @@ export const InspectionOutcome: React.FC<InspectionOutcomeProps> = ({
       </div>
 
       {/* 3. Downstream Case Readiness & Action Handoff Panel */}
-      <div className="bg-panelBg rounded-lg border border-slate-200 shadow-sm p-5 space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+      <div className="bg-panelBg rounded-lg border border-slate-700 shadow-sm p-5 space-y-4">
+        <div className="flex items-center justify-between border-b border-slate-700 pb-3">
           <div className="flex items-center gap-2">
-            <svg className="w-5 h-5 text-govNavy" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-5 h-5 text-cyan-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
             </svg>
-            <h3 className="text-sm font-bold uppercase tracking-wider text-govNavy">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-cyan-300">
               {language === "hi"
                 ? "अग्रगामी मामला तत्परता एवं प्रशासनिक स्थिति"
                 : "Downstream Case Readiness & Administrative Status"}
@@ -317,12 +317,12 @@ export const InspectionOutcome: React.FC<InspectionOutcomeProps> = ({
           <span
             className={`px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wider border ${
               readiness.readiness_state === "READY_FOR_LEGAL_NOTICE_DISPATCH"
-                ? "bg-rose-50 text-rose-800 border-rose-300"
+                ? "bg-rose-900/30 text-rose-300 border-rose-700"
                 : readiness.readiness_state === "READY_FOR_CASE_CLOSURE"
-                ? "bg-emerald-50 text-emerald-800 border-emerald-300"
+                ? "bg-emerald-900/30 text-emerald-300 border-emerald-700"
                 : readiness.readiness_state === "ACTION_REQUIRED_RETEST"
-                ? "bg-amber-50 text-amber-800 border-amber-300"
-                : "bg-blue-50 text-blue-800 border-blue-300"
+                ? "bg-amber-900/30 text-amber-300 border-amber-300"
+                : "bg-blue-900/30 text-blue-300 border-blue-700"
             }`}
           >
             {language === "hi"
@@ -340,13 +340,13 @@ export const InspectionOutcome: React.FC<InspectionOutcomeProps> = ({
         {/* Readiness State Guidance Content */}
         <div className="space-y-3">
           {readiness.readiness_state === "READY_FOR_CASE_CLOSURE" ? (
-            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="p-4 bg-emerald-900/30 border border-emerald-800 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="space-y-1">
-                <div className="flex items-center gap-2 font-bold text-emerald-900 text-xs">
+                <div className="flex items-center gap-2 font-bold text-emerald-300 text-xs">
                   <span className="h-2 w-2 rounded-full bg-emerald-600" />
                   <span>{language === "hi" ? "मामला औपचारिक समापन हेतु पात्र" : "Case Eligible for Formal Closure"}</span>
                 </div>
-                <p className="text-xs text-emerald-800">
+                <p className="text-xs text-emerald-300">
                   {readiness.downstream_action_guidance ||
                     (language === "hi"
                       ? "निरीक्षण निष्कर्षों की समीक्षा कर अधिकारी द्वारा अनुपालन मान लिया गया है। मामला आधिकारिक प्रशासनिक समापन हेतु तैयार है।"
@@ -365,9 +365,9 @@ export const InspectionOutcome: React.FC<InspectionOutcomeProps> = ({
               )}
             </div>
           ) : readiness.readiness_state === "READY_FOR_LEGAL_NOTICE_DISPATCH" ? (
-            <div className="p-4 bg-rose-50 border border-rose-200 rounded-lg space-y-3 text-xs text-rose-950">
+            <div className="p-4 bg-rose-900/30 border border-rose-800 rounded-lg space-y-3 text-xs text-rose-950">
               <div className="flex items-center justify-between flex-wrap gap-2">
-                <div className="flex items-center gap-2 font-bold text-rose-900">
+                <div className="flex items-center gap-2 font-bold text-rose-300">
                   <span className="h-2 w-2 rounded-full bg-rose-600 animate-pulse" />
                   <span>
                     {language === "hi"
@@ -375,26 +375,26 @@ export const InspectionOutcome: React.FC<InspectionOutcomeProps> = ({
                       : "Downstream Legal Workflow: Ready for Statutory Notice"}
                   </span>
                 </div>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-200/80 text-rose-900 font-bold border border-rose-300">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-200/80 text-rose-300 font-bold border border-rose-700">
                   {language === "hi" ? "प्राधिकार: विधिक मापविज्ञान नियंत्रक" : "AUTHORITY: CONTROLLER OF LEGAL METROLOGY"}
                 </span>
               </div>
 
-              <p className="text-rose-900">
+              <p className="text-rose-300">
                 {readiness.downstream_action_guidance ||
                   (language === "hi"
                     ? "निरीक्षण अधिकारी द्वारा सांविधिक उल्लंघन की पुष्टि की गई है। केस डोजियर प्रपत्र-1 कारण बताओ नोटिस तैयार करने हेतु उपलब्ध है।"
                     : "Statutory violation confirmed by inspecting officer. Case dossier is ready for Form-1 Show Cause Notice preparation.")}
               </p>
 
-              <div className="flex items-center justify-between p-3 bg-white border border-rose-200 rounded-lg flex-wrap gap-3">
+              <div className="flex items-center justify-between p-3 bg-slate-900/70 border border-rose-800 rounded-lg flex-wrap gap-3">
                 <div>
-                  <span className="font-bold text-slate-800 block text-xs">
+                  <span className="font-bold text-slate-100 block text-xs">
                     {officerRole === "CONTROLLER"
                       ? (language === "hi" ? "नियंत्रक सांविधिक प्राधिकार पुष्टीकृत" : "Controller Statutory Authority Confirmed")
                       : (language === "hi" ? "अधिकारी स्तर वृद्धि (एस्केलेशन) आवश्यक" : "Inspector Escalation Required")}
                   </span>
-                  <span className="text-[11px] text-slate-600 block">
+                  <span className="text-[11px] text-slate-400 block">
                     {officerRole === "CONTROLLER"
                       ? (language === "hi"
                           ? "आप नियंत्रक साख के साथ लॉग इन हैं। आप प्रपत्र-1 कारण बताओ नोटिस जारी करने तथा शमन शुल्क निर्धारित करने हेतु अधिकृत हैं।"
@@ -419,7 +419,7 @@ export const InspectionOutcome: React.FC<InspectionOutcomeProps> = ({
                   <button
                     type="button"
                     disabled
-                    className="px-4 py-2 text-xs font-bold text-slate-400 bg-slate-100 border border-slate-300 rounded-md cursor-not-allowed whitespace-nowrap"
+                    className="px-4 py-2 text-xs font-bold text-slate-400 bg-slate-800/80 border border-slate-600 rounded-md cursor-not-allowed whitespace-nowrap"
                     title={language === "hi" ? "प्रशासनिक नोटिस समीक्षा एवं प्रेषण हेतु नियंत्रक को अग्रेषित" : "Escalated to Controller for administrative notice review and dispatch"}
                   >
                     {language === "hi" ? "नोटिस जारी करने हेतु नियंत्रक को अग्रेषित" : "Escalated to Controller for Notice Issuance"}
@@ -428,8 +428,8 @@ export const InspectionOutcome: React.FC<InspectionOutcomeProps> = ({
               </div>
             </div>
           ) : readiness.readiness_state === "ACTION_REQUIRED_RETEST" ? (
-            <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg space-y-2 text-xs text-amber-950">
-              <div className="flex items-center gap-2 font-bold text-amber-900">
+            <div className="p-4 bg-amber-900/30 border border-amber-200 rounded-lg space-y-2 text-xs text-amber-950">
+              <div className="flex items-center gap-2 font-bold text-amber-300">
                 <span className="h-2 w-2 rounded-full bg-amber-600" />
                 <span>
                   {language === "hi"
@@ -437,7 +437,7 @@ export const InspectionOutcome: React.FC<InspectionOutcomeProps> = ({
                     : "Action Required: Physical Re-measurement or Optical Recapture"}
                 </span>
               </div>
-              <p className="text-amber-900">
+              <p className="text-amber-300">
                 {readiness.downstream_action_guidance ||
                   (language === "hi"
                     ? "निरीक्षण अधिकारी या प्रकाशीय द्वार ने अधिनिर्णय से पूर्व पुनः सत्यापन का आदेश दिया है।"
@@ -446,18 +446,18 @@ export const InspectionOutcome: React.FC<InspectionOutcomeProps> = ({
               <button
                 type="button"
                 onClick={onOpenCanvas}
-                className="mt-1 px-3 py-1.5 text-xs font-semibold text-amber-900 bg-white border border-amber-300 rounded hover:bg-amber-100 transition-colors"
+                className="mt-1 px-3 py-1.5 text-xs font-semibold text-amber-300 bg-slate-900/70 border border-amber-300 rounded hover:bg-amber-900/40 transition-colors"
               >
                 {language === "hi" ? "कैनवास पर निष्कर्ष का निरीक्षण करें →" : "Inspect Finding on Canvas →"}
               </button>
             </div>
           ) : (
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg space-y-2 text-xs text-blue-950">
-              <div className="flex items-center gap-2 font-bold text-blue-900">
+            <div className="p-4 bg-blue-900/30 border border-blue-800 rounded-lg space-y-2 text-xs text-blue-950">
+              <div className="flex items-center gap-2 font-bold text-blue-300">
                 <span className="h-2 w-2 rounded-full bg-blue-600" />
                 <span>{language === "hi" ? "अधिकारी न्यायिक निर्णय आवश्यक" : "Officer Adjudication Required"}</span>
               </div>
-              <p className="text-blue-900">
+              <p className="text-blue-300">
                 {readiness.downstream_action_guidance ||
                   (language === "hi"
                     ? "स्वचालित निष्कर्षों के लिए विभाजित दृश्य कैनवास पर मानव अधिकारी द्वारा समीक्षा एवं अधिनिर्णय आवश्यक है।"
@@ -466,7 +466,7 @@ export const InspectionOutcome: React.FC<InspectionOutcomeProps> = ({
               <button
                 type="button"
                 onClick={onOpenCanvas}
-                className="mt-1 px-3 py-1.5 text-xs font-semibold text-blue-900 bg-white border border-blue-300 rounded hover:bg-blue-100 transition-colors"
+                className="mt-1 px-3 py-1.5 text-xs font-semibold text-blue-300 bg-slate-900/70 border border-blue-700 rounded hover:bg-blue-900/40 transition-colors"
               >
                 {language === "hi" ? "अधिनिर्णय कैनवास पर जाएं →" : "Proceed to Adjudication Canvas →"}
               </button>

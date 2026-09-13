@@ -95,14 +95,14 @@ export const CameraControls: React.FC<CameraControlsProps> = ({
           >
             {/* Inner White Capture Disc */}
             <div
-              className={`w-full h-full rounded-full bg-white flex items-center justify-center transition-all ${
+              className={`w-full h-full rounded-full bg-slate-900/70 flex items-center justify-center transition-all ${
                 isCapturing
                   ? "bg-amber-400 scale-90 animate-pulse"
-                  : "group-hover:bg-slate-100"
+                  : "group-hover:bg-slate-800/70"
               }`}
             >
               {isCapturing ? (
-                <RefreshCw size={24} className="text-slate-900 animate-spin" />
+                <RefreshCw size={24} className="text-white animate-spin" />
               ) : (
                 <div className="w-8 h-8 rounded-full border-2 border-slate-900/40" />
               )}

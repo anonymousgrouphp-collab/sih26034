@@ -81,13 +81,13 @@ export const OfficerAdjudicationModal: React.FC<OfficerAdjudicationModalProps> =
     >
       <form onSubmit={handleSubmit} className="space-y-4 text-xs">
         {/* Officer Identity Box */}
-        <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 flex items-center justify-between">
+        <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700 flex items-center justify-between">
           <div>
-            <span className="text-[10px] font-bold uppercase text-slate-500 block">
+            <span className="text-[10px] font-bold uppercase text-slate-400 block">
               {language === "hi" ? "निर्णायक विधिक मापविज्ञान अधिकारी" : "Adjudicating Officer"}
             </span>
-            <span className="font-bold text-govNavy text-sm">INSP-DL-0842 • राजेश शर्मा (Rajesh Sharma)</span>
-            <span className="text-[11px] text-slate-500 block">
+            <span className="font-bold text-cyan-300 text-sm">INSP-DL-0842 • राजेश शर्मा (Rajesh Sharma)</span>
+            <span className="text-[11px] text-slate-400 block">
               {language === "hi"
                 ? "विधिक मापविज्ञान अधिकारी (राजपत्रित द्वितीय श्रेणी), दक्षिण दिल्ली प्रवर्तन प्रभाग"
                 : "LMO Class-II Gazetted, South Delhi Enforcement Division"}
@@ -99,16 +99,16 @@ export const OfficerAdjudicationModal: React.FC<OfficerAdjudicationModalProps> =
         </div>
 
         {/* Automated Finding vs Officer Decision Banner */}
-        <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg space-y-1">
+        <div className="p-3 bg-blue-900/30 border border-blue-800 rounded-lg space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-slate-600 font-semibold">
+            <span className="text-slate-400 font-semibold">
               {language === "hi" ? "स्वचालित एआई नैदानिक निष्कर्ष:" : "Automated AI Diagnostic Finding:"}
             </span>
-            <span className="font-mono font-bold text-slate-900 px-2 py-0.5 rounded bg-white border border-slate-200">
+            <span className="font-mono font-bold text-white px-2 py-0.5 rounded bg-slate-900/70 border border-slate-700">
               {caseData.overall_status}
             </span>
           </div>
-          <p className="text-[11px] text-slate-500">
+          <p className="text-[11px] text-slate-400">
             {language === "hi"
               ? "स्वचालित निष्कर्ष केवल संवर्धित नैदानिक अनुशंसा हैं। विधिक मापविज्ञान अधिनियम, 2009 की धारा 15 के अंतर्गत अंतिम निर्णय का सांविधिक अधिकार केवल जांच अधिकारी के पास सुरक्षित है।"
               : "Automated findings serve strictly as an augmented diagnostic recommendation. The adjudicating officer holds sole statutory authority under Section 15 of the Legal Metrology Act, 2009."}
@@ -117,15 +117,15 @@ export const OfficerAdjudicationModal: React.FC<OfficerAdjudicationModalProps> =
 
         {/* Error Alert */}
         {validationError && (
-          <div role="alert" className="p-2.5 bg-rose-50 border border-rose-300 rounded text-rose-800 font-semibold">
+          <div role="alert" className="p-2.5 bg-rose-900/30 border border-rose-700 rounded text-rose-300 font-semibold">
             {validationError}
           </div>
         )}
 
         {/* Decision Selection */}
         <div className="space-y-1.5">
-          <label className="font-bold text-slate-700 block">
-            {language === "hi" ? "न्यायिक निर्णय निर्धारण" : "Adjudication Decision"} <span className="text-rose-600">*</span>
+          <label className="font-bold text-slate-200 block">
+            {language === "hi" ? "न्यायिक निर्णय निर्धारण" : "Adjudication Decision"} <span className="text-rose-400">*</span>
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <button
@@ -136,14 +136,14 @@ export const OfficerAdjudicationModal: React.FC<OfficerAdjudicationModalProps> =
               }}
               className={`p-2.5 rounded-md border text-left font-sans transition-colors ${
                 verdict === "CONFIRM_VIOLATION"
-                  ? "border-rose-600 bg-rose-50/70 ring-2 ring-rose-500 text-rose-900"
-                  : "border-slate-300 bg-white hover:bg-slate-50 text-slate-700"
+                  ? "border-rose-600 bg-rose-900/30 ring-2 ring-rose-500 text-rose-300"
+                  : "border-slate-600 bg-slate-900/70 hover:bg-slate-800/60 text-slate-200"
               }`}
             >
               <div className="font-bold text-xs">
                 {language === "hi" ? "उल्लंघन की पुष्टि करें" : "Confirm Violation"}
               </div>
-              <div className="text-[10px] text-slate-500 mt-0.5">
+              <div className="text-[10px] text-slate-400 mt-0.5">
                 {language === "hi" ? "सांविधिक कमी के निष्कर्ष मान्य करें" : "Uphold statutory deficit findings"}
               </div>
             </button>
@@ -156,14 +156,14 @@ export const OfficerAdjudicationModal: React.FC<OfficerAdjudicationModalProps> =
               }}
               className={`p-2.5 rounded-md border text-left font-sans transition-colors ${
                 verdict === "DISMISS_AS_COMPLIANT"
-                  ? "border-emerald-600 bg-emerald-50/70 ring-2 ring-emerald-500 text-emerald-900"
-                  : "border-slate-300 bg-white hover:bg-slate-50 text-slate-700"
+                  ? "border-emerald-600 bg-emerald-900/30 ring-2 ring-emerald-500 text-emerald-300"
+                  : "border-slate-600 bg-slate-900/70 hover:bg-slate-800/60 text-slate-200"
               }`}
             >
               <div className="font-bold text-xs">
                 {language === "hi" ? "अनुपालन मानकर खारिज करें" : "Dismiss as Compliant"}
               </div>
-              <div className="text-[10px] text-slate-500 mt-0.5">
+              <div className="text-[10px] text-slate-400 mt-0.5">
                 {language === "hi" ? "निष्कर्ष अधिलेखित (भौतिक जांच उत्तीर्ण)" : "Override finding (manual check passed)"}
               </div>
             </button>
@@ -176,14 +176,14 @@ export const OfficerAdjudicationModal: React.FC<OfficerAdjudicationModalProps> =
               }}
               className={`p-2.5 rounded-md border text-left font-sans transition-colors ${
                 verdict === "REQUEST_RETEST"
-                  ? "border-amber-600 bg-amber-50/70 ring-2 ring-amber-500 text-amber-900"
-                  : "border-slate-300 bg-white hover:bg-slate-50 text-slate-700"
+                  ? "border-amber-600 bg-amber-900/30 ring-2 ring-amber-500 text-amber-300"
+                  : "border-slate-600 bg-slate-900/70 hover:bg-slate-800/60 text-slate-200"
               }`}
             >
               <div className="font-bold text-xs">
                 {language === "hi" ? "पुनः सत्यापन का आदेश दें" : "Request Re-verification"}
               </div>
-              <div className="text-[10px] text-slate-500 mt-0.5">
+              <div className="text-[10px] text-slate-400 mt-0.5">
                 {language === "hi" ? "भौतिक कैलीपर जांच अथवा पुनः फोटोग्राफी" : "Physical caliper check or recapture"}
               </div>
             </button>
@@ -192,7 +192,7 @@ export const OfficerAdjudicationModal: React.FC<OfficerAdjudicationModalProps> =
 
         {/* Action Order */}
         <div className="space-y-1">
-          <label htmlFor="action-order-select" className="font-bold text-slate-700 block">
+          <label htmlFor="action-order-select" className="font-bold text-slate-200 block">
             {language === "hi" ? "सांविधिक कार्रवाई आदेश" : "Statutory Action Order"}
           </label>
           <select
@@ -215,12 +215,12 @@ export const OfficerAdjudicationModal: React.FC<OfficerAdjudicationModalProps> =
 
         {/* Mandatory Remarks */}
         <div className="space-y-1">
-          <label htmlFor="officer-remarks-area" className="font-bold text-slate-700 block flex items-center justify-between">
+          <label htmlFor="officer-remarks-area" className="font-bold text-slate-200 block flex items-center justify-between">
             <span>
-              {language === "hi" ? "अधिकारी की अनिवार्य औचित्य एवं टिप्पणी" : "Mandatory Officer Justification Remarks"} <span className="text-rose-600">*</span>
+              {language === "hi" ? "अधिकारी की अनिवार्य औचित्य एवं टिप्पणी" : "Mandatory Officer Justification Remarks"} <span className="text-rose-400">*</span>
             </span>
             {isOverride && (
-              <span className="text-[10px] font-mono text-amber-800 font-bold uppercase">
+              <span className="text-[10px] font-mono text-amber-300 font-bold uppercase">
                 {language === "hi" ? "[अधिलेखन औचित्य अनिवार्य]" : "[Override Justification Required]"}
               </span>
             )}
@@ -245,12 +245,12 @@ export const OfficerAdjudicationModal: React.FC<OfficerAdjudicationModalProps> =
         </div>
 
         {/* Submission Actions */}
-        <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-200">
+        <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-700">
           <button
             type="button"
             onClick={onClose}
             disabled={isSubmitting}
-            className="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50"
+            className="px-4 py-2 text-xs font-semibold text-slate-200 bg-slate-900/70 border border-slate-600 rounded-md hover:bg-slate-800/60"
           >
             {language === "hi" ? "रद्द करें" : "Cancel"}
           </button>

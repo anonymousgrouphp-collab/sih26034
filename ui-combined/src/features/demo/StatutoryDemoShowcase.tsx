@@ -74,10 +74,10 @@ export const StatutoryDemoShowcase: React.FC<StatutoryDemoShowcaseProps> = ({
         };
       case "UNABLE_TO_VERIFY":
         return {
-          pill: "bg-purple-950/80 text-purple-400 border-purple-800/60",
-          cardBorder: "border-purple-900/50 hover:border-purple-600 bg-slate-900/90 hover:shadow-lg",
-          accentText: "text-purple-400",
-          tagBg: "bg-purple-950/40 border-purple-900/50",
+          pill: "bg-slate-800/80 text-slate-300 border-slate-600/60",
+          cardBorder: "border-slate-700/50 hover:border-slate-500 bg-slate-900/90 hover:shadow-lg",
+          accentText: "text-slate-300",
+          tagBg: "bg-slate-800/40 border-slate-700/50",
           icon: Compass,
         };
     }

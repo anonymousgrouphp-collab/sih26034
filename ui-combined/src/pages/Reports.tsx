@@ -141,7 +141,7 @@ export const Reports: React.FC = () => {
 
       {downloadSuccess && (
         <div className="p-3 bg-emerald-900/30 border border-emerald-700/60 rounded-lg text-xs text-emerald-300 flex items-center gap-2 shadow-xs animate-fade-in">
-          <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+          <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />
           <span>{downloadSuccess}</span>
         </div>
       )}
@@ -216,7 +216,7 @@ export const Reports: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Outcome Breakdown Card */}
         <div className="glass-panel p-5 space-y-4 border border-slate-700/60 rounded-xl">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
             <div className="flex items-center gap-2">
               <BarChart3 size={18} className="text-white" />
               <h3 className="section-title text-white">
@@ -283,7 +283,7 @@ export const Reports: React.FC = () => {
           )}
 
           <div className="p-3 bg-slate-800/50 border border-slate-700/60 rounded-lg text-xs text-slate-300 flex items-center gap-2">
-            <ShieldCheck size={16} className="text-emerald-600 shrink-0" />
+            <ShieldCheck size={16} className="text-emerald-400 shrink-0" />
             <span>
               {metrics.total > 0
                 ? (language === "hi"
@@ -298,7 +298,7 @@ export const Reports: React.FC = () => {
 
         {/* Ready Generated Reports List */}
         <div className="glass-panel p-5 space-y-4 border border-slate-700/60 rounded-xl">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
             <div className="flex items-center gap-2">
               <FileText size={18} className="text-white" />
               <h3 className="section-title text-white">
@@ -336,7 +336,7 @@ export const Reports: React.FC = () => {
               {periodCases.slice(0, 5).map((c) => (
                 <div
                   key={c.id}
-                  className="p-3 rounded-lg border border-slate-700/60 bg-slate-800/50/60 hover:bg-white/5 transition-colors flex items-center justify-between gap-3 text-xs"
+                  className="p-3 rounded-lg border border-slate-700/60 bg-slate-800/50/60 hover:bg-slate-900/70/10/5 transition-colors flex items-center justify-between gap-3 text-xs"
                 >
                   <div className="min-w-0">
                     <p className="font-bold text-white truncate">
@@ -358,7 +358,7 @@ export const Reports: React.FC = () => {
                     </Link>
                     <Link
                       to={`/inspections/${c.id}/evidence`}
-                      className="p-1.5 rounded text-slate-300 hover:text-white hover:bg-slate-200"
+                      className="p-1.5 rounded text-slate-300 hover:text-white hover:bg-slate-700"
                       title={language === "hi" ? "साक्ष्य संचिका देखें" : "View evidence dossier"}
                     >
                       <Download size={15} />

@@ -223,17 +223,17 @@ export const EvidenceIntake: React.FC<EvidenceIntakeProps> = ({
   };
 
   return (
-    <div className="bg-panelBg rounded-lg border border-slate-200 shadow-sm p-5 space-y-4">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-3">
+    <div className="bg-panelBg rounded-lg border border-slate-700 shadow-sm p-5 space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-800 pb-3">
         <div>
-          <h3 className="text-sm font-bold text-govNavy flex items-center gap-2">
-            <svg className="w-4 h-4 text-govNavy" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <h3 className="text-sm font-bold text-cyan-300 flex items-center gap-2">
+            <svg className="w-4 h-4 text-cyan-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
             {language === "hi" ? "साक्ष्य अंतर्ग्रहण एवं पैकेजिंग कैप्चर" : "Evidence Intake & Packaging Capture"}
           </h3>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-400 mt-0.5">
             {language === "hi"
               ? "निदान निरीक्षण हेतु ArUco 4x4 (50mm) अंशांकन संदर्भ मानक चिन्ह के साथ भौतिक पैकेज छवि अंतर्ग्रहण करें।"
               : "Ingest physical package image with ArUco 4x4 (50mm) calibration fiducial for diagnostic inspection."}
@@ -243,34 +243,34 @@ export const EvidenceIntake: React.FC<EvidenceIntakeProps> = ({
         {/* Demo Fixture Quick Selector */}
         {ApiService.isMockMode() && (
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-[11px] font-bold text-amber-800">
+            <span className="text-[11px] font-bold text-amber-300">
               {language === "hi" ? "डेमो नमूने:" : "Demo Fixtures:"}
             </span>
             <button
               type="button"
               onClick={() => loadDemoFixture("PASS")}
-              className="px-2 py-0.5 text-[10px] font-semibold rounded bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100"
+              className="px-2 py-0.5 text-[10px] font-semibold rounded bg-emerald-900/30 text-emerald-300 border border-emerald-700 hover:bg-emerald-900/40"
             >
               {language === "hi" ? "उत्तीर्ण (पानी)" : "PASS (Water)"}
             </button>
             <button
               type="button"
               onClick={() => loadDemoFixture("FAIL")}
-              className="px-2 py-0.5 text-[10px] font-semibold rounded bg-rose-50 text-rose-800 border border-rose-300 hover:bg-rose-100"
+              className="px-2 py-0.5 text-[10px] font-semibold rounded bg-rose-900/30 text-rose-300 border border-rose-700 hover:bg-rose-900/40"
             >
               {language === "hi" ? "अनुत्तीर्ण (कुकीज़)" : "FAIL (Cookies)"}
             </button>
             <button
               type="button"
               onClick={() => loadDemoFixture("REVIEW")}
-              className="px-2 py-0.5 text-[10px] font-semibold rounded bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100"
+              className="px-2 py-0.5 text-[10px] font-semibold rounded bg-amber-900/30 text-amber-300 border border-amber-300 hover:bg-amber-900/40"
             >
               {language === "hi" ? "समीक्षा (साबुन)" : "REVIEW (Soap)"}
             </button>
             <button
               type="button"
               onClick={() => loadDemoFixture("UNABLE_TO_VERIFY")}
-              className="px-2 py-0.5 text-[10px] font-semibold rounded bg-slate-100 text-slate-800 border border-slate-300 hover:bg-slate-200"
+              className="px-2 py-0.5 text-[10px] font-semibold rounded bg-slate-800/80 text-slate-100 border border-slate-600 hover:bg-slate-700"
             >
               {language === "hi" ? "असमर्थ (चकाचौंध)" : "UNABLE (Glare)"}
             </button>
@@ -320,21 +320,21 @@ export const EvidenceIntake: React.FC<EvidenceIntakeProps> = ({
                 <div className="w-12 h-12 rounded-xl bg-govNavy text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
                   <Camera size={24} className="text-amber-400" />
                 </div>
-                <span className="text-[10px] font-mono font-bold text-amber-700 bg-amber-100/80 px-2 py-0.5 rounded border border-amber-300">
+                <span className="text-[10px] font-mono font-bold text-amber-400 bg-amber-900/40 px-2 py-0.5 rounded border border-amber-300">
                   {language === "hi" ? "स्मार्टफोन फील्ड एचयूडी" : "SMARTPHONE FIELD HUD"}
                 </span>
               </div>
               <div>
-                <h4 className="text-sm font-bold text-govNavy group-hover:text-govNavy-light">
+                <h4 className="text-sm font-bold text-cyan-300 group-hover:text-cyan-300-light">
                   {language === "hi" ? "फील्ड कैमरा प्रारंभ करें" : "Launch Field Camera"}
                 </h4>
-                <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">
+                <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">
                   {language === "hi"
                     ? "ArUco 50mm संदर्भ लक्ष्य गाइड और प्रकाश सहायता के साथ वास्तविक समय लाइव वीडियो पूर्वावलोकन।"
                     : "Real-time live video preview with ArUco 50mm reference target guide and lighting assist."}
                 </p>
               </div>
-              <div className="flex items-center gap-1 text-[11px] font-bold text-govNavy">
+              <div className="flex items-center gap-1 text-[11px] font-bold text-cyan-300">
                 <span>{language === "hi" ? "लाइव कैमरा खोलें" : "Open Live Camera"}</span>
                 <span>→</span>
               </div>
@@ -347,8 +347,8 @@ export const EvidenceIntake: React.FC<EvidenceIntakeProps> = ({
               onDragLeave={handleDragLeave}
               className={`border-2 border-dashed rounded-xl p-5 text-center transition-colors cursor-pointer flex flex-col items-center justify-center space-y-2.5 ${
                 isDragOver
-                  ? "border-govNavy bg-blue-50/50"
-                  : "border-slate-300 hover:border-slate-400 bg-slate-50/60"
+                  ? "border-govNavy bg-blue-900/30"
+                  : "border-slate-600 hover:border-slate-400 bg-slate-800/60"
               }`}
               onClick={() => fileInputRef.current?.click()}
             >
@@ -360,14 +360,14 @@ export const EvidenceIntake: React.FC<EvidenceIntakeProps> = ({
                 className="hidden"
                 aria-label={language === "hi" ? "पैकेजिंग साक्ष्य छवि अपलोड करें" : "Upload packaging evidence image"}
               />
-              <div className="w-12 h-12 rounded-xl bg-white shadow-xs border border-slate-200 flex items-center justify-center text-slate-700">
-                <UploadCloud size={24} className="text-slate-600" />
+              <div className="w-12 h-12 rounded-xl bg-slate-900/70 shadow-xs border border-slate-700 flex items-center justify-center text-slate-200">
+                <UploadCloud size={24} className="text-slate-400" />
               </div>
               <div>
-                <h4 className="text-xs font-bold text-slate-800">
+                <h4 className="text-xs font-bold text-slate-100">
                   {language === "hi" ? "पैकेजिंग छवि अपलोड करें / फ़ाइलें ब्राउज़ करें" : "Upload Packaging Image / Browse Files"}
                 </h4>
-                <p className="text-[11px] text-slate-500 mt-0.5">
+                <p className="text-[11px] text-slate-400 mt-0.5">
                   {language === "hi"
                     ? "गैलरी या डेस्कटॉप स्टोरेज से 15 MB तक JPEG, PNG, या WEBP"
                     : "JPEG, PNG, or WEBP up to 15 MB from gallery or desktop storage"}
@@ -379,7 +379,7 @@ export const EvidenceIntake: React.FC<EvidenceIntakeProps> = ({
       ) : (
         /* Staged Image Preview Area (Original Evidence Preservation) */
         <div className="space-y-3">
-          <div className="relative rounded-lg border border-slate-300 bg-slate-900 overflow-hidden max-h-96 flex items-center justify-center">
+          <div className="relative rounded-lg border border-slate-600 bg-slate-900 overflow-hidden max-h-96 flex items-center justify-center">
             {/* Prominent Original Evidence Preservation Banner */}
             <div className="absolute top-3 left-3 z-10">
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-govNavy/90 text-white font-mono text-[11px] font-bold border border-amber-400/60 shadow">
@@ -420,44 +420,44 @@ export const EvidenceIntake: React.FC<EvidenceIntakeProps> = ({
           </div>
 
           {/* Technical Metadata Strip */}
-          <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+          <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700 grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
             <div>
-              <span className="text-[11px] font-bold text-slate-500 block">
+              <span className="text-[11px] font-bold text-slate-400 block">
                 {language === "hi" ? "मूल फ़ाइल नाम" : "Original Filename"}
               </span>
-              <span className="font-mono text-slate-800 truncate block" title={selectedFile?.name || existingAsset?.original_filename || "field_evidence.jpg"}>
+              <span className="font-mono text-slate-100 truncate block" title={selectedFile?.name || existingAsset?.original_filename || "field_evidence.jpg"}>
                 {selectedFile?.name || existingAsset?.original_filename || "field_evidence.jpg"}
               </span>
             </div>
 
             <div>
-              <span className="text-[11px] font-bold text-slate-500 block">
+              <span className="text-[11px] font-bold text-slate-400 block">
                 {language === "hi" ? "प्रारूप एवं फ़ाइल आकार" : "Format & File Size"}
               </span>
-              <span className="font-mono text-slate-800">
+              <span className="font-mono text-slate-100">
                 {(selectedFile?.type || existingAsset?.mime_type || "image/jpeg").replace("image/", "").toUpperCase()} •{" "}
                 {formatFileSize(selectedFile?.size || existingAsset?.file_size_bytes || 1024 * 512)}
               </span>
             </div>
 
             <div>
-              <span className="text-[11px] font-bold text-slate-500 block">
+              <span className="text-[11px] font-bold text-slate-400 block">
                 {language === "hi" ? "छवि विमाएं (Dimensions)" : "Image Dimensions"}
               </span>
-              <span className="font-mono text-slate-800">
+              <span className="font-mono text-slate-100">
                 {imageDims ? `${imageDims.width} × ${imageDims.height} px` : "1920 × 1080 px"}
               </span>
             </div>
 
             <div>
-              <span className="text-[11px] font-bold text-slate-500 block">
+              <span className="text-[11px] font-bold text-slate-400 block">
                 {language === "hi" ? "पैनल पहलू" : "Panel Facet"}
               </span>
               <select
                 value={panelType}
                 onChange={(e) => setPanelType(e.target.value as any)}
                 disabled={isSubmitting}
-                className="font-mono text-xs text-govNavy font-semibold bg-white border border-slate-300 rounded px-1.5 py-0.5 focus:outline-none"
+                className="font-mono text-xs text-cyan-300 font-semibold bg-white border border-slate-300 rounded px-1.5 py-0.5 focus:outline-none"
               >
                 <option value="PDP_FRONT">
                   {language === "hi" ? "पीडीपी (मुख्य सम्मुख पैनल)" : "PDP (Front Panel)"}
@@ -478,7 +478,7 @@ export const EvidenceIntake: React.FC<EvidenceIntakeProps> = ({
               type="button"
               onClick={clearSelection}
               disabled={isSubmitting}
-              className="text-xs text-slate-600 hover:text-slate-800 font-medium underline"
+              className="text-xs text-slate-400 hover:text-slate-100 font-medium underline"
             >
               {language === "hi" ? "खारिज / रीसेट करें" : "Discard / Reset"}
             </button>

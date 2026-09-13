@@ -138,7 +138,7 @@ export const Rules: React.FC = () => {
             type="button"
             onClick={() => setActiveTab("SCHEDULES")}
             className={`px-3 py-1.5 rounded-md transition-colors ${
-              activeTab === "SCHEDULES" ? "bg-amber-400 text-slate-950 font-bold shadow-xs" : "text-slate-400 hover:text-white hover:bg-white/5"
+              activeTab === "SCHEDULES" ? "bg-amber-400 text-slate-950 font-bold shadow-xs" : "text-slate-400 hover:text-white hover:bg-slate-900/70/10/5"
             }`}
           >
             {language === "hi" ? "तालिका-I फ़ॉन्ट अनुसूची" : "Table-I Font Schedule"}
@@ -147,7 +147,7 @@ export const Rules: React.FC = () => {
             type="button"
             onClick={() => setActiveTab("CATALOG")}
             className={`px-3 py-1.5 rounded-md transition-colors ${
-              activeTab === "CATALOG" ? "bg-amber-400 text-slate-950 font-bold shadow-xs" : "text-slate-400 hover:text-white hover:bg-white/5"
+              activeTab === "CATALOG" ? "bg-amber-400 text-slate-950 font-bold shadow-xs" : "text-slate-400 hover:text-white hover:bg-slate-900/70/10/5"
             }`}
           >
             {language === "hi" ? "नियम सूची (कैटलॉग)" : "Rule Catalog"}
@@ -156,7 +156,7 @@ export const Rules: React.FC = () => {
             type="button"
             onClick={() => setActiveTab("INVARIANTS")}
             className={`px-3 py-1.5 rounded-md transition-colors ${
-              activeTab === "INVARIANTS" ? "bg-amber-400 text-slate-950 font-bold shadow-xs" : "text-slate-400 hover:text-white hover:bg-white/5"
+              activeTab === "INVARIANTS" ? "bg-amber-400 text-slate-950 font-bold shadow-xs" : "text-slate-400 hover:text-white hover:bg-slate-900/70/10/5"
             }`}
           >
             {language === "hi" ? "साक्ष्य मानक" : "Evidentiary Invariants"}
@@ -195,28 +195,28 @@ export const Rules: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-700/60 font-normal text-slate-300">
-                  <tr className="hover:bg-white/5">
+                  <tr className="hover:bg-slate-900/70/10/5">
                     <td className="px-4 py-3 font-mono font-bold text-slate-200">1</td>
                     <td className="px-4 py-3">A ≤ 50 cm²</td>
                     <td className="px-4 py-3 font-bold text-white font-mono">1.0 mm</td>
                     <td className="px-4 py-3 font-mono text-slate-300">1.5 mm</td>
                     <td className="px-4 py-3 text-slate-400">{language === "hi" ? "पंक्ति 1, तालिका-I" : "Row 1, Table-I"}</td>
                   </tr>
-                  <tr className="hover:bg-white/5">
+                  <tr className="hover:bg-slate-900/70/10/5">
                     <td className="px-4 py-3 font-mono font-bold text-slate-200">2</td>
                     <td className="px-4 py-3">50 cm² &lt; A ≤ 100 cm²</td>
                     <td className="px-4 py-3 font-bold text-white font-mono">1.5 mm</td>
                     <td className="px-4 py-3 font-mono text-slate-300">3.0 mm</td>
                     <td className="px-4 py-3 text-slate-400">{language === "hi" ? "पंक्ति 2, तालिका-I" : "Row 2, Table-I"}</td>
                   </tr>
-                  <tr className="hover:bg-white/5">
+                  <tr className="hover:bg-slate-900/70/10/5">
                     <td className="px-4 py-3 font-mono font-bold text-slate-200">3</td>
                     <td className="px-4 py-3">100 cm² &lt; A ≤ 500 cm²</td>
                     <td className="px-4 py-3 font-bold text-white font-mono">2.5 mm</td>
                     <td className="px-4 py-3 font-mono text-slate-300">4.0 mm</td>
                     <td className="px-4 py-3 text-slate-400">{language === "hi" ? "पंक्ति 3, तालिका-I" : "Row 3, Table-I"}</td>
                   </tr>
-                  <tr className="hover:bg-white/5">
+                  <tr className="hover:bg-slate-900/70/10/5">
                     <td className="px-4 py-3 font-mono font-bold text-slate-200">4</td>
                     <td className="px-4 py-3">500 cm² &lt; A ≤ 2500 cm²</td>
                     <td className="px-4 py-3 font-bold text-white font-mono">4.0 mm</td>
@@ -265,7 +265,7 @@ export const Rules: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setExpandedRule(isOpen ? null : r.code)}
-                  className="w-full p-4 flex items-center justify-between text-left hover:bg-white/5 transition-colors"
+                  className="w-full p-4 flex items-center justify-between text-left hover:bg-slate-900/70/10/5 transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-lg bg-slate-800 text-cyan-300 shrink-0 border border-slate-700">

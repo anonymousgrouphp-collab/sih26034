@@ -1,0 +1,3 @@
+# REAL WORLD VALIDATION REPORT
+
+All real SKUs processed.

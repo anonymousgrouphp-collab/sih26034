@@ -242,7 +242,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
             {language === "hi" ? "कुल पंजीकृत मामले" : "Total Registered Cases"}
           </div>
           <div className="text-2xl font-black text-white mt-1 font-mono">{metrics.total}</div>
-          <div className="text-[11px] text-slate-500 mt-0.5">
+          <div className="text-[11px] text-slate-400 mt-0.5">
             {language === "hi" ? "विधिक माप अधिनियम की धारा 15 के तहत" : "Under Section 15 LM Act"}
           </div>
         </div>
@@ -252,7 +252,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
             {language === "hi" ? "निर्णय लंबित" : "Pending Adjudication"}
           </div>
           <div className="text-2xl font-black text-amber-400 mt-1 font-mono">{metrics.pendingAdjudication}</div>
-          <div className="text-[11px] text-slate-500 mt-0.5">
+          <div className="text-[11px] text-slate-400 mt-0.5">
             {language === "hi" ? "अधिकारी हस्ताक्षर अपेक्षित" : "Awaiting LMO Sign-off"}
           </div>
         </div>
@@ -262,7 +262,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
             {language === "hi" ? "पाए गए विधिक उल्लंघन" : "Violations Detected"}
           </div>
           <div className="text-2xl font-black text-red-400 mt-1 font-mono">{metrics.violations}</div>
-          <div className="text-[11px] text-slate-500 mt-0.5">
+          <div className="text-[11px] text-slate-400 mt-0.5">
             {language === "hi" ? "धारा 36(1) नोटिस योग्य" : "Section 36(1) Notice Ready"}
           </div>
         </div>
@@ -272,7 +272,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
             {language === "hi" ? "विधिक अनुपालक वस्तुएं" : "Compliant Products"}
           </div>
           <div className="text-2xl font-black text-emerald-400 mt-1 font-mono">{metrics.compliant}</div>
-          <div className="text-[11px] text-slate-500 mt-0.5">
+          <div className="text-[11px] text-slate-400 mt-0.5">
             {language === "hi" ? "पूर्ण विधिक अनुपालन" : "Table-I & Rule 6 compliant"}
           </div>
         </div>
@@ -546,7 +546,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                           )}
                         </div>
                         <div className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1">
-                          <CalendarDays className="w-3 h-3 text-slate-500 shrink-0" />
+                          <CalendarDays className="w-3 h-3 text-slate-400 shrink-0" />
                           <span>{formatDateTime(c.created_at)}</span>
                         </div>
                       </td>
@@ -567,7 +567,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                           {c.establishment_name || (language === "hi" ? "क्षेत्र जब्ती" : "Field Seizure")}
                         </div>
                         <div className="text-[11px] text-slate-400 max-w-xs truncate flex items-center gap-1 mt-0.5">
-                          <MapPin className="w-3 h-3 text-slate-500 shrink-0" />
+                          <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
                           <span className="truncate">{c.location || c.jurisdiction_id}</span>
                         </div>
                       </td>

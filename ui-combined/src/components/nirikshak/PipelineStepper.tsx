@@ -38,7 +38,7 @@ export const PipelineStepper: React.FC<PipelineStepperProps> = ({
   const { language } = useLanguage();
 
   return (
-    <div className={`overflow-x-auto rounded-xl border border-slate-200 bg-white p-3 shadow-xs ${className}`}>
+    <div className={`overflow-x-auto rounded-xl border border-slate-700 bg-slate-900/70 p-3 shadow-xs ${className}`}>
       <div className="flex min-w-[760px] items-center justify-between">
         {steps.map((step, idx) => {
           const isCompleted = step.status === "completed";
@@ -60,7 +60,7 @@ export const PipelineStepper: React.FC<PipelineStepperProps> = ({
                       ? "bg-govNavy text-white ring-4 ring-govNavy/15 animate-pulse"
                       : isFailed
                       ? "bg-rose-600 text-white"
-                      : "bg-slate-100 text-slate-400 border border-slate-200"
+                      : "bg-slate-800/80 text-slate-400 border border-slate-700"
                   }`}
                 >
                   {isCompleted ? <CheckCircle2 size={15} /> : idx + 1}
@@ -68,7 +68,7 @@ export const PipelineStepper: React.FC<PipelineStepperProps> = ({
                 <div>
                   <p
                     className={`text-xs font-bold leading-tight ${
-                      isActive ? "text-govNavy font-black" : isCompleted ? "text-slate-800" : "text-slate-400"
+                      isActive ? "text-cyan-300 font-black" : isCompleted ? "text-slate-100" : "text-slate-400"
                     }`}
                   >
                     {displayLabel}
@@ -84,7 +84,7 @@ export const PipelineStepper: React.FC<PipelineStepperProps> = ({
               {idx < steps.length - 1 && (
                 <div
                   className={`mx-2 h-0.5 flex-1 transition-colors ${
-                    isCompleted ? "bg-emerald-500" : "bg-slate-200"
+                    isCompleted ? "bg-emerald-500" : "bg-slate-700"
                   }`}
                 />
               )}

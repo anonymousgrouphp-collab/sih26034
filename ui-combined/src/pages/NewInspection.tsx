@@ -521,7 +521,7 @@ export const NewInspection: React.FC = () => {
                 {/* Primary: Live Field Camera */}
                 <div className="p-4 rounded-2xl bg-gradient-to-r from-govNavy to-blue-900 text-white shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div className="flex items-start gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-amber-300 border border-white/10 shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-slate-900/70/10 flex items-center justify-center text-amber-300 border border-white/10 shrink-0">
                       <Camera size={26} />
                     </div>
                     <div>
@@ -529,7 +529,7 @@ export const NewInspection: React.FC = () => {
                         <h4 className="text-sm font-bold tracking-tight">
                           {language === "hi" ? "सजीव क्षेत्रीय निरीक्षण कैमरा" : "Live Field Inspection Camera"}
                         </h4>
-                        <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-400 text-slate-900">
+                        <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-400 text-white">
                           {language === "hi" ? "अनुशंसित" : "Recommended"}
                         </span>
                       </div>
@@ -815,7 +815,7 @@ export const NewInspection: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setErrorMessage(null)}
-                    className="text-rose-400 hover:text-rose-700 p-1"
+                    className="text-rose-400 hover:text-rose-400 p-1"
                     aria-label="Dismiss error"
                   >
                     <X size={14} />

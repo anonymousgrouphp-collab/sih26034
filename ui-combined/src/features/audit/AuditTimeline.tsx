@@ -25,19 +25,19 @@ export const AuditTimeline: React.FC<AuditTimelineProps> = ({
   const systemCount = auditTrail.filter((e) => e.actor_type === "SYSTEM").length;
 
   return (
-    <div className="bg-panelBg rounded-lg border border-slate-200 shadow-sm p-4 space-y-4">
+    <div className="bg-panelBg rounded-lg border border-slate-700 shadow-sm p-4 space-y-4">
       {/* 1. Header & Filter Toolbar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-200 pb-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-700 pb-3">
         <div>
           <div className="flex items-center gap-2">
-            <svg className="w-4 h-4 text-govNavy" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-4 h-4 text-cyan-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-govNavy">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-cyan-300">
               {language === "hi" ? "कालानुक्रमिक लेखापरीक्षा (ऑडिट) अभिलेख" : "Chronological Audit Record"}
             </h3>
           </div>
-          <p className="text-[11px] text-slate-500 mt-0.5">
+          <p className="text-[11px] text-slate-400 mt-0.5">
             {language === "hi"
               ? "सिस्टम पाइपलाइन घटनाओं एवं प्राधिकृत अधिकारी कार्रवाइयों का केवल-परिशिष्ट साक्ष्य बही (लेज़र)।"
               : "Append-only evidentiary ledger of system pipeline events and authorized officer actions."}
@@ -52,7 +52,7 @@ export const AuditTimeline: React.FC<AuditTimelineProps> = ({
             className={`px-2.5 py-1 text-xs font-semibold rounded transition-colors ${
               filterActor === "ALL"
                 ? "bg-govNavy text-white shadow-sm"
-                : "bg-white text-slate-700 hover:bg-slate-100 border border-slate-200"
+                : "bg-slate-900/70 text-slate-200 hover:bg-slate-800/70 border border-slate-700"
             }`}
           >
             {language === "hi" ? `सभी घटनाएं (${auditTrail.length})` : `All Events (${auditTrail.length})`}
@@ -63,11 +63,11 @@ export const AuditTimeline: React.FC<AuditTimelineProps> = ({
             className={`px-2.5 py-1 text-xs font-semibold rounded transition-colors flex items-center gap-1 ${
               filterActor === "OFFICER"
                 ? "bg-emerald-700 text-white shadow-sm"
-                : "bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200"
+                : "bg-emerald-900/30 text-emerald-300 hover:bg-emerald-900/40 border border-emerald-800"
             }`}
           >
             <span>{language === "hi" ? "अधिकारी कार्रवाइयां" : "Officer Actions"}</span>
-            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-200 text-emerald-900 font-bold">
+            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-200 text-emerald-300 font-bold">
               {officerCount}
             </span>
           </button>
@@ -77,11 +77,11 @@ export const AuditTimeline: React.FC<AuditTimelineProps> = ({
             className={`px-2.5 py-1 text-xs font-semibold rounded transition-colors flex items-center gap-1 ${
               filterActor === "SYSTEM"
                 ? "bg-blue-700 text-white shadow-sm"
-                : "bg-blue-50 text-blue-800 hover:bg-blue-100 border border-blue-200"
+                : "bg-blue-900/30 text-blue-300 hover:bg-blue-900/40 border border-blue-800"
             }`}
           >
             <span>{language === "hi" ? "सिस्टम पाइपलाइन" : "System Pipeline"}</span>
-            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-blue-200 text-blue-900 font-bold">
+            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-blue-200 text-blue-300 font-bold">
               {systemCount}
             </span>
           </button>
@@ -90,11 +90,11 @@ export const AuditTimeline: React.FC<AuditTimelineProps> = ({
 
       {/* 2. Chronological Activity Stream */}
       {filteredEvents.length === 0 ? (
-        <div className="p-8 text-center text-xs text-slate-500 italic bg-slate-50 rounded border border-slate-200">
+        <div className="p-8 text-center text-xs text-slate-400 italic bg-slate-800/60 rounded border border-slate-700">
           {language === "hi" ? "चयनित फ़िल्टर हेतु कोई ऑडिट घटना दर्ज नहीं है।" : "No audit events recorded for the selected filter."}
         </div>
       ) : (
-        <div className="relative pl-6 border-l-2 border-slate-200 space-y-4 my-2 ml-2">
+        <div className="relative pl-6 border-l-2 border-slate-700 space-y-4 my-2 ml-2">
           {filteredEvents.map((evt) => {
             const isOfficer = evt.actor_type === "OFFICER";
             const dateStr = evt.timestamp_utc
@@ -115,27 +115,27 @@ export const AuditTimeline: React.FC<AuditTimelineProps> = ({
                 />
 
                 {/* Event Card */}
-                <div className="p-3 bg-white rounded-lg border border-slate-200 shadow-sm text-xs space-y-2 hover:border-slate-300 transition-colors">
+                <div className="p-3 bg-slate-900/70 rounded-lg border border-slate-700 shadow-sm text-xs space-y-2 hover:border-slate-600 transition-colors">
                   {/* Event Header */}
-                  <div className="flex items-center justify-between flex-wrap gap-1 border-b border-slate-100 pb-1.5">
+                  <div className="flex items-center justify-between flex-wrap gap-1 border-b border-slate-800 pb-1.5">
                     <div className="flex items-center gap-2">
                       <span
                         className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
                           isOfficer
-                            ? "bg-emerald-100 text-emerald-900 border border-emerald-300"
-                            : "bg-blue-100 text-blue-900 border border-blue-300"
+                            ? "bg-emerald-900/40 text-emerald-300 border border-emerald-700"
+                            : "bg-blue-900/40 text-blue-300 border border-blue-700"
                         }`}
                       >
                         {isOfficer
                           ? (language === "hi" ? "अधिकारी कार्रवाई" : "OFFICER ACTION")
                           : (language === "hi" ? "सिस्टम घटना" : "SYSTEM EVENT")}
                       </span>
-                      <span className="font-bold text-slate-900 text-xs">
+                      <span className="font-bold text-white text-xs">
                         {evt.event_label}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2 text-[11px] text-slate-500 font-mono">
+                    <div className="flex items-center gap-2 text-[11px] text-slate-400 font-mono">
                       <span>{language === "hi" ? `क्रम #${evt.sequence_number}` : `seq #${evt.sequence_number}`}</span>
                       <span>•</span>
                       <span>{dateStr}</span>
@@ -143,10 +143,10 @@ export const AuditTimeline: React.FC<AuditTimelineProps> = ({
                   </div>
 
                   {/* Actor Details */}
-                  <div className="flex items-center justify-between text-[11px] text-slate-600 bg-slate-50 px-2 py-1 rounded">
+                  <div className="flex items-center justify-between text-[11px] text-slate-400 bg-slate-800/60 px-2 py-1 rounded">
                     <div className="flex items-center gap-1.5">
-                      <span className="font-semibold text-slate-500">{language === "hi" ? "कर्ता:" : "Actor:"}</span>
-                      <span className="font-medium text-slate-800">{evt.actor_name}</span>
+                      <span className="font-semibold text-slate-400">{language === "hi" ? "कर्ता:" : "Actor:"}</span>
+                      <span className="font-medium text-slate-100">{evt.actor_name}</span>
                       <span className="font-mono text-[10px] text-slate-400">({evt.actor_id})</span>
                     </div>
 
@@ -158,14 +158,14 @@ export const AuditTimeline: React.FC<AuditTimelineProps> = ({
                   {/* Decision & Remarks */}
                   {evt.decision && (
                     <div className="flex items-center gap-2 text-xs">
-                      <span className="font-semibold text-slate-700">{language === "hi" ? "निर्णय:" : "Decision:"}</span>
+                      <span className="font-semibold text-slate-200">{language === "hi" ? "निर्णय:" : "Decision:"}</span>
                       <span
                         className={`px-2 py-0.5 rounded font-mono font-bold text-[11px] ${
                           evt.decision === "CONFIRM_VIOLATION" || evt.decision === "CONFIRMED"
-                            ? "bg-rose-100 text-rose-900 border border-rose-300"
+                            ? "bg-rose-900/40 text-rose-300 border border-rose-700"
                             : evt.decision === "DISMISS_AS_COMPLIANT" || evt.decision === "DISMISSED"
-                            ? "bg-emerald-100 text-emerald-900 border border-emerald-300"
-                            : "bg-amber-100 text-amber-900 border border-amber-300"
+                            ? "bg-emerald-900/40 text-emerald-300 border border-emerald-700"
+                            : "bg-amber-900/40 text-amber-300 border border-amber-300"
                         }`}
                       >
                         {language === "hi"
@@ -180,8 +180,8 @@ export const AuditTimeline: React.FC<AuditTimelineProps> = ({
                   )}
 
                   {evt.remarks && (
-                    <div className="text-slate-700 bg-slate-50 p-2 rounded border border-slate-150 text-[11px] leading-relaxed">
-                      <span className="font-semibold text-slate-500 block text-[10px] uppercase">
+                    <div className="text-slate-200 bg-slate-800/60 p-2 rounded border border-slate-150 text-[11px] leading-relaxed">
+                      <span className="font-semibold text-slate-400 block text-[10px] uppercase">
                         {language === "hi" ? "टिप्पणी / औचित्य:" : "Remarks / Justification:"}
                       </span>
                       "{evt.remarks}"
@@ -189,7 +189,7 @@ export const AuditTimeline: React.FC<AuditTimelineProps> = ({
                   )}
 
                   {/* Links / Traceability references */}
-                  <div className="flex items-center gap-3 pt-1 text-[11px] font-mono text-slate-500 flex-wrap">
+                  <div className="flex items-center gap-3 pt-1 text-[11px] font-mono text-slate-400 flex-wrap">
                     {evt.related_evidence_id && (
                       <div className="flex items-center gap-1">
                         <span>{language === "hi" ? "साक्ष्य:" : "Evidence:"}</span>
@@ -197,12 +197,12 @@ export const AuditTimeline: React.FC<AuditTimelineProps> = ({
                           <button
                             type="button"
                             onClick={() => onSelectEvidence(evt.related_evidence_id!)}
-                            className="text-govNavy hover:underline font-bold"
+                            className="text-cyan-300 hover:underline font-bold"
                           >
                             {evt.related_evidence_id}
                           </button>
                         ) : (
-                          <span className="text-govNavy font-semibold">{evt.related_evidence_id}</span>
+                          <span className="text-cyan-300 font-semibold">{evt.related_evidence_id}</span>
                         )}
                       </div>
                     )}
@@ -214,12 +214,12 @@ export const AuditTimeline: React.FC<AuditTimelineProps> = ({
                           <button
                             type="button"
                             onClick={() => onSelectFinding(evt.related_finding_id!)}
-                            className="text-govNavy hover:underline font-bold"
+                            className="text-cyan-300 hover:underline font-bold"
                           >
                             {evt.related_finding_id}
                           </button>
                         ) : (
-                          <span className="text-govNavy font-semibold">{evt.related_finding_id}</span>
+                          <span className="text-cyan-300 font-semibold">{evt.related_finding_id}</span>
                         )}
                       </div>
                     )}
@@ -241,7 +241,7 @@ export const AuditTimeline: React.FC<AuditTimelineProps> = ({
       )}
 
       {/* 3. Append-Only Policy Banner */}
-      <div className="p-2.5 bg-slate-50 border border-slate-200 rounded text-[11px] text-slate-500 flex items-center justify-between">
+      <div className="p-2.5 bg-slate-800/60 border border-slate-700 rounded text-[11px] text-slate-400 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
