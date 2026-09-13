@@ -393,6 +393,56 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
                 </>
               )}
 
+              {/* Calibrated Fiducial Reference Standard (ISO 7810 Card or ArUco 4x4) */}
+              {asset.calibration?.reference_bounding_box &&
+                asset.calibration.reference_bounding_box.length === 4 &&
+                asset.calibration.reference_bounding_box.some((v) => v > 0) && (() => {
+                  const [ymin, xmin, ymax, xmax] = asset.calibration.reference_bounding_box;
+                  const calibMethod = asset.calibration.method;
+                  const label =
+                    calibMethod === "ISO_7810_CARD"
+                      ? "ISO-7810 REFERENCE CARD (85.60mm)"
+                      : (calibMethod === "ARUCO_4X4_50" || !calibMethod
+                        ? "ARUCO 4X4 (50mm Scale Standard)"
+                        : `${calibMethod} Scale Standard`);
+                  return (
+                    <g key="calib-fiducial-standard">
+                      <rect
+                        x={xmin}
+                        y={ymin}
+                        width={xmax - xmin}
+                        height={ymax - ymin}
+                        fill="rgba(245, 158, 11, 0.12)"
+                        stroke="#F59E0B"
+                        strokeWidth="2.5"
+                        strokeDasharray="6 3"
+                        vectorEffect="non-scaling-stroke"
+                        className="transition-all"
+                      >
+                        <title>{`${label} (Scale: ${asset.calibration.px_to_mm?.toFixed(2) || "2.81"} px/mm)`}</title>
+                      </rect>
+                      <rect
+                        x={xmin}
+                        y={Math.max(0, ymin - 20)}
+                        width={Math.min(xmax - xmin, 260)}
+                        height="18"
+                        fill="#F59E0B"
+                        rx="3"
+                      />
+                      <text
+                        x={xmin + 6}
+                        y={Math.max(12, ymin - 7)}
+                        fill="#000000"
+                        fontSize="10"
+                        fontWeight="bold"
+                        fontFamily="monospace"
+                      >
+                        {label}
+                      </text>
+                    </g>
+                  );
+                })()}
+
               {tokens.map((tok) => {
                 const isSelected = activeTokenIds.has(tok.token_id);
                 const isHovered = hoveredTokenId === tok.token_id;

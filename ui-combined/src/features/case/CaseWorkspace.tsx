@@ -167,18 +167,10 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
     setActionError(null);
     setIsAnalyzingPipeline(true);
     try {
-      // Determine scenario based on product or asset quality
+      // Allow backend pipeline to evaluate real statutory rules; only set UNABLE_TO_VERIFY if optical quality gate fails
       let scenario: "PASS" | "FAIL" | "REVIEW" | "UNABLE_TO_VERIFY" | undefined;
-      if (activeAsset.quality_gate.passed === false) {
+      if (activeAsset.quality_gate?.passed === false) {
         scenario = "UNABLE_TO_VERIFY";
-      } else if (caseData.product_name.toLowerCase().includes("water")) {
-        scenario = "PASS";
-      } else if (caseData.product_name.toLowerCase().includes("soap")) {
-        scenario = "REVIEW";
-      } else if (caseData.product_name.toLowerCase().includes("chips")) {
-        scenario = "UNABLE_TO_VERIFY";
-      } else {
-        scenario = "FAIL";
       }
 
       const updated = await ApiService.executePipeline(activeAsset.image_id, caseData.id, scenario);
@@ -435,18 +427,22 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
       };
     };
 
-    // 1. Detected ArUco 4x4 (50mm) Scale Calibration Reference Standard
-    const refBox =
-      activeAsset?.calibration?.reference_bounding_box ||
-      (activeAsset?.calibration?.is_calibrated && activeAsset?.panel_type !== "ECOMMERCE_SNAPSHOT"
-        ? ([78, 78, 242, 242] as [number, number, number, number])
-        : null);
+    // 1. Detected Scale Calibration Reference Standard
+    const refBox = activeAsset?.calibration?.reference_bounding_box;
 
-    if (refBox && refBox.length === 4) {
+    if (refBox && refBox.length === 4 && refBox.some((v) => v > 0)) {
       const p = toPercentBox(refBox as [number, number, number, number]);
+      const calibMethod = activeAsset?.calibration?.method;
+      const label =
+        calibMethod === "ISO_7810_CARD"
+          ? "ISO-7810 Reference Card (85.6mm)"
+          : (calibMethod === "ARUCO_4X4_50" || !calibMethod
+            ? "ARUCO 4X4 (50mm Scale Standard)"
+            : `${calibMethod} Reference Standard`);
+
       boxes.push({
-        id: "box-aruco-fiducial",
-        label: "ARUCO 4X4 (50mm Scale Standard)",
+        id: "box-calibration-fiducial",
+        label,
         x: p.x,
         y: p.y,
         width: p.width,

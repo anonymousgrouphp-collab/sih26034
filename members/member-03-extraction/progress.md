@@ -586,6 +586,50 @@ System-wide integration with Member 4 Rule Engine and Member 5 Evidence Backend 
 ### Signing Note
 SIGNED OFF BY: Harsh Patel (anonymousgrouphp@gmail.com) — 2026-09-12 05:00 IST [VERIFIED]
 
+---
+
+## [13 September 2026] [10:25] IST
+
+### Task / Chunk
+Real Packaging Pipeline Hardening: Explicit Statutory Prefix Precedence for Manufacturing Dates, Corporate Entity Cleanup, and Pydantic Token Ingestion Compatibility.
+
+### Status
+COMPLETE
+
+### Completed
+- **Date Parser Statutory Prefix Precedence (`parsers.py` & `extractor.py`):**
+  - Added `has_mfg_prefix` indicator in `StatutoryDeclarationParser.parse_mfg_and_expiry_dates`.
+  - In `CommodityFactExtractor`, enforced strict priority for explicit statutory prefix dates (`Month & Year of Manufacturing: April 2026`) over standalone numeric dates (`01/22`), preventing debit card expiration dates or batch dates from overriding true manufacturing dates.
+- **Corporate Entity Name Clean-up:**
+  - Added regex cleaning in `parse_address` to cleanly strip trailing building, street, or plot numbers attached after corporate suffixes (`Ltd`, `Pvt Ltd`, `LLP`, `Inc`).
+  - Added `"manufactured & marketed"` role recognition in `extractor.py`.
+- **Pydantic Token Normalization:**
+  - Enhanced `_normalize_tokens` in `extractor.py` to transparently accept Pydantic `OCRToken` instances with `.model_dump()` or `.dict()` methods.
+
+### Tests
+- `& "C:\Users\ceoha\AppData\Local\Programs\Python\Python314\python.exe" -m pytest members/member-03-extraction/tests/ -v` (151 passed in 3.06s)
+- Direct real packaging verification on GOBOULT earbuds package (`media_1789250888882.jpg`):
+  - MRP: ₹1,999.00 (Tax Inclusive)
+  - Net Qty: 1.0 N
+  - Mfg Date: April 2026 (Month 4, Year 2026)
+  - Manufacturer: Exotic Mile Pvt Ltd, Delhi 110052
+  - Origin: India
+  - Consumer Care: support@goboult.co.in, +919667879464
+
+### Problems
+None. 100% deterministic and compliant with Section 63 BSA 2023.
+
+### Decisions
+1. Dates accompanied by explicit statutory prefixes (`Mfg Date`, `Month & Year of Manufacturing`) must unconditionally supersede prefix-less standalone dates to prevent payment card expiration dates from stealing manufacturing declarations.
+2. Building and plot numbers appearing in composite address lines must not corrupt the extracted corporate name.
+
+### Next Step
+Multi-facet pipeline integration and frontend canvas verification.
+
+### Signing Note
+SIGNED OFF BY: Harsh Patel (anonymousgrouphp@gmail.com) — 2026-09-13 10:25 IST [VERIFIED]
+
+
 
 
 
