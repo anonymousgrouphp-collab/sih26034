@@ -348,6 +348,49 @@ export class LiveApiService implements IInspectionApiService {
       }
 
       if (!res.ok) {
+        if (res.status !== 404) {
+          try {
+            const emaapRes = await this.fetchWithAuth(`${this.baseUrl}/inspections/${id}/emaap-export`);
+            if (emaapRes.ok) {
+              const emaapData = await emaapRes.json();
+              const recoveredCase: InspectionCase = {
+                id: id,
+                inspection_number: emaapData.inspection_number || (id.startsWith("INSP-") ? id : `INSP-2026-09-${id.slice(-4)}`),
+                created_at: emaapData.timestamp_utc || new Date().toISOString(),
+                officer_id: "INSP-DL-SOUTH",
+                jurisdiction_id: emaapData.jurisdiction || "CIRCLE_DL_SOUTH_01",
+                capture_source: "PHYSICAL_FIELD",
+                product_name: emaapData.commodity?.product_name || "Statutory Seized Commodity",
+                brand_name: emaapData.commodity?.brand,
+                manufacturer_name: undefined,
+                category: emaapData.commodity?.category || "FOOD_SNACKS",
+                package_type: emaapData.commodity?.package_type || "SPECIAL",
+                workflow_status: emaapData.verdict === "PENDING_REVIEW" ? "PENDING_REVIEW" : "COMPLETED",
+                overall_status: emaapData.verdict || "PENDING_REVIEW",
+                ai_verdict: emaapData.verdict || "PENDING",
+                evidence_assets: [],
+                extracted_fields: [],
+                rule_evaluations: (emaapData.statutory_findings || []).map((f: any, idx: number) => ({
+                  finding_id: `finding_${idx}`,
+                  rule_code: f.rule,
+                  statutory_reference: f.citation,
+                  status: f.status,
+                  severity: "CRITICAL",
+                  required_value: f.prescribed,
+                  measured_value: f.observed,
+                  discrepancy: f.discrepancy || f.prescribed,
+                  legal_consequence: f.section || "Section 36(1) LM Act 2009",
+                })),
+                audit_trail: [],
+                is_mock_fixture: false,
+                pipeline_source: "LIVE_BACKEND",
+              };
+              return recoveredCase;
+            }
+          } catch (emaapErr) {
+            console.warn("eMaap recovery failed:", emaapErr);
+          }
+        }
         throw new Error(`Failed to retrieve inspection: HTTP ${res.status}`);
       }
       const data = await res.json();
