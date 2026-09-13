@@ -192,7 +192,7 @@ class MultilingualOCREngine:
             final_conf = p_conf
             final_lang = p_lang
 
-            if PolygonNormalizer.requires_consensus_fallback(p_conf, self.fallback_threshold):
+            if self.fallback_threshold > 0 and PolygonNormalizer.requires_consensus_fallback(p_conf, self.fallback_threshold):
                 if self.fallback.is_available():
                     fb_res = self.fallback.recognize(crop)
                     if fb_res is not None:
