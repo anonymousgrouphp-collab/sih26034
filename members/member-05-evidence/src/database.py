@@ -7,10 +7,13 @@ from datetime import datetime, timezone
 from enum import Enum
 import hashlib
 import json
+import logging
 import os
 from pathlib import Path
 from typing import Any, Dict, Generator, List, Optional, Tuple, Type
 import uuid
+
+logger = logging.getLogger("nyayadrishti.database")
 
 from sqlalchemy import (
     BigInteger,
@@ -388,17 +391,39 @@ def get_database_engine(url: Optional[str] = None):
     return create_engine(db_url, connect_args=connect_args, echo=False)
 
 
+def migrate_database_schema(engine_or_conn):
+    """Executes idempotent schema migrations across PostgreSQL and SQLite."""
+    try:
+        if hasattr(engine_or_conn, "exec_driver_sql"):
+            conn = engine_or_conn
+            dialect_name = getattr(conn.dialect, "name", "").lower()
+            if "postgres" in dialect_name or "psycopg" in dialect_name:
+                conn.exec_driver_sql("ALTER TABLE evidence_images ADD COLUMN IF NOT EXISTS calibration_reference_box TEXT;")
+                conn.commit()
+            else:
+                cols = [row[1] for row in conn.exec_driver_sql("PRAGMA table_info(evidence_images)").fetchall()]
+                if cols and "calibration_reference_box" not in cols:
+                    conn.exec_driver_sql("ALTER TABLE evidence_images ADD COLUMN calibration_reference_box TEXT;")
+                    conn.commit()
+        elif hasattr(engine_or_conn, "connect"):
+            with engine_or_conn.connect() as conn:
+                dialect_name = getattr(engine_or_conn.dialect, "name", "").lower()
+                if "postgres" in dialect_name or "psycopg" in dialect_name:
+                    conn.exec_driver_sql("ALTER TABLE evidence_images ADD COLUMN IF NOT EXISTS calibration_reference_box TEXT;")
+                    conn.commit()
+                else:
+                    cols = [row[1] for row in conn.exec_driver_sql("PRAGMA table_info(evidence_images)").fetchall()]
+                    if cols and "calibration_reference_box" not in cols:
+                        conn.exec_driver_sql("ALTER TABLE evidence_images ADD COLUMN calibration_reference_box TEXT;")
+                        conn.commit()
+    except Exception as exc:
+        logger.warning(f"Database schema migration warning: {exc}")
+
+
 def init_database(engine):
     """Initializes all database tables and ensures schema migrations."""
     Base.metadata.create_all(bind=engine)
-    try:
-        with engine.connect() as conn:
-            cols = [row[1] for row in conn.exec_driver_sql("PRAGMA table_info(evidence_images)").fetchall()]
-            if cols and "calibration_reference_box" not in cols:
-                conn.exec_driver_sql("ALTER TABLE evidence_images ADD COLUMN calibration_reference_box TEXT")
-                conn.commit()
-    except Exception:
-        pass
+    migrate_database_schema(engine)
 
 
 def seed_default_platform_data(session: Session):

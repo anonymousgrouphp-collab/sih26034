@@ -748,6 +748,13 @@ export class MockApiService implements IInspectionApiService {
             normalized_value: { brand: targetCase.brand_name },
           };
         }
+        if (f.field_type === "MANUFACTURER" && targetCase.manufacturer_name) {
+          return {
+            ...f,
+            raw_ocr_text: targetCase.manufacturer_name,
+            normalized_value: { name: targetCase.manufacturer_name },
+          };
+        }
         return f;
       });
 

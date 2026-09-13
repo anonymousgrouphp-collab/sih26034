@@ -588,4 +588,45 @@ Commit and push verified baseline to `origin main` and `origin dev`.
 ### Signing Note
 SIGNED OFF BY: Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-13 10:30 IST [VERIFIED]
 
+---
+
+## [13 September 2026] [11:05] IST
+
+### Task / Chunk
+PostgreSQL Schema Migration for Render Cloud Datastore, Backend Self-Healing Resilience, and Frontend eMaap Fallback.
+
+### Status
+COMPLETE
+
+### Completed
+- **PostgreSQL DDL Migration (`database.py`):**
+  - Added `migrate_database_schema(engine_or_conn)` supporting PostgreSQL `ALTER TABLE evidence_images ADD COLUMN IF NOT EXISTS calibration_reference_box TEXT;` alongside SQLite `PRAGMA table_info` checks.
+  - Bound `migrate_database_schema` into `init_database` and FastAPI application `lifespan`.
+- **Backend Self-Healing & Safe Deserialization (`server.py`):**
+  - Added `/api/v1/system/migrate` GET/POST endpoint to trigger idempotent schema migration on-demand.
+  - Wrapped `select(EvidenceImage)` queries in `get_inspection_detail` and `get_inspection_evidence_dossier` with auto-repair and resilient fallbacks so that internal schema differences never throw unhandled HTTP 500 errors.
+  - Sanitized `json.loads` calls on `img.calibration_reference_box` to safely handle strings, arrays, and None values without throwing `JSONDecodeError`.
+- **Frontend eMaap Recovery & Authentic Entity Preservation (`liveApi.ts` & `mockApi.ts`):**
+  - Implemented automatic `/emaap-export` fallback in `LiveApiService.getInspection()` when the detail route encounters server issues, retrieving genuine database commodity facts.
+  - Prevented `MockApiService.executePipeline` from replacing user-provided commodity details with mock water or oil fixtures.
+
+### Tests
+- `python -m pytest members/member-05-evidence/tests/ -v` (71 passed in 14.21s)
+- `npm test -- --run` in `ui-combined` (146 passed in 2.82s)
+- `node build-root.cjs` (Clean production build in 7.14s)
+
+### Problems
+PostgreSQL on Render was created prior to adding `calibration_reference_box`, and SQLite-only PRAGMA syntax failed silently during initial migrations. Fixed via dialect-aware `ALTER TABLE IF NOT EXISTS` and runtime self-healing.
+
+### Decisions
+1. Production database models must use dialect-aware DDL migrations (`ALTER TABLE IF NOT EXISTS`) to maintain forward and backward schema compatibility.
+2. The frontend must never substitute unverified demo products (e.g. Fortune Sunlite or Water) for real inspection cases; it must always reflect authentic database metadata or clean error states.
+
+### Next Step
+Commit and push verified changes to `origin main` and `origin dev` for cloud deployment and live verification.
+
+### Signing Note
+SIGNED OFF BY: Shailendra Pratap Singh (shailendrapratap1@gmail.com) — 2026-09-13 11:05 IST [VERIFIED]
+
+
 
