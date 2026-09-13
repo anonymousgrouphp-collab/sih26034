@@ -59,7 +59,7 @@ export const FieldDetailPanel: React.FC<FieldDetailPanelProps> = ({
 
   if (!finding && !field && tokens.length === 0) {
     return (
-      <div className="bg-panelBg rounded-lg border border-slate-700 p-6 text-center text-slate-400 text-xs italic">
+      <div className="bg-white rounded-xl border border-slate-200 p-6 text-center text-slate-500 text-xs italic shadow-xs">
         {language === "hi"
           ? "विधिक साक्ष्य श्रृंखला की जांच हेतु बही से अनुपालन निष्कर्ष अथवा पैकेज से ओसीआर बहुभुज का चयन करें।"
           : "Select a compliance finding from the ledger or an OCR polygon on the physical package to inspect the forensic chain of evidence."}
@@ -68,21 +68,21 @@ export const FieldDetailPanel: React.FC<FieldDetailPanelProps> = ({
   }
 
   return (
-    <div className="bg-panelBg rounded-lg border border-slate-700 shadow-sm p-4 space-y-4">
+    <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-4 space-y-4">
       {/* 1. Header: Finding Status & Statutory Citation */}
-      <div className="border-b border-slate-700 pb-3 flex items-start justify-between gap-2">
+      <div className="border-b border-slate-200 pb-3 flex items-start justify-between gap-2">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-mono text-slate-400 font-bold uppercase tracking-wider">
+            <span className="text-[10px] font-mono text-slate-500 font-bold uppercase tracking-wider">
               {language === "hi" ? "न्यायिक साक्ष्य अभिलेख" : "Forensic Evidence Record"}
             </span>
             {finding?.finding_id && (
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800/80 text-slate-400 font-semibold">
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-semibold border border-slate-200">
                 #{finding.finding_id}
               </span>
             )}
           </div>
-          <h3 className="text-sm font-bold text-cyan-300 mt-0.5">
+          <h3 className="text-sm font-bold text-slate-900 mt-0.5">
             {field?.field_type
               ? field.field_type.replace(/_/g, " ")
               : finding?.field_type
@@ -97,28 +97,28 @@ export const FieldDetailPanel: React.FC<FieldDetailPanelProps> = ({
 
       {/* 2. Special Review / Unable to Verify Guidance Banner */}
       {finding?.status === "REVIEW" && (
-        <div className="p-3 bg-amber-900/30 border border-amber-300 rounded-md text-xs space-y-1">
-          <div className="font-bold text-amber-300 flex items-center gap-1.5">
-            <svg className="w-4 h-4 text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="p-3 bg-amber-50 border border-amber-300 rounded-lg text-xs space-y-1">
+          <div className="font-bold text-amber-900 flex items-center gap-1.5">
+            <svg className="w-4 h-4 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             <span>{language === "hi" ? "अधिकारी समीक्षा आवश्यक" : "OFFICER REVIEW REQUIRED"}</span>
           </div>
-          <p className="text-amber-300 text-[11px] leading-relaxed">
+          <p className="text-amber-800 text-[11px] leading-relaxed">
             {finding.discrepancy || (language === "hi" ? "माप सेंसर अनिश्चितता सीमा में आता है। निर्णय से पूर्व भौतिक कैलीपर सत्यापन की अनुशंसा है।" : "Measurement falls within the reported sensor uncertainty band. Physical caliper verification recommended before adjudication.")}
           </p>
         </div>
       )}
 
       {finding?.status === "UNABLE_TO_VERIFY" && (
-        <div className="p-3 bg-slate-800/80 border border-slate-600 rounded-md text-xs space-y-1">
-          <div className="font-bold text-slate-100 flex items-center gap-1.5">
-            <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="p-3 bg-slate-100 border border-slate-300 rounded-lg text-xs space-y-1">
+          <div className="font-bold text-slate-800 flex items-center gap-1.5">
+            <svg className="w-4 h-4 text-slate-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span>{language === "hi" ? "सत्यापन असमर्थ" : "UNABLE TO VERIFY"}</span>
           </div>
-          <p className="text-slate-200 text-[11px] leading-relaxed">
+          <p className="text-slate-600 text-[11px] leading-relaxed">
             {finding.discrepancy || (language === "hi" ? "साक्ष्य अस्पष्ट अथवा अपर्याप्त है। अधिकारी द्वारा पुनः फोटोग्राफी की सलाह दी जाती है।" : "Evidence is degraded or insufficient for automated statutory verification. Officer image recapture advised.")}
           </p>
         </div>
@@ -128,11 +128,11 @@ export const FieldDetailPanel: React.FC<FieldDetailPanelProps> = ({
       {finding && (
         <div className="space-y-2 text-xs">
           <div className="flex items-center justify-between">
-            <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-blue-600" />
+            <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-[#1B365D]" />
               {language === "hi" ? "मूल स्वचालित निष्कर्ष (एआई)" : "Original Automated Finding"}
             </h4>
-            <span className="text-[10px] font-mono text-slate-400">
+            <span className="text-[10px] font-mono text-slate-500">
               {language === "hi" ? "स्रोत: नियम इंजन (एएसटी)" : "Source: Rule Engine (AST)"}
             </span>
           </div>
@@ -141,14 +141,14 @@ export const FieldDetailPanel: React.FC<FieldDetailPanelProps> = ({
           {(finding.rule_code?.includes("FONT") || finding.statutory_reference?.includes("Table-I") || field?.measured_font_height_mm) && (
             <div className={`p-3.5 rounded-xl border space-y-2.5 ${
               finding.status === "FAIL"
-                ? "bg-rose-900/30 border-rose-800 text-rose-950"
+                ? "bg-rose-50/70 border-rose-200 text-rose-950"
                 : finding.status === "REVIEW"
-                ? "bg-amber-900/30 border-amber-200 text-amber-950"
-                : "bg-emerald-900/30 border-emerald-800 text-emerald-950"
+                ? "bg-amber-50/70 border-amber-200 text-amber-950"
+                : "bg-emerald-50/70 border-emerald-200 text-emerald-950"
             }`}>
               <div className="flex justify-between items-center text-xs">
-                <span className="font-bold text-white flex items-center gap-1.5">
-                  <svg className="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                  <svg className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
                   </svg>
                   <span>
@@ -157,37 +157,37 @@ export const FieldDetailPanel: React.FC<FieldDetailPanelProps> = ({
                 </span>
                 <span className={`px-2 py-0.5 font-bold rounded text-[10px] font-mono border ${
                   finding.status === "FAIL"
-                    ? "bg-rose-900/40 text-rose-300 border-rose-700"
+                    ? "bg-rose-100 text-rose-800 border-rose-200"
                     : finding.status === "REVIEW"
-                    ? "bg-amber-900/40 text-amber-300 border-amber-300"
-                    : "bg-emerald-900/40 text-emerald-300 border-emerald-700"
+                    ? "bg-amber-100 text-amber-900 border-amber-300"
+                    : "bg-emerald-100 text-emerald-800 border-emerald-200"
                 }`}>
                   {finding.status}
                 </span>
               </div>
               <div className="grid grid-cols-3 gap-2 text-center text-xs pt-1">
-                <div className="p-2 bg-slate-900/70 rounded-lg border border-slate-700 shadow-xs">
-                  <div className="text-[10px] text-slate-400 font-medium">
+                <div className="p-2 bg-white rounded-lg border border-slate-200 shadow-2xs">
+                  <div className="text-[10px] text-slate-500 font-semibold">
                     {language === "hi" ? "पीडीपी पृष्ठ क्षेत्रफल" : "PDP Surface Area"}
                   </div>
-                  <div className="font-mono font-bold text-white mt-0.5">
+                  <div className="font-mono font-bold text-slate-900 mt-0.5">
                     {finding.required_value?.match(/\d+(?:\.\d+)?\s*cm[²2]/)?.[0] || "144.0 cm²"}
                   </div>
                 </div>
-                <div className="p-2 bg-slate-900/70 rounded-lg border border-slate-700 shadow-xs">
-                  <div className="text-[10px] text-slate-400 font-medium">
+                <div className="p-2 bg-white rounded-lg border border-slate-200 shadow-2xs">
+                  <div className="text-[10px] text-slate-500 font-semibold">
                     {language === "hi" ? "अनिवार्य न्यूनतम" : "Mandatory Min"}
                   </div>
-                  <div className="font-mono font-bold text-emerald-400 mt-0.5">
+                  <div className="font-mono font-bold text-emerald-700 mt-0.5">
                     {finding.required_value?.match(/\d+(?:\.\d+)?\s*mm/)?.[0] || "2.50 mm"}
                   </div>
                 </div>
-                <div className="p-2 bg-slate-900/70 rounded-lg border border-slate-700 shadow-xs">
-                  <div className="text-[10px] text-slate-400 font-medium">
+                <div className="p-2 bg-white rounded-lg border border-slate-200 shadow-2xs">
+                  <div className="text-[10px] text-slate-500 font-semibold">
                     {language === "hi" ? "मापी गई ऊंचाई" : "Measured Height"}
                   </div>
                   <div className={`font-mono font-bold mt-0.5 ${
-                    finding.status === "FAIL" ? "text-rose-400" : finding.status === "REVIEW" ? "text-amber-400" : "text-emerald-400"
+                    finding.status === "FAIL" ? "text-rose-700" : finding.status === "REVIEW" ? "text-amber-700" : "text-emerald-700"
                   }`}>
                     {finding.measured_value || (field?.measured_font_height_mm ? `${field.measured_font_height_mm.toFixed(2)} mm` : "1.84 mm")}
                   </div>
@@ -195,67 +195,67 @@ export const FieldDetailPanel: React.FC<FieldDetailPanelProps> = ({
               </div>
               <div className={`text-[11px] p-2.5 rounded-lg border leading-relaxed font-medium ${
                 finding.status === "FAIL"
-                  ? "bg-rose-900/40 text-rose-300 border-rose-700"
+                  ? "bg-white text-rose-800 border-rose-200"
                   : finding.status === "REVIEW"
-                  ? "bg-amber-900/40 text-amber-300 border-amber-300"
-                  : "bg-emerald-900/40 text-emerald-300 border-emerald-700"
+                  ? "bg-white text-amber-900 border-amber-200"
+                  : "bg-white text-emerald-800 border-emerald-200"
               }`}>
                 {finding.discrepancy || (language === "hi" ? "तालिका-I अनुसूची के अंतर्गत अनुपालित अंक ऊंचाई।" : "Compliant numeral height under Table-I schedule.")}
               </div>
             </div>
           )}
 
-          <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700 space-y-2">
+          <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-2">
             <div className="flex items-center justify-between text-[11px] font-mono">
-              <span className="text-slate-400">
+              <span className="text-slate-500">
                 {language === "hi" ? "स्वचालित पाइपलाइन स्थिति:" : "Automated Pipeline Status:"}
               </span>
-              <span className="font-bold text-white px-1.5 py-0.5 rounded bg-slate-900/70 border border-slate-700">
+              <span className="font-bold text-slate-800 px-1.5 py-0.5 rounded bg-white border border-slate-200">
                 {finding.status}
               </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 font-mono">
               <div>
-                <span className="text-[10px] text-slate-400 font-bold block uppercase">
+                <span className="text-[10px] text-slate-500 font-bold block uppercase">
                   {language === "hi" ? "मापा गया मान" : "Observed Measurement"}
                 </span>
-                <span className="font-bold text-white text-xs">{finding.measured_value}</span>
+                <span className="font-bold text-slate-900 text-xs">{finding.measured_value}</span>
               </div>
               <div>
-                <span className="text-[10px] text-slate-400 font-bold block uppercase">
+                <span className="text-[10px] text-slate-500 font-bold block uppercase">
                   {language === "hi" ? "विहित सांविधिक सीमा" : "Prescribed Statutory Threshold"}
                 </span>
-                <span className="font-semibold text-slate-200 text-xs">{finding.required_value}</span>
+                <span className="font-semibold text-slate-800 text-xs">{finding.required_value}</span>
               </div>
             </div>
 
             {finding.discrepancy && (
-              <div className="pt-1.5 border-t border-slate-700">
-                <span className="text-[10px] text-slate-400 font-bold block font-mono uppercase">
+              <div className="pt-1.5 border-t border-slate-200">
+                <span className="text-[10px] text-slate-500 font-bold block font-mono uppercase">
                   {language === "hi" ? "मात्रात्मक विसंगति" : "Quantified Discrepancy"}
                 </span>
-                <span className="text-slate-100 text-[11px] font-sans font-medium">
+                <span className="text-slate-800 text-[11px] font-sans font-medium">
                   {finding.discrepancy}
                 </span>
               </div>
             )}
 
-            <div className="pt-1.5 border-t border-slate-700 space-y-1">
+            <div className="pt-1.5 border-t border-slate-200 space-y-1">
               <div className="flex items-start justify-between gap-2 text-[11px]">
-                <span className="text-slate-400 font-semibold">
+                <span className="text-slate-500 font-semibold">
                   {language === "hi" ? "सांविधिक संदर्भ:" : "Statutory Reference:"}
                 </span>
-                <span className="text-cyan-300 font-bold text-right truncate max-w-xs" title={finding.statutory_reference}>
+                <span className="text-[#1B365D] font-bold text-right truncate max-w-xs" title={finding.statutory_reference}>
                   {finding.statutory_reference}
                 </span>
               </div>
               {finding.legal_consequence && (
                 <div className="flex items-start justify-between gap-2 text-[11px]">
-                  <span className="text-slate-400 font-semibold">
+                  <span className="text-slate-500 font-semibold">
                     {language === "hi" ? "विधिक प्रावधान:" : "Legal Provision:"}
                   </span>
-                  <span className="text-rose-400 font-semibold text-right truncate max-w-xs" title={finding.legal_consequence}>
+                  <span className="text-rose-700 font-semibold text-right truncate max-w-xs" title={finding.legal_consequence}>
                     {finding.legal_consequence}
                   </span>
                 </div>
@@ -281,11 +281,11 @@ export const FieldDetailPanel: React.FC<FieldDetailPanelProps> = ({
         return (
           <div className="space-y-2 text-xs">
             <div className="flex items-center justify-between">
-              <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+              <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <span className={`w-2 h-2 rounded-full ${decisionRecord ? "bg-emerald-600" : "bg-amber-500"}`} />
                 {language === "hi" ? "अधिकारी न्यायिक निर्णय (एचआईटीएल)" : "Officer Adjudication (HITL)"}
               </h4>
-              <span className="text-[10px] font-mono text-slate-400">
+              <span className="text-[10px] font-mono text-slate-500">
                 {decisionRecord
                   ? language === "hi"
                     ? "आधिकारिक विधिक निर्णय"
@@ -297,18 +297,18 @@ export const FieldDetailPanel: React.FC<FieldDetailPanelProps> = ({
             </div>
 
             {decisionRecord ? (
-              <div className="bg-emerald-900/30 p-3 rounded-lg border border-emerald-800 space-y-2 text-xs">
-                <div className="flex items-center justify-between border-b border-emerald-100 pb-1.5">
+              <div className="bg-emerald-50/60 p-3.5 rounded-xl border border-emerald-200 space-y-2 text-xs">
+                <div className="flex items-center justify-between border-b border-emerald-200 pb-1.5">
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-slate-400 text-[11px]">
+                    <span className="font-semibold text-slate-600 text-[11px]">
                       {language === "hi" ? "अधिकारी निर्णय:" : "Officer Decision:"}
                     </span>
-                    <span className={`font-mono font-bold px-2 py-0.5 rounded text-[11px] ${
+                    <span className={`font-mono font-bold px-2 py-0.5 rounded text-[11px] border ${
                       decisionRecord.decision === "CONFIRMED"
-                        ? "bg-rose-900/40 text-rose-300 border border-rose-700"
+                        ? "bg-rose-50 text-rose-700 border-rose-200"
                         : decisionRecord.decision === "DISMISSED"
-                        ? "bg-emerald-900/40 text-emerald-300 border border-emerald-700"
-                        : "bg-amber-900/40 text-amber-300 border border-amber-300"
+                        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                        : "bg-amber-50 text-amber-800 border-amber-200"
                     }`}>
                       {decisionRecord.decision === "CONFIRMED" && language === "hi"
                         ? "उल्लंघन पुष्टीकृत"
@@ -318,7 +318,7 @@ export const FieldDetailPanel: React.FC<FieldDetailPanelProps> = ({
                     </span>
                   </div>
 
-                  <span className="font-mono text-[10px] text-slate-400">
+                  <span className="font-mono text-[10px] text-slate-500">
                     {new Date(decisionRecord.timestamp_utc).toLocaleString("en-IN", {
                       dateStyle: "short",
                       timeStyle: "short",
@@ -326,41 +326,41 @@ export const FieldDetailPanel: React.FC<FieldDetailPanelProps> = ({
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-slate-200 font-mono">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-slate-800 font-mono">
                   <div>
-                    <span className="text-[10px] text-slate-400 font-sans block uppercase">
+                    <span className="text-[10px] text-slate-500 font-sans block uppercase">
                       {language === "hi" ? "निर्णायक अधिकारी" : "Adjudicating Officer"}
                     </span>
-                    <span className="font-bold text-white font-sans">{decisionRecord.officer_name}</span>
-                    <span className="text-[10px] text-slate-400 block">Badge: {decisionRecord.badge_number}</span>
+                    <span className="font-bold text-slate-900 font-sans">{decisionRecord.officer_name}</span>
+                    <span className="text-[10px] text-slate-500 block">Badge: {decisionRecord.badge_number}</span>
                   </div>
                   {decisionRecord.action_order && (
                     <div>
-                      <span className="text-[10px] text-slate-400 font-sans block uppercase">
+                      <span className="text-[10px] text-slate-500 font-sans block uppercase">
                         {language === "hi" ? "सांविधिक कार्रवाई आदेश" : "Statutory Action Order"}
                       </span>
-                      <span className="font-bold text-slate-100 text-[10px] truncate block" title={decisionRecord.action_order}>
+                      <span className="font-bold text-[#1B365D] text-[10px] truncate block" title={decisionRecord.action_order}>
                         {decisionRecord.action_order}
                       </span>
                     </div>
                   )}
                 </div>
 
-                <div className="pt-1.5 border-t border-emerald-100">
-                  <span className="text-[10px] text-slate-400 font-bold uppercase font-mono block">
+                <div className="pt-1.5 border-t border-emerald-200">
+                  <span className="text-[10px] text-slate-500 font-bold uppercase font-mono block">
                     {language === "hi" ? "अधिकारी की अनिवार्य टिप्पणी:" : "Mandatory Officer Remarks:"}
                   </span>
-                  <p className="mt-0.5 text-slate-100 text-[11px] font-sans italic bg-slate-900/70 p-2 rounded border border-emerald-150 leading-relaxed">
+                  <p className="mt-0.5 text-slate-800 text-[11px] font-sans italic bg-white p-2.5 rounded-lg border border-emerald-200 leading-relaxed shadow-2xs">
                     "{decisionRecord.remarks}"
                   </p>
                 </div>
               </div>
             ) : (
-              <div className="p-3 bg-slate-800/60 rounded-lg border border-slate-700 text-xs text-slate-400 space-y-1">
-                <div className="font-semibold text-slate-200">
+              <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs text-slate-600 space-y-1">
+                <div className="font-semibold text-slate-800">
                   {language === "hi" ? "अधिकारी न्यायिक निर्णय की प्रतीक्षा" : "Awaiting Officer Adjudication"}
                 </div>
-                <p className="text-[11px] text-slate-400 leading-relaxed">
+                <p className="text-[11px] text-slate-500 leading-relaxed">
                   {language === "hi"
                     ? "स्वचालित निष्कर्ष केवल नैदानिक सहायता प्रदान करते हैं। निर्णायक अधिकारी के पास पुष्टि करने, खारिज करने अथवा पुनः जांच आदेश देने का सांविधिक अधिकार है।"
                     : "Automated findings provide diagnostic assistance only. The adjudicating officer retains statutory authority to confirm, dismiss, or order re-tests."}
@@ -374,48 +374,48 @@ export const FieldDetailPanel: React.FC<FieldDetailPanelProps> = ({
       {/* 4. Extracted Field Details (Rule 6 LMPC Declarations) */}
       {field && (
         <div className="space-y-2 text-xs">
-          <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+          <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
             {language === "hi" ? "अर्थगत निष्कर्षण अभिलेख" : "Semantic Extraction Record"}
           </h4>
-          <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700 space-y-2.5">
+          <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-2.5">
             <div>
-              <span className="text-[10px] text-slate-400 font-bold block font-mono uppercase">
+              <span className="text-[10px] text-slate-500 font-bold block font-mono uppercase">
                 {language === "hi" ? "मूल ओसीआर पाठ (Raw Text)" : "Raw OCR Observed Text"}
               </span>
-              <div className="p-2 bg-slate-900/70 rounded border border-slate-700 font-sans text-xs text-slate-100 font-medium">
+              <div className="p-2 bg-white rounded border border-slate-200 font-sans text-xs text-slate-900 font-medium shadow-2xs">
                 {field.raw_ocr_text}
               </div>
             </div>
 
             {/* Devanagari Numeral Normalization Inspection */}
             {hasDevanagariNumerals(field.raw_ocr_text) && (
-              <div className="p-2.5 bg-blue-900/30 border border-blue-800 rounded-md space-y-1.5">
+              <div className="p-2.5 bg-blue-50 border border-blue-200 rounded-lg space-y-1.5">
                 <div className="flex items-center justify-between text-[11px] flex-wrap gap-1">
-                  <span className="font-bold text-blue-300 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
+                  <span className="font-bold text-[#1B365D] flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#1B365D]" />
                     {language === "hi" ? "भारतीय अंक मानकीकरण" : "Indic Numeral Normalization"}
                   </span>
-                  <span className="text-[10px] font-mono px-1.5 py-0.5 bg-blue-900/40 text-blue-300 rounded font-semibold border border-blue-700">
+                  <span className="text-[10px] font-mono px-1.5 py-0.5 bg-blue-100 text-[#1B365D] rounded font-semibold border border-blue-200">
                     {language === "hi" ? "निश्चित लिप्यंतरण (०-९ → 0-9)" : "Deterministic Transliteration (०-९ → 0-9)"}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 text-xs font-mono pt-1">
-                  <div className="bg-slate-900/70 p-1.5 rounded border border-blue-100">
-                    <span className="text-[10px] text-slate-400 block font-sans uppercase">
+                  <div className="bg-white p-2 rounded border border-blue-200 shadow-2xs">
+                    <span className="text-[10px] text-slate-500 block font-sans uppercase">
                       {language === "hi" ? "प्राप्त देवनागरी" : "Observed Indic"}
                     </span>
-                    <span className="font-bold text-white text-sm font-sans">{extractDevanagariNumerals(field.raw_ocr_text)}</span>
+                    <span className="font-bold text-slate-900 text-sm font-sans">{extractDevanagariNumerals(field.raw_ocr_text)}</span>
                   </div>
-                  <div className="bg-slate-900/70 p-1.5 rounded border border-blue-100">
-                    <span className="text-[10px] text-slate-400 block font-sans uppercase">
+                  <div className="bg-white p-2 rounded border border-blue-200 shadow-2xs">
+                    <span className="text-[10px] text-slate-500 block font-sans uppercase">
                       {language === "hi" ? "मानकीकृत रूप" : "Normalized Standard"}
                     </span>
-                    <span className="font-bold text-emerald-300 text-sm">{transliterateDevanagari(extractDevanagariNumerals(field.raw_ocr_text))}</span>
+                    <span className="font-bold text-emerald-700 text-sm">{transliterateDevanagari(extractDevanagariNumerals(field.raw_ocr_text))}</span>
                   </div>
                 </div>
 
-                <p className="text-[10px] text-blue-400 italic">
+                <p className="text-[10px] text-blue-800 italic">
                   {language === "hi"
                     ? "विधिक मापविज्ञान (पैकेज्ड कमोडिटीज) नियमावली की छठी अनुसूची अनुसार निश्चित लिप्यंतरण। यह कोई ओसीआर त्रुटि सुधार नहीं है।"
                     : "Deterministic numeral transliteration per LMPC Sixth Schedule. Not an OCR error correction."}
@@ -426,33 +426,33 @@ export const FieldDetailPanel: React.FC<FieldDetailPanelProps> = ({
             {/* Structured Normalized Fact */}
             {field.normalized_value && Object.keys(field.normalized_value).length > 0 && (
               <div>
-                <span className="text-[10px] text-slate-400 font-bold block font-mono uppercase">
+                <span className="text-[10px] text-slate-500 font-bold block font-mono uppercase">
                   {language === "hi" ? "मानकीकृत संरचित तथ्य" : "Normalized Structured Fact"}
                 </span>
-                <div className="p-2 bg-slate-900/70 rounded border border-slate-700 font-mono text-[11px] text-slate-100">
+                <div className="p-2 bg-white rounded border border-slate-200 font-mono text-[11px] text-slate-800 shadow-2xs">
                   {Object.entries(field.normalized_value).map(([key, val]) => (
                     <div key={key} className="flex items-center justify-between py-0.5">
-                      <span className="text-slate-400">{key}:</span>
-                      <span className="font-bold text-white">{typeof val === "object" ? JSON.stringify(val) : String(val)}</span>
+                      <span className="text-slate-500">{key}:</span>
+                      <span className="font-bold text-slate-900">{typeof val === "object" ? JSON.stringify(val) : String(val)}</span>
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-2 text-[11px] font-mono text-slate-400 pt-1">
+            <div className="grid grid-cols-2 gap-2 text-[11px] font-mono text-slate-500 pt-1">
               <div>
-                <span className="text-[10px] text-slate-400 block uppercase">
+                <span className="text-[10px] text-slate-500 block uppercase">
                   {language === "hi" ? "निष्कर्षण विश्वसनीयता" : "Extraction Confidence"}
                 </span>
-                <span className="font-bold text-slate-100">{(field.detection_confidence * 100).toFixed(1)}%</span>
+                <span className="font-bold text-slate-900">{(field.detection_confidence * 100).toFixed(1)}%</span>
               </div>
               {field.measured_font_height_mm !== undefined && (
                 <div>
-                  <span className="text-[10px] text-slate-400 block uppercase">
+                  <span className="text-[10px] text-slate-500 block uppercase">
                     {language === "hi" ? "मापी गई फ़ॉन्ट ऊंचाई" : "Measured Font Height"}
                   </span>
-                  <span className="font-bold text-cyan-300">{field.measured_font_height_mm.toFixed(2)} mm</span>
+                  <span className="font-bold text-[#1B365D]">{field.measured_font_height_mm.toFixed(2)} mm</span>
                 </div>
               )}
             </div>
@@ -464,10 +464,10 @@ export const FieldDetailPanel: React.FC<FieldDetailPanelProps> = ({
       {tokens.length > 0 && (
         <div className="space-y-2 text-xs">
           <div className="flex items-center justify-between">
-            <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
               {language === "hi" ? `बहुभाषी ओसीआर टोकन (${tokens.length})` : `Multilingual OCR Tokens (${tokens.length})`}
             </h4>
-            <span className="text-[10px] font-mono text-emerald-400 font-semibold">
+            <span className="text-[10px] font-mono text-emerald-700 font-semibold">
               {language === "hi" ? "यूनिकोड एवं भारतीय लिपि सुरक्षित" : "Unicode & Indic Preserved"}
             </span>
           </div>
@@ -477,22 +477,22 @@ export const FieldDetailPanel: React.FC<FieldDetailPanelProps> = ({
               <div
                 key={tok.token_id}
                 onClick={() => onSelectToken && onSelectToken(tok.token_id)}
-                className="p-2.5 bg-slate-900 text-slate-100 rounded-lg border border-slate-800 font-mono text-xs space-y-1.5 cursor-pointer hover:border-slate-600 transition-colors"
+                className="p-2.5 bg-slate-50 text-slate-800 rounded-lg border border-slate-200 font-mono text-xs space-y-1.5 cursor-pointer hover:border-slate-300 hover:bg-slate-100/70 transition-colors shadow-2xs"
               >
                 <div className="flex items-center justify-between text-[11px] flex-wrap gap-1">
-                  <span className="text-amber-400 font-bold">#{tok.token_id}</span>
-                  <span className="text-slate-300 text-[10px] bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700">
+                  <span className="text-[#1B365D] font-bold">#{tok.token_id}</span>
+                  <span className="text-slate-600 text-[10px] bg-white px-1.5 py-0.5 rounded border border-slate-200">
                     {getModelDisplayName(tok, language)} • {language === "hi" ? "विश्वास" : "Conf"}: {(tok.confidence * 100).toFixed(1)}%
                   </span>
                 </div>
 
                 {/* Character String Preserving Devanagari Hindi Text & Indic Numerals */}
-                <div className="font-sans text-white text-xs font-semibold bg-slate-800/80 p-2 rounded border border-slate-700">
+                <div className="font-sans text-slate-900 text-xs font-semibold bg-white p-2 rounded border border-slate-200 shadow-2xs">
                   {tok.text}
                 </div>
 
                 {/* Coordinates */}
-                <div className="text-[10px] text-slate-400 flex items-center justify-between">
+                <div className="text-[10px] text-slate-500 flex items-center justify-between">
                   <span>{language === "hi" ? `बहुभुज: ${tok.polygon.length} बिंदु` : `Polygon: ${tok.polygon.length} vertices`}</span>
                   <span className="truncate max-w-[200px]" title={JSON.stringify(tok.polygon)}>
                     [{tok.polygon.map(([x, y]) => `(${x},${y})`).join(", ")}]

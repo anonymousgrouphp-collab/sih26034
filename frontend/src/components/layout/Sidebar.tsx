@@ -1,7 +1,7 @@
+import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Home,
-  ClipboardCheck,
   SearchCheck,
   Users,
   GitBranch,
@@ -12,16 +12,14 @@ import {
   ShieldCheck,
   Scale,
   X,
-  Sparkles,
   LogOut,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { StateEmblem } from "../common/StateEmblem";
-import { m, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { m } from "framer-motion";
 
 interface SidebarProps {
   pendingCasesCount?: number;
@@ -40,7 +38,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [isCollapsed, setIsCollapsed] = useState(false);
-
   const location = useLocation();
 
   const isController = user?.officerRole === "CONTROLLER";
@@ -92,25 +89,67 @@ export const Sidebar: React.FC<SidebarProps> = ({
       ? window.localStorage?.getItem("Nirikshak_last_case_id") || "demo-fortune-sunlite"
       : "demo-fortune-sunlite");
 
-  const navigation = [
-    { label: t("nav.dashboard", "Executive Dashboard"), path: "/dashboard", icon: Home },
-    { label: t("nav.register", "Inspection Register"), path: "/inspections", icon: SearchCheck },
+  // Semantic GovTech Functional Grouping
+  const navGroups = [
     {
-      label: language === "hi" ? "डेमो परिदृश्य (7)" : "Demo Scenarios (7)",
-      path: "/inspections/SKU-DEMO-01",
-      icon: Scale,
-      badge: "7 DEMOS",
+      title: language === "hi" ? "प्रवर्तन कार्यस्थान" : "Enforcement Desk",
+      items: [
+        {
+          label: t("nav.dashboard", "Executive Dashboard"),
+          path: "/dashboard",
+          icon: Home,
+        },
+        {
+          label: t("nav.register", "Inspection Register"),
+          path: "/inspections",
+          icon: SearchCheck,
+        },
+        {
+          label: t("nav.review", "Review Queue"),
+          path: "/review-queue",
+          icon: Users,
+          badge: pendingCasesCount > 0 ? pendingCasesCount : undefined,
+          badgeType: "warning",
+        },
+      ],
     },
-    { label: t("nav.new", "New Inspection"), path: "/inspections/new", icon: ClipboardCheck },
     {
-      label: t("nav.review", "Review Queue"),
-      path: "/review-queue",
-      icon: Users,
-      badge: pendingCasesCount > 0 ? pendingCasesCount : undefined,
+      title: language === "hi" ? "सत्यापन एवं साक्ष्य" : "Verification & Evidence",
+      items: [
+        {
+          label: language === "hi" ? "डेमो परिदृश्य" : "Demo Scenarios",
+          path: "/inspections/SKU-DEMO-01",
+          icon: Scale,
+          badge: "7",
+          badgeType: "info",
+        },
+        {
+          label: t("nav.evidence", "Evidence Dossier"),
+          path: `/inspections/${lastCaseId}/evidence`,
+          icon: FileArchive,
+        },
+        {
+          label: t("nav.reports", "Reports & Notices"),
+          path: "/reports",
+          icon: BarChart3,
+        },
+      ],
     },
-    { label: t("nav.rules", "Rules & Schedules"), path: "/rules", icon: GitBranch },
-    { label: t("nav.evidence", "Evidence Dossier"), path: `/inspections/${lastCaseId}/evidence`, icon: FileArchive },
-    { label: t("nav.reports", "Reports & Notices"), path: "/reports", icon: BarChart3 },
+    {
+      title: language === "hi" ? "विधिक मानक एवं विन्यास" : "Regulatory & Settings",
+      items: [
+        {
+          label: t("nav.rules", "Rules & Schedules"),
+          path: "/rules",
+          icon: GitBranch,
+        },
+        {
+          label: t("nav.settings", "Station Settings"),
+          path: "/settings",
+          icon: Settings,
+        },
+      ],
+    },
   ];
 
   return (
@@ -119,185 +158,212 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {mobileOpen && (
         <div
           onClick={onCloseMobile}
-          className="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-xs lg:hidden"
+          className="fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-xs lg:hidden"
         />
       )}
 
       <m.aside
         initial={false}
-        animate={{ width: isCollapsed ? 64 : 240 }}
+        animate={{ width: isCollapsed ? 68 : 256 }}
         transition={{ duration: 0.2, ease: [0.2, 0, 0, 1] }}
-        className={`fixed inset-y-0 left-0 z-50 flex shrink-0 flex-col border-r border-white/10 glass-panel text-slate-300 transition-transform lg:sticky lg:inset-y-auto lg:top-[70px] lg:h-[calc(100vh-8.25rem)] ${
+        className={`fixed inset-y-0 left-0 z-[60] flex shrink-0 flex-col border-r border-slate-200 bg-white text-slate-700 transition-transform lg:sticky lg:inset-y-auto lg:top-[57px] lg:h-[calc(100vh-3.6rem)] lg:z-30 shadow-xs select-none ${
           mobileOpen ? "translate-x-0 shadow-2xl w-64" : "-translate-x-full lg:translate-x-0 lg:shadow-none"
         }`}
       >
         {/* Mobile Header */}
-        <div className="flex h-16 items-center justify-between border-b border-white/10 px-4 lg:hidden">
+        <div className="flex h-14 items-center justify-between border-b border-slate-200 px-4 lg:hidden bg-slate-50">
           <div className="flex items-center gap-2.5">
-            <StateEmblem size={22} tone="white" showMotto={true} className="shrink-0" />
-            <span className="font-bold text-sm tracking-tight text-white">NIRIKSHAK</span>
+            <StateEmblem size={22} tone="navy" showMotto={true} className="shrink-0" />
+            <span className="font-bold text-sm tracking-tight text-[#1B365D]">NIRIKSHAK</span>
           </div>
           <button
             type="button"
             onClick={onCloseMobile}
-            className="rounded-md p-1.5 text-slate-300 hover:bg-white/10 hover:text-white"
+            className="rounded-md p-1.5 text-slate-500 hover:bg-slate-200 hover:text-slate-900"
           >
             <X size={20} />
           </button>
         </div>
 
-        {/* Desktop Collapse Toggle */}
-        <div className="hidden lg:flex items-center justify-end p-2 border-b border-white/10">
+        {/* Desktop Header / Collapse Bar */}
+        <div className="hidden lg:flex items-center justify-between px-3.5 py-2.5 border-b border-slate-100">
+          {!isCollapsed ? (
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-emerald-200 shrink-0 animate-pulse" />
+              <span className="text-[10.5px] font-mono font-bold uppercase tracking-wider text-slate-500 truncate">
+                {language === "hi" ? "विधिक कार्यस्थान" : "LMO Workstation"}
+              </span>
+            </div>
+          ) : (
+            <div className="w-full flex justify-center">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-emerald-200 shrink-0 animate-pulse" />
+            </div>
+          )}
           <button
+            type="button"
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-1.5 rounded-md hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+            className="p-1 rounded-md hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
+            title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
-            {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+            {isCollapsed ? <ChevronRight size={15} /> : <ChevronLeft size={15} />}
           </button>
         </div>
 
-        {/* Top Primary Action + Navigation */}
-        <div className="flex-1 min-h-0 overflow-y-auto p-3 space-y-3 custom-scrollbar">
+        {/* Top Primary Action + Grouped Navigation */}
+        <div className="flex-1 min-h-0 overflow-y-auto p-3 space-y-4 custom-scrollbar">
+          {/* Primary Action Button */}
           <Link
             to="/inspections/new"
-            onClick={onCloseMobile}
-            className={`w-full flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white text-xs sm:text-sm font-bold rounded-lg shadow-lg shadow-amber-500/20 transition-all focus:ring-2 focus:ring-amber-500 focus:outline-none overflow-hidden ${isCollapsed ? 'px-0' : 'px-4'}`}
+            onClick={() => {
+              onCloseMobile?.();
+              onNewInspectionClick?.();
+            }}
+            title={isCollapsed ? t("action.new_case", "New Inspection Case") : undefined}
+            className={`w-full flex items-center justify-center gap-2 py-2.5 bg-[#1B365D] hover:bg-[#0A2540] text-white text-xs font-bold rounded-lg shadow-sm hover:shadow transition-all border border-[#152a48] group overflow-hidden ${
+              isCollapsed ? "px-0" : "px-3.5"
+            }`}
           >
-            <Plus size={isCollapsed ? 20 : 16} className="shrink-0" />
-            {!isCollapsed && <span className="truncate">{t("action.new_case", "New Inspection")}</span>}
+            <div className="w-5 h-5 rounded bg-[#FF9933] text-slate-950 flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+              <Plus size={13} className="stroke-[3]" />
+            </div>
+            {!isCollapsed && (
+              <span className="truncate tracking-wide">
+                {t("action.new_case", "New Inspection Case")}
+              </span>
+            )}
           </Link>
 
-          {!isCollapsed && (
-            <p className="px-1 pt-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-              {language === "hi" ? "नेविगेशन मेनू" : "Navigation Menu"}
-            </p>
-          )}
+          {/* Grouped Navigation Links */}
+          <nav className="space-y-4">
+            {navGroups.map((group, groupIdx) => (
+              <div key={groupIdx} className="space-y-1">
+                {!isCollapsed ? (
+                  <p className="px-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                    {group.title}
+                  </p>
+                ) : (
+                  <div className="h-px bg-slate-100 my-2 mx-1" />
+                )}
 
-          <nav className="space-y-1 relative">
-            {navigation.map((item) => {
-              const Icon = item.icon;
-              const active = isItemActive(item.path);
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  onClick={onCloseMobile}
-                  title={isCollapsed ? item.label : undefined}
-                  className={`relative w-full flex items-center justify-between py-2.5 text-xs font-semibold rounded-lg transition-colors overflow-hidden ${
-                    active
-                      ? "text-white font-bold bg-white/10"
-                      : "text-slate-400 hover:bg-white/5 hover:text-slate-200"
-                  } ${isCollapsed ? 'px-0 justify-center' : 'px-3'}`}
-                >
-                  {active && (
-                    <m.div
-                      layoutId="nav-indicator"
-                      className="absolute left-0 top-0 bottom-0 w-[2px] bg-[#e5a93c]"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.2 }}
-                    />
-                  )}
-                  <div className={`flex items-center gap-3 ${isCollapsed ? 'justify-center' : ''}`}>
-                    <Icon size={18} className={`shrink-0 ${active ? "text-amber-400" : "text-slate-500"}`} />
-                    {!isCollapsed && <span className="truncate">{item.label}</span>}
-                  </div>
-                  {!isCollapsed && item.badge !== undefined && (
-                    <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold rounded-full bg-amber-500/20 text-amber-300 shrink-0">
-                      {item.badge}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
+                {group.items.map((item) => {
+                  const Icon = item.icon;
+                  const active = isItemActive(item.path);
+
+                  return (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      onClick={onCloseMobile}
+                      title={isCollapsed ? item.label : undefined}
+                      className={`group relative w-full flex items-center justify-between py-2.5 text-sm font-semibold rounded-lg transition-all overflow-hidden ${
+                        active
+                          ? "bg-[#1B365D]/8 text-[#1B365D] font-bold border-l-[3.5px] border-[#1B365D] rounded-l-none pl-2.5"
+                          : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 border-l-[3.5px] border-transparent pl-2.5"
+                      } ${isCollapsed ? "px-0 justify-center border-l-0" : "pr-3"}`}
+                    >
+                      <div className={`flex items-center gap-2.5 ${isCollapsed ? "justify-center" : ""}`}>
+                        <Icon
+                          size={18}
+                          className={`shrink-0 transition-colors ${
+                            active
+                              ? "text-[#1B365D]"
+                              : "text-slate-400 group-hover:text-slate-600"
+                          }`}
+                        />
+                        {!isCollapsed && <span className="truncate">{item.label}</span>}
+                      </div>
+
+                      {!isCollapsed && item.badge !== undefined && (
+                        <span
+                          className={`px-1.5 py-0.5 text-[11px] font-mono font-bold rounded-md shrink-0 border ${
+                            item.badgeType === "warning"
+                              ? "bg-amber-50 text-amber-900 border-amber-300"
+                              : "bg-blue-50 text-[#1B365D] border-blue-200"
+                          }`}
+                        >
+                          {item.badge}
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            ))}
           </nav>
         </div>
 
-        {/* Bottom */}
-        <div className="shrink-0 mt-auto p-3 space-y-3 border-t border-white/10 bg-black/20">
-          <Link
-            to="/settings"
-            onClick={onCloseMobile}
-            title={isCollapsed ? t("nav.settings", "Station Settings") : undefined}
-            className={`w-full flex items-center gap-3 py-2 text-xs font-semibold rounded-lg transition-colors overflow-hidden ${
-              isItemActive("/settings")
-                ? "text-white font-bold bg-white/10"
-                : "text-slate-400 hover:bg-white/5 hover:text-slate-200"
-            } ${isCollapsed ? 'px-0 justify-center' : 'px-3'}`}
-          >
-            {isItemActive("/settings") && (
-              <m.div
-                layoutId="nav-indicator"
-                className="absolute left-0 top-0 bottom-0 w-[2px] bg-[#e5a93c]"
-                transition={{ duration: 0.2 }}
-              />
-            )}
-            <Settings size={18} className={`shrink-0 ${isItemActive("/settings") ? "text-amber-400" : "text-slate-500"}`} />
-            {!isCollapsed && <span className="truncate">{t("nav.settings", "Station Settings")}</span>}
-          </Link>
-
-          {!isCollapsed && (
-            <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[11px] space-y-1">
-              <div className="flex items-center gap-1.5 font-bold text-[10px] uppercase tracking-wider text-amber-400">
-                <ShieldCheck size={13} className="text-amber-500" />
-                <span className="truncate">{language === "hi" ? "विधिक मापविज्ञान अधिनियम, 2009" : "Legal Metrology Act"}</span>
-              </div>
-            </div>
-          )}
-
-          {!isCollapsed && (
-            <div className="p-3 border border-white/10 bg-white/5 rounded-lg text-[10.5px] font-mono space-y-1 text-slate-400">
-              <div className="flex items-center justify-between">
-                <span className="font-semibold">{language === "hi" ? "सांविधिक नियम:" : "Statute:"}</span>
-                <span className="text-white font-medium">LMPC 2011</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="font-semibold">{language === "hi" ? "साक्ष्य अधिनियम:" : "Evidence Act:"}</span>
-                <span className="text-emerald-400 font-bold">Sec 63 BSA</span>
-              </div>
-            </div>
-          )}
-
-          <div
-            className={`flex items-center gap-2.5 rounded-lg border bg-white/5 transition-all overflow-hidden ${
-              isController ? "border-purple-500/30" : "border-amber-500/30"
-            } ${isCollapsed ? 'p-1.5 justify-center' : 'p-2.5'}`}
-            title={`Active Officer: ${user?.name || (isController ? "S.K. Verma" : "Rajesh Sharma")}`}
-          >
-            <div
-              className={`w-7 h-7 rounded-md flex items-center justify-center text-[10px] font-black shrink-0 ${
-                isController ? "bg-purple-600 text-white" : "bg-amber-500 text-govNavy"
-              }`}
-            >
-              {user?.initials || (isController ? "SKV" : "RS")}
-            </div>
-            {!isCollapsed && (
-              <>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <span className="text-[11px] font-bold text-white truncate">
-                      {user?.name || (isController ? "S.K. Verma" : "R. Sharma")}
-                    </span>
+        {/* Bottom Officer Credential & Statutory Regulatory Card */}
+        <div className="shrink-0 mt-auto p-3 border-t border-slate-200 bg-slate-50/70">
+          {!isCollapsed ? (
+            <div className="rounded-xl border border-slate-200 bg-white p-2.5 shadow-2xs space-y-2">
+              {/* Officer Identification Row */}
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-black shrink-0 shadow-2xs ${
+                      isController ? "bg-purple-700 text-white" : "bg-[#1B365D] text-white"
+                    }`}
+                  >
+                    {user?.initials || (isController ? "SKV" : "RS")}
                   </div>
-                  <div className="text-[9px] font-mono text-slate-500 truncate">
-                    {user?.badgeNumber || (isController ? "CTRL-DL-0012" : "INSP-DL-0842")}
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold text-slate-900 truncate leading-tight">
+                      {user?.name || (isController ? "S.K. Verma" : "Rajesh Sharma")}
+                    </p>
+                    <p className="text-[11px] font-mono text-slate-500 truncate mt-0.5">
+                      {user?.badgeNumber || (isController ? "CTRL-DL-0012" : "INSP-DL-0842")}
+                    </p>
                   </div>
                 </div>
+
                 <button
                   type="button"
                   onClick={handleSignOut}
-                  title="Sign out"
-                  aria-label="Sign out"
-                  className="p-1 rounded text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors shrink-0"
+                  title={t("portal.signout", "Sign out")}
+                  aria-label={t("portal.signout", "Sign out")}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors shrink-0 cursor-pointer"
                 >
-                  <LogOut size={14} />
+                  <LogOut size={15} />
                 </button>
-              </>
-            )}
-          </div>
+              </div>
+
+              {/* Integrated Statutory Regulatory Seal */}
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] font-mono text-slate-500">
+                <span className="flex items-center gap-1 font-semibold text-slate-700">
+                  <ShieldCheck size={12} className="text-[#1B365D]" />
+                  <span>LMPC 2011</span>
+                </span>
+                <span className="text-slate-300">•</span>
+                <span className="font-bold text-emerald-700">
+                  Sec 63 BSA 2023
+                </span>
+              </div>
+            </div>
+          ) : (
+            /* Collapsed view: compact avatar and logout button */
+            <div className="flex flex-col items-center gap-2 py-1">
+              <div
+                className={`w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-black shadow-2xs ${
+                  isController ? "bg-purple-700 text-white" : "bg-[#1B365D] text-white"
+                }`}
+                title={`${user?.name || (isController ? "S.K. Verma" : "Rajesh Sharma")} (${user?.badgeNumber || (isController ? "CTRL-DL-0012" : "INSP-DL-0842")})`}
+              >
+                {user?.initials || (isController ? "SKV" : "RS")}
+              </div>
+              <button
+                type="button"
+                onClick={handleSignOut}
+                title={t("portal.signout", "Sign out")}
+                aria-label={t("portal.signout", "Sign out")}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+              >
+                <LogOut size={15} />
+              </button>
+            </div>
+          )}
         </div>
       </m.aside>
     </>
   );
 };
-

@@ -108,15 +108,16 @@ export const Reports: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 glass-panel p-5 rounded-xl border border-slate-700/60 shadow-2xl">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 bg-white p-5 rounded-xl border border-slate-200/90 shadow-xs relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FF9933] via-white to-[#138808]" />
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-widest bg-amber-400/10 border border-amber-400/30 px-2 py-0.5 rounded text-amber-400">
+          <span className="text-[10px] font-bold uppercase tracking-widest bg-amber-100 border border-amber-300 px-2 py-0.5 rounded text-amber-900">
             {language === "hi" ? "सांविधिक रिपोर्ट एवं डोजियर" : "Statutory Reports & Dossiers"}
           </span>
-          <h1 className="text-2xl font-black text-white mt-1">
+          <h1 className="text-2xl font-black text-[#1B365D] mt-1">
             {language === "hi" ? "प्रवर्तन विश्लेषण एवं आधिकारिक रिपोर्ट" : "Enforcement Analytics & Official Reports"}
           </h1>
-          <p className="text-xs text-slate-400 mt-0.5 max-w-2xl">
+          <p className="text-xs text-slate-600 mt-0.5 max-w-2xl">
             {language === "hi"
               ? "विभागीय रिकॉर्ड हेतु परिचालन सारांश, धारा 36(1) के तहत प्रपत्र-1 विधिक नोटिस एवं धारा 63 बीएसए 2023 साक्ष्य ऑडिट प्रमाणपत्र।"
               : "Operational summaries, Form-1 legal notices under Section 36(1), and Section 63 BSA 2023 evidence audit certificates for departmental records."}
@@ -124,14 +125,18 @@ export const Reports: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2.5">
-          <button type="button" onClick={handlePrint} className="btn-secondary text-xs">
+          <button
+            type="button"
+            onClick={handlePrint}
+            className="px-3.5 py-2 text-xs font-bold rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer"
+          >
             <Printer size={15} />
             <span>{language === "hi" ? "रिपोर्ट प्रिंट करें" : "Print Report"}</span>
           </button>
           <button
             type="button"
             onClick={() => handleDownload("DoCA_Monthly_Inspection_Summary_Sept2026.pdf")}
-            className="btn-primary text-xs"
+            className="px-4 py-2 text-xs font-bold rounded-lg bg-[#1B365D] hover:bg-[#0A2540] text-white shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
           >
             <Download size={15} />
             <span>{language === "hi" ? "कार्यकारी पीडीएफ निर्यात करें" : "Export Executive PDF"}</span>
@@ -140,17 +145,17 @@ export const Reports: React.FC = () => {
       </div>
 
       {downloadSuccess && (
-        <div className="p-3 bg-emerald-900/30 border border-emerald-700/60 rounded-lg text-xs text-emerald-300 flex items-center gap-2 shadow-xs animate-fade-in">
-          <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />
+        <div className="p-3 bg-emerald-50 border border-emerald-300 rounded-lg text-xs text-emerald-800 flex items-center gap-2 shadow-xs animate-fade-in">
+          <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
           <span>{downloadSuccess}</span>
         </div>
       )}
 
       {/* Filter Row */}
-      <form className="glass-panel p-4 border border-slate-700/60 rounded-xl" onSubmit={(e) => e.preventDefault()}>
+      <form className="bg-white p-4 border border-slate-200/90 rounded-xl shadow-xs" onSubmit={(e) => e.preventDefault()}>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
           <div>
-            <label htmlFor="reporting-period" className="block text-slate-300 font-bold mb-1">
+            <label htmlFor="reporting-period" className="block text-slate-700 font-bold mb-1">
               {language === "hi" ? "रिपोर्टिंग अवधि" : "Reporting Period"}
             </label>
             <div className="relative">
@@ -159,7 +164,7 @@ export const Reports: React.FC = () => {
                 id="reporting-period"
                 value={period}
                 onChange={(e) => setPeriod(e.target.value)}
-                className="input pl-9 text-xs"
+                className="w-full bg-white border border-slate-300 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-[#1B365D] focus:outline-none"
               >
                 <option value="SEPTEMBER_2026">
                   {language === "hi" ? "सितंबर 2026 (वर्तमान प्रवर्तन चक्र)" : "September 2026 (Current Enforcement Cycle)"}
@@ -175,14 +180,14 @@ export const Reports: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="enforcement-division" className="block text-slate-300 font-bold mb-1">
+            <label htmlFor="enforcement-division" className="block text-slate-700 font-bold mb-1">
               {language === "hi" ? "प्रवर्तन प्रभाग / मंडल" : "Enforcement Division / Circle"}
             </label>
             <select
               id="enforcement-division"
               value={division}
               onChange={(e) => setDivision(e.target.value)}
-              className="input text-xs"
+              className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-[#1B365D] focus:outline-none"
             >
               <option value="CIRCLE_DL_SOUTH_01">
                 {language === "hi" ? "DL-SOUTH-01 (दक्षिण दिल्ली मंडल)" : "DL-SOUTH-01 (South Delhi Circle)"}
@@ -200,10 +205,13 @@ export const Reports: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="document-classification" className="block text-slate-300 font-bold mb-1">
+            <label htmlFor="document-classification" className="block text-slate-700 font-bold mb-1">
               {language === "hi" ? "दस्तावेज़ वर्गीकरण" : "Document Classification"}
             </label>
-            <select id="document-classification" className="input text-xs">
+            <select
+              id="document-classification"
+              className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-[#1B365D] focus:outline-none"
+            >
               <option>{language === "hi" ? "सभी औपचारिक रिपोर्ट एवं नोटिस" : "All Formal Reports & Notices"}</option>
               <option>{language === "hi" ? "प्रपत्र-1 शमन नोटिस (धारा 36)" : "Form-1 Compounding Notices (Section 36)"}</option>
               <option>{language === "hi" ? "धारा 63 बीएसए डिजिटल प्रमाणपत्र" : "Section 63 BSA Digital Certificates"}</option>
@@ -215,23 +223,23 @@ export const Reports: React.FC = () => {
       {/* Two Column Section: Left Outcome Distribution, Right Generated Reports */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Outcome Breakdown Card */}
-        <div className="glass-panel p-5 space-y-4 border border-slate-700/60 rounded-xl">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="bg-white p-5 space-y-4 border border-slate-200/90 rounded-xl shadow-xs">
+          <div className="flex items-center justify-between border-b border-slate-200 pb-3">
             <div className="flex items-center gap-2">
-              <BarChart3 size={18} className="text-white" />
-              <h3 className="section-title text-white">
+              <BarChart3 size={18} className="text-[#1B365D]" />
+              <h3 className="text-sm font-bold text-[#1B365D]">
                 {language === "hi" ? "निरीक्षण परिणाम वितरण" : "Inspection Outcomes Distribution"}
               </h3>
             </div>
-            <span className="font-mono text-xs font-bold text-slate-400 bg-slate-800/50 px-2 py-0.5 rounded">
+            <span className="font-mono text-xs font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
               {metrics.total} {language === "hi" ? "मामले" : "Cases"}
             </span>
           </div>
 
           {isLoading ? (
             <div className="p-8 text-center">
-              <RefreshCw className="w-5 h-5 animate-spin mx-auto text-white" />
-              <p className="text-xs text-slate-400 mt-2 font-mono">
+              <RefreshCw className="w-5 h-5 animate-spin mx-auto text-[#1B365D]" />
+              <p className="text-xs text-slate-500 mt-2 font-mono">
                 {language === "hi" ? "डेटा संकलित किया जा रहा है..." : "Compiling statistics..."}
               </p>
             </div>
@@ -242,39 +250,39 @@ export const Reports: React.FC = () => {
                   label: language === "hi" ? "पूर्णतः अनुपालन (उत्तीर्ण - PASS)" : "Fully Compliant (PASS)",
                   count: metrics.passed,
                   percent: metrics.passPct,
-                  color: "bg-emerald-500",
-                  text: "text-emerald-400",
+                  color: "bg-emerald-600",
+                  text: "text-emerald-700",
                 },
                 {
                   label: language === "hi" ? "सांविधिक उल्लंघन (असफल - FAIL)" : "Statutory Violation (FAIL)",
                   count: metrics.failed,
                   percent: metrics.failPct,
-                  color: "bg-rose-500",
-                  text: "text-rose-400",
+                  color: "bg-rose-600",
+                  text: "text-rose-700",
                 },
                 {
                   label: language === "hi" ? "सीमावर्ती सेंसर समीक्षा (REVIEW)" : "Borderline Sensor Review (REVIEW)",
                   count: metrics.review,
                   percent: metrics.reviewPct,
                   color: "bg-amber-500",
-                  text: "text-amber-400",
+                  text: "text-amber-700",
                 },
                 {
                   label: language === "hi" ? "निम्न गुणवत्ता साक्ष्य (सत्यापन असमर्थ)" : "Degraded Evidence (UNABLE_TO_VERIFY)",
                   count: metrics.unable,
                   percent: metrics.unablePct,
-                  color: "bg-slate-500",
-                  text: "text-slate-200",
+                  color: "bg-slate-400",
+                  text: "text-slate-600",
                 },
               ].map((item) => (
                 <div key={item.label} className="space-y-1 text-xs">
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-slate-200">{item.label}</span>
+                    <span className="font-semibold text-slate-700">{item.label}</span>
                     <span className={`font-bold font-mono ${item.text}`}>
                       {item.count} {language === "hi" ? "मामले" : "case(s)"} ({item.percent}%)
                     </span>
                   </div>
-                  <div className="h-2 rounded-full bg-slate-800/60 overflow-hidden">
+                  <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
                     <div className={`h-full rounded-full ${item.color}`} style={{ width: `${item.percent}%` }} />
                   </div>
                 </div>
@@ -282,8 +290,8 @@ export const Reports: React.FC = () => {
             </div>
           )}
 
-          <div className="p-3 bg-slate-800/50 border border-slate-700/60 rounded-lg text-xs text-slate-300 flex items-center gap-2">
-            <ShieldCheck size={16} className="text-emerald-400 shrink-0" />
+          <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-700 flex items-center gap-2">
+            <ShieldCheck size={16} className="text-emerald-600 shrink-0" />
             <span>
               {metrics.total > 0
                 ? (language === "hi"
@@ -297,11 +305,11 @@ export const Reports: React.FC = () => {
         </div>
 
         {/* Ready Generated Reports List */}
-        <div className="glass-panel p-5 space-y-4 border border-slate-700/60 rounded-xl">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="bg-white p-5 space-y-4 border border-slate-200/90 rounded-xl shadow-xs">
+          <div className="flex items-center justify-between border-b border-slate-200 pb-3">
             <div className="flex items-center gap-2">
-              <FileText size={18} className="text-white" />
-              <h3 className="section-title text-white">
+              <FileText size={18} className="text-[#1B365D]" />
+              <h3 className="text-sm font-bold text-[#1B365D]">
                 {language === "hi" ? "आधिकारिक विभागीय रिपोर्ट एवं नोटिस" : "Official Departmental Reports & Notices"}
               </h3>
             </div>
@@ -309,24 +317,24 @@ export const Reports: React.FC = () => {
 
           {isLoading ? (
             <div className="p-8 text-center">
-              <RefreshCw className="w-5 h-5 animate-spin mx-auto text-white" />
-              <p className="text-xs text-slate-400 mt-2 font-mono">
+              <RefreshCw className="w-5 h-5 animate-spin mx-auto text-[#1B365D]" />
+              <p className="text-xs text-slate-500 mt-2 font-mono">
                 {language === "hi" ? "रिपोर्ट लोड की जा रही हैं..." : "Loading reports..."}
               </p>
             </div>
           ) : periodCases.length === 0 ? (
-            <div className="p-8 text-center text-slate-400 space-y-2 border border-dashed border-slate-700/60 rounded-lg">
+            <div className="p-8 text-center text-slate-500 space-y-2 border border-dashed border-slate-300 rounded-xl bg-slate-50/50">
               <FileText className="w-8 h-8 mx-auto text-slate-400" />
-              <p className="font-bold text-xs text-slate-200">
+              <p className="font-bold text-xs text-slate-800">
                 {language === "hi" ? "कोई आधिकारिक रिपोर्ट या नोटिस उपलब्ध नहीं है" : "No Official Reports or Notices Generated"}
               </p>
-              <p className="text-[11px] text-slate-400 max-w-xs mx-auto">
+              <p className="text-[11px] text-slate-500 max-w-xs mx-auto">
                 {language === "hi"
                   ? "निरीक्षण पंजीकृत करें और प्रपत्र-1 विधिक नोटिस उत्पन्न करने के लिए अधिनिर्णय पूर्ण करें।"
                   : "Register packaged commodity inspections and complete officer adjudication to generate statutory Form-1 notices."}
               </p>
               <div className="pt-2">
-                <Link to="/inspections/new" className="btn-primary text-xs px-3.5 py-1.5 inline-flex items-center gap-1 shadow-2xs">
+                <Link to="/inspections/new" className="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-[#1B365D] hover:bg-[#0A2540] text-white shadow-xs inline-flex items-center gap-1">
                   <span>{language === "hi" ? "नया निरीक्षण पंजीकृत करें" : "Register New Inspection"}</span>
                 </Link>
               </div>
@@ -336,29 +344,29 @@ export const Reports: React.FC = () => {
               {periodCases.slice(0, 5).map((c) => (
                 <div
                   key={c.id}
-                  className="p-3 rounded-lg border border-slate-700/60 bg-slate-800/50/60 hover:bg-slate-900/70/10/5 transition-colors flex items-center justify-between gap-3 text-xs"
+                  className="p-3 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-slate-50 hover:border-slate-300 transition-colors flex items-center justify-between gap-3 text-xs"
                 >
                   <div className="min-w-0">
-                    <p className="font-bold text-white truncate">
+                    <p className="font-bold text-slate-900 truncate">
                       {language === "hi"
                         ? `प्रपत्र-1 सांविधिक नोटिस — ${c.product_name}`
                         : `Form-1 Statutory Notice — ${c.product_name}`}
                     </p>
-                    <p className="text-[11px] text-slate-400 truncate font-mono">
+                    <p className="text-[11px] text-slate-500 truncate font-mono">
                       {c.inspection_number} • {c.establishment_name || c.jurisdiction_id}
                     </p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <Link
                       to={`/inspections/${c.id}`}
-                      className="p-1.5 rounded text-white hover:bg-govNavy/10"
+                      className="p-1.5 rounded-lg text-[#1B365D] hover:bg-blue-50 border border-transparent hover:border-blue-200 transition-colors"
                       title={language === "hi" ? "केस देखें" : "Inspect case"}
                     >
                       <ExternalLink size={15} />
                     </Link>
                     <Link
                       to={`/inspections/${c.id}/evidence`}
-                      className="p-1.5 rounded text-slate-300 hover:text-white hover:bg-slate-700"
+                      className="p-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-colors"
                       title={language === "hi" ? "साक्ष्य संचिका देखें" : "View evidence dossier"}
                     >
                       <Download size={15} />
@@ -372,7 +380,7 @@ export const Reports: React.FC = () => {
       </div>
 
       {/* Cryptographic Evidence Integrity Seal Banner */}
-      <div className="card p-5 bg-gradient-to-r from-govNavy to-slate-900 text-white rounded-xl border border-slate-800 flex flex-col md:flex-row items-center justify-between gap-5 shadow-lg">
+      <div className="p-5 bg-[#1B365D] text-white rounded-xl border border-blue-900/40 flex flex-col md:flex-row items-center justify-between gap-5 shadow-sm relative overflow-hidden">
         <div className="flex items-center gap-4">
           <img
             src="/assets/reports/bsa_merkle_seal.svg"
@@ -381,16 +389,16 @@ export const Reports: React.FC = () => {
           />
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-amber-400 bg-amber-400/10 border border-amber-400/20 px-2 py-0.5 rounded">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-amber-300 bg-amber-400/20 border border-amber-300/40 px-2 py-0.5 rounded">
                 {language === "hi" ? "राजपत्र अधिनियम सं. 47/2023" : "Gazette Act No. 47 of 2023"}
               </span>
-              <span className="text-xs font-bold text-slate-200">
+              <span className="text-xs font-bold text-white">
                 {language === "hi"
                   ? "धारा 63 बीएसए 2023 डिजिटल साक्ष्य अखंडता"
                   : "Section 63 BSA 2023 Digital Evidence Integrity"}
               </span>
             </div>
-            <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
+            <p className="text-xs text-blue-100/90 max-w-2xl leading-relaxed">
               {language === "hi"
                 ? "निरीक्षक द्वारा तैयार प्रत्येक निरीक्षण डोजियर एवं प्रपत्र-1 नोटिस मूल ऑप्टिकल छवियों, अरूको मीट्रिक पैमानों और बहुभाषी ओसीआर टोकन को SHA-256 मर्कल डीएजी श्रृंखला में संरक्षित करता है।"
                 : "Every inspection dossier and Form-1 notice generated by NIRIKSHAK anchors raw optical captures, ArUco metric scaling factors, and multilingual OCR tokens into a SHA-256 Merkle DAG chain-of-custody."}
@@ -402,7 +410,7 @@ export const Reports: React.FC = () => {
           <a
             href="/form1.pdf"
             download="Sample_Sec63_BSA_Certificate.pdf"
-            className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-white font-bold text-xs rounded-lg transition-colors shadow-sm flex items-center gap-1.5"
+            className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-lg transition-colors shadow-xs flex items-center gap-1.5 cursor-pointer"
           >
             <Download size={14} />
             <span>

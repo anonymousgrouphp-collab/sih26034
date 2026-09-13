@@ -234,6 +234,9 @@ export interface AdjudicationRequest {
   officer_remarks: string;     // Mandatory on override
   action_order: OfficerActionOrder;
   officer_pin_hash?: string;
+  officer_name?: string;
+  badge_number?: string;
+  officer_id?: string;
 }
 
 export interface OfficerDecision {
@@ -432,7 +435,7 @@ export interface InspectionSummary {
   category: string;
   package_type: PackagingType;
   workflow_status: WorkflowStatus;
-  overall_status: EpistemicVerdict | "PENDING_REVIEW";
+  overall_status: EpistemicVerdict | "PENDING_REVIEW" | "COMPLETED" | "PENDING";
   ai_verdict: EpistemicVerdict | "PENDING";
   jurisdiction_id: string;
   created_at: string;

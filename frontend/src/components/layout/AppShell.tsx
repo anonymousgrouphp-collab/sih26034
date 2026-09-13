@@ -66,11 +66,15 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   };
 
   const pendingReviewCount = cases.filter(
-    (c) => c.overall_status === "REVIEW" || c.overall_status === "UNABLE_TO_VERIFY" || c.workflow_status === "PENDING_REVIEW"
+    (c) =>
+      c.overall_status === "REVIEW" ||
+      c.overall_status === "UNABLE_TO_VERIFY" ||
+      c.overall_status === "PENDING_REVIEW" ||
+      c.overall_status === "PENDING"
   ).length;
 
   return (
-    <div className="min-h-screen bg-[#0b1320] flex flex-col font-sans relative overflow-x-clip">
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans relative overflow-x-clip text-slate-900">
       {/* WCAG 2.1 AA Accessible Skip Link */}
       <a href="#main-content" className="skip-link">
         {language === "hi" ? "मुख्य वैधानिक सामग्री पर जाएं" : "Skip to main statutory content"}

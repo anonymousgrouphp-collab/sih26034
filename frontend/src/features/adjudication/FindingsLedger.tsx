@@ -37,19 +37,19 @@ export const FindingsLedger: React.FC<FindingsLedgerProps> = ({
   const unableCount = findings.filter((f) => f.status === "UNABLE_TO_VERIFY").length;
 
   return (
-    <div className="bg-panelBg rounded-lg border border-slate-700 shadow-sm flex flex-col h-full overflow-hidden">
+    <div className="bg-white rounded-xl border border-slate-200 shadow-xs flex flex-col h-full overflow-hidden">
       {/* 1. Header & Tabs */}
-      <div className="p-3 border-b border-slate-700 space-y-2 bg-slate-800/60">
+      <div className="p-3 border-b border-slate-200 space-y-2.5 bg-slate-50/80">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <svg className="w-4 h-4 text-cyan-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-4 h-4 text-[#1B365D]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
             </svg>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-cyan-300">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
               {language === "hi" ? "सांविधिक निष्कर्ष बही (लेज़र)" : "Statutory Findings Ledger"}
             </h3>
           </div>
-          <span className="text-[11px] font-mono text-slate-400 font-semibold">
+          <span className="text-[11px] font-mono text-slate-500 font-medium">
             {findings.length} {language === "hi" ? "निष्कर्ष" : "determinations"}
           </span>
         </div>
@@ -59,10 +59,10 @@ export const FindingsLedger: React.FC<FindingsLedgerProps> = ({
           <button
             type="button"
             onClick={() => setFilter("ALL")}
-            className={`px-2 py-0.5 text-xs font-semibold rounded transition-colors ${
+            className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors ${
               filter === "ALL"
-                ? "bg-govNavy text-white"
-                : "bg-slate-900/70 text-slate-200 hover:bg-slate-800/70 border border-slate-700"
+                ? "bg-[#1B365D] text-white shadow-2xs font-bold"
+                : "bg-white text-slate-700 hover:bg-slate-100 border border-slate-200"
             }`}
           >
             {language === "hi" ? "सभी" : "All"} ({findings.length})
@@ -70,42 +70,42 @@ export const FindingsLedger: React.FC<FindingsLedgerProps> = ({
           <button
             type="button"
             onClick={() => setFilter("FAIL")}
-            className={`px-2 py-0.5 text-xs font-semibold rounded transition-colors flex items-center gap-1 ${
+            className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1 ${
               filter === "FAIL"
-                ? "bg-rose-700 text-white"
-                : "bg-rose-900/30 text-rose-300 hover:bg-rose-900/40 border border-rose-800"
+                ? "bg-rose-700 text-white font-bold shadow-2xs"
+                : "bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200"
             }`}
           >
             <span>{language === "hi" ? "उल्लंघन" : "Violations"}</span>
-            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-rose-200 text-rose-300 font-bold">
+            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${filter === "FAIL" ? "bg-rose-800 text-white" : "bg-rose-200/80 text-rose-800"}`}>
               {failCount}
             </span>
           </button>
           <button
             type="button"
             onClick={() => setFilter("REVIEW")}
-            className={`px-2 py-0.5 text-xs font-semibold rounded transition-colors flex items-center gap-1 ${
+            className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1 ${
               filter === "REVIEW"
-                ? "bg-amber-600 text-white"
-                : "bg-amber-900/30 text-amber-300 hover:bg-amber-900/40 border border-amber-200"
+                ? "bg-amber-600 text-white font-bold shadow-2xs"
+                : "bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200"
             }`}
           >
             <span>{language === "hi" ? "समीक्षा" : "Review"}</span>
-            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-200 text-amber-300 font-bold">
+            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${filter === "REVIEW" ? "bg-amber-700 text-white" : "bg-amber-200/80 text-amber-900"}`}>
               {reviewCount}
             </span>
           </button>
           <button
             type="button"
             onClick={() => setFilter("PASS")}
-            className={`px-2 py-0.5 text-xs font-semibold rounded transition-colors flex items-center gap-1 ${
+            className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1 ${
               filter === "PASS"
-                ? "bg-emerald-700 text-white"
-                : "bg-emerald-900/30 text-emerald-300 hover:bg-emerald-900/40 border border-emerald-800"
+                ? "bg-emerald-700 text-white font-bold shadow-2xs"
+                : "bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200"
             }`}
           >
-            <span>{language === "hi" ? "उत्तीर्ण" : "Pass"}</span>
-            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-200 text-emerald-300 font-bold">
+            <span>{language === "hi" ? "अनुपालन" : "Compliant"}</span>
+            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${filter === "PASS" ? "bg-emerald-800 text-white" : "bg-emerald-200/80 text-emerald-900"}`}>
               {passCount}
             </span>
           </button>
@@ -113,14 +113,14 @@ export const FindingsLedger: React.FC<FindingsLedgerProps> = ({
             <button
               type="button"
               onClick={() => setFilter("UNABLE_TO_VERIFY")}
-              className={`px-2 py-0.5 text-xs font-semibold rounded transition-colors flex items-center gap-1 ${
+              className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1 ${
                 filter === "UNABLE_TO_VERIFY"
-                  ? "bg-slate-700 text-white"
-                  : "bg-slate-800/80 text-slate-200 hover:bg-slate-700 border border-slate-600"
+                  ? "bg-slate-700 text-white shadow-2xs font-bold"
+                  : "bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200"
               }`}
             >
               <span>{language === "hi" ? "अस्पष्ट" : "Degraded"}</span>
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-300 text-slate-100 font-bold">
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-200 text-slate-800 font-bold">
                 {unableCount}
               </span>
             </button>
@@ -129,9 +129,9 @@ export const FindingsLedger: React.FC<FindingsLedgerProps> = ({
       </div>
 
       {/* 2. Findings Scrollable List */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-2.5 max-h-[520px]">
+      <div className="flex-1 overflow-y-auto p-3 space-y-2.5 max-h-[580px]">
         {filteredFindings.length === 0 ? (
-          <div className="p-8 text-center text-xs text-slate-400 italic">
+          <div className="p-8 text-center text-xs text-slate-500 italic">
             {language === "hi" ? "चयनित फिल्टर के अनुरूप कोई विधिक निष्कर्ष नहीं मिला।" : "No compliance findings match the selected filter."}
           </div>
         ) : (
@@ -146,19 +146,19 @@ export const FindingsLedger: React.FC<FindingsLedgerProps> = ({
                 data-testid={`finding-item-${finding.finding_id}`}
                 aria-pressed={isSelected}
                 onClick={() => onSelectFinding(finding.finding_id)}
-                className={`w-full text-left p-3 rounded-lg border transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-govNavy ${
+                className={`w-full text-left p-3 rounded-xl border transition-all cursor-pointer focus:outline-none ${
                   isSelected
-                    ? "border-govNavy bg-blue-900/30 shadow-sm ring-1 ring-govNavy"
-                    : "border-slate-700 bg-slate-900/70 hover:border-slate-600 hover:bg-slate-800/60"
+                    ? "border-[#1B365D] bg-blue-50/40 ring-1 ring-[#1B365D]/30 shadow-xs"
+                    : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/60 shadow-2xs"
                 }`}
               >
                 {/* Finding Header */}
                 <div className="flex items-start justify-between gap-2">
                   <div className="space-y-0.5">
-                    <span className="text-[10px] font-mono text-slate-400 font-bold uppercase tracking-wider block">
+                    <span className="text-[10px] font-mono text-slate-500 font-bold uppercase tracking-wider block">
                       {finding.rule_code.replace(/_/g, " ")}
                     </span>
-                    <h4 className="text-xs font-bold text-white leading-tight">
+                    <h4 className="text-xs font-bold text-slate-900 leading-tight">
                       {finding.field_type
                         ? finding.field_type.replace(/_/g, " ")
                         : linkedField?.field_type.replace(/_/g, " ") || "Statutory Declaration"}
@@ -168,28 +168,28 @@ export const FindingsLedger: React.FC<FindingsLedgerProps> = ({
                 </div>
 
                 {/* Values Comparison Strip */}
-                <div className="mt-2 grid grid-cols-2 gap-2 text-xs bg-slate-800/60 p-2 rounded border border-slate-800 font-mono">
+                <div className="mt-2 grid grid-cols-2 gap-2 text-xs bg-slate-50 p-2.5 rounded-lg border border-slate-200 font-mono">
                   <div>
-                    <span className="text-[10px] text-slate-400 font-bold block uppercase">
+                    <span className="text-[10px] text-slate-500 font-semibold block uppercase">
                       {language === "hi" ? "प्राप्त मान" : "Observed"}
                     </span>
                     <span
-                      className={`font-semibold truncate block ${
+                      className={`font-bold truncate block ${
                         finding.status === "FAIL"
-                          ? "text-rose-400"
+                          ? "text-rose-700"
                           : finding.status === "REVIEW"
-                          ? "text-amber-400"
-                          : "text-slate-100"
+                          ? "text-amber-700"
+                          : "text-slate-900"
                       }`}
                     >
                       {finding.measured_value}
                     </span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-400 font-bold block uppercase">
+                    <span className="text-[10px] text-slate-500 font-semibold block uppercase">
                       {language === "hi" ? "विहित मानक" : "Prescribed"}
                     </span>
-                    <span className="text-slate-200 font-semibold truncate block">
+                    <span className="text-slate-900 font-medium truncate block">
                       {finding.required_value}
                     </span>
                   </div>
@@ -197,8 +197,8 @@ export const FindingsLedger: React.FC<FindingsLedgerProps> = ({
 
                 {/* Discrepancy & Legal Notice Footnote */}
                 {finding.discrepancy && (
-                  <p className="mt-1.5 text-[11px] text-slate-400 leading-snug">
-                    <span className="font-semibold text-slate-100">
+                  <p className="mt-1.5 text-[11px] text-slate-600 leading-snug">
+                    <span className="font-semibold text-slate-800">
                       {language === "hi" ? "निष्कर्ष: " : "Finding: "}
                     </span>
                     {finding.discrepancy}
@@ -229,25 +229,25 @@ export const FindingsLedger: React.FC<FindingsLedgerProps> = ({
                   const officerDecisionText = getDecisionLabel(rawDecision);
 
                   return (
-                    <div className="mt-2 pt-1.5 border-t border-slate-800 flex items-center justify-between text-[11px] font-mono">
+                    <div className="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-mono">
                       <div className="flex items-center gap-1">
-                        <span className="text-slate-400 font-sans text-[10px] uppercase font-semibold">
+                        <span className="text-slate-500 font-sans text-[10px] uppercase font-semibold">
                           {language === "hi" ? "एआई निष्कर्ष:" : "AI Finding:"}
                         </span>
-                        <span className="font-bold text-slate-100">{finding.status}</span>
+                        <span className="font-bold text-slate-800">{finding.status}</span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <span className="text-slate-400 font-sans text-[10px] uppercase font-semibold">
+                        <span className="text-slate-500 font-sans text-[10px] uppercase font-semibold">
                           {language === "hi" ? "अधिकारी निर्णय:" : "Officer Adjudication:"}
                         </span>
                         {officerDecisionText ? (
                           <span
-                            className={`font-bold px-1.5 py-0.2 rounded text-[10px] ${
+                            className={`font-bold px-1.5 py-0.2 rounded text-[10px] border ${
                               rawDecision?.includes("CONFIRM")
-                                ? "bg-rose-900/40 text-rose-300 border border-rose-800"
+                                ? "bg-rose-50 text-rose-700 border-rose-200"
                                 : rawDecision?.includes("DISMISS")
-                                ? "bg-emerald-900/40 text-emerald-300 border border-emerald-800"
-                                : "bg-amber-900/40 text-amber-300 border border-amber-200"
+                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                : "bg-amber-50 text-amber-800 border-amber-200"
                             }`}
                           >
                             {officerDecisionText}
@@ -263,14 +263,14 @@ export const FindingsLedger: React.FC<FindingsLedgerProps> = ({
                 })()}
 
                 {/* Relational Evidence Link */}
-                <div className="mt-1.5 pt-1.5 border-t border-slate-800 flex items-center justify-between text-[11px] font-mono text-slate-400">
+                <div className="mt-1.5 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-mono text-slate-500">
                   <span className="flex items-center gap-1">
                     <svg className="w-3 h-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                     </svg>
                     <span>{linkedField?.token_ids?.[0] ? `#${linkedField.token_ids[0]}` : `#${finding.finding_id}`}</span>
                   </span>
-                  <span className="text-slate-400 text-[10px]">
+                  <span className="text-[#1B365D] hover:underline font-semibold text-[10px]">
                     {language === "hi" ? "पैकेज पर ट्रेस करें ↗" : "Click to trace on package ↗"}
                   </span>
                 </div>

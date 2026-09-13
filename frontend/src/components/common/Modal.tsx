@@ -69,7 +69,7 @@ export const Modal: React.FC<ModalProps> = ({
         >
           <m.div
             ref={modalRef}
-            className={`relative w-full ${maxWidthClasses} rounded-lg border border-slate-200 bg-panelBg shadow-2xl transition-all my-8 max-h-[90vh] flex flex-col`}
+            className={`relative w-full ${maxWidthClasses} rounded-2xl border border-slate-200 bg-white text-slate-900 shadow-2xl transition-all my-8 max-h-[90vh] flex flex-col overflow-hidden`}
             variants={{
               hidden: { opacity: 0, scale: 0.95, y: 8 },
               visible: {
@@ -80,10 +80,13 @@ export const Modal: React.FC<ModalProps> = ({
               },
             }}
           >
+            {/* National Tricolor Top Accent */}
+            <div className="h-1 bg-gradient-to-r from-[#ff9933] via-white to-[#138808] w-full shrink-0" />
+
             {/* Header */}
-            <div className="flex items-start justify-between border-b border-slate-200 px-6 py-4 bg-slate-50 rounded-t-lg">
+            <div className="flex items-start justify-between border-b border-slate-200 px-6 py-4 bg-slate-50">
               <div>
-                <h2 id="modal-headline" className="text-base font-bold text-govNavy">
+                <h2 id="modal-headline" className="text-base font-bold text-slate-900 tracking-tight">
                   {title}
                 </h2>
                 {subtitle && (
@@ -96,7 +99,7 @@ export const Modal: React.FC<ModalProps> = ({
                 type="button"
                 onClick={onClose}
                 aria-label={language === "hi" ? "संवाद बंद करें" : "Close dialog"}
-                className="rounded p-1 text-slate-400 hover:bg-slate-200 hover:text-slate-600 focus:outline-none focus:ring-2 focus:ring-govNavy"
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-200 hover:text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#1B365D] transition-colors"
               >
                 <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path
@@ -109,7 +112,7 @@ export const Modal: React.FC<ModalProps> = ({
             </div>
 
             {/* Scrollable Content */}
-            <div className="overflow-y-auto px-6 py-5 flex-1">{children}</div>
+            <div className="overflow-y-auto px-6 py-5 flex-1 bg-white text-slate-800">{children}</div>
           </m.div>
         </m.div>
       )}

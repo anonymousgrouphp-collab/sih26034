@@ -54,24 +54,24 @@ export const KPICard: React.FC<KPICardProps> = ({
   delay = 0,
 }) => {
   const toneClasses = {
-    normal: "bg-white border-slate-200 text-govNavy",
-    success: "bg-verdictPass-light border-emerald-300 text-verdictPass-dark",
-    warning: "bg-verdictReview-light border-amber-300 text-verdictReview-dark",
-    danger: "bg-verdictFail-light border-rose-300 text-verdictFail-dark",
+    normal: "bg-white border border-slate-200/90 text-slate-900 shadow-xs hover:border-blue-300 hover:shadow-sm",
+    success: "bg-emerald-50/60 border border-emerald-200 text-emerald-950 shadow-xs hover:border-emerald-300 hover:shadow-sm",
+    warning: "bg-amber-50/60 border border-amber-200 text-amber-950 shadow-xs hover:border-amber-300 hover:shadow-sm",
+    danger: "bg-rose-50/60 border border-rose-200 text-rose-950 shadow-xs hover:border-rose-300 hover:shadow-sm",
   };
 
   const iconBgStyles = {
-    normal: { background: "radial-gradient(circle at 30% 30%, rgba(27,54,93,0.3), rgba(27,54,93,0.08))" },
-    success: { background: "radial-gradient(circle at 30% 30%, rgba(5,150,105,0.25), rgba(5,150,105,0.05))" },
-    warning: { background: "radial-gradient(circle at 30% 30%, rgba(217,119,6,0.25), rgba(217,119,6,0.05))" },
-    danger: { background: "radial-gradient(circle at 30% 30%, rgba(220,38,38,0.25), rgba(220,38,38,0.05))" },
+    normal: { background: "#EFF6FF" },
+    success: { background: "#ECFDF5" },
+    warning: { background: "#FFFBEB" },
+    danger: { background: "#FFF1F2" },
   };
 
   const iconTextClasses = {
-    normal: "text-govNavy",
-    success: "text-emerald-800",
-    warning: "text-amber-800",
-    danger: "text-rose-800",
+    normal: "text-[#1B365D] border border-blue-200",
+    success: "text-emerald-700 border border-emerald-200",
+    warning: "text-amber-700 border border-amber-200",
+    danger: "text-rose-700 border border-rose-200",
   };
 
   return (
@@ -94,14 +94,14 @@ export const KPICard: React.FC<KPICardProps> = ({
               {trend && (
                 <span
                   className={`text-[11px] font-bold ${
-                    trendPositive ? "text-emerald-700" : "text-slate-500"
+                    trendPositive ? "text-emerald-700" : "text-amber-700"
                   }`}
                 >
                   {trend}
                 </span>
               )}
             </div>
-            {subtext && <p className="mt-1 text-xs text-slate-500 truncate">{subtext}</p>}
+            {subtext && <p className="mt-1 text-xs text-slate-600 truncate">{subtext}</p>}
           </div>
           {icon && (
             <div

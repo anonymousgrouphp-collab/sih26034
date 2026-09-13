@@ -34,7 +34,7 @@ export const GovTopBar: React.FC = () => {
   }, [language]);
 
   return (
-    <div className="gov-topbar screen-only no-print glass text-slate-200 border-b border-slate-700/60 text-[11px] font-sans">
+    <div className="gov-topbar screen-only no-print bg-[#0A2540] text-slate-100 border-b border-slate-700/60 text-[11px] font-sans">
       <div className="w-full max-w-[1750px] mx-auto px-3 sm:px-5 lg:px-6">
         <div className="flex items-center justify-between min-h-[2.25rem] py-1 gap-2 flex-wrap">
           {/* Left: Authentic Indian National Flag & Government Hierarchy */}

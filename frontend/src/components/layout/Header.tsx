@@ -5,7 +5,7 @@ import { OfficerRole } from "../../types/inspection";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { ApiService } from "../../services/api";
-import { Radio, Scale, ShieldCheck, CheckCircle2, ChevronDown } from "lucide-react";
+import { Radio, Scale, ShieldCheck, CheckCircle2, ChevronDown, Search } from "lucide-react";
 import { DEMO_SCENARIOS } from "../../features/demo/demoCatalog";
 import { Modal } from "../common/Modal";
 import { useCircle } from "../../context/CircleContext";
@@ -28,7 +28,7 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleSidebar,
   onOpenCommandPalette,
 }) => {
-  const { user, switchOfficerRole } = useAuth();
+  const { user } = useAuth();
   const { t, language } = useLanguage();
   const navigate = useNavigate();
   const isController = user?.officerRole === "CONTROLLER";
@@ -76,10 +76,6 @@ export const Header: React.FC<HeaderProps> = ({
     onCircleChange(result.circle.id);
   };
 
-  const handleRoleToggle = (newRole: OfficerRole) => {
-    switchOfficerRole(newRole);
-  };
-
   const handleModeSwitch = (mode: "ONLINE" | "LOCAL_RESILIENT") => {
     setCurrentMode(mode);
     try {
@@ -99,22 +95,20 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <>
       <header
-        className={`glass text-white border-b-2 shadow-md sticky top-0 z-50 w-full transition-colors duration-200 ${
-          isController ? "border-purple-500" : "border-amber-500"
-        }`}
+        className="bg-[#1B365D] text-white border-b border-[#0A2540] shadow-md sticky top-0 z-50 w-full"
       >
       {/* Tricolor National Stripe */}
-      <div className="h-1 bg-gradient-to-r from-[#ff9933] via-white to-[#138808] w-full" />
+      <div className="h-0.5 bg-gradient-to-r from-[#ff9933] via-white to-[#138808] w-full" />
 
       <div className="w-full max-w-[1750px] mx-auto px-3 sm:px-5 lg:px-6">
-        <div className="flex items-center justify-between h-16 max-h-16 gap-2 lg:gap-4">
+        <div className="flex items-center justify-between h-14 max-h-14 gap-2 lg:gap-4">
           {/* Brand & State Emblem of India */}
           <div className="flex items-center space-x-2 sm:space-x-3 shrink-0 py-0.5">
             {onToggleSidebar && (
               <button
                 type="button"
                 onClick={onToggleSidebar}
-                className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-govNavy-light lg:hidden"
+                className="p-1.5 rounded-lg text-slate-200 hover:text-white hover:bg-white/10 lg:hidden"
                 title="Toggle Navigation Menu"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -126,222 +120,223 @@ export const Header: React.FC<HeaderProps> = ({
             <NirikshakBrandLogo tone="light" size="md" />
           </div>
 
-          {/* Quick Command Palette Search Trigger */}
-          {onOpenCommandPalette && (
-            <button
-              type="button"
-              onClick={onOpenCommandPalette}
-              aria-label="Open universal command search palette (Ctrl+K)"
-              className="hidden lg:flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-govNavy-dark/80 hover:bg-govNavy-light border border-slate-700 text-slate-300 hover:text-white text-xs transition-colors shadow-2xs whitespace-nowrap min-w-0 overflow-hidden"
-            >
-              <svg className="w-3.5 h-3.5 text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <span className="hidden 2xl:inline truncate min-w-0">{t("portal.command_search", "Quick Search Cases & Rules...")}</span>
-              <span className="inline 2xl:hidden truncate min-w-0">{t("portal.command_search_short", "Search Cases...")}</span>
-              <kbd className="hidden 2xl:inline-block ml-1 font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-amber-300 border border-slate-600 shrink-0">
-                Ctrl K
-              </kbd>
-            </button>
-          )}
-
-          {/* Controls: Circle Selector, Connectivity, RBAC Toggle, Officer Profile */}
-          <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
-            {/* Quick Demo Cases Dropdown Launcher */}
-            <div className="relative">
+            {/* Quick Command Palette Search Trigger */}
+            {onOpenCommandPalette && (
               <button
                 type="button"
-                onClick={() => {
-                  setDemoMenuOpen(!demoMenuOpen);
-                  setModeMenuOpen(false);
-                }}
-                className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-black text-xs transition-all shadow-xs border border-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-300"
-                title="Quick Access: Certified Statutory Demonstration Scenarios"
-                aria-haspopup="true"
-                aria-expanded={demoMenuOpen}
+                onClick={onOpenCommandPalette}
+                aria-label="Open universal command search palette (Ctrl+K)"
+                className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0f2847] hover:bg-[#153459] border border-white/20 text-slate-200 hover:text-white text-xs font-medium transition-colors shadow-2xs whitespace-nowrap min-w-0 overflow-hidden cursor-pointer"
               >
-                <Scale size={14} className="text-slate-950" />
-                <span className="hidden sm:inline">{language === "hi" ? "डेमो परिदृश्य" : "Demo Cases"}</span>
-                <span className="hidden sm:inline bg-slate-950 text-amber-300 text-[10px] font-mono font-black px-1.5 py-0.2 rounded-full">
-                  7
-                </span>
-                <ChevronDown size={13} className={`transition-transform duration-200 ${demoMenuOpen ? "rotate-180" : ""}`} />
+                <Search size={14} className="text-blue-300 shrink-0" />
+                <span className="hidden 2xl:inline truncate min-w-0">{t("portal.command_search", "Quick Search Cases & Rules...")}</span>
+                <span className="inline 2xl:hidden truncate min-w-0">{t("portal.command_search_short", "Search Cases...")}</span>
+                <kbd className="hidden 2xl:inline-block ml-1 font-mono text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-blue-200 border border-white/20 font-bold shrink-0">
+                  Ctrl K
+                </kbd>
               </button>
-
-              {demoMenuOpen && (
-                <>
-                  {/* Fixed Backdrop for Outside Click Dismissal */}
-                  <div
-                    className="fixed inset-0 z-40 bg-transparent"
-                    onClick={() => setDemoMenuOpen(false)}
-                    aria-hidden="true"
-                  />
-
-                  <div
-                    className="absolute left-0 mt-2 w-80 sm:w-88 rounded-xl bg-white text-slate-900 shadow-2xl border border-slate-200 p-2 z-50 animate-pop-in"
-                  >
-                    <div className="px-3 py-2 border-b border-slate-100 flex items-center justify-between">
-                      <div>
-                        <p className="font-extrabold text-xs text-govNavy flex items-center gap-1.5">
-                          <Scale size={12} className="text-amber-500" />
-                          <span>{language === "hi" ? "सांविधिक प्रदर्शन परिदृश्य" : "Statutory Demo Suite"}</span>
-                        </p>
-                      <p className="text-[10px] text-slate-500">
-                        {language === "hi" ? "त्वरित सांविधिक जांच हेतु 1-क्लिक लोड" : "1-Click load for statutory audit"}
-                      </p>
-                    </div>
-                    <Link
-                      to="/dashboard#demo-showcase"
-                      onClick={() => setDemoMenuOpen(false)}
-                      className="text-[11px] font-bold text-amber-700 hover:underline"
-                    >
-                      {language === "hi" ? "सभी 7 देखें" : "View All"}
-                    </Link>
-                  </div>
-
-                  <div className="py-1 max-h-80 overflow-y-auto space-y-1">
-                    {DEMO_SCENARIOS.map((s) => (
-                      <button
-                        key={s.caseId}
-                        type="button"
-                        onClick={() => {
-                          setDemoMenuOpen(false);
-                          navigate(`/inspections/${s.caseId}`);
-                        }}
-                        className="w-full text-left p-2 rounded-lg hover:bg-slate-50 flex items-center justify-between gap-2 text-xs transition-colors group border border-transparent hover:border-slate-200"
-                      >
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-1.5">
-                            <span className="font-mono text-[9px] font-bold text-slate-500">
-                              #{s.scenarioNumber}
-                            </span>
-                            <span className="font-bold text-slate-900 group-hover:text-govNavy truncate">
-                              {language === "hi" && s.titleHi ? s.titleHi : s.title}
-                            </span>
-                          </div>
-                          <p className="text-[10.5px] text-slate-500 truncate mt-0.5">
-                            {language === "hi" && s.headlineViolationHi ? s.headlineViolationHi : s.headlineViolation}
-                          </p>
-                        </div>
-                        <span
-                          className={`text-[9.5px] font-black px-1.5 py-0.5 rounded border shrink-0 ${
-                            s.targetVerdict === "FAIL"
-                              ? "bg-rose-50 text-rose-700 border-rose-200"
-                              : s.targetVerdict === "PASS"
-                              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                              : s.targetVerdict === "REVIEW"
-                              ? "bg-amber-50 text-amber-800 border-amber-200"
-                              : "bg-purple-50 text-purple-700 border-purple-200"
-                          }`}
-                        >
-                          {s.targetVerdict}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </>
             )}
-          </div>
 
-            {/* Jurisdiction Circle Selector */}
-            <div className="hidden 2xl:flex items-center space-x-2 bg-govNavy-dark/70 px-3 py-1.5 rounded-lg border border-slate-700 shrink-0">
-              <label htmlFor="circle-select" className="text-xs text-slate-300 whitespace-nowrap font-medium">
-                {t("portal.circle", "Circle:")}
-              </label>
-              <select
-                id="circle-select"
-                value={activeCircle}
-                onChange={(e) => {
-                  if (e.target.value === "__add_new_circle__") {
-                    openAddCircleModal();
-                    return;
-                  }
-                  onCircleChange(e.target.value);
-                }}
-                className="bg-transparent text-xs text-amber-200 font-semibold focus:outline-none cursor-pointer pr-2 max-w-[160px] 2xl:max-w-[220px] truncate"
-              >
-                {allCircles.map((c) => (
-                  <option key={c.id} value={c.id} className="bg-govNavy text-white">
-                    {(language === "hi" && c.labelHi ? c.labelHi : c.label) +
-                      (customCircles.some((cc) => cc.id === c.id) ? " • custom" : "")}
-                  </option>
-                ))}
-                {/* Guard: keep the select truthful if the stored circle is not in the registry */}
-                {!allCircles.some((c) => c.id === activeCircle) && (
-                  <option value={activeCircle} className="bg-govNavy text-white">
-                    {activeCircle}
-                  </option>
-                )}
-                <option value="__add_new_circle__" className="bg-govNavy text-emerald-300">
-                  ＋ Add New Circle…
-                </option>
-              </select>
+            {/* Controls: Circle Selector, Connectivity, RBAC Toggle, Officer Profile */}
+            <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+              {/* Quick Demo Cases Dropdown Launcher */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDemoMenuOpen(!demoMenuOpen);
+                    setModeMenuOpen(false);
+                  }}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0f2847] hover:bg-[#153459] border border-blue-300/30 hover:border-blue-300/50 text-white font-semibold text-xs transition-all shadow-2xs focus:outline-none focus:ring-2 focus:ring-blue-400/30 cursor-pointer"
+                  title="Quick Access: Certified Statutory Demonstration Scenarios"
+                  aria-haspopup="true"
+                  aria-expanded={demoMenuOpen}
+                >
+                  <Scale size={14} className="text-[#FF9933] shrink-0" />
+                  <span className="hidden sm:inline">{language === "hi" ? "डेमो परिदृश्य" : "Demo Cases"}</span>
+                  <span className="px-1.5 py-0.2 rounded-md bg-white/15 text-white text-[10px] font-mono font-bold">
+                    7
+                  </span>
+                  <ChevronDown size={13} className={`text-blue-200 transition-transform duration-200 ${demoMenuOpen ? "rotate-180" : ""}`} />
+                </button>
+
+                {demoMenuOpen && (
+                  <>
+                    {/* Fixed Backdrop for Outside Click Dismissal */}
+                    <div
+                      className="fixed inset-0 z-40 bg-transparent"
+                      onClick={() => setDemoMenuOpen(false)}
+                      aria-hidden="true"
+                    />
+
+                    <div
+                      className="absolute left-0 mt-2 w-80 sm:w-88 rounded-xl bg-white text-slate-800 shadow-2xl border border-slate-200 p-2 z-50 animate-pop-in"
+                    >
+                      <div className="px-3 py-2 border-b border-slate-100 flex items-center justify-between">
+                        <div>
+                          <p className="font-extrabold text-xs text-[#1B365D] flex items-center gap-1.5">
+                            <Scale size={12} className="text-[#FF9933]" />
+                            <span>{language === "hi" ? "सांविधिक प्रदर्शन परिदृश्य" : "Statutory Demo Suite"}</span>
+                          </p>
+                        <p className="text-[10px] text-slate-500">
+                          {language === "hi" ? "त्वरित सांविधिक जांच हेतु 1-क्लिक लोड" : "1-Click load for statutory audit"}
+                        </p>
+                      </div>
+                      <Link
+                        to="/dashboard#demo-showcase"
+                        onClick={() => setDemoMenuOpen(false)}
+                        className="text-[11px] font-bold text-[#1B365D] hover:underline"
+                      >
+                        {language === "hi" ? "सभी 7 देखें" : "View All"}
+                      </Link>
+                    </div>
+
+                    <div className="py-1 max-h-80 overflow-y-auto space-y-1">
+                      {DEMO_SCENARIOS.map((s) => (
+                        <button
+                          key={s.caseId}
+                          type="button"
+                          onClick={() => {
+                            setDemoMenuOpen(false);
+                            navigate(`/inspections/${s.caseId}`);
+                          }}
+                          className="w-full text-left p-2 rounded-lg hover:bg-slate-50 flex items-center justify-between gap-2 text-xs transition-colors group border border-transparent hover:border-slate-200 cursor-pointer"
+                        >
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-mono text-[9px] font-bold text-slate-500">
+                                #{s.scenarioNumber}
+                              </span>
+                              <span className="font-bold text-slate-800 group-hover:text-[#1B365D] truncate">
+                                {language === "hi" && s.titleHi ? s.titleHi : s.title}
+                              </span>
+                            </div>
+                            <p className="text-[10.5px] text-slate-500 truncate mt-0.5">
+                              {language === "hi" && s.headlineViolationHi ? s.headlineViolationHi : s.headlineViolation}
+                            </p>
+                          </div>
+                          <span
+                            className={`text-[9.5px] font-bold px-1.5 py-0.5 rounded border shrink-0 ${
+                              s.targetVerdict === "FAIL"
+                                ? "bg-rose-50 text-rose-700 border-rose-200"
+                                : s.targetVerdict === "PASS"
+                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                : s.targetVerdict === "REVIEW"
+                                ? "bg-amber-50 text-amber-700 border-amber-200"
+                                : "bg-slate-100 text-slate-700 border-slate-300"
+                            }`}
+                          >
+                            {s.targetVerdict}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
 
-            {/* Quick RBAC Role Toggle */}
-            <div
-              className={`hidden sm:flex items-center bg-govNavy-dark/80 p-0.5 rounded-lg border text-xs shrink-0 transition-colors ${
-                isController ? "border-purple-500/50" : "border-amber-500/40"
-              }`}
-            >
-              <button
-                type="button"
-                onClick={() => handleRoleToggle("INSPECTOR")}
-                className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all ${
-                  !isController
-                    ? "bg-amber-500 text-govNavy shadow-xs"
-                    : "text-slate-300 hover:text-white"
-                }`}
-                title="Switch to Legal Metrology Officer (Inspector) Role"
-              >
-                {t("portal.role_lmo", "LMO Inspector")}
-              </button>
-              <button
-                type="button"
-                onClick={() => handleRoleToggle("CONTROLLER")}
-                className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all ${
-                  isController
-                    ? "bg-purple-600 text-white shadow-xs"
-                    : "text-slate-300 hover:text-white"
-                }`}
-                title="Switch to Controller of Legal Metrology Role"
-              >
-                {t("portal.role_controller", "Controller")}
-              </button>
-            </div>
+              {/* Jurisdiction Circle Selector */}
+              <div className="hidden xl:flex items-center gap-1.5 bg-[#0f2847] px-3 py-1.5 rounded-lg border border-white/20 text-xs shadow-2xs shrink-0">
+                <label htmlFor="circle-select" className="text-blue-200/80 whitespace-nowrap font-medium text-[11px]">
+                  {t("portal.circle", "Circle:")}
+                </label>
+                <select
+                  id="circle-select"
+                  value={activeCircle}
+                  onChange={(e) => {
+                    if (e.target.value === "__add_new_circle__") {
+                      openAddCircleModal();
+                      return;
+                    }
+                    onCircleChange(e.target.value);
+                  }}
+                  className="bg-transparent text-xs text-white font-semibold focus:outline-none cursor-pointer pr-1 max-w-[160px] 2xl:max-w-[220px] truncate"
+                >
+                  {allCircles.map((c) => (
+                    <option key={c.id} value={c.id} className="bg-[#1B365D] text-white">
+                      {(language === "hi" && c.labelHi ? c.labelHi : c.label) +
+                        (customCircles.some((cc) => cc.id === c.id) ? " • custom" : "")}
+                    </option>
+                  ))}
+                  {/* Guard: keep the select truthful if the stored circle is not in the registry */}
+                  {!allCircles.some((c) => c.id === activeCircle) && (
+                    <option value={activeCircle} className="bg-[#1B365D] text-white">
+                      {activeCircle}
+                    </option>
+                  )}
+                  <option value="__add_new_circle__" className="bg-[#1B365D] text-emerald-300">
+                    ＋ Add New Circle…
+                  </option>
+                </select>
+              </div>
 
-            {/* System Operating Mode — Mode A (Online Monolith) / Mode B (Local Resilient Field Mode).
-                Rendered as an explained dropdown so its purpose is self-evident (feedback #bug-2). */}
-            <div className="relative hidden md:block shrink-0">
-              <button
-                type="button"
-                onClick={() => {
-                  setModeMenuOpen(!modeMenuOpen);
-                  setDemoMenuOpen(false);
-                }}
-                aria-haspopup="true"
-                aria-expanded={modeMenuOpen}
-                aria-label="System operating mode"
-                title="Statutory System Mode: Mode A runs inspections from the central cloud server & datastore; Mode B runs standalone on this workstation (local storage) when field connectivity is unavailable."
-                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-bold transition-all bg-govNavy-dark/80 ${
-                  isController ? "border-purple-500/50 hover:border-purple-400/80" : "border-slate-700 hover:border-amber-400/60"
-                }`}
+              {/* Authenticated Official Cadre Display (Locked to Login Session) */}
+              <div
+                className="hidden sm:flex items-center gap-1.5 bg-[#0c1e36] px-2.5 py-1 rounded-lg border border-white/20 text-xs shrink-0 shadow-2xs"
+                title={
+                  language === "hi"
+                    ? `प्रमाणित सत्र: ${isController ? "विधिक मापविज्ञान नियंत्रक" : "विधिक मापविज्ञान अधिकारी (निरीक्षक)"} • संवर्ग परिवर्तन हेतु कृपया साइन आउट कर पुनः प्रवेश करें।`
+                    : `Authenticated Session: ${isController ? "Controller of Legal Metrology" : "Legal Metrology Officer (Inspector)"} • To switch cadre, please sign out and sign in.`
+                }
               >
-                <Radio
-                  size={13}
-                  className={`shrink-0 ${currentMode === "ONLINE" ? "text-emerald-400" : "text-amber-400"}`}
-                />
-                <span className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold hidden xl:inline">
-                  System Mode
-                </span>
-                <span className={currentMode === "ONLINE" ? "text-emerald-300" : "text-amber-300"}>
-                  {currentMode === "ONLINE"
-                    ? `Mode A ${language === "hi" ? "(ऑनलाइन)" : "(Online)"}`
-                    : `Mode B ${language === "hi" ? "(लचीला)" : "(Resilient)"}`}
-                </span>
-                <ChevronDown size={13} className={`text-slate-400 transition-transform duration-200 ${modeMenuOpen ? "rotate-180" : ""}`} />
-              </button>
+                <div className="flex items-center gap-1 select-none text-[10px] font-bold text-blue-200/80 uppercase tracking-wider">
+                  <ShieldCheck size={12} className="text-[#FF9933] shrink-0" />
+                  <span>{language === "hi" ? "संवर्ग:" : "Cadre:"}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span
+                    className={`px-2 py-0.5 rounded text-[10.5px] font-bold font-mono ${
+                      isController
+                        ? "bg-purple-900/80 text-purple-200 border border-purple-400/30"
+                        : "bg-blue-900/80 text-blue-200 border border-blue-400/30"
+                    }`}
+                  >
+                    {isController
+                      ? (language === "hi" ? "नियंत्रक" : "Controller")
+                      : (language === "hi" ? "निरीक्षक" : "LMO Inspector")}
+                  </span>
+                  <span className="font-mono text-[10px] text-amber-300/90 font-semibold hidden md:inline">
+                    {user?.badgeNumber || (isController ? "CTRL-DL-0012" : "INSP-DL-0842")}
+                  </span>
+                  <span
+                    className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"
+                    title={language === "hi" ? "सत्र प्रमाणित" : "Session Authenticated"}
+                  />
+                </div>
+              </div>
+
+              {/* System Operating Mode */}
+              <div className="relative hidden md:block shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setModeMenuOpen(!modeMenuOpen);
+                    setDemoMenuOpen(false);
+                  }}
+                  aria-haspopup="true"
+                  aria-expanded={modeMenuOpen}
+                  aria-label="System operating mode"
+                  title="Statutory System Mode: Mode A runs inspections from the central cloud server & datastore; Mode B runs standalone on this workstation (local storage) when field connectivity is unavailable."
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/20 hover:border-white/40 text-xs font-semibold transition-all bg-[#0f2847] hover:bg-[#153459] text-white shadow-2xs cursor-pointer"
+                >
+                  <span
+                    className={`w-2 h-2 rounded-full shrink-0 ${
+                      currentMode === "ONLINE"
+                        ? "bg-emerald-400 animate-pulse ring-2 ring-emerald-400/30"
+                        : "bg-amber-400 ring-2 ring-amber-400/30"
+                    }`}
+                  />
+                  <span className="text-[10px] uppercase tracking-wider text-blue-200/80 font-bold hidden 2xl:inline">
+                    System Mode
+                  </span>
+                  <span>
+                    {currentMode === "ONLINE"
+                      ? `Mode A ${language === "hi" ? "(ऑनलाइन)" : "(Online)"}`
+                      : `Mode B ${language === "hi" ? "(लचीला)" : "(Resilient)"}`}
+                  </span>
+                  <ChevronDown size={13} className={`text-blue-200 transition-transform duration-200 ${modeMenuOpen ? "rotate-180" : ""}`} />
+                </button>
 
               {modeMenuOpen && (
                 <>
@@ -352,10 +347,10 @@ export const Header: React.FC<HeaderProps> = ({
                     aria-hidden="true"
                   />
 
-                  <div className="absolute right-0 mt-2 w-80 rounded-xl bg-white text-slate-900 shadow-2xl border border-slate-200 p-2 z-50 animate-pop-in">
+                  <div className="absolute right-0 mt-2 w-80 rounded-xl bg-white text-slate-800 shadow-2xl border border-slate-200 p-2 z-50 animate-pop-in">
                     <div className="px-3 py-2 border-b border-slate-100">
-                      <p className="font-extrabold text-xs text-govNavy flex items-center gap-1.5">
-                        <Radio size={12} className="text-emerald-500" />
+                      <p className="font-extrabold text-xs text-[#1B365D] flex items-center gap-1.5">
+                        <Radio size={12} className="text-emerald-600" />
                         <span>{language === "hi" ? "सिस्टम संचालन मोड" : "System Operating Mode"}</span>
                       </p>
                       <p className="text-[10px] text-slate-500 mt-0.5">
@@ -374,13 +369,13 @@ export const Header: React.FC<HeaderProps> = ({
                         }}
                         className={`w-full text-left p-2.5 rounded-lg flex items-start justify-between gap-2 border transition-colors ${
                           currentMode === "ONLINE"
-                            ? "bg-emerald-50 border-emerald-300"
-                            : "border-transparent hover:bg-slate-50 hover:border-slate-200"
+                            ? "bg-emerald-50 border-emerald-300 text-emerald-950"
+                            : "border-slate-100 hover:bg-slate-50 hover:border-slate-200"
                         }`}
                       >
                         <div className="min-w-0">
                           <p className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0" />
                             Mode A — {language === "hi" ? "ऑनलाइन मोनोलिथ" : "Online Monolith"}
                           </p>
                           <p className="text-[10.5px] text-slate-500 mt-0.5 leading-relaxed">
@@ -400,8 +395,8 @@ export const Header: React.FC<HeaderProps> = ({
                         }}
                         className={`w-full text-left p-2.5 rounded-lg flex items-start justify-between gap-2 border transition-colors ${
                           currentMode === "LOCAL_RESILIENT"
-                            ? "bg-amber-50 border-amber-300"
-                            : "border-transparent hover:bg-slate-50 hover:border-slate-200"
+                            ? "bg-amber-50 border-amber-300 text-amber-950"
+                            : "border-slate-100 hover:bg-slate-50 hover:border-slate-200"
                         }`}
                       >
                         <div className="min-w-0">
@@ -441,7 +436,7 @@ export const Header: React.FC<HeaderProps> = ({
       >
         <form onSubmit={handleAddCircleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="new-circle-id" className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+            <label htmlFor="new-circle-id" className="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1">
               {language === "hi" ? "मंडल आईडी" : "Circle ID"}
             </label>
             <input
@@ -462,7 +457,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           <div>
-            <label htmlFor="new-circle-label" className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+            <label htmlFor="new-circle-label" className="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1">
               {language === "hi" ? "प्रदर्शन नाम" : "Display Name"}
             </label>
             <input
@@ -478,7 +473,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           <div>
-            <label htmlFor="new-circle-label-hi" className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+            <label htmlFor="new-circle-label-hi" className="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1">
               {language === "hi" ? "हिंदी नाम (वैकल्पिक)" : "Hindi Name (optional)"}
             </label>
             <input
@@ -493,7 +488,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {newCircleError && (
-            <p role="alert" className="text-xs font-semibold text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+            <p role="alert" className="text-xs font-semibold text-rose-200 bg-rose-950/80 border border-rose-500/50 rounded-lg px-3 py-2">
               {newCircleError}
             </p>
           )}

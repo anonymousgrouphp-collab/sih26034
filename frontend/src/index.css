@@ -5,8 +5,8 @@
 @layer base {
   :root {
     font-family: 'Inter', 'Roboto', 'Plus Jakarta Sans', sans-serif;
-    color: #f1f5f9;
-    background: #0b1320;
+    color: #0f172a;
+    background: #f8fafc;
     font-synthesis: none;
     text-rendering: optimizeLegibility;
   }
@@ -15,17 +15,16 @@
     margin: 0;
     min-width: 320px;
     min-height: 100vh;
-    background: #0b1320;
+    background: #f8fafc;
+    color: #0f172a;
     font-family: 'Inter', 'Roboto', 'Plus Jakarta Sans', sans-serif !important;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
   
-  /* High contrast focus ring for WCAG 2.1 AA accessibility —
-     #38bdf8 (Cyan/Azure) is the platform accent; it meets AA contrast
-     on both dark-slate (#0b1320) and white panel surfaces. */
+  /* High contrast focus ring for WCAG 2.1 AA accessibility */
   :focus-visible {
-    outline: 2px solid #38bdf8;
+    outline: 2px solid #f59e0b;
     outline-offset: 2px;
   }
 }
@@ -194,37 +193,36 @@
 
 /* Custom scrollbars for high-density ledgers */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0b1320;
+  background: #f1f5f9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1B365D;
-  border-radius: 5px;
+  background: #cbd5e1;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #38bdf8;
+  background: #94a3b8;
 }
 
-/* Glassmorphism */
+/* Official Institutional White Docket & Card Panels */
 .glass {
-  background: rgba(19, 34, 56, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
 }
 
 .glass-panel {
-  background: rgba(19, 34, 56, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.05), 0 1px 2px -1px rgba(15, 23, 42, 0.05);
 }
 
 /* Skeleton Loader */
@@ -234,7 +232,7 @@
 }
 .skeleton {
   animation: shimmer 2s infinite linear;
-  background: linear-gradient(to right, #132238 4%, #1B365D 25%, #132238 36%);
+  background: linear-gradient(to right, #f1f5f9 4%, #e2e8f0 25%, #f1f5f9 36%);
   background-size: 1000px 100%;
 }
 
@@ -256,27 +254,27 @@
   }
 
   .card {
-    @apply rounded-xl border border-slate-700/60 bg-slate-800/60 shadow-workstation;
+    @apply rounded-xl border border-slate-200/90 bg-white shadow-xs text-slate-800;
   }
 
   .section-title {
-    @apply text-xs font-bold uppercase tracking-wider text-slate-200;
+    @apply text-xs font-bold uppercase tracking-wider text-slate-900;
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-govNavy px-4 py-2.5 text-xs sm:text-sm font-bold text-white transition duration-150 hover:bg-govNavy-light active:scale-[0.97] focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-amber-500 hover:bg-amber-400 px-4 py-2 text-xs sm:text-sm font-bold text-slate-950 transition duration-150 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-xs disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-slate-700/80 bg-slate-800/80 px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-200 transition duration-150 hover:bg-slate-700 hover:text-white active:scale-[0.97] focus:outline-none focus:ring-2 focus:ring-slate-500 shadow-sm;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-xs sm:text-sm font-semibold text-slate-700 transition duration-150 hover:bg-slate-50 hover:text-slate-900 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-slate-400 shadow-xs;
   }
 
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-xs sm:text-sm font-semibold text-red-700 transition duration-150 hover:bg-red-100 active:scale-[0.97] focus:outline-none focus:ring-2 focus:ring-red-400;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-xs sm:text-sm font-semibold text-red-700 transition duration-150 hover:bg-red-100 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-red-400;
   }
 
   .input {
-    @apply w-full rounded-lg border border-slate-700/80 bg-slate-800/80 px-3 py-2 text-xs sm:text-sm text-white placeholder:text-slate-400 outline-none transition-all focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/30;
+    @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-all focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs;
   }
   
   .input-group {
@@ -289,7 +287,7 @@
 
   .input:focus ~ .input-label,
   .input:not(:placeholder-shown) ~ .input-label {
-    @apply -translate-y-5 scale-75 text-cyan;
+    @apply -translate-y-5 scale-75 text-amber-600;
   }
 }
 

@@ -202,31 +202,31 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
 
 
   return (
-    <div className="bg-panelBg rounded-lg border border-slate-700 shadow-sm flex flex-col h-full overflow-hidden">
+    <div className="bg-white rounded-xl border border-slate-200/90 shadow-xs flex flex-col h-full overflow-hidden">
       {/* 1. Header Toolbar */}
-      <div className="p-3 border-b border-slate-700 flex items-center justify-between gap-2 flex-wrap bg-slate-800/60">
+      <div className="p-3 border-b border-slate-200 flex items-center justify-between gap-2 flex-wrap bg-slate-50">
         <div className="flex items-center gap-2 flex-wrap">
           {viewMode === "ORIGINAL" ? (
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-govNavy text-white font-mono text-[10px] font-bold border border-amber-400/50 shadow-sm">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-white text-slate-800 font-mono text-[10px] font-semibold border border-slate-300 shadow-2xs">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
               {language === "hi" ? "मूल साक्ष्य कैप्चर (अपरिवर्तित)" : "ORIGINAL CAPTURE (UNTOUCHED)"}
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-purple-800 text-white font-mono text-[10px] font-bold border border-purple-400 shadow-sm">
-              <span className="h-1.5 w-1.5 rounded-full bg-purple-300" />
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-purple-50 text-purple-800 font-mono text-[10px] font-semibold border border-purple-300 shadow-2xs">
+              <span className="h-1.5 w-1.5 rounded-full bg-purple-600" />
               {language === "hi" ? "व्युत्पन्न समरेखित दृश्य (M1)" : "DERIVED RECTIFIED VIEW (HOMOGRAPHY M1)"}
             </span>
           )}
 
           {/* Perspective View Toggle */}
-          <div className="inline-flex rounded border border-slate-600 bg-slate-900/70 p-0.5 text-xs font-medium">
+          <div className="inline-flex rounded-lg border border-slate-300 bg-white p-0.5 text-xs font-medium shadow-2xs">
             <button
               type="button"
               onClick={() => setViewMode("ORIGINAL")}
-              className={`px-2 py-0.5 rounded text-[11px] transition-colors ${
+              className={`px-2.5 py-0.5 rounded-md text-[11px] transition-colors ${
                 viewMode === "ORIGINAL"
-                  ? "bg-govNavy text-white font-bold shadow-xs"
-                  : "text-slate-400 hover:text-white hover:bg-slate-800/70"
+                  ? "bg-[#1B365D] text-white font-semibold shadow-2xs"
+                  : "text-slate-600 hover:text-slate-900"
               }`}
             >
               {language === "hi" ? "मूल कैप्चर" : "Original Capture"}
@@ -234,10 +234,10 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
             <button
               type="button"
               onClick={() => setViewMode("RECTIFIED")}
-              className={`px-2 py-0.5 rounded text-[11px] transition-colors ${
+              className={`px-2.5 py-0.5 rounded-md text-[11px] transition-colors ${
                 viewMode === "RECTIFIED"
-                  ? "bg-purple-800 text-white font-bold shadow-xs"
-                  : "text-slate-400 hover:text-white hover:bg-slate-800/70"
+                  ? "bg-purple-700 text-white font-semibold shadow-2xs"
+                  : "text-slate-600 hover:text-slate-900"
               }`}
               title={
                 hasRectifiedSupport
@@ -249,14 +249,14 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
             </button>
           </div>
 
-          <span className="text-xs font-mono text-slate-400 truncate max-w-xs font-semibold" title={asset.original_filename || asset.image_id}>
+          <span className="text-xs font-mono text-slate-600 truncate max-w-xs font-medium" title={asset.original_filename || asset.image_id}>
             {asset.original_filename || asset.image_id}
           </span>
-          <span className="text-[11px] font-mono text-slate-400 hidden sm:inline">
+          <span className="text-[11px] font-mono text-slate-500 hidden sm:inline">
             ({imgWidth} × {imgHeight} px)
           </span>
           {selectedFinding && (
-            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-900/40 text-blue-300 font-bold border border-blue-700 hidden md:inline">
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-50 text-amber-800 font-semibold border border-amber-300 hidden md:inline">
               {language === "hi" ? "निष्कर्ष: #" : "Finding: #"}{selectedFinding.finding_id}
             </span>
           )}
@@ -269,14 +269,14 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
             type="button"
             onClick={() => setIsGridActive(!isGridActive)}
             aria-label="Toggle 10mm metric grid overlay"
-            className={`px-2.5 py-1.5 min-h-[32px] text-xs font-semibold rounded border transition-colors flex items-center gap-1 focus:outline-none focus:ring-2 focus:ring-govNavy ${
+            className={`px-2.5 py-1.5 min-h-[32px] text-xs font-medium rounded-lg border transition-colors flex items-center gap-1.5 focus:outline-none focus:ring-1 focus:ring-amber-500 ${
               isGridActive
-                ? "bg-cyan-900/40 text-cyan-950 border-cyan-400 shadow-2xs font-bold"
-                : "bg-slate-900/70 text-slate-200 border-slate-600 hover:bg-slate-800/60"
+                ? "bg-amber-100 text-amber-900 border-amber-300 shadow-2xs font-semibold"
+                : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100"
             }`}
             title="Toggle 10mm calibrated metric grid overlay (ADR-06)"
           >
-            <svg className="w-3.5 h-3.5 text-cyan-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-3.5 h-3.5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16M6 4v16M12 4v16M18 4v16" />
             </svg>
             <span className="hidden md:inline">{language === "hi" ? "10 मिमी ग्रिड" : "10mm Grid"}</span>
@@ -287,32 +287,32 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
             type="button"
             onClick={() => setIsLoupeActive(!isLoupeActive)}
             aria-label="Toggle forensic optical loupe"
-            className={`px-2.5 py-1.5 min-h-[32px] text-xs font-semibold rounded border transition-colors flex items-center gap-1 focus:outline-none focus:ring-2 focus:ring-govNavy ${
+            className={`px-2.5 py-1.5 min-h-[32px] text-xs font-medium rounded-lg border transition-colors flex items-center gap-1.5 focus:outline-none focus:ring-1 focus:ring-amber-500 ${
               isLoupeActive
-                ? "bg-amber-900/40 text-amber-300 border-amber-400 shadow-2xs font-bold"
-                : "bg-slate-900/70 text-slate-200 border-slate-600 hover:bg-slate-800/60"
+                ? "bg-amber-100 text-amber-900 border-amber-300 shadow-2xs font-semibold"
+                : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100"
             }`}
             title="Toggle 2.5x optical forensic magnification loupe"
           >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-3.5 h-3.5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
             </svg>
             <span className="hidden md:inline">{language === "hi" ? "आवर्धक लेंस" : "Loupe"}</span>
           </button>
 
           {/* Zoom Buttons */}
-          <div className="flex items-center rounded border border-slate-600 bg-slate-900/70 overflow-hidden text-xs min-h-[32px]">
+          <div className="flex items-center rounded-lg border border-slate-300 bg-white overflow-hidden text-xs min-h-[32px] shadow-2xs">
             <button
               type="button"
               onClick={handleZoomOut}
               disabled={zoomLevel <= 0.5}
               aria-label="Zoom out evidence"
-              className="px-2.5 py-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center hover:bg-slate-800/70 text-slate-200 disabled:opacity-40 font-bold border-r border-slate-700"
+              className="px-2.5 py-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center hover:bg-slate-100 text-slate-700 disabled:opacity-40 font-bold border-r border-slate-300"
               title="Zoom out"
             >
               −
             </button>
-            <span className="px-2 py-1 font-mono text-[11px] text-slate-200 font-semibold min-w-[3rem] text-center">
+            <span className="px-2 py-1 font-mono text-[11px] text-slate-800 font-semibold min-w-[3rem] text-center">
               {Math.round(zoomLevel * 100)}%
             </span>
             <button
@@ -320,7 +320,7 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
               onClick={handleZoomIn}
               disabled={zoomLevel >= 3.0}
               aria-label="Zoom in evidence"
-              className="px-2.5 py-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center hover:bg-slate-800/70 text-slate-200 disabled:opacity-40 font-bold border-r border-slate-700"
+              className="px-2.5 py-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center hover:bg-slate-100 text-slate-700 disabled:opacity-40 font-bold border-r border-slate-300"
               title="Zoom in"
             >
               +
@@ -329,7 +329,7 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
               type="button"
               onClick={handleZoomFit}
               aria-label="Fit evidence to viewport"
-              className="px-2.5 py-1.5 min-h-[32px] flex items-center justify-center hover:bg-slate-800/70 text-slate-200 font-medium border-r border-slate-700 text-[11px]"
+              className="px-2.5 py-1.5 min-h-[32px] flex items-center justify-center hover:bg-slate-100 text-slate-700 font-medium border-r border-slate-300 text-[11px]"
               title="Fit to viewport"
             >
               {language === "hi" ? "अनुकूलित" : "Fit"}
@@ -338,7 +338,7 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
               type="button"
               onClick={handleZoomReset}
               aria-label="Reset zoom to 100%"
-              className="px-2.5 py-1.5 min-h-[32px] flex items-center justify-center hover:bg-slate-800/70 text-slate-200 font-medium text-[11px]"
+              className="px-2.5 py-1.5 min-h-[32px] flex items-center justify-center hover:bg-slate-100 text-slate-700 font-medium text-[11px]"
               title="Reset 100%"
             >
               {language === "hi" ? "रीसेट" : "Reset"}
@@ -352,7 +352,7 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
         ref={containerRef}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className="relative flex-1 bg-slate-950 overflow-auto min-h-[420px] max-h-[580px] p-2 flex items-center justify-center select-none"
+        className="relative flex-1 bg-slate-100 overflow-auto min-h-[440px] max-h-[600px] p-3 flex items-center justify-center select-none border-b border-slate-200"
       >
         {imageSrc ? (
           <div
@@ -361,7 +361,7 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
               transformOrigin: "center center",
               transition: "transform 0.15s ease-out",
             }}
-            className="relative max-w-full inline-block shadow-2xl rounded"
+            className="relative max-w-full inline-block shadow-lg rounded"
           >
             {/* Rectified View Banner if active */}
             {viewMode === "RECTIFIED" && (
@@ -414,10 +414,10 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
                       <path
                         d={`M ${(asset.calibration?.px_to_mm || 16) * 10} 0 L 0 0 0 ${(asset.calibration?.px_to_mm || 16) * 10}`}
                         fill="none"
-                        stroke="rgba(6, 182, 212, 0.45)"
+                        stroke="rgba(27, 54, 93, 0.35)"
                         strokeWidth="1.5"
                       />
-                      <circle cx="0" cy="0" r="2" fill="rgba(6, 182, 212, 0.85)" />
+                      <circle cx="0" cy="0" r="2" fill="rgba(27, 54, 93, 0.75)" />
                     </pattern>
                   </defs>
                   <rect width={imgWidth} height={imgHeight} fill="url(#metric-10mm-grid)" pointerEvents="none" />
@@ -443,8 +443,8 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
                         y={ymin}
                         width={xmax - xmin}
                         height={ymax - ymin}
-                        fill="rgba(245, 158, 11, 0.12)"
-                        stroke="#F59E0B"
+                        fill="rgba(245, 158, 11, 0.15)"
+                        stroke="#D97706"
                         strokeWidth="2.5"
                         strokeDasharray="6 3"
                         vectorEffect="non-scaling-stroke"
@@ -457,13 +457,13 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
                         y={Math.max(0, ymin - 20)}
                         width={Math.min(xmax - xmin, 260)}
                         height="18"
-                        fill="#F59E0B"
+                        fill="#D97706"
                         rx="3"
                       />
                       <text
                         x={xmin + 6}
                         y={Math.max(12, ymin - 7)}
-                        fill="#000000"
+                        fill="#FFFFFF"
                         fontSize="10"
                         fontWeight="bold"
                         fontFamily="monospace"
@@ -502,8 +502,8 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
                     {/* Main Interactive Polygon */}
                     <polygon
                       points={points}
-                      fill={isSelected ? style.fill : isHovered ? "rgba(59, 130, 246, 0.25)" : "rgba(30, 41, 59, 0.15)"}
-                      stroke={isSelected ? style.stroke : isHovered ? "#3B82F6" : style.stroke}
+                      fill={isSelected ? style.fill : isHovered ? "rgba(2, 132, 199, 0.25)" : "rgba(30, 41, 59, 0.08)"}
+                      stroke={isSelected ? style.stroke : isHovered ? "#0284c7" : style.stroke}
                       strokeWidth={isSelected ? "3" : isHovered ? "2.5" : "1.5"}
                       vectorEffect="non-scaling-stroke"
                       className="cursor-pointer transition-all duration-150 focus:outline-none"
@@ -543,7 +543,7 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
             </svg>
           </div>
         ) : (
-          <div className="text-center p-8 text-slate-400 text-xs font-mono">
+          <div className="text-center p-8 text-slate-500 text-xs font-mono">
             <div>Physical package image reference unavailable</div>
             <div className="text-slate-400 mt-1">{asset.image_id}</div>
           </div>
@@ -552,7 +552,7 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
         {/* Floating Magnifying Loupe Overlay (2.5x Optical Forensic Zoom) */}
         {isLoupeActive && loupePos.visible && (
           <div
-            className="fixed pointer-events-none z-50 rounded-full border-3 border-amber-400 shadow-2xl bg-slate-900 overflow-hidden flex flex-col items-center justify-center ring-4 ring-black/40"
+            className="fixed pointer-events-none z-50 rounded-full border-3 border-amber-500 shadow-2xl bg-white overflow-hidden flex flex-col items-center justify-center ring-4 ring-slate-900/20"
             style={{
               width: "180px",
               height: "180px",
@@ -573,16 +573,16 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
 
             {/* Loupe Crosshairs & Calibration Ring */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="w-full h-px bg-amber-400/80 shadow-xs" />
-              <div className="h-full w-px bg-amber-400/80 absolute shadow-xs" />
-              <div className="w-6 h-6 rounded-full border border-amber-400/90" />
+              <div className="w-full h-px bg-amber-600/80 shadow-xs" />
+              <div className="h-full w-px bg-amber-600/80 absolute shadow-xs" />
+              <div className="w-6 h-6 rounded-full border border-amber-600" />
             </div>
 
             {/* Loupe Coordinate HUD */}
-            <div className="absolute bottom-2 z-10 bg-slate-950/90 px-2 py-0.5 rounded text-[10px] font-mono text-amber-300 font-bold border border-amber-400/50 shadow-md flex items-center gap-1.5">
+            <div className="absolute bottom-2 z-10 bg-[#1B365D] px-2 py-0.5 rounded text-[10px] font-mono text-amber-300 font-bold border border-amber-400/50 shadow-md flex items-center gap-1.5">
               <span>X:{loupePos.imgPixelX} Y:{loupePos.imgPixelY}</span>
               {asset.calibration?.px_to_mm && (
-                <span className="text-cyan-300 text-[9.5px]">
+                <span className="text-cyan-200 text-[9.5px]">
                   ({(loupePos.imgPixelX / asset.calibration.px_to_mm).toFixed(1)}mm)
                 </span>
               )}
@@ -592,29 +592,29 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
       </div>
 
       {/* 2.5 Token & Bounding Box Inspector Drawer */}
-      <div className="p-3 bg-slate-900/70 border-t border-slate-700 text-xs transition">
+      <div className="p-3 bg-white border-t border-slate-200 text-xs transition">
         <div className="flex flex-wrap items-center justify-between mb-2 gap-2">
           <div className="flex items-center space-x-2">
-            <span className="font-bold text-white text-[11px] uppercase tracking-wider flex items-center space-x-1.5">
-              <svg className="w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <span className="font-semibold text-slate-900 text-[11px] uppercase tracking-wider flex items-center space-x-1.5">
+              <svg className="w-3.5 h-3.5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <circle cx="11" cy="11" r="8" />
                 <path d="m21 21-4.3-4.3" />
               </svg>
               <span>Token & Bounding Box Inspector:</span>
             </span>
-            <span className="px-2 py-0.5 bg-slate-800/80 border border-slate-700 text-slate-200 rounded font-mono text-[10px] font-semibold">
+            <span className="px-2 py-0.5 bg-blue-50 border border-blue-200 text-[#1B365D] rounded font-mono text-[10px] font-bold">
               {currentField?.field_type || (currentToken ? "OCR_TOKEN" : "SELECT A BOX")}
             </span>
           </div>
           <div className="flex items-center space-x-2">
-            <span className="text-[10px] text-slate-400 font-mono">
+            <span className="text-[10px] text-slate-500 font-mono">
               {currentToken?.model_source || "DBNet++ Detection | PP-OCRv4 Recognition"}
             </span>
             {currentToken && (
               <button
                 type="button"
                 onClick={() => onSelectToken("")}
-                className="px-2.5 py-1 bg-slate-800/80 hover:bg-slate-700 text-slate-200 rounded text-[10px] font-medium transition border border-slate-700"
+                className="px-2.5 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] font-medium transition border border-slate-300"
               >
                 Clear
               </button>
@@ -624,23 +624,23 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
 
         {currentToken ? (
           <div className="space-y-2">
-            <div className="p-2.5 bg-slate-800/60 border border-slate-700 rounded-md font-mono text-white font-bold text-xs">
+            <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg font-mono text-slate-900 font-bold text-xs">
               "{currentToken.text}"
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] font-mono">
-              <div className="p-1.5 bg-slate-800/60 rounded border border-slate-700">
-                <span className="text-[9px] text-slate-400 uppercase block">
+              <div className="p-2 bg-slate-50 rounded-lg border border-slate-200">
+                <span className="text-[9px] text-slate-500 uppercase block font-sans font-semibold">
                   {language === "hi" ? "विश्वसनीयता" : "Confidence"}
                 </span>
-                <span className="font-bold text-emerald-400">
+                <span className="font-bold text-emerald-700">
                   OCR: {(currentToken.confidence * 100).toFixed(1)}% | Det: 99.0%
                 </span>
               </div>
-              <div className="p-1.5 bg-slate-800/60 rounded border border-slate-700">
-                <span className="text-[9px] text-slate-400 uppercase block">
+              <div className="p-2 bg-slate-50 rounded-lg border border-slate-200">
+                <span className="text-[9px] text-slate-500 uppercase block font-sans font-semibold">
                   {language === "hi" ? "लिपि / भाषा" : "Script / Lang"}
                 </span>
-                <span className="font-bold text-slate-100">
+                <span className="font-semibold text-slate-800">
                   {currentToken.language === "hi" || /[\u0900-\u097F]/.test(currentToken.text)
                     ? language === "hi"
                       ? "देवनागरी (हिन्दी)"
@@ -650,11 +650,11 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
                     : "Latin (English)"}
                 </span>
               </div>
-              <div className="p-1.5 bg-slate-800/60 rounded border border-slate-700">
-                <span className="text-[9px] text-slate-400 uppercase block">
+              <div className="p-2 bg-slate-50 rounded-lg border border-slate-200">
+                <span className="text-[9px] text-slate-500 uppercase block font-sans font-semibold">
                   {language === "hi" ? "फ़ॉन्ट ऊंचाई" : "Font Height"}
                 </span>
-                <span className="font-bold text-cyan-300">
+                <span className="font-bold text-amber-700">
                   {currentField?.measured_font_height_mm
                     ? `${currentField.measured_font_height_mm.toFixed(2)} mm`
                     : language === "hi"
@@ -662,18 +662,18 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
                     : "1.84 mm (calibrated)"}
                 </span>
               </div>
-              <div className="p-1.5 bg-slate-800/60 rounded border border-slate-700">
-                <span className="text-[9px] text-slate-400 uppercase block">
+              <div className="p-2 bg-slate-50 rounded-lg border border-slate-200">
+                <span className="text-[9px] text-slate-500 uppercase block font-sans font-semibold">
                   {language === "hi" ? "निर्देशांक" : "Coordinates"}
                 </span>
-                <span className="font-bold text-slate-200 truncate block">
+                <span className="font-semibold text-slate-700 truncate block">
                   {currentToken.bounding_box ? `[${currentToken.bounding_box.join(", ")}]` : `4-point polygon`}
                 </span>
               </div>
             </div>
             {/* Devanagari Bilingual Callout if Indic Script detected */}
             {(currentToken.language === "hi" || /[\u0900-\u097F]/.test(currentToken.text)) && (
-              <div className="p-2 bg-amber-900/30 border border-amber-200 rounded text-[11px] flex items-center justify-between text-amber-300">
+              <div className="p-2 bg-amber-50 border border-amber-300 rounded-lg text-[11px] flex items-center justify-between text-amber-900 shadow-2xs">
                 <div className="flex items-center gap-1.5 font-semibold">
                   <span className="h-1.5 w-1.5 rounded-full bg-amber-600" />
                   <span>
@@ -681,14 +681,14 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
                     {currentToken.text}
                   </span>
                 </div>
-                <span className="text-[10px] font-mono text-amber-400">
+                <span className="text-[10px] font-mono text-amber-800 font-bold">
                   {language === "hi" ? "धारा 63 बीएसए 2023 द्विभाषी मानक" : "Section 63 BSA 2023 Bilingual Standard"}
                 </span>
               </div>
             )}
           </div>
         ) : (
-          <div className="text-slate-400 text-[11px] py-1">
+          <div className="text-slate-500 text-[11px] py-1">
             {language === "hi"
               ? "टोकन विश्वसनीयता, मॉडल स्रोत एवं अंशांकित फ़ॉन्ट ऊंचाई देखने हेतु ऊपर किसी बॉक्स पर क्लिक करें या नियम चुनें।"
               : "Click any bounding box above or select a rule to inspect token confidence, model attribution, and calibrated font height."}
@@ -697,27 +697,27 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
       </div>
 
       {/* 3. Evidence Provenance & Calibration Strip */}
-      <div className="p-3 bg-slate-800/60 border-t border-slate-700 grid grid-cols-1 md:grid-cols-3 gap-2 text-xs font-mono text-slate-400">
+      <div className="p-3 bg-slate-50 border-t border-slate-200 grid grid-cols-1 md:grid-cols-3 gap-2 text-xs font-mono text-slate-600">
         <div className="truncate">
-          <span className="font-bold text-slate-200 block text-[10px] uppercase">
+          <span className="font-bold text-slate-700 block text-[10px] uppercase font-sans">
             {language === "hi" ? "मानक SHA-256 (बैकएंड रिकॉर्ड)" : "Canonical SHA-256 (Backend Record)"}
           </span>
-          <span className="text-cyan-300 font-semibold truncate block text-[11px]" title={asset.raw_sha256}>
+          <span className="text-slate-800 font-semibold truncate block text-[11px]" title={asset.raw_sha256}>
             {asset.raw_sha256}
           </span>
         </div>
 
         <div>
-          <span className="font-bold text-slate-200 block text-[10px] uppercase">
+          <span className="font-bold text-slate-700 block text-[10px] uppercase font-sans">
             {language === "hi" ? "मीट्रिक अंशांकन" : "Metric Calibration"}
           </span>
           {asset.calibration?.is_calibrated ? (
-            <span className="text-emerald-400 font-semibold text-[11px] block">
+            <span className="text-emerald-700 font-bold text-[11px] block">
               {asset.calibration.method} • {asset.calibration.px_to_mm.toFixed(2)} px/mm
               {asset.calibration.margin_of_error_pct ? ` (±${asset.calibration.margin_of_error_pct}%)` : ""}
             </span>
           ) : (
-            <span className="text-slate-400 text-[11px] block">
+            <span className="text-slate-500 text-[11px] block">
               {language === "hi" ? "अ-अंशांकित / प्रकाशीय अनुमान" : "Uncalibrated / Optical Estimate"}
             </span>
           )}
@@ -728,12 +728,12 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
             <button
               type="button"
               onClick={onRetakeRequested}
-              className="text-[11px] font-sans font-semibold text-slate-200 hover:text-white underline focus:outline-none"
+              className="text-[11px] font-sans font-semibold text-[#1B365D] hover:underline focus:outline-none"
             >
               {language === "hi" ? "पुनः फोटोग्राफी अनुरोध" : "Request Recapture"}
             </button>
           )}
-          <span className="text-[11px] px-2 py-0.5 bg-slate-700 text-slate-200 rounded font-sans font-bold">
+          <span className="text-[11px] px-2 py-0.5 bg-white text-slate-800 rounded font-sans font-medium border border-slate-300 shadow-2xs">
             {language === "hi" ? "पहल: " : "Facet: "}{asset.panel_type}
           </span>
         </div>

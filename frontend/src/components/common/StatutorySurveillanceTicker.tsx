@@ -75,9 +75,9 @@ export const StatutorySurveillanceTicker: React.FC = () => {
   const current = BULLETINS[activeIndex];
 
   return (
-    <div className="rounded-xl bg-slate-900 text-white border border-slate-700/80 shadow-sm overflow-hidden flex flex-col sm:flex-row items-stretch text-xs">
+    <div className="rounded-xl bg-white text-slate-900 border border-slate-200 shadow-xs overflow-hidden flex flex-col sm:flex-row items-stretch text-xs">
       {/* Label Badge */}
-      <div className="bg-govNavy px-3.5 py-2.5 flex items-center gap-2 text-amber-400 font-extrabold uppercase tracking-wider text-[11px] shrink-0 border-b sm:border-b-0 sm:border-r border-slate-700">
+      <div className="bg-[#1B365D] px-3.5 py-2.5 flex items-center gap-2 text-white font-extrabold uppercase tracking-wider text-[11px] shrink-0 border-b sm:border-b-0 sm:border-r border-[#152a48]">
         <Megaphone size={15} className="text-amber-400 animate-pulse" />
         <span className="whitespace-nowrap">
           {t("ticker.directives", "Statutory Directives")}
@@ -87,14 +87,14 @@ export const StatutorySurveillanceTicker: React.FC = () => {
       {/* Ticker Content */}
       <div className="flex-1 px-4 py-2 flex items-center justify-between gap-3 overflow-hidden">
         <div className="flex items-center gap-2.5 overflow-hidden">
-          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-400/40 shrink-0">
+          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-50 text-amber-800 border border-amber-200 shrink-0">
             {current.tag}
           </span>
-          <p className="truncate text-slate-200 text-xs">
-            <strong className="text-white mr-1.5">
+          <p className="truncate text-slate-700 text-xs">
+            <strong className="text-slate-900 mr-1.5">
               {current.title[language] || current.title.en}:
             </strong>
-            <span className="text-slate-300 hidden md:inline">
+            <span className="text-slate-600 hidden md:inline">
               {current.desc[language] || current.desc.en}
             </span>
           </p>
@@ -102,7 +102,7 @@ export const StatutorySurveillanceTicker: React.FC = () => {
 
         <Link
           to={current.link}
-          className="text-[11px] font-bold text-amber-400 hover:text-amber-300 shrink-0 flex items-center gap-1 hover:underline ml-2"
+          className="text-[11px] font-bold text-[#1B365D] hover:text-[#0A2540] shrink-0 flex items-center gap-1 hover:underline ml-2"
         >
           <span>{t("ticker.view_rule", "View Rule")}</span>
           <ChevronRight size={13} />
@@ -110,13 +110,13 @@ export const StatutorySurveillanceTicker: React.FC = () => {
       </div>
 
       {/* Ticker Step Indicators */}
-      <div className="hidden lg:flex items-center gap-1 px-3 bg-slate-950/60 border-l border-slate-800 shrink-0">
+      <div className="hidden lg:flex items-center gap-1 px-3 bg-slate-50 border-l border-slate-200 shrink-0">
         {BULLETINS.map((_, i) => (
           <button
             key={i}
             onClick={() => setActiveIndex(i)}
             className={`h-1.5 rounded-full transition-all ${
-              i === activeIndex ? "w-4 bg-amber-400" : "w-1.5 bg-slate-600 hover:bg-slate-400"
+              i === activeIndex ? "w-4 bg-[#1B365D]" : "w-1.5 bg-slate-300 hover:bg-slate-400"
             }`}
             aria-label={`Go to statutory bulletin ${i + 1}`}
           />

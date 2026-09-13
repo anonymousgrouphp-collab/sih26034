@@ -728,132 +728,136 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
         <div className="space-y-4">
           {/* Workspace Mode Switcher (available when case has evaluations) */}
           {caseData.rule_evaluations && caseData.rule_evaluations.length > 0 && (
-            <div className="workspace-switcher screen-only no-print flex items-center justify-between bg-slate-800/80 p-1.5 rounded-lg border border-slate-700 gap-2 min-w-0">
-              <div className="flex items-center gap-1.5 flex-nowrap overflow-x-auto no-scrollbar min-w-0 flex-1">
+            <div className="workspace-switcher screen-only no-print flex flex-col sm:flex-row items-stretch sm:items-center justify-between bg-white p-2 rounded-xl border border-slate-200 gap-2 min-w-0 shadow-xs">
+              <div className="flex items-center gap-1.5 flex-wrap lg:flex-nowrap overflow-x-auto no-scrollbar min-w-0 flex-1">
                 <button
                   type="button"
                   onClick={() => setActiveWorkspaceView("OVERVIEW")}
-                  className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                  className={`px-3.5 py-2 text-sm font-bold rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
                     activeWorkspaceView === "OVERVIEW"
-                      ? "bg-govNavy text-white shadow-sm"
-                      : "text-slate-400 hover:text-white bg-slate-900/70 border border-slate-700"
+                      ? "bg-[#1B365D] text-white shadow-xs border border-[#1B365D]"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                   }`}
                 >
-                  <Eye className="w-3.5 h-3.5 shrink-0" />
-                  <span>{language === "hi" ? "निरीक्षण अवलोकन" : "Inspection Overview"}</span>
+                  <Eye className="w-4 h-4 shrink-0" />
+                  <span>{language === "hi" ? "निरीक्षण अवलोकन" : "Overview"}</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveWorkspaceView("CANVAS")}
-                  className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                  className={`px-3.5 py-2 text-sm font-bold rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
                     activeWorkspaceView === "CANVAS"
-                      ? "bg-govNavy text-white shadow-sm"
-                      : "text-slate-400 hover:text-white bg-slate-900/70 border border-slate-700"
+                      ? "bg-[#1B365D] text-white shadow-xs border border-[#1B365D]"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                   }`}
                 >
-                  <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
-                  <span>{language === "hi" ? "विधिक विभाजन-कैनवास" : "Forensic Split-Canvas"}</span>
+                  <span>{language === "hi" ? "विधिक विभाजन-कैनवास" : "Forensic Canvas"}</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveWorkspaceView("HUD")}
-                  className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                  className={`px-3.5 py-2 text-sm font-bold rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
                     activeWorkspaceView === "HUD"
-                      ? "bg-govNavy text-white shadow-sm"
-                      : "text-slate-400 hover:text-white bg-slate-900/70 border border-slate-700"
+                      ? "bg-[#1B365D] text-white shadow-xs border border-[#1B365D]"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                   }`}
                 >
-                  <Activity className="w-3.5 h-3.5 shrink-0" />
+                  <Activity className="w-4 h-4 shrink-0" />
                   <span>{language === "hi" ? "नैदानिक HUD" : "Diagnostic HUD"}</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveWorkspaceView("OUTCOME")}
-                  className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                  className={`px-3.5 py-2 text-sm font-bold rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
                     activeWorkspaceView === "OUTCOME"
-                      ? "bg-govNavy text-white shadow-sm"
-                      : "text-slate-400 hover:text-white bg-slate-900/70 border border-slate-700"
+                      ? "bg-[#1B365D] text-white shadow-xs border border-[#1B365D]"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                   }`}
                 >
-                  <Scale className="w-3.5 h-3.5 shrink-0" />
-                  <span>{language === "hi" ? "अधिनिर्णय व परिणाम" : "Adjudication & Outcome"}</span>
+                  <Scale className="w-4 h-4 shrink-0" />
+                  <span>{language === "hi" ? "अधिनिर्णय" : "Adjudication"}</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveWorkspaceView("REPORT")}
-                  className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                  className={`px-3.5 py-2 text-sm font-bold rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
                     activeWorkspaceView === "REPORT"
-                      ? "bg-govNavy text-white shadow-sm"
-                      : "text-slate-400 hover:text-white bg-slate-900/70 border border-slate-700"
+                      ? "bg-[#1B365D] text-white shadow-xs border border-[#1B365D]"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                   }`}
                 >
-                  <FileText className="w-3.5 h-3.5 shrink-0" />
-                  <span>{language === "hi" ? "औपचारिक रिपोर्ट एवं नोटिस" : "Formal Report & Notice"}</span>
+                  <FileText className="w-4 h-4 shrink-0" />
+                  <span>{language === "hi" ? "औपचारिक रिपोर्ट" : "Formal Report"}</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveWorkspaceView("AUDIT")}
-                  className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                  className={`px-3.5 py-2 text-sm font-bold rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
                     activeWorkspaceView === "AUDIT"
-                      ? "bg-govNavy text-white shadow-sm"
-                      : "text-slate-400 hover:text-white bg-slate-900/70 border border-slate-700"
+                      ? "bg-[#1B365D] text-white shadow-xs border border-[#1B365D]"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                   }`}
                 >
-                  <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
-                  <span>{language === "hi" ? "ऑडिट एवं साक्ष्य" : "Audit & Diagnostics"}</span>
+                  <ShieldCheck className="w-4 h-4 shrink-0" />
+                  <span>{language === "hi" ? "ऑडिट ट्रेल" : "Audit Trail"}</span>
                 </button>
+              </div>
+
+              {/* Dedicated Action Group */}
+              <div className="flex items-center gap-2 shrink-0 border-t sm:border-t-0 sm:border-l border-slate-200 pt-1.5 sm:pt-0 sm:pl-2.5">
+                <span className="hidden xl:inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200 text-xs font-mono font-bold text-slate-700 shrink-0">
+                  <span>{caseData.rule_evaluations.length}</span>
+                  <span>{language === "hi" ? "निष्कर्ष" : "findings"}</span>
+                </span>
                 <Link
                   to={`/inspections/${caseData.id}/evidence`}
-                  className="px-3 py-1.5 text-xs font-bold rounded-md transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 text-cyan-300 hover:bg-govNavy/10 bg-govNavy/5 border border-govNavy/20"
+                  className="px-3.5 py-2 text-sm font-bold rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 text-emerald-800 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-300 shadow-2xs"
                   title={language === "hi" ? "धारा 63 बीएसए साक्ष्य संचिका खोलें" : "Open Section 63 BSA Evidence Dossier"}
                 >
-                  <Lock className="w-3.5 h-3.5 shrink-0 text-cyan-300" />
+                  <Lock className="w-4 h-4 shrink-0 text-emerald-700" />
                   <span>{language === "hi" ? "साक्ष्य संचिका (डोज़ियर)" : "Evidence Dossier"}</span>
                 </Link>
               </div>
-
-              <span className="text-[11px] font-mono text-slate-400 pr-2 hidden 2xl:inline font-semibold shrink-0">
-                {caseData.rule_evaluations.length} {language === "hi" ? "सांविधिक निष्कर्ष मूल्यांकित" : "statutory findings evaluated"}
-              </span>
             </div>
           )}
 
           {/* View 0: Inspection Overview (Nirikshak Vision Synthesis) */}
           {activeWorkspaceView === "OVERVIEW" ? (
-            <div className="space-y-5">
+            <div className="space-y-4">
               {/* 1. 5-Stage Statutory Pipeline Progress */}
               <PipelineStepper steps={pipelineSteps} />
 
               {/* 2. Executive Inspection Summary Ribbon (Statutory Ticker) */}
-              <div className="bg-slate-900/70 rounded-xl border border-slate-700 p-4 sm:p-5 shadow-xs">
+              <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-xs">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   {/* Left: Commodity Quick Badges */}
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-slate-800/80 text-slate-200 border border-slate-700">
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <span className="px-3 py-1.5 rounded-md text-sm font-bold bg-slate-100 text-slate-800 border border-slate-200">
                       {caseData.category?.replace(/_/g, " ") || (language === "hi" ? "पैकेज्ड वस्तु" : "PACKAGED COMMODITY")}
                     </span>
                     {caseData.declared_net_quantity && (
-                      <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-blue-900/30 text-blue-400 border border-blue-800">
-                        {language === "hi" ? "शुद्ध मात्रा:" : "Net Qty:"} {caseData.declared_net_quantity}
+                      <span className="px-3 py-1.5 rounded-md text-sm font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                        {language === "hi" ? "शुद्ध मात्रा:" : "Net Qty:"} <strong className="text-slate-900">{caseData.declared_net_quantity}</strong>
                       </span>
                     )}
                     {caseData.extracted_fields?.find((f) => f.field_type === "MRP") && (
-                      <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-900/30 text-emerald-400 border border-emerald-800">
-                        MRP: {caseData.extracted_fields.find((f) => f.field_type === "MRP")?.raw_ocr_text}
+                      <span className="px-3 py-1.5 rounded-md text-sm font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        MRP: <strong className="text-emerald-800 font-mono font-bold">{caseData.extracted_fields.find((f) => f.field_type === "MRP")?.raw_ocr_text}</strong>
                       </span>
                     )}
-                    <span className="text-xs text-slate-400 font-medium">
-                      • {caseData.rule_evaluations?.length || 0} {language === "hi" ? "सांविधिक जांचें सत्यापित" : "statutory checks verified"}
+                    <span className="text-sm text-slate-500 font-medium">
+                      • {caseData.rule_evaluations?.length || 0} {language === "hi" ? "सांविधिक जांचें" : "statutory checks verified"}
                     </span>
                   </div>
 
                   {/* Right: Case ID, Confidence Score */}
                   <div className="flex items-center gap-3 shrink-0">
-                    <div className="flex items-center gap-2 text-xs">
-                      <span className="text-slate-400 font-medium">{language === "hi" ? "विश्वसनीयता:" : "Confidence:"}</span>
-                      <div className="w-24 h-2 rounded-full bg-slate-700 overflow-hidden">
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="text-slate-500 font-semibold">{language === "hi" ? "विश्वसनीयता:" : "Confidence:"}</span>
+                      <div className="w-24 h-2 rounded-full bg-slate-100 border border-slate-200 overflow-hidden">
                         <div
                           className={`h-full rounded-full transition-all ${
                             confidenceScore >= 90 ? "bg-emerald-500" : confidenceScore >= 75 ? "bg-amber-500" : "bg-rose-500"
@@ -861,62 +865,62 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                           style={{ width: `${Math.min(100, Math.max(10, confidenceScore))}%` }}
                         />
                       </div>
-                      <span className="font-bold font-mono text-slate-100">{confidenceScore}%</span>
+                      <span className="font-bold font-mono text-slate-900">{confidenceScore}%</span>
                     </div>
 
                     <button
                       type="button"
                       onClick={handleCopyCaseId}
-                      className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs font-mono font-bold transition-colors"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 text-sm font-mono font-semibold transition-colors border border-slate-200 cursor-pointer"
                       title={language === "hi" ? "केस आईडी कॉपी करने हेतु क्लिक करें" : "Click to copy Case ID"}
                     >
-                      {copiedId ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
+                      {copiedId ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
                       <span className="max-w-[160px] xl:max-w-[220px] truncate">{caseData.id}</span>
                     </button>
                   </div>
                 </div>
 
                 {/* Metric Summary Ticker */}
-                <div className="mt-4 pt-3 border-t border-slate-800 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2 text-xs">
-                  <div className="bg-slate-800/60 p-2 rounded-lg border border-slate-800 text-center">
-                    <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                <div className="mt-3 pt-3 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 text-sm">
+                  <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-center">
+                    <span className="text-[11px] uppercase font-bold text-slate-500 block">
                       {language === "hi" ? "कुल जांचें" : "Total Checks"}
                     </span>
-                    <span className="text-sm font-black text-white">{caseData.rule_evaluations?.length || 0}</span>
+                    <span className="text-base font-black text-slate-900">{caseData.rule_evaluations?.length || 0}</span>
                   </div>
-                  <div className="bg-emerald-900/30 p-2 rounded-lg border border-emerald-100 text-center">
-                    <span className="text-[10px] uppercase font-bold text-emerald-400 block">
+                  <div className="bg-emerald-50 p-2.5 rounded-lg border border-emerald-200 text-center">
+                    <span className="text-[11px] uppercase font-bold text-emerald-700 block">
                       {language === "hi" ? "अनुपालन" : "Compliant"}
                     </span>
-                    <span className="text-sm font-black text-emerald-300">{passedRulesCount}</span>
+                    <span className="text-base font-black text-emerald-700">{passedRulesCount}</span>
                   </div>
-                  <div className="bg-rose-900/30 p-2 rounded-lg border border-rose-100 text-center">
-                    <span className="text-[10px] uppercase font-bold text-rose-400 block">
+                  <div className="bg-rose-50 p-2.5 rounded-lg border border-rose-200 text-center">
+                    <span className="text-[11px] uppercase font-bold text-rose-700 block">
                       {language === "hi" ? "उल्लंघन" : "Violations"}
                     </span>
-                    <span className="text-sm font-black text-rose-300">{failedRulesCount}</span>
+                    <span className="text-base font-black text-rose-700">{failedRulesCount}</span>
                   </div>
-                  <div className="bg-amber-900/30 p-2 rounded-lg border border-amber-100 text-center">
-                    <span className="text-[10px] uppercase font-bold text-amber-400 block">
+                  <div className="bg-amber-50 p-2.5 rounded-lg border border-amber-200 text-center">
+                    <span className="text-[11px] uppercase font-bold text-amber-700 block">
                       {language === "hi" ? "समीक्षा दायरा" : "Review Band"}
                     </span>
-                    <span className="text-sm font-black text-amber-300">{reviewRulesCount}</span>
+                    <span className="text-base font-black text-amber-700">{reviewRulesCount}</span>
                   </div>
-                  <div className="bg-slate-800/60 p-2 rounded-lg border border-slate-800 text-center">
-                    <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                  <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-center">
+                    <span className="text-[11px] uppercase font-bold text-slate-500 block">
                       {language === "hi" ? "अंशांकन" : "Calibration"}
                     </span>
-                    <span className={`text-xs font-black ${calibrationData.available ? "text-emerald-400" : "text-amber-400"}`}>
+                    <span className={`text-xs font-bold ${calibrationData.available ? "text-emerald-700" : "text-amber-700"}`}>
                       {calibrationData.available
-                        ? (language === "hi" ? "अरूको संसूचित" : "ArUco Detected")
+                        ? (language === "hi" ? "अरूको संसूचित" : "ArUco Valid")
                         : (language === "hi" ? "असंबंधित" : "Uncalibrated")}
                     </span>
                   </div>
-                  <div className="bg-slate-800/60 p-2 rounded-lg border border-slate-800 text-center">
-                    <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                  <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-center">
+                    <span className="text-[11px] uppercase font-bold text-slate-500 block">
                       {language === "hi" ? "विसंगतियां" : "Conflicts"}
                     </span>
-                    <span className={`text-xs font-black ${conflictItems.length > 0 ? "text-amber-400" : "text-slate-200"}`}>
+                    <span className={`text-xs font-bold ${conflictItems.length > 0 ? "text-amber-700" : "text-slate-700"}`}>
                       {conflictItems.length > 0
                         ? `${conflictItems.length} ${language === "hi" ? "विसंगति" : "Conflict"}`
                         : (language === "hi" ? "कोई नहीं" : "None")}
@@ -925,10 +929,10 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                 </div>
               </div>
 
-              {/* 3. Two-Column Detailed Operational Workspace */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-                {/* Left Column (6 cols): Vision Canvas & Calibration */}
-                <div className="lg:col-span-6 space-y-4">
+              {/* 3. Two-Column Detailed Operational Workspace (Ergonomic Sticky Placement) */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+                {/* Left Column (6 cols): Sticky Vision Canvas & Calibration */}
+                <div className="lg:col-span-6 space-y-4 lg:sticky lg:top-[65px]">
                   <InspectionVisionCanvas
                     images={canvasImages}
                     boxes={canvasBoxes}
@@ -949,43 +953,43 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                   <CalibrationCard calibration={calibrationData} />
 
                   {/* Technical Asset Metadata & SHA-256 Chain Box */}
-                  <div className="bg-slate-900/70 rounded-xl border border-slate-700 p-4 shadow-xs space-y-2">
-                    <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                  <div className="bg-white rounded-xl border border-slate-200 p-3.5 shadow-xs space-y-2">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                       <div className="flex items-center gap-2">
-                        <ShieldCheck className="w-4 h-4 text-cyan-300" />
-                        <h4 className="text-xs font-bold text-white uppercase tracking-wide">
+                        <ShieldCheck className="w-4 h-4 text-[#1B365D]" />
+                        <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wide">
                           {language === "hi" ? "साक्ष्य संपत्ति एवं धारा 63 बीएसए हैश" : "Evidence Asset & Section 63 BSA Hash"}
                         </h4>
                       </div>
-                      <span className="text-[10px] font-mono bg-emerald-900/40 text-emerald-300 px-2 py-0.5 rounded font-bold">
+                      <span className="text-[10px] font-mono bg-blue-50 text-[#1B365D] border border-blue-200 px-2 py-0.5 rounded font-bold">
                         {language === "hi" ? "मूल साक्ष्य संपत्ति" : "ORIGINAL ASSET"}
                       </span>
                     </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs font-mono text-slate-400 pt-1">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs font-mono text-slate-500 pt-1">
                       <div>
-                        <span className="text-[10px] text-slate-400 block font-sans">
+                        <span className="text-[10px] text-slate-500 block font-sans font-medium">
                           {language === "hi" ? "संपत्ति आईडी" : "Asset ID"}
                         </span>
-                        <span className="font-bold text-slate-100">{activeAsset?.image_id || "IMG-DEFAULT"}</span>
+                        <span className="font-bold text-slate-900">{activeAsset?.image_id || "IMG-DEFAULT"}</span>
                       </div>
                       <div>
-                        <span className="text-[10px] text-slate-400 block font-sans">
+                        <span className="text-[10px] text-slate-500 block font-sans font-medium">
                           {language === "hi" ? "रिज़ॉल्यूशन" : "Resolution"}
                         </span>
-                        <span>{activeAsset?.image_width || 1280} × {activeAsset?.image_height || 960} px</span>
+                        <span className="text-slate-800">{activeAsset?.image_width || 1280} × {activeAsset?.image_height || 960} px</span>
                       </div>
                       <div>
-                        <span className="text-[10px] text-slate-400 block font-sans">
+                        <span className="text-[10px] text-slate-500 block font-sans font-medium">
                           {language === "hi" ? "पैनल पहलू" : "Panel Facet"}
                         </span>
-                        <span className="font-sans font-semibold text-slate-100">{activeAsset?.panel_type || "PDP_FRONT"}</span>
+                        <span className="font-sans font-semibold text-slate-900">{activeAsset?.panel_type || "PDP_FRONT"}</span>
                       </div>
                     </div>
-                    <div className="pt-2 border-t border-slate-800">
-                      <span className="text-[10px] text-slate-400 block font-sans">
+                    <div className="pt-2 border-t border-slate-100">
+                      <span className="text-[10px] text-slate-500 block font-sans font-medium">
                         {language === "hi" ? "एसएचए-256 लेज़र डाइजेस्ट (धारा 63 बीएसए 2023)" : "SHA-256 Ledger Digest (Sec 63 BSA 2023)"}
                       </span>
-                      <span className="font-mono text-[11px] text-slate-400 break-all select-all block bg-slate-800/60 p-1.5 rounded border border-slate-700 mt-0.5">
+                      <span className="font-mono text-[11px] text-slate-700 break-all select-all block bg-slate-50 p-1.5 rounded border border-slate-200 mt-0.5">
                         {activeAsset?.raw_sha256 || "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"}
                       </span>
                     </div>
@@ -1019,30 +1023,30 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                   <RuleResultCard rules={ruleItems} />
 
                   {/* Quick Officer Adjudication Box */}
-                  <div className="bg-slate-900/70 rounded-xl border border-slate-700 p-4 sm:p-5 shadow-xs space-y-4">
-                    <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs space-y-3">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                       <div className="flex items-center gap-2">
-                        <div className="p-1.5 rounded-md bg-govNavy/10 text-cyan-300">
+                        <div className="p-1.5 rounded-md bg-[#1B365D]/10 text-[#1B365D]">
                           <UserCheck size={18} />
                         </div>
                         <div>
-                          <h3 className="text-xs font-bold text-white uppercase tracking-wide">
+                          <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wide">
                             {language === "hi" ? "अधिकारी प्रारंभिक अधिनिर्णय" : "Officer Preliminary Adjudication"}
                           </h3>
-                          <p className="text-[10px] text-slate-400">
+                          <p className="text-[10px] text-slate-500 font-medium">
                             {language === "hi"
                               ? "संवर्धित नैदानिक सहायक (DoCA सांविधिक कार्यप्रवाह)"
                               : "Augmented diagnostic assistant (DoCA statutory workflow)"}
                           </p>
                         </div>
                       </div>
-                      <span className="text-[10px] font-bold bg-blue-900/30 text-blue-300 border border-blue-800 px-2 py-0.5 rounded-full">
+                      <span className="text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 px-2 py-0.5 rounded-full">
                         {language === "hi" ? "मानव हस्ताक्षर गेट" : "HUMAN SIGN-OFF GATE"}
                       </span>
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-slate-200 block">
+                      <label className="text-xs font-semibold text-slate-800 block">
                         {language === "hi" ? "अधिकारी टिप्पणियां / सांविधिक निर्देश" : "Officer Notes / Statutory Directions"}
                       </label>
                       <textarea
@@ -1054,12 +1058,12 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                             : "Enter observations, compounding recommendations, or directions to manufacturer..."
                         }
                         rows={3}
-                        className="w-full text-xs p-2.5 rounded-lg border border-slate-600 focus:outline-none focus:ring-2 focus:ring-govNavy/20 focus:border-govNavy text-slate-100"
+                        className="w-full text-xs p-2.5 rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-[#1B365D] text-slate-900 placeholder:text-slate-400"
                       />
                       <div className="flex items-center justify-between">
-                        <span className="text-[11px] text-slate-400">
+                        <span className="text-[11px] text-slate-500">
                           {quickDecisionSaved ? (
-                            <span className="text-emerald-400 font-bold flex items-center gap-1">
+                            <span className="text-emerald-700 font-bold flex items-center gap-1">
                               <CheckCircle2 size={13} />
                               <span>{language === "hi" ? "टिप्पणियां स्थानीय केस सत्र में सहेजी गईं" : "Notes saved to local case session"}</span>
                             </span>
@@ -1072,7 +1076,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                         <button
                           type="button"
                           onClick={handleSaveNotes}
-                          className="px-3 py-1 text-xs font-semibold bg-slate-800/80 hover:bg-slate-700 text-slate-200 rounded-md border border-slate-700 transition-colors flex items-center gap-1"
+                          className="px-3 py-1 text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 rounded-md border border-slate-200 transition-colors flex items-center gap-1 cursor-pointer"
                         >
                           <Save size={12} />
                           <span>{language === "hi" ? "प्रारूप सहेजें" : "Save Draft"}</span>
@@ -1081,12 +1085,12 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="pt-2 border-t border-slate-800 space-y-2.5">
+                    <div className="pt-2 border-t border-slate-100 space-y-2">
                       <button
                         type="button"
                         onClick={handleQuickGenerateNotice}
                         disabled={isGeneratingNotice}
-                        className="w-full py-2.5 px-4 rounded-lg bg-govNavy hover:bg-govNavy-light text-white text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-xs disabled:opacity-50"
+                        className="w-full py-2.5 px-4 rounded-lg bg-[#1B365D] hover:bg-[#0A2540] text-white text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-xs disabled:opacity-50 cursor-pointer"
                       >
                         {isGeneratingNotice ? (
                           <>
@@ -1113,17 +1117,17 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                         <button
                           type="button"
                           onClick={() => setActiveWorkspaceView("CANVAS")}
-                          className="px-3 py-2 rounded-lg border border-slate-600 hover:bg-slate-800/60 font-bold text-slate-200 flex items-center justify-center gap-1.5 transition-colors"
+                          className="px-3 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 font-semibold text-slate-700 flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                         >
-                          <ExternalLink size={13} className="text-slate-400" />
+                          <ExternalLink size={13} className="text-slate-500" />
                           <span>{language === "hi" ? "गहन विभाजन कैनवास" : "Deep Split Canvas"}</span>
                         </button>
                         <button
                           type="button"
                           onClick={() => setActiveWorkspaceView("AUDIT")}
-                          className="px-3 py-2 rounded-lg border border-slate-600 hover:bg-slate-800/60 font-bold text-slate-200 flex items-center justify-center gap-1.5 transition-colors"
+                          className="px-3 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 font-semibold text-slate-700 flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                         >
-                          <ShieldCheck size={13} className="text-slate-400" />
+                          <ShieldCheck size={13} className="text-slate-500" />
                           <span>{language === "hi" ? "ऑडिट एवं डीएजी" : "Audit & DAG"}</span>
                         </button>
                       </div>
@@ -1131,7 +1135,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                       <button
                         type="button"
                         onClick={() => setActiveWorkspaceView("REPORT")}
-                        className="w-full py-2 px-3 rounded-lg border border-slate-700 hover:bg-slate-800/60 font-semibold text-slate-400 text-xs flex items-center justify-center gap-1.5 transition-colors"
+                        className="w-full py-2 px-3 rounded-lg border border-slate-200 hover:bg-slate-50 font-semibold text-slate-600 hover:text-slate-900 text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                       >
                         <span>
                           {language === "hi"
@@ -1144,9 +1148,9 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                       <button
                         type="button"
                         onClick={() => setIsDeleteDialogOpen(true)}
-                        className="w-full py-2 px-3 rounded-lg border border-rose-800 bg-rose-900/30 hover:bg-rose-900/40 font-semibold text-rose-400 text-xs flex items-center justify-center gap-1.5 transition-colors"
+                        className="w-full py-2 px-3 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 font-semibold text-rose-700 text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                       >
-                        <Trash2 size={13} className="text-rose-400" />
+                        <Trash2 size={13} className="text-rose-600" />
                         <span>
                           {language === "hi"
                             ? "मामला निरस्त एवं डेटाबेस से हटाएं"
@@ -1186,15 +1190,15 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
             /* View 3: Dedicated Audit, Provenance & Diagnostic Telemetry View */
             <div className="space-y-4">
               {/* Audit Sub-Navigation Bar */}
-              <div className="flex items-center justify-between bg-slate-900/70 p-2 rounded-lg border border-slate-700 gap-2">
+              <div className="flex items-center justify-between bg-white p-2.5 rounded-xl border border-slate-200/90 shadow-xs gap-2">
                 <div className="flex items-center gap-2 flex-nowrap overflow-x-auto no-scrollbar shrink-0">
                   <button
                     type="button"
                     onClick={() => setAuditSubTab("PROVENANCE")}
-                    className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors whitespace-nowrap shrink-0 ${
+                    className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       auditSubTab === "PROVENANCE"
-                        ? "bg-govNavy text-white shadow-sm"
-                        : "text-slate-400 hover:text-white bg-slate-800/60"
+                        ? "bg-[#1B365D] text-white shadow-xs"
+                        : "text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/70 border border-slate-200"
                     }`}
                   >
                     <span>
@@ -1207,10 +1211,10 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                   <button
                     type="button"
                     onClick={() => setAuditSubTab("DIAGNOSTICS")}
-                    className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors whitespace-nowrap shrink-0 ${
+                    className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       auditSubTab === "DIAGNOSTICS"
-                        ? "bg-govNavy text-white shadow-sm"
-                        : "text-slate-400 hover:text-white bg-slate-800/60"
+                        ? "bg-[#1B365D] text-white shadow-xs"
+                        : "text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/70 border border-slate-200"
                     }`}
                   >
                     <span>
@@ -1221,7 +1225,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                     </span>
                   </button>
                 </div>
-                <span className="text-[11px] font-mono text-slate-400 font-semibold hidden xl:inline shrink-0">
+                <span className="text-[11px] font-mono text-slate-500 font-semibold hidden xl:inline shrink-0">
                   {language === "hi" ? "अपरिवर्तनीय क्रिप्टोग्राफिक ऑडिट ट्रेल" : "Immutable Cryptographic Audit Trail"}
                 </span>
               </div>
@@ -1247,7 +1251,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                   </div>
                 </div>
               ) : (
-                <div className="bg-slate-900/70 rounded-xl border border-slate-700 p-4 shadow-xs">
+                <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-xs">
                   <AnalysisHUD
                     caseData={caseData}
                     activeAsset={activeAsset}
@@ -1265,13 +1269,13 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
               <div className="lg:col-span-5 space-y-3">
                 {/* Multi-Angle Evidence Facet Switcher */}
                 {caseData.evidence_assets && caseData.evidence_assets.length > 1 && (
-                  <div className="bg-slate-900/70 border border-slate-700 rounded-lg p-2.5 shadow-xs">
+                  <div className="bg-white border border-slate-200/90 rounded-xl p-3 shadow-xs">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-bold text-cyan-300 flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-govNavy" />
+                      <span className="text-xs font-bold text-[#1B365D] flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-[#1B365D]" />
                         {language === "hi" ? "पैकेजिंग फलक चयन" : "Select Packaging Facet"}
                       </span>
-                      <span className="text-[10px] font-mono text-slate-400">
+                      <span className="text-[10px] font-mono text-slate-500">
                         {caseData.evidence_assets.length} {language === "hi" ? "कोण" : "angles"}
                       </span>
                     </div>
@@ -1283,13 +1287,15 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                             key={asset.image_id}
                             type="button"
                             onClick={() => setSelectedAssetId(asset.image_id)}
-                            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border text-xs transition-all shrink-0 ${
+                            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs transition-all shrink-0 cursor-pointer ${
                               isSelected
-                                ? "bg-govNavy text-white border-govNavy shadow-xs font-bold"
-                                : "bg-slate-800/60 text-slate-200 border-slate-700 hover:bg-slate-800/70 font-medium"
+                                ? "bg-[#1B365D] text-white border-[#1B365D] shadow-xs font-bold"
+                                : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 font-medium"
                             }`}
                           >
-                            <span className="w-5 h-5 rounded bg-slate-700 overflow-hidden shrink-0 flex items-center justify-center text-[10px] font-bold">
+                            <span className={`w-5 h-5 rounded overflow-hidden shrink-0 flex items-center justify-center text-[10px] font-bold ${
+                              isSelected ? "bg-white/20 text-white" : "bg-slate-200 text-slate-700"
+                            }`}>
                               #{index + 1}
                             </span>
                             <span>
@@ -1308,21 +1314,21 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                   </div>
                 )}
 
-                <div className="bg-panelBg rounded-lg border border-slate-700 shadow-sm p-4 space-y-3">
-                  <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                <div className="bg-white rounded-xl border border-slate-200/90 shadow-xs p-4 space-y-3">
+                  <div className="flex items-center justify-between border-b border-slate-200 pb-2.5">
                     <div className="flex items-center gap-1.5">
                       <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-cyan-300">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-[#1B365D]">
                         {language === "hi" ? "भौतिक साक्ष्य संपत्ति" : "Physical Evidence Asset"}
                       </h4>
                     </div>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-govNavy text-white font-bold">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#1B365D] text-white font-bold">
                       {language === "hi" ? "मूल अछूता साक्ष्य" : "ORIGINAL UNTOUCHED"}
                     </span>
                   </div>
 
                   {/* Image Preview Box */}
-                  <div className="relative rounded-lg border border-slate-600 bg-slate-950 overflow-hidden min-h-64 flex items-center justify-center">
+                  <div className="relative rounded-xl border border-slate-300 bg-slate-100 overflow-hidden min-h-64 flex items-center justify-center">
                     {activeAsset?.preview_url || activeAsset?.file_path ? (
                       <img
                         src={
@@ -1355,8 +1361,8 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                         className="max-h-96 w-auto object-contain rounded"
                       />
                     ) : (
-                      <div className="p-8 text-center text-slate-400 text-xs">
-                        <div className="font-mono text-slate-300 mb-1">{activeAsset?.image_id}</div>
+                      <div className="p-8 text-center text-slate-500 text-xs">
+                        <div className="font-mono text-slate-700 mb-1">{activeAsset?.image_id}</div>
                         <div>
                           {language === "hi"
                             ? "सुरक्षित भंडारण लेज़र पर भौतिक साक्ष्य तस्वीर"
@@ -1367,30 +1373,30 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                   </div>
 
                   {/* Technical Evidence Attributes */}
-                  <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700 space-y-1.5 text-xs font-mono text-slate-200">
+                  <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1.5 text-xs font-mono text-slate-800">
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold text-slate-400">
+                      <span className="font-semibold text-slate-500">
                         {language === "hi" ? "साक्ष्य संदर्भ:" : "Asset Reference:"}
                       </span>
-                      <span className="text-cyan-300 font-bold">{activeAsset?.image_id}</span>
+                      <span className="text-[#1B365D] font-bold">{activeAsset?.image_id}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold text-slate-400">
+                      <span className="font-semibold text-slate-500">
                         {language === "hi" ? "रिज़ॉल्यूशन:" : "Resolution:"}
                       </span>
-                      <span>{activeAsset?.image_width} × {activeAsset?.image_height} px</span>
+                      <span className="font-medium text-slate-800">{activeAsset?.image_width} × {activeAsset?.image_height} px</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold text-slate-400">
+                      <span className="font-semibold text-slate-500">
                         {language === "hi" ? "पहलू:" : "Facet:"}
                       </span>
-                      <span className="font-sans font-medium text-slate-100">{activeAsset?.panel_type}</span>
+                      <span className="font-sans font-semibold text-slate-900">{activeAsset?.panel_type}</span>
                     </div>
-                    <div className="flex items-center justify-between pt-1 border-t border-slate-700 text-[11px]">
-                      <span className="font-semibold text-slate-400">
+                    <div className="flex items-center justify-between pt-1 border-t border-slate-200 text-[11px]">
+                      <span className="font-semibold text-slate-500">
                         {language === "hi" ? "प्रमाणिक एसएचए-256 (बैकएंड रिकॉर्ड):" : "Canonical SHA-256 (Backend Record):"}
                       </span>
-                      <span className="text-slate-400 truncate max-w-[180px]" title={activeAsset?.raw_sha256}>
+                      <span className="text-slate-600 truncate max-w-[180px] font-mono" title={activeAsset?.raw_sha256}>
                         {activeAsset?.raw_sha256}
                       </span>
                     </div>
@@ -1401,9 +1407,9 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                     <button
                       type="button"
                       onClick={() => setIsRetakeMode(true)}
-                      className="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 transition-colors focus:outline-none"
+                      className="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors focus:outline-none cursor-pointer shadow-2xs"
                     >
-                      <svg className="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                       </svg>
                       <span>
@@ -1431,17 +1437,18 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
 
       {/* Deletion Confirmation Modal */}
       {isDeleteDialogOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-overlay-in">
-          <div className="bg-slate-900/70 rounded-xl max-w-md w-full p-6 shadow-2xl border border-slate-700 space-y-4 animate-pop-in">
-            <div className="flex items-start gap-3">
-              <div className="p-2.5 bg-rose-900/40 text-rose-400 rounded-full shrink-0">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4 animate-overlay-in">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4 animate-pop-in relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FF9933] via-white to-[#138808]" />
+            <div className="flex items-start gap-3 pt-1">
+              <div className="p-2.5 bg-rose-50 text-rose-600 border border-rose-100 rounded-full shrink-0">
                 <Trash2 size={22} />
               </div>
               <div>
-                <h3 className="text-base font-bold text-white">
+                <h3 className="text-base font-bold text-slate-900">
                   {language === "hi" ? "मामला निरस्त एवं स्थायी निष्कासन" : "Dispose & Permanently Delete Case"}
                 </h3>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-xs text-slate-500 mt-1 font-medium">
                   {language === "hi"
                     ? "डेटाबेस से यह मामला एवं सभी संबंधित विधिक विवरण पूरी तरह हटा दिए जाएंगे।"
                     : "This inspection case and all related statutory details will be permanently removed from the database sitewide."}
@@ -1449,18 +1456,18 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
               </div>
             </div>
 
-            <div className="p-3 bg-slate-800/60 rounded-lg border border-slate-700 text-xs space-y-1.5">
+            <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs space-y-1.5">
               <div className="flex justify-between">
-                <span className="text-slate-400">{language === "hi" ? "केस संख्या:" : "Case Number:"}</span>
-                <span className="font-mono font-bold text-slate-100">{caseData.inspection_number}</span>
+                <span className="text-slate-500 font-medium">{language === "hi" ? "केस संख्या:" : "Case Number:"}</span>
+                <span className="font-mono font-bold text-slate-900">{caseData.inspection_number}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">{language === "hi" ? "उत्पाद / वस्तु:" : "Product / Commodity:"}</span>
-                <span className="font-semibold text-slate-100 truncate max-w-[220px]">{caseData.product_name}</span>
+                <span className="text-slate-500 font-medium">{language === "hi" ? "उत्पाद / वस्तु:" : "Product / Commodity:"}</span>
+                <span className="font-semibold text-slate-900 truncate max-w-[220px]">{caseData.product_name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">{language === "hi" ? "दिनांक एवं समय:" : "Date & Time:"}</span>
-                <span className="font-mono text-slate-200">
+                <span className="text-slate-500 font-medium">{language === "hi" ? "दिनांक एवं समय:" : "Date & Time:"}</span>
+                <span className="font-mono text-slate-800">
                   {new Date(caseData.created_at).toLocaleString("en-IN", {
                     day: "2-digit",
                     month: "short",
@@ -1473,7 +1480,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
               </div>
             </div>
 
-            <p className="text-[11px] text-rose-400 bg-rose-900/30 p-2.5 rounded border border-rose-800">
+            <p className="text-[11px] text-rose-700 bg-rose-50 p-2.5 rounded border border-rose-200">
               <b>{language === "hi" ? "सांविधिक चेतावनी: " : "Statutory Warning: "}</b>
               {language === "hi"
                 ? "यह कार्रवाई पूर्ववत नहीं की जा सकती। सभी साक्ष्य छवियां, बीओयू निर्देशांक, नियम निष्कर्ष एवं नोटिस स्थायी रूप से नष्ट हो जाएंगे।"
@@ -1493,7 +1500,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                 type="button"
                 disabled={isDeletingCase}
                 onClick={handleDeleteCase}
-                className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 disabled:opacity-50 rounded-lg flex items-center gap-1.5 transition-colors shadow-xs"
+                className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 disabled:opacity-50 rounded-lg flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer"
               >
                 {isDeletingCase ? (
                   <>

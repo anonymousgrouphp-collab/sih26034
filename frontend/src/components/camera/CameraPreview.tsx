@@ -131,7 +131,7 @@ export const CameraPreview: React.FC<CameraPreviewProps> = ({
                 <div className="text-[10px] font-mono font-bold text-amber-300 uppercase tracking-tight">
                   ArUco #42 (50mm)
                 </div>
-                <div className="w-12 h-12 mx-auto border border-amber-400/60 rounded bg-slate-900/70/10 flex items-center justify-center">
+                <div className="w-12 h-12 mx-auto border border-amber-400/60 rounded bg-slate-900/80 flex items-center justify-center">
                   <span className="text-[9px] font-mono text-amber-200">50 mm</span>
                 </div>
                 <div className="text-[9px] text-amber-100/90 leading-tight">

@@ -38,7 +38,7 @@ export const PipelineStepper: React.FC<PipelineStepperProps> = ({
   const { language } = useLanguage();
 
   return (
-    <div className={`overflow-x-auto rounded-xl border border-slate-700 bg-slate-900/70 p-3 shadow-xs ${className}`}>
+    <div className={`overflow-x-auto rounded-xl border border-slate-200 bg-white p-4 shadow-xs ${className}`}>
       <div className="flex min-w-[760px] items-center justify-between">
         {steps.map((step, idx) => {
           const isCompleted = step.status === "completed";
@@ -51,30 +51,30 @@ export const PipelineStepper: React.FC<PipelineStepperProps> = ({
 
           return (
             <React.Fragment key={step.id || idx}>
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-3">
                 <div
-                  className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-black transition-all ${
+                  className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-black transition-all ${
                     isCompleted
                       ? "bg-emerald-600 text-white shadow-xs"
                       : isActive
-                      ? "bg-govNavy text-white ring-4 ring-govNavy/15 animate-pulse"
+                      ? "bg-[#1B365D] text-white ring-4 ring-blue-100 shadow-xs"
                       : isFailed
                       ? "bg-rose-600 text-white"
-                      : "bg-slate-800/80 text-slate-400 border border-slate-700"
+                      : "bg-slate-100 text-slate-500 border border-slate-300"
                   }`}
                 >
-                  {isCompleted ? <CheckCircle2 size={15} /> : idx + 1}
+                  {isCompleted ? <CheckCircle2 size={16} /> : idx + 1}
                 </div>
                 <div>
                   <p
-                    className={`text-xs font-bold leading-tight ${
-                      isActive ? "text-cyan-300 font-black" : isCompleted ? "text-slate-100" : "text-slate-400"
+                    className={`text-sm leading-tight ${
+                      isActive ? "text-[#1B365D] font-extrabold" : isCompleted ? "text-slate-800 font-bold" : "text-slate-500 font-medium"
                     }`}
                   >
                     {displayLabel}
                   </p>
                   {displayDescription && (
-                    <p className="text-[10px] text-slate-400 hidden sm:block truncate max-w-[140px]">
+                    <p className="text-xs text-slate-500 hidden sm:block truncate max-w-[160px]">
                       {displayDescription}
                     </p>
                   )}
@@ -84,7 +84,7 @@ export const PipelineStepper: React.FC<PipelineStepperProps> = ({
               {idx < steps.length - 1 && (
                 <div
                   className={`mx-2 h-0.5 flex-1 transition-colors ${
-                    isCompleted ? "bg-emerald-500" : "bg-slate-700"
+                    isCompleted ? "bg-emerald-500" : "bg-slate-200"
                   }`}
                 />
               )}

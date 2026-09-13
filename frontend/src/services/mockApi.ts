@@ -47,6 +47,33 @@ import {
   getDeletedCaseIds,
 } from "./mockData";
 
+export function getActiveSessionOfficer(): {
+  name: string;
+  badgeNumber: string;
+  designation: string;
+  officerRole: string;
+} {
+  let name = "Rajesh Sharma";
+  let badgeNumber = "INSP-DL-0842";
+  let designation = "Legal Metrology Officer (Inspector)";
+  let officerRole = "INSPECTOR";
+
+  try {
+    const stored = typeof window !== "undefined" ? localStorage.getItem("Nirikshak_session") : null;
+    if (stored) {
+      const session = JSON.parse(stored);
+      if (session.name) name = session.name;
+      if (session.badgeNumber) badgeNumber = session.badgeNumber;
+      if (session.designation) designation = session.designation;
+      if (session.officerRole) officerRole = session.officerRole;
+    }
+  } catch {
+    // fallback to defaults
+  }
+
+  return { name, badgeNumber, designation, officerRole };
+}
+
 export class MockApiService implements IInspectionApiService {
   private static instance: MockApiService;
 
@@ -846,12 +873,17 @@ export class MockApiService implements IInspectionApiService {
       } as ApiError;
     }
 
+    const sessionOfficer = getActiveSessionOfficer();
+    const activeOfficerName = request.officer_name || sessionOfficer.name;
+    const activeBadgeNumber = request.badge_number || sessionOfficer.badgeNumber;
+    const activeOfficerId = request.officer_id || activeBadgeNumber;
+
     const decision: OfficerDecision = {
       decision_id: `dec_${Date.now()}`,
       inspection_id: inspectionId,
-      officer_id: "INSP-DL-0842",
-      badge_number: "INSP-DL-0842",
-      officer_name: "Rajesh Sharma",
+      officer_id: activeOfficerId,
+      badge_number: activeBadgeNumber,
+      officer_name: activeOfficerName,
       verdict: request.adjudication_verdict,
       override_applied: request.override_applied,
       remarks: request.officer_remarks,
@@ -898,8 +930,8 @@ export class MockApiService implements IInspectionApiService {
       event_type: request.override_applied ? "OFFICER_OVERRIDE_APPLIED" : "OFFICER_ADJUDICATION_RECORDED",
       event_label: request.override_applied ? "Officer Adjudication Override" : "Officer Adjudication Recorded",
       actor_type: "OFFICER",
-      actor_id: "INSP-DL-0842",
-      actor_name: "Rajesh Sharma",
+      actor_id: activeBadgeNumber,
+      actor_name: activeOfficerName,
       entity_type: "ADJUDICATION",
       entity_id: decision.decision_id,
       decision: request.adjudication_verdict,
@@ -929,12 +961,13 @@ export class MockApiService implements IInspectionApiService {
       } as ApiError;
     }
 
+    const officer = getActiveSessionOfficer();
     const findingAdj: FindingAdjudication = {
       finding_id: findingId,
       decision,
-      officer_id: "INSP-DL-0842",
-      officer_name: "Rajesh Sharma",
-      badge_number: "INSP-DL-0842",
+      officer_id: officer.badgeNumber,
+      officer_name: officer.name,
+      badge_number: officer.badgeNumber,
       remarks: remarks.trim(),
       timestamp_utc: new Date().toISOString(),
       action_order: actionOrder,
@@ -955,8 +988,8 @@ export class MockApiService implements IInspectionApiService {
       event_type: "OFFICER_ADJUDICATION_RECORDED",
       event_label: `Finding Adjudicated: ${decision}`,
       actor_type: "OFFICER",
-      actor_id: "INSP-DL-0842",
-      actor_name: "Rajesh Sharma",
+      actor_id: officer.badgeNumber,
+      actor_name: officer.name,
       entity_type: "FINDING",
       entity_id: findingId,
       related_finding_id: findingId,
@@ -1002,12 +1035,13 @@ export class MockApiService implements IInspectionApiService {
       },
     });
 
+    const officer = getActiveSessionOfficer();
     appendAuditEvent(inspectionId, {
       event_type: "INSPECTION_CLOSED",
       event_label: "Inspection Case Closed",
       actor_type: "OFFICER",
-      actor_id: "INSP-DL-0842",
-      actor_name: "Rajesh Sharma",
+      actor_id: officer.badgeNumber,
+      actor_name: officer.name,
       entity_type: "INSPECTION",
       entity_id: inspectionId,
       decision: "CASE_CLOSED",
@@ -1019,6 +1053,7 @@ export class MockApiService implements IInspectionApiService {
 
   public async getEvidenceDossier(inspectionId: string): Promise<any> {
     const insp = await this.getInspection(inspectionId);
+    const officer = getActiveSessionOfficer();
     return {
       status: "SUCCESS",
       inspection_id: insp.id,
@@ -1028,8 +1063,8 @@ export class MockApiService implements IInspectionApiService {
       certificate_number: `SEC63-BSA-2026-${(insp.sku_demo_id || insp.id).replace(/[^a-zA-Z0-9]/g, "").slice(-8).toUpperCase()}`,
       merkle_root: insp.evidence_graph?.merkle_root || "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
       statutory_mandate: "Section 63 of Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)",
-      adjudicating_officer: "Rajesh Sharma (INSP-DL-0842)",
-      officer_badge: "INSP-DL-0842",
+      adjudicating_officer: `${officer.name} (${officer.badgeNumber})`,
+      officer_badge: officer.badgeNumber,
       jurisdiction_circle: insp.jurisdiction_id || "CIRCLE_DL_SOUTH_01",
       total_evidence_assets: (insp.evidence_assets || []).length,
       total_extracted_fields: (insp.extracted_fields || []).length,
@@ -1040,10 +1075,12 @@ export class MockApiService implements IInspectionApiService {
   }
 
   public async generateNotice(_payload: GenerateNoticePayload): Promise<LegalNoticeResult> {
+    const officer = getActiveSessionOfficer();
+    const shortBadge = officer.badgeNumber.replace(/[^0-9]/g, "").slice(-4) || "0842";
     return {
       notice_id: `not_mock_${Date.now()}`,
-      notice_reference_number: "LMO/DL/SOUTH/2026/0842",
-      bsa_certificate_number: "CERT-BSA2023-20260910-0842",
+      notice_reference_number: `LMO/DL/SOUTH/${new Date().getFullYear()}/${shortBadge}`,
+      bsa_certificate_number: `CERT-BSA2023-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-${shortBadge}`,
       statutory_mandate: "Section 36(1) of Legal Metrology Act, 2009 read with Section 63 BSA 2023",
       pdf_download_url: "/form1.pdf",
       merkle_entry_hash: "8c42b9101adfa9280194bc0281efca891048bca120938a1ef908123bcdef0123",

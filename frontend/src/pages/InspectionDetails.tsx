@@ -50,9 +50,9 @@ export const InspectionDetails: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="glass-panel p-12 text-center rounded-2xl border border-slate-700/60 shadow-xl space-y-3">
-        <div className="w-8 h-8 border-4 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto" />
-        <p className="text-xs font-bold text-slate-300 font-mono">
+      <div className="bg-white p-12 text-center rounded-xl border border-slate-200 shadow-xs space-y-3">
+        <div className="w-8 h-8 border-4 border-[#1B365D] border-t-transparent rounded-full animate-spin mx-auto" />
+        <p className="text-xs font-bold text-slate-600 font-mono">
           {language === "hi"
             ? "सांविधिक केस फ़ाइल और क्रिप्टोग्राफ़िक साक्ष्य संपत्तियां लोड हो रही हैं..."
             : "Loading statutory case file and cryptographic evidence assets..."}
@@ -63,22 +63,24 @@ export const InspectionDetails: React.FC = () => {
 
   if (error || !caseData) {
     return (
-      <div className="glass-panel p-10 text-center rounded-2xl border border-rose-900/50 shadow-xl space-y-4 max-w-xl mx-auto">
-        <AlertCircle size={36} className="text-rose-400 mx-auto" />
-        <h2 className="text-base font-bold text-white">
+      <div className="bg-white p-10 text-center rounded-xl border border-slate-200 shadow-xs space-y-4 max-w-xl mx-auto">
+        <div className="w-12 h-12 rounded-xl bg-rose-50 text-rose-700 flex items-center justify-center mx-auto border border-rose-200">
+          <AlertCircle size={26} />
+        </div>
+        <h2 className="text-base font-bold text-slate-900">
           {language === "hi" ? "निरीक्षण केस नहीं मिला" : "Inspection Case Not Found"}
         </h2>
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-slate-600">
           {language === "hi" ? (
             <>
               केस संदर्भ आईडी{" "}
-              <code className="font-mono bg-slate-800 text-amber-300 border border-slate-700 px-1.5 py-0.5 rounded">{id}</code>{" "}
+              <code className="font-mono bg-slate-100 text-slate-900 border border-slate-200 px-1.5 py-0.5 rounded">{id}</code>{" "}
               डेटास्टोर से पुनर्प्राप्त नहीं की जा सकी।
             </>
           ) : (
             <>
               Case reference ID{" "}
-              <code className="font-mono bg-slate-800 text-amber-300 border border-slate-700 px-1.5 py-0.5 rounded">{id}</code> could
+              <code className="font-mono bg-slate-100 text-slate-900 border border-slate-200 px-1.5 py-0.5 rounded">{id}</code> could
               not be retrieved from datastore.
             </>
           )}

@@ -75,17 +75,20 @@ export const CaseClosureModal: React.FC<CaseClosureModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs"
       role="dialog"
       aria-modal="true"
       aria-labelledby="closure-modal-title"
     >
       <div
         ref={modalRef}
-        className="w-full max-w-lg bg-panelBg rounded-xl border border-slate-700 shadow-2xl overflow-hidden"
+        className="w-full max-w-lg bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden relative"
       >
+        {/* Top Indian Tricolor Accent Ribbon */}
+        <div className="h-1 bg-gradient-to-r from-[#FF9933] via-white to-[#138808]" />
+
         {/* Header */}
-        <div className="bg-govNavy px-6 py-4 text-white flex items-center justify-between">
+        <div className="bg-[#1B365D] px-6 py-4 text-white flex items-center justify-between">
           <div className="flex items-center gap-2">
             <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -98,7 +101,7 @@ export const CaseClosureModal: React.FC<CaseClosureModalProps> = ({
             type="button"
             onClick={onClose}
             disabled={isSubmitting}
-            className="text-slate-300 hover:text-white text-lg font-bold leading-none p-1 rounded"
+            className="text-white/80 hover:text-white text-lg font-bold leading-none p-1 rounded transition-colors cursor-pointer"
             aria-label="Close modal"
           >
             ✕
@@ -107,8 +110,8 @@ export const CaseClosureModal: React.FC<CaseClosureModalProps> = ({
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div className="p-3.5 bg-emerald-900/30 border border-emerald-800 rounded-lg text-xs text-emerald-300 space-y-1">
-            <div className="font-bold flex items-center gap-1.5">
+          <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-950 space-y-1 shadow-2xs">
+            <div className="font-bold flex items-center gap-1.5 text-emerald-800">
               <span className="h-2 w-2 rounded-full bg-emerald-600" />
               <span>
                 {language === "hi"
@@ -116,40 +119,40 @@ export const CaseClosureModal: React.FC<CaseClosureModalProps> = ({
                   : "Backend Readiness: Ready for Case Closure"}
               </span>
             </div>
-            <p className="text-slate-400 text-[11px] leading-relaxed">
+            <p className="text-slate-600 text-[11px] leading-relaxed font-medium">
               {language === "hi"
                 ? "वर्तमान कार्यप्रवाह स्थिति द्वारा मामला समापन हेतु तैयार चिह्नित है। यह कार्रवाई अधिकारी के समापन निर्णय को अभिलिखित करेगी तथा बैकएंड के माध्यम से केस कार्यप्रवाह को अद्यतन करेगी।"
                 : "The case is marked ready for closure by the current workflow state. This action will record the officer's closure decision and update the case workflow through the configured backend."}
             </p>
           </div>
 
-          <div className="bg-slate-800/60 p-3 rounded border border-slate-700 text-xs space-y-1">
+          <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs space-y-1.5 shadow-2xs">
             <div className="flex justify-between">
-              <span className="text-slate-400 font-medium">
+              <span className="text-slate-500 font-medium">
                 {language === "hi" ? "केस संख्या:" : "Case Number:"}
               </span>
-              <span className="font-mono font-bold text-slate-100">{caseData.inspection_number}</span>
+              <span className="font-mono font-bold text-slate-900">{caseData.inspection_number}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-400 font-medium">
+              <span className="text-slate-500 font-medium">
                 {language === "hi" ? "वस्तु (कमोडिटी):" : "Commodity:"}
               </span>
-              <span className="font-semibold text-slate-100">{caseData.product_name}</span>
+              <span className="font-semibold text-slate-900">{caseData.product_name}</span>
             </div>
             {caseData.establishment_name && (
               <div className="flex justify-between">
-                <span className="text-slate-400 font-medium">
+                <span className="text-slate-500 font-medium">
                   {language === "hi" ? "प्रतिष्ठान:" : "Establishment:"}
                 </span>
-                <span className="text-slate-100">{caseData.establishment_name}</span>
+                <span className="text-slate-800 font-medium">{caseData.establishment_name}</span>
               </div>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="closure-remarks" className="block text-xs font-bold text-slate-200">
+            <label htmlFor="closure-remarks" className="block text-xs font-bold text-slate-800">
               {language === "hi" ? "अधिकारी समापन टिप्पणी" : "Officer Closure Remarks"}{" "}
-              <span className="text-rose-400">*</span>
+              <span className="text-rose-600">*</span>
             </label>
             <textarea
               id="closure-remarks"
@@ -158,7 +161,7 @@ export const CaseClosureModal: React.FC<CaseClosureModalProps> = ({
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
               disabled={isSubmitting}
-              className="w-full text-xs p-2.5 rounded border border-slate-600 focus:outline-none focus:ring-2 focus:ring-govNavy/20 focus:border-govNavy text-slate-100"
+              className="w-full text-xs p-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#1B365D]/20 focus:border-[#1B365D] text-slate-900 bg-white placeholder:text-slate-400"
               placeholder={
                 language === "hi"
                   ? "आधिकारिक तथ्यात्मक औचित्य या समापन टिप्पणी दर्ज करें..."
@@ -168,25 +171,25 @@ export const CaseClosureModal: React.FC<CaseClosureModalProps> = ({
           </div>
 
           {validationError && (
-            <div role="alert" className="p-2.5 bg-rose-900/30 border border-rose-800 rounded text-xs text-rose-300">
+            <div role="alert" className="p-2.5 bg-rose-50 border border-rose-200 rounded-lg text-xs text-rose-800 font-medium">
               {validationError}
             </div>
           )}
 
           {/* Footer Actions */}
-          <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-700">
+          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-200">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-4 py-2 text-xs font-semibold text-slate-200 bg-slate-900/70 border border-slate-600 rounded-md hover:bg-slate-800/60 transition-colors"
+              className="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
             >
               {language === "hi" ? "रद्द करें" : "Cancel"}
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 rounded-md transition-colors flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+              className="px-4 py-2 text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 rounded-lg transition-colors flex items-center gap-1.5 shadow-xs disabled:opacity-50 cursor-pointer"
             >
               {isSubmitting ? (
                 <>

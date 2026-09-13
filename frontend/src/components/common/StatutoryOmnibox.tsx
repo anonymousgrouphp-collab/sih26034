@@ -285,12 +285,12 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
 
   return (
     <div className={`w-full max-w-4xl mx-auto ${className}`}>
-      {/* Search Input Bar (india.gov.in Signature Omnibox Pattern) */}
+      {/* Search Input Bar (india.gov.in / Ministry of Consumer Affairs Administrative Search Pattern) */}
       <form onSubmit={handleSearch} className="relative group">
-        <div className="relative flex flex-col sm:flex-row items-stretch rounded-2xl sm:rounded-full bg-slate-900/70 shadow-xl border-2 border-slate-700 hover:border-slate-600 focus-within:border-emerald-600 focus-within:ring-4 focus-within:ring-emerald-600/20 overflow-hidden transition-all">
+        <div className="relative flex flex-col sm:flex-row items-stretch rounded-xl bg-white shadow-xs border border-slate-300 hover:border-slate-400 focus-within:border-[#1B365D] focus-within:ring-2 focus-within:ring-[#1B365D]/20 overflow-hidden transition-all">
           {/* Search Icon & Input */}
-          <div className="flex items-center flex-1 pl-4 sm:pl-6 pr-3 py-2 sm:py-0">
-            <Search size={20} className="text-slate-400 shrink-0 mr-3" />
+          <div className="flex items-center flex-1 pl-4 sm:pl-5 pr-3 py-2 sm:py-0">
+            <Search size={18} className="text-[#1B365D] shrink-0 mr-3" />
             <input
               type="text"
               value={query}
@@ -299,13 +299,13 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
                 "omnibox.placeholder",
                 "Search statutory rules, Table-I font schedule, banned units, GSR notifications..."
               )}
-              className="w-full py-2.5 sm:py-3.5 text-xs sm:text-sm text-white placeholder:text-slate-400 bg-transparent focus:outline-none font-medium"
+              className="w-full py-2.5 sm:py-3 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 bg-transparent focus:outline-none font-medium"
               aria-label="Statutory Inspection & Rule Search Omnibox"
             />
           </div>
 
           {/* Category Dropdown (india.gov.in Pattern) */}
-          <div className="flex items-center border-t sm:border-t-0 sm:border-l border-slate-700 bg-slate-800/60 px-3 sm:px-4 py-2 sm:py-0">
+          <div className="flex items-center border-t sm:border-t-0 sm:border-l border-slate-200 bg-slate-50/80 px-3 sm:px-4 py-2 sm:py-0">
             <label htmlFor="statutory-category-select" className="sr-only">
               {language === "hi" ? "श्रेणी चुनें" : "Select Category"}
             </label>
@@ -318,22 +318,22 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
                   setSelectedRule(STATUTORY_RULES[e.target.value]);
                 }
               }}
-              className="bg-transparent text-[11px] sm:text-xs font-semibold text-slate-200 focus:outline-none cursor-pointer py-1.5 pr-6 appearance-none relative"
+              className="bg-transparent text-[11px] sm:text-xs font-semibold text-slate-700 focus:outline-none cursor-pointer py-1.5 pr-6 appearance-none relative"
             >
-              <option value="all">{language === "hi" ? "सभी श्रेणियां" : "All Categories"}</option>
-              <option value="table1">{language === "hi" ? "तालिका-I फ़ॉन्ट अनुसूची" : "Table-I Font Schedule"}</option>
-              <option value="banned_units">{language === "hi" ? "प्रतिबंधित इकाइयां (gms/ML)" : "Prohibited Units (gms/ML)"}</option>
-              <option value="usp">{language === "hi" ? "यूनिट विक्रय मूल्य (USP)" : "USP Math Verification"}</option>
-              <option value="ecommerce">{language === "hi" ? "ई-कॉमर्स नियम 6(10)" : "E-Commerce Rule 6(10)"}</option>
-              <option value="sec 63">{language === "hi" ? "धारा 63 बीएसए 2023 साक्ष्य" : "Sec 63 BSA Evidence"}</option>
+              <option value="all" className="bg-white text-slate-800">{language === "hi" ? "सभी श्रेणियां" : "All Categories"}</option>
+              <option value="table1" className="bg-white text-slate-800">{language === "hi" ? "तालिका-I फ़ॉन्ट अनुसूची" : "Table-I Font Schedule"}</option>
+              <option value="banned_units" className="bg-white text-slate-800">{language === "hi" ? "प्रतिबंधित इकाइयां (gms/ML)" : "Prohibited Units (gms/ML)"}</option>
+              <option value="usp" className="bg-white text-slate-800">{language === "hi" ? "यूनिट विक्रय मूल्य (USP)" : "USP Math Verification"}</option>
+              <option value="ecommerce" className="bg-white text-slate-800">{language === "hi" ? "ई-कॉमर्स नियम 6(10)" : "E-Commerce Rule 6(10)"}</option>
+              <option value="sec63" className="bg-white text-slate-800">{language === "hi" ? "धारा 63 बीएसए 2023 साक्ष्य" : "Sec 63 BSA Evidence"}</option>
             </select>
-            <ChevronDown size={14} className="text-slate-400 -ml-4 pointer-events-none shrink-0" />
+            <ChevronDown size={14} className="text-slate-500 -ml-4 pointer-events-none shrink-0" />
           </div>
 
-          {/* Emerald Green Search CTA Button (Signature india.gov.in #146337 Forest/Emerald Green Button) */}
+          {/* Sovereign Navy Search CTA Button */}
           <button
             type="submit"
-            className="inline-flex items-center justify-center gap-2 bg-[#146337] hover:bg-[#0f4d2a] text-white px-7 py-3 sm:py-3.5 text-xs sm:text-sm font-bold tracking-wide transition-colors shrink-0 shadow-xs sm:rounded-r-full"
+            className="inline-flex items-center justify-center gap-2 bg-[#1B365D] hover:bg-[#0A2540] text-white px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold tracking-wide transition-colors shrink-0 shadow-xs cursor-pointer"
           >
             <span>{language === "hi" ? "खोजें" : "Search"}</span>
             <ArrowRight size={15} />
@@ -341,24 +341,17 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
         </div>
       </form>
 
-      {/* Trending Searches Row (india.gov.in Signature Pattern) */}
+      {/* Statutory Provisions / Quick References Row */}
       <div className="flex flex-wrap items-center gap-2 mt-3 px-1 text-[11px]">
-        <span
-          className={`font-extrabold tracking-wide uppercase text-[10px] shrink-0 ${
-            variant === "dashboard" ? "text-amber-300" : "text-amber-300"
-          }`}
-        >
-          {language === "hi" ? "ट्रेंडिंग खोजें :" : "Trending Searches :"}
+        <span className="font-bold tracking-wider uppercase text-[10.5px] text-slate-500 shrink-0 flex items-center gap-1.5">
+          <Scale size={13} className="text-[#1B365D]" />
+          <span>{language === "hi" ? "त्वरित विधिक संदर्भ :" : "STATUTORY REFERENCES :"}</span>
         </span>
 
         <button
           type="button"
           onClick={() => setSelectedRule(STATUTORY_RULES.table1)}
-          className={`px-3 py-1 rounded-full text-[11px] font-semibold transition-all ${
-            variant === "dashboard"
-              ? "bg-slate-800/80 hover:bg-slate-700 text-slate-100 hover:text-white border border-slate-700 hover:border-slate-600 shadow-2xs"
-              : "bg-slate-900/70/10 hover:bg-slate-900/70/10/20 text-white border border-white/20 hover:border-white/40 backdrop-blur-xs"
-          }`}
+          className="px-3 py-1 rounded-lg text-[11px] font-semibold transition-all bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-[#1B365D] border border-slate-200 hover:border-blue-300 shadow-2xs cursor-pointer"
         >
           {t("omnibox.pill_table1", "Table-I Font Schedule (Row 5 = 6.0 mm)")}
         </button>
@@ -366,11 +359,7 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
         <button
           type="button"
           onClick={() => setSelectedRule(STATUTORY_RULES.banned_units)}
-          className={`px-3 py-1 rounded-full text-[11px] font-semibold transition-all ${
-            variant === "dashboard"
-              ? "bg-slate-800/80 hover:bg-slate-700 text-slate-100 hover:text-white border border-slate-700 hover:border-slate-600 shadow-2xs"
-              : "bg-slate-900/70/10 hover:bg-slate-900/70/10/20 text-white border border-white/20 hover:border-white/40 backdrop-blur-xs"
-          }`}
+          className="px-3 py-1 rounded-lg text-[11px] font-semibold transition-all bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-[#1B365D] border border-slate-200 hover:border-blue-300 shadow-2xs cursor-pointer"
         >
           {t("omnibox.pill_banned", "Prohibited Units (gms, ML, gm, ltrs)")}
         </button>
@@ -378,11 +367,7 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
         <button
           type="button"
           onClick={() => setSelectedRule(STATUTORY_RULES.usp)}
-          className={`px-3 py-1 rounded-full text-[11px] font-semibold transition-all ${
-            variant === "dashboard"
-              ? "bg-slate-800/80 hover:bg-slate-700 text-slate-100 hover:text-white border border-slate-700 hover:border-slate-600 shadow-2xs"
-              : "bg-slate-900/70/10 hover:bg-slate-900/70/10/20 text-white border border-white/20 hover:border-white/40 backdrop-blur-xs"
-          }`}
+          className="px-3 py-1 rounded-lg text-[11px] font-semibold transition-all bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-[#1B365D] border border-slate-200 hover:border-blue-300 shadow-2xs cursor-pointer"
         >
           {t("omnibox.pill_usp", "USP Math (|USP×Qty - MRP| ≤ ₹0.02)")}
         </button>
@@ -390,11 +375,7 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
         <button
           type="button"
           onClick={() => setSelectedRule(STATUTORY_RULES.ecommerce)}
-          className={`px-3 py-1 rounded-full text-[11px] font-semibold transition-all ${
-            variant === "dashboard"
-              ? "bg-slate-800/80 hover:bg-slate-700 text-slate-100 hover:text-white border border-slate-700 hover:border-slate-600 shadow-2xs"
-              : "bg-slate-900/70/10 hover:bg-slate-900/70/10/20 text-white border border-white/20 hover:border-white/40 backdrop-blur-xs"
-          }`}
+          className="px-3 py-1 rounded-lg text-[11px] font-semibold transition-all bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-[#1B365D] border border-slate-200 hover:border-blue-300 shadow-2xs cursor-pointer"
         >
           {t("omnibox.pill_ecom", "Rule 6(10) E-Commerce")}
         </button>
@@ -402,11 +383,7 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
         <button
           type="button"
           onClick={() => setSelectedRule(STATUTORY_RULES.sec63)}
-          className={`px-3 py-1 rounded-full text-[11px] font-semibold transition-all ${
-            variant === "dashboard"
-              ? "bg-slate-800/80 hover:bg-slate-700 text-slate-100 hover:text-white border border-slate-700 hover:border-slate-600 shadow-2xs"
-              : "bg-slate-900/70/10 hover:bg-slate-900/70/10/20 text-white border border-white/20 hover:border-white/40 backdrop-blur-xs"
-          }`}
+          className="px-3 py-1 rounded-lg text-[11px] font-semibold transition-all bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-[#1B365D] border border-slate-200 hover:border-blue-300 shadow-2xs cursor-pointer"
         >
           {t("omnibox.pill_sec63", "Section 63 BSA 2023 Merkle Proof")}
         </button>
@@ -418,25 +395,28 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
           role="dialog"
           aria-modal="true"
           aria-labelledby="rule-modal-title"
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in"
+          className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in"
         >
-          <div className="bg-slate-900/70 text-white rounded-2xl shadow-2xl border-2 border-amber-400 max-w-2xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white text-slate-900 rounded-2xl shadow-2xl border border-slate-200 max-w-2xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto relative overflow-hidden">
+            {/* Sovereign Tricolor Accent Ribbon */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FF9933] via-white to-[#138808]" />
+
             {/* Header */}
-            <div className="flex items-start justify-between border-b border-slate-700 pb-3">
+            <div className="flex items-start justify-between border-b border-slate-200 pb-3 pt-1">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-amber-900/30 text-amber-400 border border-amber-300">
+                <div className="p-2.5 rounded-xl bg-amber-100 text-amber-900 border border-amber-300 shrink-0">
                   <Scale size={22} />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-govNavy text-white">
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-100 border border-amber-300 text-amber-900">
                       {selectedRule.gazette[language === "hi" ? "hi" : "en"]}
                     </span>
                     <span className="text-[10px] text-slate-500 font-semibold">
                       {selectedRule.act[language === "hi" ? "hi" : "en"]}
                     </span>
                   </div>
-                  <h3 id="rule-modal-title" className="text-base sm:text-lg font-black text-govNavy mt-1">
+                  <h3 id="rule-modal-title" className="text-base sm:text-lg font-bold text-[#1B365D] mt-1">
                     {selectedRule.title[language === "hi" ? "hi" : "en"]}
                   </h3>
                 </div>
@@ -444,7 +424,7 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
               <button
                 type="button"
                 onClick={() => setSelectedRule(null)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-400 hover:bg-slate-800/70 transition-colors"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
                 aria-label="Close dialog"
               >
                 <X size={20} />
@@ -452,24 +432,24 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
             </div>
 
             {/* Statutory Summary */}
-            <div className="p-3.5 rounded-xl bg-slate-800/60 border border-slate-700 text-xs sm:text-sm text-slate-200 leading-relaxed font-medium">
+            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed font-normal">
               <p>{selectedRule.summary[language === "hi" ? "hi" : "en"]}</p>
             </div>
 
             {/* Statutory Thresholds & Legal Defenses */}
             <div className="space-y-2">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                <ShieldCheck size={14} className="text-amber-400" />
+              <h4 className="text-xs font-bold uppercase tracking-wider text-amber-900 flex items-center gap-1.5">
+                <ShieldCheck size={14} className="text-amber-700" />
                 <span>
                   {language === "hi"
                     ? "अनिवार्य विधिक सीमाएं एवं न्यायालय साक्ष्य बचाव"
                     : "Mandatory Statutory Schedules & Evidentiary Defenses"}
                 </span>
               </h4>
-              <ul className="space-y-1.5 text-xs text-slate-100">
+              <ul className="space-y-1.5 text-xs text-slate-800">
                 {selectedRule.thresholds[language === "hi" ? "hi" : "en"].map((item, idx) => (
-                  <li key={idx} className="flex items-start gap-2 bg-amber-900/30 p-2.5 rounded-lg border border-amber-200/80">
-                    <CheckCircle2 size={15} className="text-emerald-400 shrink-0 mt-0.5" />
+                  <li key={idx} className="flex items-start gap-2 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+                    <CheckCircle2 size={15} className="text-emerald-600 shrink-0 mt-0.5" />
                     <span className="leading-snug">{item}</span>
                   </li>
                 ))}
@@ -477,11 +457,11 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
             </div>
 
             {/* Action Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-700">
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-200">
               <button
                 type="button"
                 onClick={() => setSelectedRule(null)}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:bg-slate-800/70 transition-colors"
+                className="px-4 py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer"
               >
                 {t("omnibox.close", "Close Schedule")}
               </button>
@@ -492,7 +472,7 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
                     setSelectedRule(null);
                     navigate("/rules");
                   }}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-govNavy hover:bg-slate-800/70 border border-slate-600 transition-colors"
+                  className="px-4 py-2 rounded-lg text-xs font-bold text-slate-700 hover:text-slate-950 hover:bg-slate-100 border border-slate-300 transition-colors cursor-pointer"
                 >
                   {t("omnibox.view_full", "View Full Rules & Schedules Dossier")}
                 </button>
@@ -502,7 +482,7 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
                     setSelectedRule(null);
                     navigate("/inspections/demo-fortune-sunlite");
                   }}
-                  className="px-4 py-2 rounded-xl text-xs font-bold bg-govNavy hover:bg-govNavy-light text-white shadow-md transition-colors inline-flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-lg text-xs font-bold bg-[#1B365D] hover:bg-[#0A2540] text-white shadow-xs transition-colors inline-flex items-center gap-1.5 cursor-pointer"
                 >
                   <span>{language === "hi" ? "कैनवास में परीक्षण करें" : "Test in Canvas"}</span>
                   <ArrowRight size={13} />

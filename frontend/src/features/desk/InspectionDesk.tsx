@@ -37,10 +37,16 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
   const metrics = useMemo(() => {
     const total = cases.length;
     const pendingAdjudication = cases.filter(
-      (c) => c.workflow_status === "PENDING_REVIEW" || c.workflow_status === "DRAFT" || c.workflow_status === "OPEN"
+      (c) =>
+        c.overall_status === "REVIEW" ||
+        c.overall_status === "UNABLE_TO_VERIFY" ||
+        c.overall_status === "PENDING_REVIEW" ||
+        c.overall_status === "PENDING"
     ).length;
     const violations = cases.filter((c) => c.overall_status === "FAIL" || (c.violations_count && c.violations_count > 0)).length;
-    const compliant = cases.filter((c) => c.overall_status === "PASS").length;
+    const compliant = cases.filter(
+      (c) => c.overall_status === "PASS" || (c.overall_status === "COMPLETED" && c.ai_verdict !== "FAIL")
+    ).length;
 
     return { total, pendingAdjudication, violations, compliant };
   }, [cases]);
@@ -87,6 +93,20 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
     return Math.max(0, Math.min(1, val));
   };
 
+  const getFormattedProductName = (c: InspectionSummary): string => {
+    if (c.product_name && c.product_name !== "Unlabeled Sample") {
+      return c.product_name;
+    }
+    if (c.brand_name) {
+      return `${c.brand_name} Commodity`;
+    }
+    const category = (c as unknown as { category?: string }).category;
+    if (category) {
+      return `${category.replace(/_/g, " ")} Sample`;
+    }
+    return "Packaged Commodity Sample";
+  };
+
   // Filtered case records
   const filteredCases = useMemo(() => {
     return cases.filter((c) => {
@@ -117,7 +137,8 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
       // Search term filter
       if (searchTerm.trim()) {
         const query = searchTerm.toLowerCase();
-        const matchProduct = c.product_name.toLowerCase().includes(query);
+        const prodName = getFormattedProductName(c).toLowerCase();
+        const matchProduct = prodName.includes(query);
         const matchNumber = c.inspection_number.toLowerCase().includes(query);
         const matchBrand = c.brand_name ? c.brand_name.toLowerCase().includes(query) : false;
         const matchEst = c.establishment_name ? c.establishment_name.toLowerCase().includes(query) : false;
@@ -132,8 +153,16 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
       }
 
       // Verdict filter
-      if (selectedVerdict !== "ALL" && c.overall_status !== selectedVerdict) {
-        return false;
+      if (selectedVerdict !== "ALL") {
+        if (selectedVerdict === "PASS") {
+          if (!(c.overall_status === "PASS" || (c.overall_status === "COMPLETED" && c.ai_verdict !== "FAIL"))) return false;
+        } else if (selectedVerdict === "FAIL") {
+          if (!(c.overall_status === "FAIL" || (c.violations_count !== undefined && c.violations_count > 0))) return false;
+        } else if (selectedVerdict === "REVIEW") {
+          if (!(c.overall_status === "REVIEW" || c.overall_status === "UNABLE_TO_VERIFY" || c.overall_status === "PENDING_REVIEW" || c.overall_status === "PENDING")) return false;
+        } else if (c.overall_status !== selectedVerdict) {
+          return false;
+        }
       }
 
       return true;
@@ -191,17 +220,17 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
   return (
     <div className="space-y-5">
       {/* Desk Title Strip & Action */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 glass-panel p-5 rounded-xl border border-slate-700/60 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold text-white">
+            <h2 className="text-lg font-bold text-slate-900">
               {language === "hi" ? "निरीक्षण पटल" : "Inspection Desk"}
             </h2>
-            <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-cyan-300">
+            <span className="text-xs font-mono px-2.5 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-[#1B365D] font-bold">
               {language === "hi" ? `सक्रिय मंडल: ${activeCircle}` : `Active Circle: ${activeCircle}`}
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 font-medium mt-1">
             {language === "hi"
               ? "विधिक मापविज्ञान (पैकेज वस्तुएं) नियम, 2011 के अंतर्गत सत्यापित निरीक्षण कार्य कतार।"
               : "Statutory work queue for verified packaged commodity inspections under LMPC Rules, 2011."}
@@ -213,7 +242,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
             <button
               type="button"
               onClick={onRefresh}
-              className="p-2 text-slate-300 bg-slate-800/80 border border-slate-700 rounded-lg hover:bg-slate-700 text-xs font-medium focus:outline-none transition-colors"
+              className="p-2 text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 text-xs font-medium focus:outline-none transition-colors"
               title={language === "hi" ? "मामला पंजी रीफ्रेश करें" : "Refresh case register"}
             >
               <svg className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -225,7 +254,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
           <button
             type="button"
             onClick={onNewInspectionClick}
-            className="flex items-center gap-1.5 px-4 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold rounded-lg shadow-sm transition-colors focus:ring-2 focus:ring-amber-500 focus:outline-none"
+            className="flex items-center gap-1.5 px-4 py-2 bg-[#1B365D] hover:bg-[#0A2540] text-white text-xs font-bold rounded-lg shadow-xs transition-colors focus:ring-2 focus:ring-[#1B365D] focus:outline-none cursor-pointer"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -237,42 +266,42 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
 
       {/* KPI Metric Summary Strip */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
-        <div className="glass-panel p-4 rounded-xl border border-slate-700/60 shadow-sm">
-          <div className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+          <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">
             {language === "hi" ? "कुल पंजीकृत मामले" : "Total Registered Cases"}
           </div>
-          <div className="text-2xl font-black text-white mt-1 font-mono">{metrics.total}</div>
-          <div className="text-[11px] text-slate-400 mt-0.5">
+          <div className="text-2xl font-black text-slate-900 mt-1 font-mono">{metrics.total}</div>
+          <div className="text-[11px] text-slate-500 mt-0.5 font-medium">
             {language === "hi" ? "विधिक माप अधिनियम की धारा 15 के तहत" : "Under Section 15 LM Act"}
           </div>
         </div>
 
-        <div className="glass-panel p-4 rounded-xl border border-slate-700/60 shadow-sm">
-          <div className="text-xs font-medium text-amber-400 uppercase tracking-wider">
+        <div className="bg-white p-4 rounded-xl border border-amber-200 shadow-xs">
+          <div className="text-xs font-bold text-amber-700 uppercase tracking-wider">
             {language === "hi" ? "निर्णय लंबित" : "Pending Adjudication"}
           </div>
-          <div className="text-2xl font-black text-amber-400 mt-1 font-mono">{metrics.pendingAdjudication}</div>
-          <div className="text-[11px] text-slate-400 mt-0.5">
+          <div className="text-2xl font-black text-amber-600 mt-1 font-mono">{metrics.pendingAdjudication}</div>
+          <div className="text-[11px] text-slate-500 mt-0.5 font-medium">
             {language === "hi" ? "अधिकारी हस्ताक्षर अपेक्षित" : "Awaiting LMO Sign-off"}
           </div>
         </div>
 
-        <div className="glass-panel p-4 rounded-xl border border-slate-700/60 shadow-sm">
-          <div className="text-xs font-medium text-red-400 uppercase tracking-wider">
+        <div className="bg-white p-4 rounded-xl border border-rose-200 shadow-xs">
+          <div className="text-xs font-bold text-rose-700 uppercase tracking-wider">
             {language === "hi" ? "पाए गए विधिक उल्लंघन" : "Violations Detected"}
           </div>
-          <div className="text-2xl font-black text-red-400 mt-1 font-mono">{metrics.violations}</div>
-          <div className="text-[11px] text-slate-400 mt-0.5">
+          <div className="text-2xl font-black text-rose-600 mt-1 font-mono">{metrics.violations}</div>
+          <div className="text-[11px] text-slate-500 mt-0.5 font-medium">
             {language === "hi" ? "धारा 36(1) नोटिस योग्य" : "Section 36(1) Notice Ready"}
           </div>
         </div>
 
-        <div className="glass-panel p-4 rounded-xl border border-slate-700/60 shadow-sm">
-          <div className="text-xs font-medium text-emerald-400 uppercase tracking-wider">
+        <div className="bg-white p-4 rounded-xl border border-emerald-200 shadow-xs">
+          <div className="text-xs font-bold text-emerald-700 uppercase tracking-wider">
             {language === "hi" ? "विधिक अनुपालक वस्तुएं" : "Compliant Products"}
           </div>
-          <div className="text-2xl font-black text-emerald-400 mt-1 font-mono">{metrics.compliant}</div>
-          <div className="text-[11px] text-slate-400 mt-0.5">
+          <div className="text-2xl font-black text-emerald-600 mt-1 font-mono">{metrics.compliant}</div>
+          <div className="text-[11px] text-slate-500 mt-0.5 font-medium">
             {language === "hi" ? "पूर्ण विधिक अनुपालन" : "Table-I & Rule 6 compliant"}
           </div>
         </div>
@@ -281,19 +310,19 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
       {/* Golden Demonstration SKU Quick-Selector Bar (1-Click Pipeline Verification) */}
       <GoldenSkuQuickSelector onSelectSku={onSelectCase} />
 
-      {/* Quick Triage Filter Pills (Urvashi Workstation Enhancement) */}
-      <div className="flex items-center gap-2 flex-wrap glass-panel p-3 rounded-xl border border-slate-700/60 shadow-xs">
-        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider shrink-0">
+      {/* Quick Triage Filter Pills */}
+      <div className="flex items-center gap-2 flex-wrap bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
+        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider shrink-0">
           {language === "hi" ? "त्वरित वर्गीकरण:" : "Quick Triage:"}
         </span>
         <button
           type="button"
           data-testid="triage-all"
           onClick={() => setTriageFilter("ALL")}
-          className={`px-3 py-1 text-xs font-semibold rounded-full border transition-colors ${
+          className={`px-3 py-1 text-xs font-bold rounded-full border transition-colors cursor-pointer ${
             triageFilter === "ALL"
-              ? "bg-amber-400 text-slate-950 font-bold border-amber-300 shadow-xs"
-              : "bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-700"
+              ? "bg-[#1B365D] text-white border-[#1B365D] shadow-xs"
+              : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
           }`}
         >
           {language === "hi" ? `सभी मामले (${cases.length})` : `All Cases (${cases.length})`}
@@ -302,32 +331,32 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
           type="button"
           data-testid="triage-conflicts"
           onClick={() => setTriageFilter("CONFLICTS")}
-          className={`px-3 py-1 text-xs font-semibold rounded-full border transition-colors inline-flex items-center gap-1.5 ${
+          className={`px-3 py-1 text-xs font-bold rounded-full border transition-colors inline-flex items-center gap-1.5 cursor-pointer ${
             triageFilter === "CONFLICTS"
-              ? "bg-amber-500 text-slate-950 font-bold border-amber-400 shadow-xs"
-              : "bg-amber-950/40 text-amber-400 border-amber-800/60 hover:bg-amber-900/40"
+              ? "bg-amber-500 text-white border-amber-500 shadow-xs"
+              : "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100"
           }`}
         >
-          <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+          <span className="w-2 h-2 rounded-full bg-amber-500"></span>
           {language === "hi" ? `विवादित मामले (${conflictCount})` : `Conflict Cases (${conflictCount})`}
         </button>
         <button
           type="button"
           data-testid="triage-evidence-gaps"
           onClick={() => setTriageFilter("EVIDENCE_GAPS")}
-          className={`px-3 py-1 text-xs font-semibold rounded-full border transition-colors inline-flex items-center gap-1.5 ${
+          className={`px-3 py-1 text-xs font-bold rounded-full border transition-colors inline-flex items-center gap-1.5 cursor-pointer ${
             triageFilter === "EVIDENCE_GAPS"
-              ? "bg-cyan-500 text-slate-950 font-bold border-cyan-400 shadow-xs"
-              : "bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-700"
+              ? "bg-purple-700 text-white border-purple-700 shadow-xs"
+              : "bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100"
           }`}
         >
-          <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
+          <span className="w-2 h-2 rounded-full bg-purple-500"></span>
           {language === "hi" ? `साक्ष्य अंतराल (${evidenceGapCount})` : `Evidence Gaps (${evidenceGapCount})`}
         </button>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="glass-panel p-3.5 rounded-xl border border-slate-700/60 shadow-sm flex flex-col md:flex-row items-center justify-between gap-3">
+      <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-center justify-between gap-3">
         {/* Search */}
         <div className="relative w-full md:w-80">
           <input
@@ -335,7 +364,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder={language === "hi" ? "वस्तु, ब्रांड, प्रतिष्ठान या मामला आईडी खोजें..." : "Search commodity, brand, shop, or case ID..."}
-            className="w-full text-xs pl-8 pr-3 py-2 border border-slate-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-cyan-400 bg-slate-800/90 text-white placeholder:text-slate-400"
+            className="w-full text-xs pl-8 pr-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1B365D] bg-white text-slate-900 placeholder:text-slate-400"
           />
           <svg
             className="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5"
@@ -351,13 +380,13 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
         <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
           {/* Workflow Status Filter */}
           <div className="flex items-center gap-1.5 shrink-0">
-            <span className="text-xs font-medium text-slate-400">
+            <span className="text-xs font-semibold text-slate-600">
               {language === "hi" ? "कार्यप्रवाह:" : "Workflow:"}
             </span>
             <select
               value={selectedWorkflow}
               onChange={(e) => setSelectedWorkflow(e.target.value)}
-              className="text-xs px-2.5 py-1.5 border border-slate-700 rounded-lg bg-slate-800 text-slate-200 focus:outline-none focus:ring-1 focus:ring-cyan-400"
+              className="text-xs px-2.5 py-1.5 border border-slate-200 rounded-lg bg-white text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#1B365D]"
             >
               <option value="ALL">{language === "hi" ? "सभी कार्यप्रवाह" : "All Workflows"}</option>
               <option value="DRAFT">{language === "hi" ? "प्रारूप (Draft)" : "Draft"}</option>
@@ -370,13 +399,13 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
 
           {/* Verdict Filter */}
           <div className="flex items-center gap-1.5 shrink-0">
-            <span className="text-xs font-medium text-slate-400">
+            <span className="text-xs font-semibold text-slate-600">
               {language === "hi" ? "निर्णय:" : "Verdict:"}
             </span>
             <select
               value={selectedVerdict}
               onChange={(e) => setSelectedVerdict(e.target.value)}
-              className="text-xs px-2.5 py-1.5 border border-slate-700 rounded-lg bg-slate-800 text-slate-200 focus:outline-none focus:ring-1 focus:ring-cyan-400"
+              className="text-xs px-2.5 py-1.5 border border-slate-200 rounded-lg bg-white text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#1B365D]"
             >
               <option value="ALL">{language === "hi" ? "सभी निर्णय" : "All Verdicts"}</option>
               <option value="PASS">{language === "hi" ? "उत्तीर्ण (PASS)" : "PASS (Compliant)"}</option>
@@ -396,7 +425,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                 setSelectedVerdict("ALL");
                 setTriageFilter("ALL");
               }}
-              className="text-xs text-rose-400 hover:text-rose-300 font-medium px-2 py-1 underline"
+              className="text-xs text-rose-600 hover:text-rose-700 font-semibold px-2 py-1 underline"
             >
               {language === "hi" ? "फ़िल्टर हटाएं" : "Clear"}
             </button>
@@ -405,7 +434,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
       </div>
 
       {/* Case Register Table */}
-      <div className="glass-panel rounded-xl border border-slate-700/60 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
         {filteredCases.length === 0 ? (
           <div className="p-10 text-center space-y-3">
             <img
@@ -414,7 +443,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
               className="w-32 h-28 mx-auto object-contain"
             />
             <div>
-              <h3 className="text-sm font-bold text-white mb-1">
+              <h3 className="text-sm font-bold text-slate-900 mb-1">
                 {searchTerm || selectedWorkflow !== "ALL" || selectedVerdict !== "ALL" || triageFilter !== "ALL"
                   ? (language === "hi" ? "कोई निरीक्षण मामला आपके फिल्टर से मेल नहीं खाता" : "No inspection cases match your filter")
                   : (language === "hi" ? "कोई भौतिक निरीक्षण मामला पंजीकृत नहीं है" : "No physical inspection cases registered")}
@@ -439,7 +468,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
         ) : (
           <>
             {/* Mobile View: High-Legibility Card Tiles */}
-            <div className="block md:hidden divide-y divide-slate-700/60">
+            <div className="block md:hidden divide-y divide-slate-100">
               {filteredCases.map((c) => {
                 const conf = getCaseConfidence(c);
                 const confPct = Math.min(100, Math.max(0, Math.round(conf * 100)));
@@ -447,35 +476,35 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                   <div
                     key={`mobile-${c.id}`}
                     onClick={() => onSelectCase(c.id)}
-                    className="p-3.5 hover:bg-slate-800/50 cursor-pointer space-y-2 transition-colors"
+                    className="p-3.5 hover:bg-blue-50/50 cursor-pointer space-y-2 transition-colors"
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-mono text-xs font-bold text-cyan-400 truncate">
+                      <span className="font-mono text-xs font-bold text-[#1B365D] truncate">
                         {c.inspection_number}
                       </span>
                       <VerdictBadge verdict={c.overall_status} size="sm" />
                     </div>
                     <div>
-                      <div className="font-semibold text-white text-xs truncate">
-                        {c.product_name}
+                      <div className="font-semibold text-slate-900 text-xs truncate">
+                        {getFormattedProductName(c)}
                       </div>
-                      <div className="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
+                      <div className="text-[11px] text-slate-500 font-medium flex items-center gap-1 mt-0.5">
                         <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
                         <span className="truncate">{c.establishment_name || (language === "hi" ? "खुदरा डिपो" : "Retail Depot")} • {c.location || c.jurisdiction_id}</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 pt-0.5">
-                      <span className="text-[10px] text-slate-400 font-medium">{language === "hi" ? "विश्वसनीयता" : "Confidence"}: {confPct}%</span>
-                      <div className="h-1.5 w-20 overflow-hidden rounded-full bg-slate-700">
+                      <span className="text-[10px] text-slate-600 font-semibold">{language === "hi" ? "विश्वसनीयता" : "Confidence"}: {confPct}%</span>
+                      <div className="h-1.5 w-20 overflow-hidden rounded-full bg-slate-100 border border-slate-200">
                         <div
                           className={`h-full rounded-full transition-all ${
-                            confPct >= 90 ? "bg-emerald-500" : confPct >= 70 ? "bg-amber-400" : "bg-rose-500"
+                            confPct >= 90 ? "bg-emerald-500" : confPct >= 70 ? "bg-amber-500" : "bg-rose-500"
                           }`}
                           style={{ width: `${confPct}%` }}
                         />
                       </div>
                     </div>
-                    <div className="pt-2 border-t border-slate-700/60 flex items-center justify-between text-[11px] text-slate-400">
+                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
                       <div className="font-mono text-[10px] flex items-center gap-1">
                         <CalendarDays className="w-3 h-3 text-slate-400 shrink-0" />
                         <span>{formatDateTime(c.created_at)} • {formatInspectionType(c.inspection_type)}</span>
@@ -487,7 +516,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                             e.stopPropagation();
                             setCaseToDelete(c);
                           }}
-                          className="p-1 text-slate-400 hover:text-rose-400 hover:bg-rose-950/40 rounded transition-colors"
+                          className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded transition-colors"
                           title={language === "hi" ? "मामला हटाएं" : "Delete Case"}
                           aria-label={`Delete case ${c.inspection_number}`}
                         >
@@ -499,7 +528,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                             e.stopPropagation();
                             onSelectCase(c.id);
                           }}
-                          className="text-xs font-bold text-cyan-400 hover:underline"
+                          className="text-xs font-bold text-[#1B365D] hover:underline"
                         >
                           {language === "hi" ? "जांचें →" : "Inspect →"}
                         </button>
@@ -512,8 +541,8 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
 
             {/* Desktop View: Full Data Table with Workstation Micro-Interactions */}
             <div className="hidden md:block overflow-x-auto">
-              <table className="min-w-full divide-y divide-slate-700/60 text-left">
-              <thead className="bg-slate-800/90 text-[11px] font-bold text-slate-300 uppercase tracking-wider">
+              <table className="min-w-full divide-y divide-slate-200 text-left">
+              <thead className="bg-slate-50 text-[11px] font-bold text-slate-600 uppercase tracking-wider border-b border-slate-200">
                 <tr>
                   <th scope="col" className="px-4 py-3">{language === "hi" ? "केस आईडी / दिनांक एवं समय" : "Case ID / Date & Time"}</th>
                   <th scope="col" className="px-4 py-3">{language === "hi" ? "वस्तु एवं ब्रांड" : "Commodity & Brand"}</th>
@@ -525,7 +554,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                   <th scope="col" className="px-4 py-3 text-right">{language === "hi" ? "कार्रवाई" : "Action"}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-700/60 text-xs text-slate-300">
+              <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
                 {filteredCases.map((c) => {
                   const conf = getCaseConfidence(c);
                   const confPct = Math.min(100, Math.max(0, Math.round(conf * 100)));
@@ -533,19 +562,19 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                     <tr
                       key={c.id}
                       onClick={() => onSelectCase(c.id)}
-                      className="hover:bg-slate-800/50 cursor-pointer transition-colors group"
+                      className="hover:bg-blue-50/50 cursor-pointer transition-colors group"
                     >
                       {/* Case ID & Date */}
                       <td className="px-4 py-3.5 whitespace-nowrap">
-                        <div className="font-mono font-bold text-cyan-400 flex items-center gap-1">
+                        <div className="font-mono font-bold text-[#1B365D] flex items-center gap-1.5">
                           {c.inspection_number}
                           {c.is_mock_fixture && (
-                            <span className="text-[10px] font-mono font-normal px-1 rounded bg-slate-800 text-slate-400 border border-slate-700">
+                            <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200">
                               DEMO
                             </span>
                           )}
                         </div>
-                        <div className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1">
+                        <div className="text-[11px] text-slate-500 font-medium mt-0.5 flex items-center gap-1">
                           <CalendarDays className="w-3 h-3 text-slate-400 shrink-0" />
                           <span>{formatDateTime(c.created_at)}</span>
                         </div>
@@ -553,20 +582,20 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
 
                       {/* Commodity & Brand */}
                       <td className="px-4 py-3.5">
-                        <div className="font-semibold text-white max-w-xs truncate" title={c.product_name}>
-                          {c.product_name}
+                        <div className="font-bold text-slate-900 max-w-xs truncate group-hover:text-[#1B365D] transition-colors" title={getFormattedProductName(c)}>
+                          {getFormattedProductName(c)}
                         </div>
-                        <div className="text-[11px] text-slate-400 mt-0.5">
+                        <div className="text-[11px] text-slate-500 font-medium mt-0.5">
                           {c.brand_name || (language === "hi" ? "गैर-ब्रांडेड / सामान्य" : "Unbranded / Generics")}
                         </div>
                       </td>
 
                       {/* Establishment & Location */}
                       <td className="px-4 py-3.5">
-                        <div className="text-slate-200 max-w-xs truncate" title={c.establishment_name || (language === "hi" ? "क्षेत्र व्यापारी" : "Field Trader")}>
+                        <div className="text-slate-800 font-medium max-w-xs truncate" title={c.establishment_name || (language === "hi" ? "क्षेत्र व्यापारी" : "Field Trader")}>
                           {c.establishment_name || (language === "hi" ? "क्षेत्र जब्ती" : "Field Seizure")}
                         </div>
-                        <div className="text-[11px] text-slate-400 max-w-xs truncate flex items-center gap-1 mt-0.5">
+                        <div className="text-[11px] text-slate-500 font-medium max-w-xs truncate flex items-center gap-1 mt-0.5">
                           <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
                           <span className="truncate">{c.location || c.jurisdiction_id}</span>
                         </div>
@@ -574,7 +603,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
 
                       {/* Inspection Type */}
                       <td className="px-4 py-3.5 whitespace-nowrap">
-                        <span className="text-slate-300">
+                        <span className="text-slate-700 font-medium">
                           {formatInspectionType(c.inspection_type)}
                         </span>
                       </td>
@@ -582,16 +611,16 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                       {/* Confidence Micro-Progress Bar */}
                       <td className="px-4 py-3.5 whitespace-nowrap">
                         <div className="w-24">
-                          <span className="text-[11px] font-mono font-bold text-slate-300">
+                          <span className="text-[11px] font-mono font-bold text-slate-700">
                             {confPct}%
                           </span>
-                          <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-slate-700">
+                          <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-slate-100 border border-slate-200">
                             <div
                               className={`h-full rounded-full transition-all ${
                                 confPct >= 90
                                   ? "bg-emerald-500"
                                   : confPct >= 70
-                                  ? "bg-amber-400"
+                                  ? "bg-amber-500"
                                   : "bg-rose-500"
                               }`}
                               style={{ width: `${confPct}%` }}
@@ -625,7 +654,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                               e.stopPropagation();
                               setCaseToDelete(c);
                             }}
-                            className="p-1.5 text-rose-400 hover:text-white bg-rose-950/40 hover:bg-rose-600 border border-rose-800/60 hover:border-rose-600 rounded-md transition-all flex items-center justify-center shrink-0 shadow-2xs"
+                            className="p-1.5 text-slate-400 hover:text-rose-600 bg-white hover:bg-rose-50 border border-slate-200 hover:border-rose-200 rounded-lg transition-all flex items-center justify-center shrink-0 shadow-2xs"
                             title={language === "hi" ? "मामला स्थायी रूप से हटाएं" : "Permanently Delete Case"}
                             aria-label={`Delete case ${c.inspection_number}`}
                           >
@@ -637,7 +666,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                               e.stopPropagation();
                               onSelectCase(c.id);
                             }}
-                            className="px-2.5 py-1 text-xs font-semibold text-cyan-400 group-hover:text-slate-950 group-hover:bg-cyan-400 border border-cyan-500/50 rounded transition-colors"
+                            className="px-2.5 py-1 text-xs font-bold text-[#1B365D] group-hover:text-white group-hover:bg-[#1B365D] border border-blue-200 rounded-lg transition-colors cursor-pointer"
                           >
                             {language === "hi" ? "केस खोलें →" : "Open Case →"}
                           </button>
@@ -655,17 +684,18 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
 
       {/* Deletion Confirmation Modal */}
       {caseToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-xs p-4 animate-overlay-in">
-          <div className="bg-slate-900 rounded-xl max-w-md w-full p-6 shadow-2xl border border-slate-700 space-y-4 animate-pop-in">
-            <div className="flex items-start gap-3">
-              <div className="p-2.5 bg-rose-950/80 text-rose-400 border border-rose-800/60 rounded-full shrink-0">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4 animate-overlay-in">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4 animate-pop-in relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FF9933] via-white to-[#138808]" />
+            <div className="flex items-start gap-3 pt-1">
+              <div className="p-2.5 bg-rose-50 text-rose-600 border border-rose-100 rounded-full shrink-0">
                 <Trash2 size={22} />
               </div>
               <div>
-                <h3 className="text-base font-bold text-white">
+                <h3 className="text-base font-bold text-slate-900">
                   {language === "hi" ? "मामला निरस्त एवं स्थायी निष्कासन" : "Dispose & Permanently Delete Case"}
                 </h3>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-xs text-slate-500 mt-1 font-medium">
                   {language === "hi"
                     ? "डेटाबेस से यह मामला एवं सभी संबंधित विधिक विवरण पूरी तरह हटा दिए जाएंगे।"
                     : "This inspection case and all related statutory details will be permanently removed from the database sitewide."}
@@ -673,22 +703,22 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
               </div>
             </div>
 
-            <div className="p-3 bg-slate-800/80 rounded-lg border border-slate-700 text-xs space-y-1.5">
+            <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs space-y-1.5">
               <div className="flex justify-between">
-                <span className="text-slate-400">{language === "hi" ? "केस संख्या:" : "Case Number:"}</span>
-                <span className="font-mono font-bold text-cyan-400">{caseToDelete.inspection_number}</span>
+                <span className="text-slate-500 font-medium">{language === "hi" ? "केस संख्या:" : "Case Number:"}</span>
+                <span className="font-mono font-bold text-slate-900">{caseToDelete.inspection_number}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">{language === "hi" ? "उत्पाद / वस्तु:" : "Product / Commodity:"}</span>
-                <span className="font-semibold text-white truncate max-w-[220px]">{caseToDelete.product_name}</span>
+                <span className="text-slate-500 font-medium">{language === "hi" ? "उत्पाद / वस्तु:" : "Product / Commodity:"}</span>
+                <span className="font-semibold text-slate-900 truncate max-w-[220px]">{caseToDelete.product_name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">{language === "hi" ? "दिनांक एवं समय:" : "Date & Time:"}</span>
-                <span className="font-mono text-slate-300">{formatDateTime(caseToDelete.created_at)}</span>
+                <span className="text-slate-500 font-medium">{language === "hi" ? "दिनांक एवं समय:" : "Date & Time:"}</span>
+                <span className="font-mono text-slate-800">{formatDateTime(caseToDelete.created_at)}</span>
               </div>
             </div>
 
-            <p className="text-[11px] text-rose-300 bg-rose-950/40 p-2.5 rounded border border-rose-800/60">
+            <p className="text-[11px] text-rose-700 bg-rose-50 p-2.5 rounded border border-rose-200">
               <b>{language === "hi" ? "सांविधिक चेतावनी: " : "Statutory Warning: "}</b>
               {language === "hi"
                 ? "यह कार्रवाई पूर्ववत नहीं की जा सकती। सभी साक्ष्य छवियां, बीओयू निर्देशांक, नियम निष्कर्ष एवं नोटिस स्थायी रूप से नष्ट हो जाएंगे।"
@@ -724,7 +754,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                     setDeletingCaseId(null);
                   }
                 }}
-                className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 disabled:opacity-50 rounded-lg flex items-center gap-1.5 transition-colors shadow-xs"
+                className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 disabled:opacity-50 rounded-lg flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer"
               >
                 {deletingCaseId === caseToDelete.id ? (
                   <>

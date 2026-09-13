@@ -50,34 +50,34 @@ export const StatutoryDemoShowcase: React.FC<StatutoryDemoShowcaseProps> = ({
     switch (verdict) {
       case "FAIL":
         return {
-          pill: "bg-red-950/80 text-red-400 border-red-800/60",
-          cardBorder: "border-rose-900/50 hover:border-rose-600 bg-slate-900/90 hover:shadow-lg",
-          accentText: "text-rose-400",
-          tagBg: "bg-rose-950/40 border-rose-900/50",
+          pill: "bg-rose-50 text-rose-700 border-rose-200",
+          cardBorder: "border-slate-200 hover:border-rose-300 bg-white hover:shadow-md",
+          accentText: "text-rose-700",
+          tagBg: "bg-rose-50/80 border-rose-200",
           icon: ShieldAlert,
         };
       case "PASS":
         return {
-          pill: "bg-emerald-950/80 text-emerald-400 border-emerald-800/60",
-          cardBorder: "border-emerald-900/50 hover:border-emerald-600 bg-slate-900/90 hover:shadow-lg",
-          accentText: "text-emerald-400",
-          tagBg: "bg-emerald-950/40 border-emerald-900/50",
+          pill: "bg-emerald-50 text-emerald-700 border-emerald-200",
+          cardBorder: "border-slate-200 hover:border-emerald-300 bg-white hover:shadow-md",
+          accentText: "text-emerald-700",
+          tagBg: "bg-emerald-50/80 border-emerald-200",
           icon: ShieldCheck,
         };
       case "REVIEW":
         return {
-          pill: "bg-amber-950/80 text-amber-400 border-amber-800/60",
-          cardBorder: "border-amber-900/50 hover:border-amber-600 bg-slate-900/90 hover:shadow-lg",
-          accentText: "text-amber-400",
-          tagBg: "bg-amber-950/40 border-amber-900/50",
+          pill: "bg-amber-50 text-amber-800 border-amber-200",
+          cardBorder: "border-slate-200 hover:border-amber-300 bg-white hover:shadow-md",
+          accentText: "text-amber-800",
+          tagBg: "bg-amber-50/80 border-amber-200",
           icon: Scale,
         };
       case "UNABLE_TO_VERIFY":
         return {
-          pill: "bg-slate-800/80 text-slate-300 border-slate-600/60",
-          cardBorder: "border-slate-700/50 hover:border-slate-500 bg-slate-900/90 hover:shadow-lg",
-          accentText: "text-slate-300",
-          tagBg: "bg-slate-800/40 border-slate-700/50",
+          pill: "bg-slate-100 text-slate-700 border-slate-200",
+          cardBorder: "border-slate-200 hover:border-slate-300 bg-white hover:shadow-md",
+          accentText: "text-slate-700",
+          tagBg: "bg-slate-50 border-slate-200",
           icon: Compass,
         };
     }
@@ -87,10 +87,10 @@ export const StatutoryDemoShowcase: React.FC<StatutoryDemoShowcaseProps> = ({
     <section
       id="demo-showcase"
       aria-label="Statutory Demonstration Suite"
-      className="glass-panel rounded-2xl border border-slate-700/60 shadow-sm overflow-hidden space-y-4 scroll-mt-24"
+      className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden space-y-4 scroll-mt-24"
     >
       {/* Top National Header Bar */}
-      <div className="bg-gradient-to-r from-govNavy via-govNavy to-slate-900 text-white p-5 sm:p-6 border-b-2 border-amber-500">
+      <div className="bg-[#1B365D] text-white p-5 sm:p-6 border-b-2 border-amber-500">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1.5 max-w-3xl">
             <div className="flex flex-wrap items-center gap-2">
@@ -111,7 +111,7 @@ export const StatutoryDemoShowcase: React.FC<StatutoryDemoShowcaseProps> = ({
                 : "Statutory Demonstration & Evaluation Hub"}
             </h2>
 
-            <p className="text-xs text-slate-300 leading-relaxed">
+            <p className="text-xs text-blue-100 leading-relaxed">
               {language === "hi"
                 ? "एलएमपीसी नियम, 2011, तालिका-I फॉन्ट अनुसूची एवं धारा 63 भारतीय साक्ष्य अधिनियम, 2023 के तहत वास्तविक परिदृश्यों का 1-क्लिक परीक्षण करें। प्रत्येक परिदृश्य पूर्ण ओसीआर, अंशांकन और नियम परिणाम प्रस्तुत करता है।"
                 : "Test end-to-end statutory verification workflows with pre-certified demonstration scenarios. Each case includes high-resolution packaging frames, calibrated ArUco homography, multilingual OCR, rule AST evaluations, and Section 63 BSA 2023 Merkle certificates."}
@@ -123,7 +123,7 @@ export const StatutoryDemoShowcase: React.FC<StatutoryDemoShowcaseProps> = ({
             <button
               type="button"
               onClick={() => handleOpenCase("SKU-DEMO-01")}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-black text-xs bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 shadow-md hover:shadow-lg transition-all border border-amber-600 ring-2 ring-amber-400/40"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs bg-amber-400 hover:bg-amber-500 text-slate-950 shadow-xs transition-all border border-amber-500 cursor-pointer"
             >
               <Play size={15} className="fill-slate-950" />
               <span>
@@ -134,8 +134,8 @@ export const StatutoryDemoShowcase: React.FC<StatutoryDemoShowcaseProps> = ({
         </div>
 
         {/* Filter Pills Navigation */}
-        <div className="flex flex-wrap items-center gap-1.5 mt-5 pt-3 border-t border-slate-700/60">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1">
+        <div className="flex flex-wrap items-center gap-1.5 mt-5 pt-3 border-t border-white/10">
+          <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider mr-1">
             {language === "hi" ? "फ़िल्टर परिदृश्य:" : "Filter Scenarios:"}
           </span>
           {[
@@ -174,7 +174,7 @@ export const StatutoryDemoShowcase: React.FC<StatutoryDemoShowcaseProps> = ({
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   isActive
                     ? "bg-amber-400 text-slate-950 shadow-xs"
-                    : "bg-govNavy-dark/80 text-slate-300 hover:text-white hover:bg-govNavy-light border border-slate-700"
+                    : "bg-[#0A2540] text-slate-200 hover:text-white hover:bg-[#143154] border border-blue-900/50"
                 }`}
               >
                 {tab.label}
@@ -197,10 +197,6 @@ export const StatutoryDemoShowcase: React.FC<StatutoryDemoShowcaseProps> = ({
               language === "hi" && item.headlineViolationHi
                 ? item.headlineViolationHi
                 : item.headlineViolation;
-            const label =
-              language === "hi" && item.verdictLabelHi
-                ? item.verdictLabelHi
-                : item.verdictLabel;
 
             return (
               <div
@@ -209,12 +205,12 @@ export const StatutoryDemoShowcase: React.FC<StatutoryDemoShowcaseProps> = ({
               >
                 <div className="space-y-3">
                   {/* Card Header: Tag, Counter & Verdict */}
-                  <div className="flex items-center justify-between gap-2 border-b border-slate-700/60 pb-2.5">
+                  <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
                     <div className="flex items-center gap-1.5">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-mono font-black bg-slate-800 text-cyan-300 border border-slate-700">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-mono font-black bg-slate-100 text-[#1B365D] border border-slate-200">
                         DEMO #{item.scenarioNumber}
                       </span>
-                      <span className="text-[10px] font-mono font-bold text-slate-400">
+                      <span className="text-[10px] font-mono font-bold text-slate-500">
                         {item.skuId}
                       </span>
                     </div>
@@ -229,7 +225,7 @@ export const StatutoryDemoShowcase: React.FC<StatutoryDemoShowcaseProps> = ({
 
                   {/* Thumbnail & Title Row */}
                   <div className="flex gap-3 items-start">
-                    <div className="w-16 h-16 rounded-lg bg-slate-800 border border-slate-700 overflow-hidden shrink-0 flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-lg bg-slate-50 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center">
                       <img
                         src={item.imagePath}
                         alt={title}
@@ -242,13 +238,13 @@ export const StatutoryDemoShowcase: React.FC<StatutoryDemoShowcaseProps> = ({
                       />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-extrabold text-sm text-white line-clamp-1" title={title}>
+                      <h3 className="font-extrabold text-sm text-slate-900 line-clamp-1" title={title}>
                         {title}
                       </h3>
-                      <p className="text-[11px] text-slate-400 font-medium truncate mt-0.5">
+                      <p className="text-[11px] text-slate-500 font-medium truncate mt-0.5">
                         {category} • {item.packageType}
                       </p>
-                      <span className="inline-block mt-1 text-[10px] font-mono text-cyan-400">
+                      <span className="inline-block mt-1 text-[10px] font-mono text-[#1B365D] font-bold">
                         {item.inspectionNumber}
                       </span>
                     </div>
@@ -265,20 +261,20 @@ export const StatutoryDemoShowcase: React.FC<StatutoryDemoShowcaseProps> = ({
                   </div>
 
                   {/* Statutory Metric Telemetry Badge */}
-                  <div className="grid grid-cols-2 gap-2 text-[11px] bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/60">
+                  <div className="grid grid-cols-2 gap-2 text-[11px] bg-slate-50 p-2.5 rounded-lg border border-slate-200">
                     <div>
-                      <span className="text-[10px] text-slate-400 uppercase font-bold block">
+                      <span className="text-[10px] text-slate-500 uppercase font-bold block">
                         {language === "hi" ? "पीडीपी क्षेत्रफल" : "PDP Area"}
                       </span>
-                      <span className="font-mono font-extrabold text-slate-200">
+                      <span className="font-mono font-extrabold text-slate-900">
                         {item.pdpAreaCm2} cm²
                       </span>
                     </div>
                     <div>
-                      <span className="text-[10px] text-slate-400 uppercase font-bold block">
+                      <span className="text-[10px] text-slate-500 uppercase font-bold block">
                         {language === "hi" ? "तालिका-I न्यूनतम फॉन्ट" : "Table-I Min Font"}
                       </span>
-                      <span className="font-mono font-extrabold text-slate-200">
+                      <span className="font-mono font-extrabold text-slate-900">
                         {item.observedFontMm
                           ? `${item.observedFontMm} mm (Req >= ${item.expectedFontMm} mm)`
                           : `>= ${item.expectedFontMm} mm`}
@@ -287,25 +283,25 @@ export const StatutoryDemoShowcase: React.FC<StatutoryDemoShowcaseProps> = ({
                   </div>
 
                   {/* Primary Statutory Reference */}
-                  <div className="text-[11px] text-slate-400 font-mono truncate">
-                    <span className="font-bold text-slate-500 mr-1">Rule:</span>
+                  <div className="text-[11px] text-slate-500 font-mono truncate">
+                    <span className="font-bold text-slate-700 mr-1">Rule:</span>
                     <span>{item.statutoryRules[0]}</span>
                   </div>
                 </div>
 
                 {/* Card Actions */}
-                <div className="mt-4 pt-3 border-t border-slate-700/60 flex items-center justify-between gap-2">
-                  <span className="text-[10.5px] font-mono font-semibold text-slate-400">
+                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                  <span className="text-[10.5px] font-mono font-semibold text-slate-500">
                     Sec 63 BSA 2023
                   </span>
 
                   <button
                     type="button"
                     onClick={() => handleOpenCase(item.caseId)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold bg-amber-400 text-slate-950 hover:bg-amber-300 transition-all shadow-xs"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-[#1B365D] text-white hover:bg-[#0A2540] transition-all shadow-xs"
                   >
                     <span>{language === "hi" ? "केस एवं परिणाम देखें" : "Inspect Demo"}</span>
-                    <ArrowRight size={13} className="text-slate-950" />
+                    <ArrowRight size={13} className="text-white" />
                   </button>
                 </div>
               </div>

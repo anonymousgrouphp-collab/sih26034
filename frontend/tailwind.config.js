@@ -11,49 +11,47 @@ export default {
         // `text-base` font-size utility (23 usages in src) and hijacks it
         // into a color utility. The page canvas uses #0b1320 directly
         // (surfaceBg below now carries the same value).
-        surface: "#132238",
-        saffron: "#e5a93c",
-        // NOTE: assigning a single string to `cyan` would replace Tailwind's
-        // entire default cyan scale (cyan-50…950), silently killing every
-        // `cyan-<shade>` utility used across src. Keep the full scale and
-        // pin the brand accent as DEFAULT (#38bdf8, WCAG focus-ring color).
+        surface: "#FFFFFF",
+        saffron: "#FF9933",
         cyan: {
-          DEFAULT: "#38bdf8",
-          50: "#ecfeff",
-          100: "#cffafe",
-          200: "#a5f3fc",
-          300: "#67e8f9",
-          400: "#22d3ee",
-          500: "#06b6d4",
-          600: "#0891b2",
-          700: "#0e7490",
-          800: "#155e75",
-          900: "#164e63",
-          950: "#083344",
+          DEFAULT: "#0284c7",
+          50: "#f0f9ff",
+          100: "#e0f2fe",
+          200: "#bae6fd",
+          300: "#7dd3fc",
+          400: "#38bdf8",
+          500: "#0ea5e9",
+          600: "#0284c7",
+          700: "#0369a1",
+          800: "#075985",
+          900: "#0c4a6e",
+          950: "#082f49",
         },
-        success: "#138A4B",
-        // Official Statutory & Institutional Tokens (09_UI_UX_BLUEPRINT.md)
+        success: "#10b981",
+        // Official Statutory & Institutional Tokens (Government of India Certified Deep Navy)
         govNavy: {
-          DEFAULT: "#1B365D", // Ashoka Deep Navy
-          light: "#2E5B9A",
-          dark: "#0F2038",
+          DEFAULT: "#1B365D", // Official Indian Sovereign Navy Blue
+          light: "#244B7E",
+          dark: "#0A2540",
+          deep: "#071A2F",
         },
         navy: {
-          50: "#eef3f8",
-          100: "#dce6f0",
-          200: "#bacddd",
-          300: "#8da9c1",
-          400: "#5e83a6",
-          500: "#3d6387",
-          600: "#294f73",
-          700: "#1B365D",
-          800: "#162d4d",
-          900: "#102238",
+          50: "#f0f4f9",
+          100: "#dbe5f1",
+          200: "#b8cde3",
+          300: "#8bb0d2",
+          400: "#5d90bf",
+          500: "#3d73a7",
+          600: "#2d5a87",
+          700: "#24486d",
+          800: "#1B365D",
+          900: "#0A2540",
         },
         government: {
           navy: "#1B365D",
-          saffron: "#E87817",
-          green: "#138A4B",
+          saffron: "#FF9933",
+          green: "#138808",
+          gold: "#D97706",
         },
         // 4-State Epistemic Compliance Tokens
         verdictPass: {
@@ -76,9 +74,10 @@ export default {
           light: "#F1F5F9",   // Slate 100 tint
           dark: "#334155",
         },
-        // Surface and Panel Tokens
-        surfaceBg: "#0b1320",
-        panelBg: "#132238",
+        // Surface and Panel Tokens (Crisp Institutional White & Slate)
+        surfaceBg: "#F8FAFC",
+        panelBg: "#FFFFFF",
+        panelBorder: "#E2E8F0",
       },
       fontFamily: {
         sans: ['"Inter"', '"Roboto"', '"Plus Jakarta Sans"', "sans-serif"],

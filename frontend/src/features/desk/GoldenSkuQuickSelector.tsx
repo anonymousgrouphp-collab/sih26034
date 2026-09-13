@@ -239,39 +239,10 @@ export const GoldenSkuQuickSelector: React.FC<GoldenSkuQuickSelectorProps> = ({
 }) => {
   const { language } = useLanguage();
 
-  const getBadgeStyle = (verdict: GoldenSkuItem["verdict"]) => {
-    switch (verdict) {
-      case "FAIL":
-        return "bg-red-950/80 text-red-400 border-red-900/80";
-      case "PASS":
-        return "bg-emerald-950/80 text-emerald-400 border-emerald-900/80";
-      case "REVIEW":
-        return "bg-amber-950/80 text-amber-400 border-amber-900/80";
-      case "UNABLE":
-        return "bg-purple-950/80 text-purple-400 border-purple-900/80";
-    }
-  };
-
-  const getCardBorder = (verdict: GoldenSkuItem["verdict"], isSelected: boolean) => {
-    if (isSelected) {
-      return "border-amber-400 ring-2 ring-amber-400/50 bg-slate-900";
-    }
-    switch (verdict) {
-      case "FAIL":
-        return "border-rose-900/40 hover:border-rose-600 bg-slate-900/90";
-      case "PASS":
-        return "border-emerald-900/40 hover:border-emerald-600 bg-slate-900/90";
-      case "REVIEW":
-        return "border-amber-900/40 hover:border-amber-600 bg-slate-900/90";
-      case "UNABLE":
-        return "border-purple-900/40 hover:border-purple-600 bg-slate-900/90";
-    }
-  };
-
   if (isCompact) {
     return (
-      <div className="flex items-center gap-1.5 overflow-x-auto py-1">
-        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap mr-1">
+      <div className="flex items-center gap-1.5 overflow-x-auto py-1 no-scrollbar">
+        <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap mr-1">
           {language === "hi" ? "डेमो एसकेयू:" : "Demo SKUs:"}
         </span>
         {GOLDEN_SKU_ITEMS.map((item) => {
@@ -285,23 +256,23 @@ export const GoldenSkuQuickSelector: React.FC<GoldenSkuQuickSelectorProps> = ({
               key={item.skuId}
               type="button"
               onClick={() => onSelectSku(item.caseId)}
-              className={`px-2.5 py-1 rounded text-xs font-mono font-medium flex items-center gap-1.5 border transition shrink-0 ${
+              className={`px-2.5 py-1 rounded-lg text-xs font-mono font-medium flex items-center gap-1.5 border transition shrink-0 cursor-pointer ${
                 isSelected
-                  ? "bg-amber-400 text-slate-950 font-bold border-amber-300 shadow-sm"
-                  : "bg-slate-800/80 text-slate-300 hover:bg-slate-700 border-slate-700/80"
+                  ? "bg-[#1B365D] text-white font-bold border-[#1B365D] shadow-xs"
+                  : "bg-white text-slate-700 hover:bg-slate-50 border-slate-300 shadow-2xs"
               }`}
               title={`${itemName} — ${itemDesc}`}
             >
               <span>{item.skuId}</span>
               <span
-                className={`text-[9px] font-bold px-1 py-0.2 rounded border ${
+                className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${
                   item.verdict === "FAIL"
-                    ? "bg-red-950/80 text-red-400 border-red-800/60"
+                    ? "bg-rose-50 text-rose-700 border-rose-200"
                     : item.verdict === "PASS"
-                    ? "bg-emerald-950/80 text-emerald-400 border-emerald-800/60"
+                    ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                     : item.verdict === "REVIEW"
-                    ? "bg-amber-950/80 text-amber-400 border-amber-800/60"
-                    : "bg-purple-950/80 text-purple-400 border-purple-800/60"
+                    ? "bg-amber-50 text-amber-700 border-amber-200"
+                    : "bg-purple-50 text-purple-700 border-purple-200"
                 }`}
               >
                 {label}
@@ -314,28 +285,28 @@ export const GoldenSkuQuickSelector: React.FC<GoldenSkuQuickSelectorProps> = ({
   }
 
   return (
-    <div className="glass-panel border border-slate-700/60 rounded-xl p-4 sm:p-5 shadow-sm space-y-3.5">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 border-b border-slate-700/60 pb-3">
+    <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-xs space-y-3.5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 border-b border-slate-100 pb-3">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+          <div className="w-6 h-6 rounded-lg bg-[#1B365D]/10 border border-[#1B365D]/20 flex items-center justify-center text-[#1B365D] shrink-0">
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
           </div>
           <div>
-            <h3 className="text-xs font-bold text-amber-400 uppercase tracking-wider">
+            <h3 className="text-xs font-bold text-[#1B365D] uppercase tracking-wider">
               {language === "hi"
                 ? "स्वर्ण प्रदर्शन एसकेयू (पूर्व-प्रमाणित परीक्षण परिदृश्य)"
                 : "Golden Demonstration SKUs (Pre-Certified Test Scenarios)"}
             </h3>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-slate-500 font-medium">
               {language === "hi"
                 ? "एलएमपीसी नियम, 2011 के अंतर्गत तत्काल पूर्ण सांविधिक सत्यापन हेतु 1-क्लिक लोड"
                 : "1-Click load for instant end-to-end statutory verification under LMPC Rules, 2011"}
             </p>
           </div>
         </div>
-        <span className="text-[11px] font-mono text-cyan-400 hidden sm:inline">
+        <span className="text-[11px] font-mono text-slate-500 font-medium hidden sm:inline">
           {language === "hi" ? "6 स्वर्ण परीक्षण मामले तैयार" : "6 Golden Test Cases Ready"}
         </span>
       </div>
@@ -344,15 +315,15 @@ export const GoldenSkuQuickSelector: React.FC<GoldenSkuQuickSelectorProps> = ({
         {GOLDEN_SKU_ITEMS.map((item) => {
           const isSelected = activeSkuId === item.skuId || activeSkuId === item.caseId;
           const badgeStyles = {
-            FAIL: "bg-red-950/80 text-red-400 border-red-800/60",
-            PASS: "bg-emerald-950/80 text-emerald-400 border-emerald-800/60",
-            REVIEW: "bg-amber-950/80 text-amber-400 border-amber-800/60",
-            UNABLE: "bg-slate-800/80 text-slate-300 border-slate-600/60",
+            FAIL: "bg-rose-50 text-rose-700 border-rose-200",
+            PASS: "bg-emerald-50 text-emerald-700 border-emerald-200",
+            REVIEW: "bg-amber-50 text-amber-700 border-amber-200",
+            UNABLE: "bg-purple-50 text-purple-700 border-purple-200",
           };
 
           const cardStyles = isSelected
-            ? "border-amber-400 ring-2 ring-amber-400/40 bg-slate-800/90 shadow-sm"
-            : "border-slate-700/60 bg-slate-800/40 hover:bg-slate-800/80 hover:border-slate-600";
+            ? "border-[#1B365D] ring-2 ring-[#1B365D]/20 bg-blue-50/40 shadow-xs"
+            : "border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 shadow-xs";
 
           const label = language === "hi" && item.verdictLabelHi ? item.verdictLabelHi : item.verdictLabel;
           const itemName = language === "hi" && item.nameHi ? item.nameHi : item.name;
@@ -364,11 +335,11 @@ export const GoldenSkuQuickSelector: React.FC<GoldenSkuQuickSelectorProps> = ({
               key={item.skuId}
               type="button"
               onClick={() => onSelectSku(item.caseId)}
-              className={`p-3 rounded-lg text-left transition-all duration-200 border flex flex-col justify-between group focus:outline-none focus:ring-2 focus:ring-amber-400 ${cardStyles}`}
+              className={`p-3 rounded-xl text-left transition-all duration-200 border flex flex-col justify-between group focus:outline-none focus:ring-2 focus:ring-[#1B365D] cursor-pointer ${cardStyles}`}
             >
               <div>
                 <div className="flex justify-between items-center text-[10px] mb-1.5">
-                  <span className="font-mono font-bold text-slate-400 group-hover:text-cyan-300">
+                  <span className="font-mono font-bold text-slate-500 group-hover:text-[#1B365D]">
                     {item.skuId}
                   </span>
                   <span
@@ -377,17 +348,17 @@ export const GoldenSkuQuickSelector: React.FC<GoldenSkuQuickSelectorProps> = ({
                     {label}
                   </span>
                 </div>
-                <div className="text-xs font-bold text-white group-hover:text-amber-300 transition-colors line-clamp-1">
+                <div className="text-xs font-bold text-slate-900 group-hover:text-[#1B365D] transition-colors line-clamp-1">
                   {itemName}
                 </div>
-                <div className="text-[11px] text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+                <div className="text-[11px] text-slate-600 mt-1 line-clamp-2 leading-relaxed">
                   {itemDesc}
                 </div>
               </div>
 
-              <div className="mt-2.5 pt-2 border-t border-slate-700/60 text-[10px] font-mono text-slate-400 truncate flex items-center justify-between">
+              <div className="mt-2.5 pt-2 border-t border-slate-100 text-[10px] font-mono text-slate-500 truncate flex items-center justify-between">
                 <span className="truncate">{citation}</span>
-                <span className="text-amber-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity ml-1">→</span>
+                <span className="text-[#1B365D] font-bold opacity-0 group-hover:opacity-100 transition-opacity ml-1">→</span>
               </div>
             </button>
           );

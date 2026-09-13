@@ -4,6 +4,7 @@ import { ApiService } from "../services/api";
 import { InspectionCase } from "../types/inspection";
 import { VerdictBadge } from "../components/common/StatusBadge";
 import { useLanguage } from "../context/LanguageContext";
+import { useAuth } from "../context/AuthContext";
 import { getJurisdictionCircle } from "../context/CircleContext";
 import {
   ArrowLeft,
@@ -24,6 +25,7 @@ export const EvidenceDossier: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { language } = useLanguage();
+  const { user } = useAuth();
 
   const [caseData, setCaseData] = useState<InspectionCase | null>(null);
   const [targetCaseId, setTargetCaseId] = useState<string | null>(id || null);
@@ -219,7 +221,9 @@ export const EvidenceDossier: React.FC = () => {
         brand_name: caseData.brand_name,
         manufacturer_name: caseData.manufacturer_name,
         overall_status: caseData.overall_status,
-        officer_id: caseData.officer_id,
+        officer_id: user?.badgeNumber || caseData.officer_id || "INSP-DL-0842",
+        officer_name: user?.name || "Rajesh Sharma",
+        officer_designation: user?.designation || "Legal Metrology Officer (Gazetted)",
         jurisdiction_id: caseData.jurisdiction_id,
         created_at: caseData.created_at,
       },
@@ -253,9 +257,9 @@ export const EvidenceDossier: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="glass-panel p-12 text-center space-y-3 border border-slate-700/60 rounded-xl">
-        <div className="w-8 h-8 border-4 border-govNavy border-t-transparent rounded-full animate-spin mx-auto" />
-        <p className="text-xs font-bold text-slate-400">
+      <div className="bg-white p-12 text-center space-y-3 border border-slate-200 rounded-xl shadow-xs">
+        <div className="w-8 h-8 border-4 border-[#1B365D] border-t-transparent rounded-full animate-spin mx-auto" />
+        <p className="text-xs font-bold text-slate-600">
           {language === "hi"
             ? "इलेक्ट्रॉनिक साक्ष्य संचिका (डोज़ियर) संकलित की जा रही है..."
             : "Compiling electronic evidence dossier..."}
@@ -267,14 +271,14 @@ export const EvidenceDossier: React.FC = () => {
   if (!caseData) {
     if (!loadError && !targetCaseId) {
       return (
-        <div className="glass-panel p-10 text-center space-y-4 max-w-xl mx-auto border border-slate-700/60 rounded-xl">
-          <div className="w-12 h-12 rounded-full bg-slate-700/50 text-slate-400 flex items-center justify-center mx-auto">
+        <div className="bg-white p-10 text-center space-y-4 max-w-xl mx-auto border border-slate-200 rounded-xl shadow-xs">
+          <div className="w-12 h-12 rounded-xl bg-slate-100 text-[#1B365D] flex items-center justify-center mx-auto border border-slate-200">
             <FileArchive size={24} />
           </div>
-          <h2 className="text-base font-bold text-slate-100">
+          <h2 className="text-base font-bold text-slate-900">
             {language === "hi" ? "कोई साक्ष्य संचिका उपलब्ध नहीं है" : "No Evidence Dossier Available"}
           </h2>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto">
+          <p className="text-xs text-slate-600 max-w-sm mx-auto">
             {language === "hi"
               ? "रजिस्टर में कोई सक्रिय निरीक्षण मामला नहीं मिला। कृपया केस पंजी से एक मामला चुनें या नया निरीक्षण पंजीकृत करें।"
               : "No active inspection cases found in the register. Please select a case from the Inspection Desk or register a new commodity inspection."}
@@ -292,14 +296,14 @@ export const EvidenceDossier: React.FC = () => {
     }
 
     return (
-      <div className="glass-panel p-10 text-center space-y-4 max-w-xl mx-auto border border-slate-700/60 rounded-xl">
-        <div className="w-12 h-12 rounded-full bg-rose-900/30 text-rose-400 flex items-center justify-center mx-auto">
+      <div className="bg-white p-10 text-center space-y-4 max-w-xl mx-auto border border-slate-200 rounded-xl shadow-xs">
+        <div className="w-12 h-12 rounded-xl bg-rose-50 text-rose-700 flex items-center justify-center mx-auto border border-rose-200">
           <FileArchive size={24} />
         </div>
-        <h2 className="text-base font-bold text-slate-100">
+        <h2 className="text-base font-bold text-slate-900">
           {language === "hi" ? "साक्ष्य संचिका लोड करने में असमर्थ" : "Unable to Load Evidence Dossier"}
         </h2>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-600">
           {loadError ||
             (language === "hi"
               ? `केस आईडी "${targetCaseId || id || "—"}" के लिए साक्ष्य रिकॉर्ड उपलब्ध नहीं है।`
@@ -321,19 +325,19 @@ export const EvidenceDossier: React.FC = () => {
     <div className="space-y-6">
       {/* Print-specific Government Header (Only visible in Print/PDF mode) */}
       <div className="hidden print:block text-center border-b-2 border-slate-900 pb-4 mb-6">
-        <div className="text-[11px] font-bold tracking-widest text-slate-200 uppercase">
+        <div className="text-[11px] font-bold tracking-widest text-slate-700 uppercase">
           Government of India • Ministry of Consumer Affairs, Food & Public Distribution
         </div>
-        <div className="text-sm font-black tracking-wide text-white uppercase mt-0.5">
+        <div className="text-sm font-black tracking-wide text-slate-900 uppercase mt-0.5">
           Department of Consumer Affairs • Legal Metrology Division
         </div>
-        <div className="text-base font-black text-white uppercase mt-2">
+        <div className="text-base font-black text-slate-900 uppercase mt-2">
           Certificate of Electronic Record & Evidence Dossier
         </div>
-        <div className="text-xs font-semibold text-slate-200">
+        <div className="text-xs font-semibold text-slate-700">
           Under Section 63 of Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)
         </div>
-        <div className="flex justify-between items-center text-[10px] font-mono text-slate-400 mt-3 pt-2 border-t border-slate-600">
+        <div className="flex justify-between items-center text-[10px] font-mono text-slate-600 mt-3 pt-2 border-t border-slate-300">
           <span>CERT NO: {certificateNumber}</span>
           <span>DATE: {new Date().toLocaleDateString("en-IN")}</span>
           <span>MERKLE ROOT: {merkleRoot.slice(0, 24)}...</span>
@@ -341,32 +345,32 @@ export const EvidenceDossier: React.FC = () => {
       </div>
 
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-panel p-5 rounded-xl border border-slate-700/60 shadow-2xl print:hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-slate-200/90 shadow-xs print:hidden">
         <div className="flex items-start gap-3">
           <button
             type="button"
             onClick={() => navigate(`/inspections/${caseData.id}`)}
-            className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-900/70/10/10 transition-colors mt-0.5"
+            className="p-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors mt-0.5 border border-slate-200"
             title={language === "hi" ? "निरीक्षण कार्यक्षेत्र पर वापस जाएं" : "Back to Inspection Workspace"}
           >
             <ArrowLeft size={18} />
           </button>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-400/10 border border-amber-400/30 px-2 py-0.5 rounded">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#1B365D] bg-blue-50 border border-blue-200 px-2 py-0.5 rounded">
                 {language === "hi"
                   ? "धारा 63 बीएसए 2023 इलेक्ट्रॉनिक साक्ष्य संचिका (डोज़ियर)"
                   : "Section 63 BSA 2023 Electronic Evidence Dossier"}
               </span>
-              <span className="text-slate-500">•</span>
-              <span className="font-mono text-xs font-bold text-slate-300">
+              <span className="text-slate-400">•</span>
+              <span className="font-mono text-xs font-bold text-slate-700">
                 {caseData.inspection_number}
               </span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-black text-white mt-1">
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 mt-1">
               {language === "hi" ? "साक्ष्य संचिका:" : "Evidence Dossier:"} {caseData.product_name}
             </h1>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5">
               {language === "hi"
                 ? "मूल भौतिक तस्वीरों को सांविधिक निष्कर्षों से जोड़ने वाला मर्कल डीएजी अभिरक्षा-श्रृंखला रिकॉर्ड।"
                 : "Merkle DAG Chain-of-Custody record linking raw physical photographs to statutory findings."}
@@ -405,19 +409,19 @@ export const EvidenceDossier: React.FC = () => {
       </div>
 
       {exportNotice && (
-        <div className="p-3 bg-emerald-900/30 border border-emerald-700 rounded-lg text-xs text-emerald-300 flex items-center gap-2 shadow-xs print:hidden">
-          <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />
+        <div className="p-3 bg-emerald-50 border border-emerald-300 rounded-lg text-xs text-emerald-800 flex items-center gap-2 shadow-xs print:hidden">
+          <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
           <span>{exportNotice}</span>
         </div>
       )}
 
       {/* 3 Summary Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="glass-panel p-4 border border-slate-700/60 rounded-xl">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+        <div className="bg-white p-4 border border-slate-200/90 rounded-xl shadow-xs">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
             {language === "hi" ? "स्रोत साक्ष्य संपत्तियां" : "Source Evidence Assets"}
           </span>
-          <p className="text-2xl font-black text-white mt-1">
+          <p className="text-2xl font-black text-slate-900 mt-1">
             {(caseData.evidence_assets || []).length} {language === "hi" ? "भौतिक तस्वीर" : "Physical Photo(s)"}
           </p>
           <p className="text-[11px] text-slate-500 mt-0.5">
@@ -425,11 +429,11 @@ export const EvidenceDossier: React.FC = () => {
           </p>
         </div>
 
-        <div className="glass-panel p-4 border border-slate-700/60 rounded-xl">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+        <div className="bg-white p-4 border border-slate-200/90 rounded-xl shadow-xs">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
             {language === "hi" ? "निष्कर्षित घोषणाएं" : "Extracted Declarations"}
           </span>
-          <p className="text-2xl font-black text-white mt-1">
+          <p className="text-2xl font-black text-slate-900 mt-1">
             {caseData.extracted_fields?.length || 0} {language === "hi" ? "सांविधिक क्षेत्र" : "Statutory Fields"}
           </p>
           <p className="text-[11px] text-slate-500 mt-0.5">
@@ -437,8 +441,8 @@ export const EvidenceDossier: React.FC = () => {
           </p>
         </div>
 
-        <div className="glass-panel p-4 border border-slate-700/60 rounded-xl">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+        <div className="bg-white p-4 border border-slate-200/90 rounded-xl shadow-xs">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
             {language === "hi" ? "विधिक मापविज्ञान निर्णय" : "Legal Metrology Verdict"}
           </span>
           <div className="mt-1 flex items-center gap-2">
@@ -451,32 +455,32 @@ export const EvidenceDossier: React.FC = () => {
       </div>
 
       {/* 3-Tier Evidence Chain */}
-      <div className="glass-panel overflow-hidden border border-slate-700/60 rounded-xl">
-        <div className="border-b border-slate-700/60 p-4 bg-slate-800/60 flex items-center justify-between">
+      <div className="bg-white overflow-hidden border border-slate-200/90 rounded-xl shadow-xs">
+        <div className="border-b border-slate-200 p-4 bg-slate-50 flex items-center justify-between">
           <div>
-            <h3 className="section-title text-white">
+            <h3 className="section-title text-[#1B365D]">
               {language === "hi" ? "क्रिप्टोग्राफिक साक्ष्य श्रृंखला" : "Cryptographic Evidence Chain"}
             </h3>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5">
               {language === "hi"
                 ? "स्रोत साक्ष्य → अवलोकन → नियम मूल्यांकन → अधिकारी अधिनिर्णय"
                 : "Source Evidence → Observations → Rule Evaluations → Officer Adjudication"}
             </p>
           </div>
-          <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-950/40 px-2.5 py-1 rounded-full border border-emerald-700/60">
-            <ShieldCheck size={14} />
+          <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-300">
+            <ShieldCheck size={14} className="text-emerald-600" />
             <span>{language === "hi" ? "धारा 63 बीएसए 2023 सत्यापित" : "Section 63 BSA 2023 Validated"}</span>
           </div>
         </div>
 
         {/* Tier 1: Original Photographs */}
-        <section className="p-5 border-b border-slate-700/60 space-y-3">
+        <section className="p-5 border-b border-slate-200 space-y-3">
           <div className="flex items-center gap-2">
-            <FileImage size={18} className="text-cyan-400" />
-            <h4 className="text-sm font-bold text-white">
+            <FileImage size={18} className="text-[#1B365D]" />
+            <h4 className="text-sm font-bold text-slate-900">
               {language === "hi" ? "1. मूल पैकेजिंग साक्ष्य तस्वीरें" : "1. Raw Packaging Evidence Photographs"}
             </h4>
-            <span className="text-xs font-mono text-slate-400">
+            <span className="text-xs font-mono text-slate-500">
               ({(caseData.evidence_assets || []).length} {language === "hi" ? "मद" : "item"})
             </span>
           </div>
@@ -495,14 +499,14 @@ export const EvidenceDossier: React.FC = () => {
               return (
               <div
                 key={asset.image_id}
-                className="p-3.5 rounded-lg border border-slate-700/60 bg-slate-800/40 space-y-2 text-xs"
+                className="p-3.5 rounded-lg border border-slate-200 bg-slate-50/70 space-y-2 text-xs"
               >
                 <div className="flex gap-3 items-start">
                   {effectiveSrc && (
                     <img
                       src={effectiveSrc}
                       alt={asset.panel_type}
-                      className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded border border-slate-700/60 bg-slate-900 shrink-0"
+                      className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded border border-slate-200 bg-white shrink-0"
                       onError={(e) => {
                         const target = e.currentTarget;
                         if (asset.image_id && !target.src.includes(`/evidence/image/${asset.image_id}`)) {
@@ -515,17 +519,17 @@ export const EvidenceDossier: React.FC = () => {
                   )}
                   <div className="flex-1 min-w-0 space-y-1">
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-cyan-400 font-mono truncate">{asset.image_id}</span>
-                      <span className="px-2 py-0.5 text-[10px] rounded bg-slate-700 border border-slate-600 text-slate-300">
+                      <span className="font-bold text-[#1B365D] font-mono truncate">{asset.image_id}</span>
+                      <span className="px-2 py-0.5 text-[10px] font-semibold rounded bg-slate-200 border border-slate-300 text-slate-700">
                         {asset.panel_type}
                       </span>
                     </div>
-                    <div className="font-mono text-[11px] text-slate-300 space-y-0.5">
+                    <div className="font-mono text-[11px] text-slate-600 space-y-0.5">
                       <div>
                         {language === "hi" ? "आयाम:" : "Dimensions:"} {asset.image_width || 1920} × {asset.image_height || 1080} px
                       </div>
                       <div className="break-all" title={asset.raw_sha256}>
-                        SHA-256: <span className="text-white font-bold">{asset.raw_sha256 || "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"}</span>
+                        SHA-256: <span className="text-slate-900 font-bold">{asset.raw_sha256 || "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"}</span>
                       </div>
                       <div>
                         {language === "hi"
@@ -533,7 +537,7 @@ export const EvidenceDossier: React.FC = () => {
                           : `Optical Quality: Blur σ²=${asset.quality_gate?.blur_variance?.toFixed(1) || "340.0"} • Glare=${asset.quality_gate?.glare_percentage?.toFixed(1) || "2.1"}%`}
                       </div>
                       {asset.calibration && (
-                        <div className="text-amber-400 font-semibold">
+                        <div className="text-amber-800 font-semibold">
                           {language === "hi" ? "कैलिब्रेशन:" : "Calibration:"} {asset.calibration.method} (Scale: {asset.calibration.px_to_mm.toFixed(3)} mm/px)
                         </div>
                       )}
@@ -547,31 +551,30 @@ export const EvidenceDossier: React.FC = () => {
         </section>
 
         {/* Tier 2: OCR Declarations */}
-        <section className="p-5 border-b border-slate-700/60 space-y-3">
+        <section className="p-5 border-b border-slate-200 space-y-3">
           <div className="flex items-center gap-2">
-            <ScanText size={18} className="text-cyan-400" />
-            <h4 className="text-sm font-bold text-white">
+            <ScanText size={18} className="text-[#1B365D]" />
+            <h4 className="text-sm font-bold text-slate-900">
               {language === "hi" ? "2. बहुभाषी ओसीआर टोकन अवलोकन" : "2. Multilingual OCR Token Observations"}
             </h4>
-            <span className="text-xs font-mono text-slate-400">
+            <span className="text-xs font-mono text-slate-500">
               ({ocrTokens.length} {language === "hi" ? "टोकन निष्कर्षित" : "tokens extracted"})
             </span>
           </div>
 
-          <div className="overflow-x-auto border border-slate-700/60 rounded-lg">
-            <table className="min-w-full divide-y divide-slate-700/60 text-xs">
-              <thead className="bg-slate-800/80 text-[11px] font-bold text-slate-300">
+          <div className="overflow-x-auto border border-slate-200 rounded-lg shadow-2xs">
+            <table className="min-w-full divide-y divide-slate-200 text-xs">
+              <thead className="bg-slate-50 text-[11px] font-bold text-slate-700">
                 <tr>
-                  <th className="py-2 px-3 text-left">{language === "hi" ? "टोकन आईडी" : "Token ID"}</th>
-                  <th className="py-2 px-3 text-left">{language === "hi" ? "निष्कर्षित पाठ" : "Extracted Text"}</th>
-                  <th className="py-2 px-3 text-left">{language === "hi" ? "विश्वसनीयता" : "Confidence"}</th>
-                  <th className="py-2 px-3 text-left">{language === "hi" ? "लिपि" : "Script"}</th>
-                  <th className="py-2 px-3 text-left">{language === "hi" ? "कैलिब्रेटेड ऊंचाई" : "Fiducial Height"}</th>
+                  <th className="py-2.5 px-3 text-left">{language === "hi" ? "टोकन आईडी" : "Token ID"}</th>
+                  <th className="py-2.5 px-3 text-left">{language === "hi" ? "निष्कर्षित पाठ" : "Extracted Text"}</th>
+                  <th className="py-2.5 px-3 text-left">{language === "hi" ? "विश्वसनीयता" : "Confidence"}</th>
+                  <th className="py-2.5 px-3 text-left">{language === "hi" ? "लिपि" : "Script"}</th>
+                  <th className="py-2.5 px-3 text-left">{language === "hi" ? "कैलिब्रेटेड ऊंचाई" : "Fiducial Height"}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-700/60 text-slate-200">
+              <tbody className="divide-y divide-slate-100 text-slate-800 bg-white">
                 {ocrTokens.slice(0, 10).map((token) => {
-                  // Robust font height determination: use measured_font_height_mm or scale math
                   const calculatedHeight = (() => {
                     if (token.measured_font_height_mm && token.measured_font_height_mm > 0) {
                       return `${token.measured_font_height_mm.toFixed(2)} mm`;
@@ -583,7 +586,6 @@ export const EvidenceDossier: React.FC = () => {
                     ) {
                       const heightPx = Math.abs(token.bounding_box[2] - token.bounding_box[0]);
                       const scale = activeAsset?.calibration?.px_to_mm || 0.088;
-                      // If scale > 1.0, it is px/mm so divide; if <= 1.0, it is mm/px so multiply
                       const mm = scale > 1.0 ? heightPx / scale : heightPx * scale;
                       return `${mm.toFixed(2)} mm`;
                     }
@@ -591,16 +593,16 @@ export const EvidenceDossier: React.FC = () => {
                   })();
 
                   return (
-                    <tr key={token.token_id || token.id} className="hover:bg-slate-800/50">
-                      <td className="py-2 px-3 font-mono text-slate-400">{token.token_id || token.id}</td>
-                      <td className="py-2 px-3 font-bold text-white">{token.text || token.raw_ocr_text}</td>
-                      <td className="py-2 px-3 font-mono text-cyan-300">{Math.round((token.confidence || token.ocr_confidence || 0.95) * 100)}%</td>
-                      <td className="py-2 px-3 font-mono text-slate-300">
+                    <tr key={token.token_id || token.id} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="py-2.5 px-3 font-mono text-slate-500">{token.token_id || token.id}</td>
+                      <td className="py-2.5 px-3 font-bold text-slate-900">{token.text || token.raw_ocr_text}</td>
+                      <td className="py-2.5 px-3 font-mono font-semibold text-sky-700">{Math.round((token.confidence || token.ocr_confidence || 0.95) * 100)}%</td>
+                      <td className="py-2.5 px-3 font-medium text-slate-600">
                         {token.language === "hi" || /[\u0900-\u097F]/.test(token.text || "")
                           ? (language === "hi" ? "देवनागरी (हिन्दी)" : "Devanagari (Hindi)")
                           : (language === "hi" ? "लैटिन (अंग्रेज़ी)" : "Latin (English)")}
                       </td>
-                      <td className="py-2 px-3 font-mono font-bold text-emerald-400">
+                      <td className="py-2.5 px-3 font-mono font-bold text-emerald-700">
                         {calculatedHeight}
                       </td>
                     </tr>
@@ -612,13 +614,13 @@ export const EvidenceDossier: React.FC = () => {
         </section>
 
         {/* Tier 3: Statutory Rule Evaluations */}
-        <section className="p-5 border-b border-slate-700/60 space-y-3">
+        <section className="p-5 border-b border-slate-200 space-y-3">
           <div className="flex items-center gap-2">
-            <ShieldCheck size={18} className="text-emerald-400" />
-            <h4 className="text-sm font-bold text-white">
+            <ShieldCheck size={18} className="text-emerald-700" />
+            <h4 className="text-sm font-bold text-slate-900">
               {language === "hi" ? "3. नियतात्मक नियम मूल्यांकन" : "3. Deterministic Rule Evaluations"}
             </h4>
-            <span className="text-xs font-mono text-slate-400">
+            <span className="text-xs font-mono text-slate-500">
               ({rules.length} {language === "hi" ? "सांविधिक जांचें" : "statutory checks"})
             </span>
           </div>
@@ -635,14 +637,14 @@ export const EvidenceDossier: React.FC = () => {
               return (
                 <div
                   key={rule.finding_id}
-                  className="p-3 rounded-lg border border-slate-700/60 bg-slate-800/40 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
+                  className="p-3 rounded-lg border border-slate-200 bg-slate-50/60 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs hover:bg-slate-50 transition-colors"
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono font-bold text-cyan-400">{rule.rule_code}</span>
-                      <span className="font-bold text-slate-200">{rule.statutory_reference}</span>
+                      <span className="font-mono font-bold text-[#1B365D]">{rule.rule_code}</span>
+                      <span className="font-bold text-slate-800">{rule.statutory_reference}</span>
                     </div>
-                    <p className="text-slate-400 text-[11.5px]">
+                    <p className="text-slate-600 text-[11.5px]">
                       {rule.discrepancy || rule.legal_consequence}
                     </p>
                   </div>
@@ -659,36 +661,36 @@ export const EvidenceDossier: React.FC = () => {
         {auditEvents.length > 0 && (
           <section className="p-5 space-y-3">
             <div className="flex items-center gap-2">
-              <Activity size={18} className="text-amber-400" />
-              <h4 className="text-sm font-bold text-white">
+              <Activity size={18} className="text-amber-600" />
+              <h4 className="text-sm font-bold text-slate-900">
                 {language === "hi" ? "4. क्रिप्टोग्राफिक ऑडिट लेज़र (मर्कल ट्रेल)" : "4. Cryptographic Audit Ledger (Merkle Trail)"}
               </h4>
-              <span className="text-xs font-mono text-slate-400">
+              <span className="text-xs font-mono text-slate-500">
                 ({auditEvents.length} {language === "hi" ? "अपरिवर्तनीय प्रविष्टियां" : "immutable entries"})
               </span>
             </div>
 
-            <div className="overflow-x-auto border border-slate-700/60 rounded-lg">
-              <table className="min-w-full divide-y divide-slate-700/60 text-xs">
-                <thead className="bg-slate-800/80 text-[11px] font-bold text-slate-300">
+            <div className="overflow-x-auto border border-slate-200 rounded-lg shadow-2xs">
+              <table className="min-w-full divide-y divide-slate-200 text-xs">
+                <thead className="bg-slate-50 text-[11px] font-bold text-slate-700">
                   <tr>
-                    <th className="py-2 px-3 text-left">#</th>
-                    <th className="py-2 px-3 text-left">{language === "hi" ? "समय मोहर (UTC)" : "Timestamp (UTC)"}</th>
-                    <th className="py-2 px-3 text-left">{language === "hi" ? "कार्यवाई प्रकार" : "Action Type"}</th>
-                    <th className="py-2 px-3 text-left">{language === "hi" ? "अधिकारी / कर्ता" : "Actor"}</th>
-                    <th className="py-2 px-3 text-left">{language === "hi" ? "एसएचए-256 हैश" : "Entry Hash"}</th>
+                    <th className="py-2.5 px-3 text-left">#</th>
+                    <th className="py-2.5 px-3 text-left">{language === "hi" ? "समय मोहर (UTC)" : "Timestamp (UTC)"}</th>
+                    <th className="py-2.5 px-3 text-left">{language === "hi" ? "कार्यवाई प्रकार" : "Action Type"}</th>
+                    <th className="py-2.5 px-3 text-left">{language === "hi" ? "अधिकारी / कर्ता" : "Actor"}</th>
+                    <th className="py-2.5 px-3 text-left">{language === "hi" ? "एसएचए-256 हैश" : "Entry Hash"}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-700/60 font-mono text-[11px] text-slate-300">
+                <tbody className="divide-y divide-slate-100 font-mono text-[11px] text-slate-700 bg-white">
                   {auditEvents.map((evt, idx) => (
-                    <tr key={evt.id || idx} className="hover:bg-slate-800/50">
-                      <td className="py-2 px-3 text-slate-400">{evt.sequence_number || idx + 1}</td>
-                      <td className="py-2 px-3 text-slate-300">
+                    <tr key={evt.id || idx} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="py-2.5 px-3 text-slate-500">{evt.sequence_number || idx + 1}</td>
+                      <td className="py-2.5 px-3 text-slate-600">
                         {evt.timestamp_utc ? new Date(evt.timestamp_utc).toLocaleString("en-IN") : "N/A"}
                       </td>
-                      <td className="py-2 px-3 font-bold text-white">{evt.event_type || evt.event_label}</td>
-                      <td className="py-2 px-3 text-cyan-400 font-semibold">{evt.actor_id}</td>
-                      <td className="py-2 px-3 text-slate-400 truncate max-w-[200px]" title={evt.entry_hash}>
+                      <td className="py-2.5 px-3 font-bold text-slate-900">{evt.event_type || evt.event_label}</td>
+                      <td className="py-2.5 px-3 text-[#1B365D] font-bold">{evt.actor_id}</td>
+                      <td className="py-2.5 px-3 text-slate-500 truncate max-w-[200px]" title={evt.entry_hash}>
                         {evt.entry_hash ? `${evt.entry_hash.slice(0, 16)}...` : "TAMPER_EVIDENT_OK"}
                       </td>
                     </tr>
@@ -701,41 +703,41 @@ export const EvidenceDossier: React.FC = () => {
       </div>
 
       {/* Section 63 BSA 2023 Digital Certificate Statement */}
-      <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/30 p-5 space-y-3">
-        <div className="flex items-center gap-2 font-bold text-emerald-300 text-sm">
-          <Lock size={18} className="text-emerald-400" />
+      <div className="rounded-xl border border-emerald-300 bg-emerald-50/80 p-5 space-y-3 shadow-xs">
+        <div className="flex items-center gap-2 font-bold text-emerald-900 text-sm">
+          <Lock size={18} className="text-emerald-700" />
           <span>
             {language === "hi"
               ? "धारा 63 भारतीय साक्ष्य अधिनियम, 2023 साक्ष्य संबंधी निश्चर (इनवेरिएंट्स)"
               : "Section 63 Bharatiya Sakshya Adhiniyam, 2023 Evidentiary Invariants"}
           </span>
         </div>
-        <p className="text-xs text-emerald-200/90 leading-relaxed">
+        <p className="text-xs text-emerald-950/80 leading-relaxed">
           {language === "hi"
             ? "यह डिजिटल प्रमाणपत्र भारतीय साक्ष्य अधिनियम, 1872 की निरस्त धारा 65B का स्थान लेने वाले भारतीय साक्ष्य अधिनियम, 2023 (बीएसए 2023) की धारा 63 की अनिवार्य आवश्यकताओं का अनुपालन करता है। सभी क्रिप्टोग्राफिक हैश, डिवाइस पैरामीटर और अधिकारी टाइमस्टैम्प मर्कल डीएजी लेज़र में अपरिवर्तनीय रूप से अंकित हैं।"
             : "This digital certificate complies with the mandatory requirements of Section 63 of Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023), superseding repealed Section 65B of the Indian Evidence Act, 1872. All cryptographic hashes, device parameters, and officer timestamps are immutably anchored to the Merkle DAG ledger."}
         </p>
-        <div className="p-3 bg-emerald-950/60 rounded-lg border border-emerald-500/30 font-mono text-[11px] text-emerald-200 space-y-1">
+        <div className="p-3.5 bg-white rounded-lg border border-emerald-200 font-mono text-[11px] text-slate-700 space-y-1.5 shadow-2xs">
           <div>
-            <span className="font-bold">{language === "hi" ? "प्रमाणपत्र आईडी:" : "Cert ID:"}</span> {certificateNumber}
+            <span className="font-bold text-slate-900">{language === "hi" ? "प्रमाणपत्र आईडी:" : "Cert ID:"}</span> {certificateNumber}
           </div>
           <div className="break-all">
-            <span className="font-bold">{language === "hi" ? "मर्कल रूट हैश:" : "Merkle Root:"}</span> {merkleRoot}
+            <span className="font-bold text-slate-900">{language === "hi" ? "मर्कल रूट हैश:" : "Merkle Root:"}</span> {merkleRoot}
           </div>
           <div>
-            <span className="font-bold">{language === "hi" ? "अधिनिर्णायक अधिकारी:" : "Adjudicating Officer:"}</span>{" "}
-            {dossierCert?.adjudicating_officer || caseData.officer_id || "Rajesh Sharma (INSP-DL-0842)"}
+            <span className="font-bold text-slate-900">{language === "hi" ? "अधिनिर्णायक अधिकारी:" : "Adjudicating Officer:"}</span>{" "}
+            {user ? `${user.name} (${user.badgeNumber})` : (dossierCert?.adjudicating_officer || caseData.officer_id || "Rajesh Sharma (INSP-DL-0842)")}
           </div>
           <div>
-            <span className="font-bold">{language === "hi" ? "क्षेत्राधिकार सर्कल:" : "Jurisdiction Circle:"}</span>{" "}
+            <span className="font-bold text-slate-900">{language === "hi" ? "क्षेत्राधिकार सर्कल:" : "Jurisdiction Circle:"}</span>{" "}
             {language === "hi"
               ? getJurisdictionCircle(caseData.jurisdiction_id).labelHi
               : getJurisdictionCircle(caseData.jurisdiction_id).label}
           </div>
           <div>
-            <span className="font-bold">{language === "hi" ? "समय मोहर:" : "Timestamp:"}</span>{" "}
+            <span className="font-bold text-slate-900">{language === "hi" ? "समय मोहर:" : "Timestamp:"}</span>{" "}
             {new Date().toLocaleDateString(language === "hi" ? "hi-IN" : "en-IN")} •{" "}
-            {language === "hi" ? "छेड़छाड़-रोधी एसएचए-256 लेज़र" : "Tamper-Evident SHA-256 Ledger"}
+            <span className="text-emerald-700 font-bold">{language === "hi" ? "छेड़छाड़-रोधी एसएचए-256 लेज़र" : "Tamper-Evident SHA-256 Ledger"}</span>
           </div>
         </div>
       </div>
