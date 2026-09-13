@@ -44,6 +44,7 @@ import {
   computeCaseReadiness,
   loadPersistedCases,
   deleteMockCase,
+  getDeletedCaseIds,
 } from "./mockData";
 
 export class MockApiService implements IInspectionApiService {
@@ -175,6 +176,15 @@ export class MockApiService implements IInspectionApiService {
   }
 
   public async getInspection(id: string): Promise<InspectionCase> {
+    const deletedIds = getDeletedCaseIds();
+    if (deletedIds.has(id)) {
+      throw {
+        error_code: "CASE_DISPOSED",
+        status: 404,
+        message: `Inspection case ${id} has been permanently disposed and deleted.`,
+      };
+    }
+
     const mockCases = getMockCases();
     let found =
       mockCases[id] ||

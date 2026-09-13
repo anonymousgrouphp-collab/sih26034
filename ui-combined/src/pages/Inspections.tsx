@@ -41,6 +41,18 @@ export const Inspections: React.FC = () => {
     navigate(`/inspections/${newCase.id}`);
   };
 
+  const handleDeleteCase = async (caseId: string) => {
+    // 1. Instant optimistic UI removal
+    setCases((prev) => prev.filter((c) => c.id !== caseId && c.inspection_number !== caseId));
+    try {
+      await ApiService.deleteInspection(caseId);
+    } catch (err) {
+      console.error("Failed to delete case:", err);
+    } finally {
+      await loadCases();
+    }
+  };
+
   return (
     <div className="space-y-4">
       <InspectionDesk
@@ -50,6 +62,7 @@ export const Inspections: React.FC = () => {
         onNewInspectionClick={() => navigate("/inspections/new")}
         isLoading={isLoading}
         onRefresh={loadCases}
+        onDeleteCase={handleDeleteCase}
       />
 
       <NewInspectionModal

@@ -37,6 +37,7 @@ import {
 import { LiveApiService } from "./liveApi";
 import { MockApiService } from "./mockApi";
 import { DemoFixtureService } from "./demoFixtures";
+import { getDeletedCaseIds, saveDeletedCaseId, deleteMockCase } from "./mockData";
 
 export { LiveApiService } from "./liveApi";
 export { MockApiService } from "./mockApi";
@@ -139,12 +140,20 @@ export class ApiService {
     limit?: number;
     offset?: number;
   }): Promise<{ total: number; items: InspectionSummary[] }> {
+    const deletedIds = getDeletedCaseIds();
+
     if (this.operatingMode === "DEMO_FIXTURE") {
-      return await DemoFixtureService.getInstance().listInspections(params);
+      const res = await DemoFixtureService.getInstance().listInspections(params);
+      const filtered = res.items.filter((c) => !deletedIds.has(c.id) && !deletedIds.has(c.inspection_number));
+      return { total: filtered.length, items: filtered };
     }
 
     try {
       const liveResult = await LiveApiService.getInstance().listInspections(params);
+      const filteredLive = liveResult.items.filter(
+        (c) => !deletedIds.has(c.id) && !deletedIds.has(c.inspection_number)
+      );
+
       // Retrieve any unsynced locally staged genuine custom cases to guarantee zero data loss.
       // Strictly ignore all mock/demo fixtures so a cleared live database reflects 0 cases.
       try {
@@ -152,10 +161,12 @@ export class ApiService {
         const localCustom = mockResult.items.filter(
           (c) =>
             !ApiService.isDemoOrFixtureCase(c) &&
-            !liveResult.items.some((lr) => lr.id === c.id || lr.inspection_number === c.inspection_number)
+            !deletedIds.has(c.id) &&
+            !deletedIds.has(c.inspection_number) &&
+            !filteredLive.some((lr) => lr.id === c.id || lr.inspection_number === c.inspection_number)
         );
         if (localCustom.length > 0) {
-          const merged = [...liveResult.items, ...localCustom];
+          const merged = [...filteredLive, ...localCustom];
           merged.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
           return {
             total: merged.length,
@@ -166,10 +177,20 @@ export class ApiService {
         // Ignore mock merge errors
       }
 
-      return liveResult;
+      return {
+        total: filteredLive.length,
+        items: filteredLive,
+      };
     } catch (err: any) {
       console.warn("Live server unreachable for listInspections. Falling back to Mode B local datastore:", err);
-      return await MockApiService.getInstance().listInspections(params);
+      const mockResult = await MockApiService.getInstance().listInspections(params);
+      const filtered = mockResult.items.filter(
+        (c) => !deletedIds.has(c.id) && !deletedIds.has(c.inspection_number)
+      );
+      return {
+        total: filtered.length,
+        items: filtered,
+      };
     }
   }
 
@@ -240,6 +261,15 @@ export class ApiService {
   }
 
   public static async getInspection(id: string): Promise<InspectionCase> {
+    const deletedIds = getDeletedCaseIds();
+    if (deletedIds.has(id)) {
+      throw {
+        error_code: "CASE_DISPOSED",
+        status: 404,
+        message: `Inspection case ${id} has been permanently disposed and deleted.`,
+      };
+    }
+
     if (this.operatingMode === "DEMO_FIXTURE") {
       try {
         const demoCase = await DemoFixtureService.getInstance().getInspection(id);
@@ -493,6 +523,26 @@ export class ApiService {
   public static async deleteInspection(
     inspectionId: string
   ): Promise<{ success: boolean; message: string; deleted_id: string }> {
+    // 1. Immediately record in deleted set
+    saveDeletedCaseId(inspectionId);
+
+    // 2. Discover any alias identifiers (e.g. inspection_number or id)
+    try {
+      const active = this.getActiveService();
+      const existing = await active.getInspection(inspectionId).catch(() => null);
+      if (existing) {
+        if (existing.id) saveDeletedCaseId(existing.id);
+        if (existing.inspection_number) saveDeletedCaseId(existing.inspection_number);
+        if (existing.sku_demo_id) saveDeletedCaseId(existing.sku_demo_id);
+      }
+    } catch {}
+
+    // 3. Purge from mock / local storage
+    try {
+      deleteMockCase(inspectionId);
+    } catch {}
+
+    // 4. Delete from active backend service
     try {
       const active = this.getActiveService();
       if (active.deleteInspection) {

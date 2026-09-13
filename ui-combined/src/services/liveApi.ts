@@ -32,7 +32,7 @@ import {
   RuleFinding,
 } from "../types/inspection";
 import { StorageService } from "./storage";
-import { computeCaseReadiness, deleteMockCase } from "./mockData";
+import { computeCaseReadiness, deleteMockCase, getDeletedCaseIds, saveDeletedCaseId } from "./mockData";
 
 export class LiveApiService implements IInspectionApiService {
   private static instance: LiveApiService;
@@ -229,27 +229,30 @@ export class LiveApiService implements IInspectionApiService {
         throw new Error(`HTTP ${res.status}`);
       }
       const data = await res.json();
-      const items: InspectionSummary[] = (data.items || []).map((r: any) => ({
-        id: r.id,
-        inspection_number: r.inspection_number,
-        product_name: r.product_name,
-        brand_name: r.brand_name,
-        category: r.category || "FOOD_SNACKS",
-        package_type: r.package_type || "RECTANGULAR",
-        workflow_status: r.workflow_status || (r.adjudication_timestamp ? "COMPLETED" : "PENDING_REVIEW"),
-        overall_status: r.overall_status || "PENDING_REVIEW",
-        ai_verdict: r.ai_verdict || "PENDING",
-        jurisdiction_id: r.jurisdiction_id || "CIRCLE_DL_SOUTH_01",
-        created_at: r.created_at || r.inspection_timestamp || new Date().toISOString(),
-        violations_count: 0,
-        adjudicated: !!r.adjudication_timestamp,
-        is_mock_fixture: false,
-      }));
+      const deletedIds = getDeletedCaseIds();
+      const items: InspectionSummary[] = (data.items || [])
+        .filter((r: any) => !deletedIds.has(r.id) && !deletedIds.has(r.inspection_number))
+        .map((r: any) => ({
+          id: r.id,
+          inspection_number: r.inspection_number,
+          product_name: r.product_name,
+          brand_name: r.brand_name,
+          category: r.category || "FOOD_SNACKS",
+          package_type: r.package_type || "RECTANGULAR",
+          workflow_status: r.workflow_status || (r.adjudication_timestamp ? "COMPLETED" : "PENDING_REVIEW"),
+          overall_status: r.overall_status || "PENDING_REVIEW",
+          ai_verdict: r.ai_verdict || "PENDING",
+          jurisdiction_id: r.jurisdiction_id || "CIRCLE_DL_SOUTH_01",
+          created_at: r.created_at || r.inspection_timestamp || new Date().toISOString(),
+          violations_count: 0,
+          adjudicated: !!r.adjudication_timestamp,
+          is_mock_fixture: false,
+        }));
 
       items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
       return {
-        total: data.total || items.length,
+        total: items.length,
         items,
       };
     } catch (e: any) {
@@ -320,6 +323,14 @@ export class LiveApiService implements IInspectionApiService {
   }
 
   public async getInspection(id: string): Promise<InspectionCase> {
+    const deletedIds = getDeletedCaseIds();
+    if (deletedIds.has(id)) {
+      throw {
+        status: 404,
+        message: `Inspection case ${id} has been permanently disposed and deleted.`,
+      };
+    }
+
     try {
       let res = await this.fetchWithAuth(`${this.baseUrl}/inspections/${encodeURIComponent(id)}`);
       if (res.status === 404 && id.startsWith("SKU-DEMO-")) {
@@ -796,14 +807,20 @@ export class LiveApiService implements IInspectionApiService {
   }
 
   public async deleteInspection(inspectionId: string): Promise<{ success: boolean; message: string; deleted_id: string }> {
+    saveDeletedCaseId(inspectionId);
+    this.pipelineArtifactCache.delete(inspectionId);
+    deleteMockCase(inspectionId);
+
     try {
-      const res = await this.fetchWithAuth(`${this.baseUrl}/inspections/${inspectionId}`, {
+      const res = await this.fetchWithAuth(`${this.baseUrl}/inspections/${encodeURIComponent(inspectionId)}`, {
         method: "DELETE",
       });
-      this.pipelineArtifactCache.delete(inspectionId);
-      deleteMockCase(inspectionId);
       if (res.ok) {
         const data = await res.json();
+        if (data?.inspection_number) {
+          saveDeletedCaseId(data.inspection_number);
+          deleteMockCase(data.inspection_number);
+        }
         return {
           success: true,
           message: data?.message || `Inspection case ${inspectionId} has been disposed.`,
@@ -817,8 +834,6 @@ export class LiveApiService implements IInspectionApiService {
       };
     } catch (e: any) {
       console.warn("Live delete failed; applying local fallback disposal:", e);
-      this.pipelineArtifactCache.delete(inspectionId);
-      deleteMockCase(inspectionId);
       return {
         success: true,
         message: `Inspection case ${inspectionId} has been disposed and removed from workspace.`,

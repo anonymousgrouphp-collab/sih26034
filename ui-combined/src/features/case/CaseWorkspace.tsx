@@ -655,6 +655,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
         onBack={onBack}
         isProcessing={isSubmittingEvidence || isAnalyzingPipeline}
         onSelectSku={onSelectCase}
+        onDeleteCase={() => setIsDeleteDialogOpen(true)}
       />
 
       {/* Action Error Banner */}
