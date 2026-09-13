@@ -11,6 +11,7 @@ interface KPICardProps {
   tone?: "normal" | "success" | "warning" | "danger";
   onClick?: () => void;
   delay?: number;
+  statutoryCitation?: string;
 }
 
 const AnimatedCounter: React.FC<{ value: string | number }> = ({ value }) => {
@@ -52,12 +53,13 @@ export const KPICard: React.FC<KPICardProps> = ({
   tone = "normal",
   onClick,
   delay = 0,
+  statutoryCitation,
 }) => {
   const toneClasses = {
     normal: "bg-white border border-slate-200/90 text-slate-900 shadow-xs hover:border-blue-300 hover:shadow-sm",
-    success: "bg-emerald-50/60 border border-emerald-200 text-emerald-950 shadow-xs hover:border-emerald-300 hover:shadow-sm",
-    warning: "bg-amber-50/60 border border-amber-200 text-amber-950 shadow-xs hover:border-amber-300 hover:shadow-sm",
-    danger: "bg-rose-50/60 border border-rose-200 text-rose-950 shadow-xs hover:border-rose-300 hover:shadow-sm",
+    success: "bg-emerald-50/50 border border-emerald-200 text-emerald-950 shadow-xs hover:border-emerald-300 hover:shadow-sm",
+    warning: "bg-amber-50/50 border border-amber-200 text-amber-950 shadow-xs hover:border-amber-300 hover:shadow-sm",
+    danger: "bg-rose-50/50 border border-rose-200 text-rose-950 shadow-xs hover:border-rose-300 hover:shadow-sm",
   };
 
   const iconBgStyles = {
@@ -68,20 +70,33 @@ export const KPICard: React.FC<KPICardProps> = ({
   };
 
   const iconTextClasses = {
-    normal: "text-[#1B365D] border border-blue-200",
-    success: "text-emerald-700 border border-emerald-200",
-    warning: "text-amber-700 border border-amber-200",
-    danger: "text-rose-700 border border-rose-200",
+    normal: "text-[#1B365D] border border-blue-200 shadow-xs",
+    success: "text-emerald-700 border border-emerald-200 shadow-xs",
+    warning: "text-amber-700 border border-amber-200 shadow-xs",
+    danger: "text-rose-700 border border-rose-200 shadow-xs",
   };
 
   return (
     <Reveal delay={delay}>
       <div
         onClick={onClick}
-        className={`card card-lift p-4 sm:p-5 transition-all ${toneClasses[tone]} ${
+        className={`card card-lift p-4 sm:p-5 transition-all relative overflow-hidden ${toneClasses[tone]} ${
           onClick ? "cursor-pointer hover:scale-[1.01]" : ""
         }`}
       >
+        {/* Subtle Sovereign Accent Top Line */}
+        <div
+          className={`absolute top-0 left-0 right-0 h-1 ${
+            tone === "normal"
+              ? "bg-[#1B365D]"
+              : tone === "success"
+              ? "bg-emerald-600"
+              : tone === "danger"
+              ? "bg-rose-600"
+              : "bg-amber-500"
+          }`}
+        />
+
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 truncate">
@@ -112,6 +127,12 @@ export const KPICard: React.FC<KPICardProps> = ({
             </div>
           )}
         </div>
+
+        {statutoryCitation && (
+          <div className="mt-3 pt-2 border-t border-slate-200/70 flex items-center justify-between text-[10px] font-mono text-slate-500">
+            <span className="truncate font-semibold tracking-tight">{statutoryCitation}</span>
+          </div>
+        )}
       </div>
     </Reveal>
   );

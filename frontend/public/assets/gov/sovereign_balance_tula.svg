@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="tulaGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#FDE68A"/>
+      <stop offset="40%" stopColor="#D4AF37"/>
+      <stop offset="80%" stopColor="#9A7B1C"/>
+      <stop offset="100%" stopColor="#684E0B"/>
+    </linearGradient>
+
+    <linearGradient id="panShine" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stopColor="#F5D77F"/>
+      <stop offset="100%" stopColor="#805C06"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Central Vertical Pillar -->
+  <rect x="146" y="55" width="8" height="175" rx="2" fill="url(#tulaGold)"/>
+  <!-- Top Finial Ornaments -->
+  <circle cx="150" cy="45" r="9" fill="url(#tulaGold)"/>
+  <circle cx="150" cy="45" r="4" fill="#0B1D3A"/>
+  <polygon points="144,55 156,55 152,70 148,70" fill="url(#tulaGold)"/>
+
+  <!-- Precision Plumb Line (Center vertical indicator for 0.00g equilibrium) -->
+  <line x1="150" y1="70" x2="150" y2="180" stroke="#EF4444" stroke-width="1.2" stroke-dasharray="3 2"/>
+  <polygon points="150,186 146,178 154,178" fill="#EF4444"/>
+
+  <!-- Main Balance Beam (Horizontal Arched Pivot) -->
+  <path d="M 50,86 Q 150,70 250,86" fill="none" stroke="url(#tulaGold)" stroke-width="6" stroke-linecap="round"/>
+  <!-- Pivot Bearing Housing -->
+  <circle cx="150" cy="74" r="11" fill="#0B1D3A" stroke="url(#tulaGold)" stroke-width="2.5"/>
+  <circle cx="150" cy="74" r="5" fill="url(#tulaGold)"/>
+
+  <!-- Left Pan Assembly -->
+  <!-- Left Knife-Edge Agate Bearing -->
+  <circle cx="50" cy="86" r="4.5" fill="url(#tulaGold)"/>
+  <!-- Left Cords -->
+  <line x1="50" y1="86" x2="20" y2="165" stroke="url(#tulaGold)" stroke-width="1.5"/>
+  <line x1="50" y1="86" x2="50" y2="165" stroke="url(#tulaGold)" stroke-width="1.5"/>
+  <line x1="50" y1="86" x2="80" y2="165" stroke="url(#tulaGold)" stroke-width="1.5"/>
+  <!-- Left Pan Dish -->
+  <path d="M 12,165 Q 50,190 88,165 Z" fill="url(#panShine)" stroke="#AA7C11" stroke-width="1.2"/>
+  <!-- Reference Weights in Left Pan (1kg & 500g Brass Weights) -->
+  <path d="M 38,162 L 40,146 L 50,146 L 52,162 Z" fill="url(#tulaGold)" stroke="#684E0B" stroke-width="0.8"/>
+  <circle cx="45" cy="144" r="2.5" fill="url(#tulaGold)"/>
+  <path d="M 54,163 L 55,152 L 62,152 L 63,163 Z" fill="url(#tulaGold)" stroke="#684E0B" stroke-width="0.8"/>
+
+  <!-- Right Pan Assembly -->
+  <!-- Right Knife-Edge Agate Bearing -->
+  <circle cx="250" cy="86" r="4.5" fill="url(#tulaGold)"/>
+  <!-- Right Cords -->
+  <line x1="250" y1="86" x2="220" y2="165" stroke="url(#tulaGold)" stroke-width="1.5"/>
+  <line x1="250" y1="86" x2="250" y2="165" stroke="url(#tulaGold)" stroke-width="1.5"/>
+  <line x1="250" y1="86" x2="280" y2="165" stroke="url(#tulaGold)" stroke-width="1.5"/>
+  <!-- Right Pan Dish -->
+  <path d="M 212,165 Q 250,190 288,165 Z" fill="url(#panShine)" stroke="#AA7C11" stroke-width="1.2"/>
+  <!-- Verified Test Sample Pack in Right Pan -->
+  <rect x="238" y="145" width="24" height="20" rx="2" fill="#1B365D" stroke="url(#tulaGold)" stroke-width="1"/>
+  <line x1="240" y1="150" x2="260" y2="150" stroke="#FF9933" stroke-width="1.2"/>
+
+  <!-- Heavy Stepped Cast-Iron Foot / Calibration Base -->
+  <polygon points="120,230 180,230 196,258 104,258" fill="url(#tulaGold)" stroke="#AA7C11" stroke-width="1.5"/>
+  <rect x="88" y="258" width="124" height="10" rx="3" fill="#0B1D3A" stroke="url(#tulaGold)" stroke-width="2"/>
+
+  <!-- Levelling Screws on Base -->
+  <circle cx="98" cy="272" r="3.5" fill="url(#tulaGold)"/>
+  <circle cx="202" cy="272" r="3.5" fill="url(#tulaGold)"/>
+</svg>

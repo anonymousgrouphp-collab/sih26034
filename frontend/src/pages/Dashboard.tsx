@@ -191,13 +191,32 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Executive Inspection Control Centre Command Hero */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-        {/* National Portal Tricolor Ribbon */}
-        <div className="h-1.5 bg-gradient-to-r from-[#FF9933] via-white to-[#138808]" />
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden relative">
+        {/* Subtle Sovereign Security Guilloche Background Pattern */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-40 mix-blend-multiply"
+          style={{
+            backgroundImage: "url('/assets/gov/gov_guilloche_pattern.svg')",
+            backgroundRepeat: "repeat",
+            backgroundSize: "400px 200px",
+          }}
+          aria-hidden="true"
+        />
 
-        <div className="p-5 sm:p-6 space-y-4">
+        {/* National Portal Tricolor Ribbon */}
+        <div className="h-1.5 bg-gradient-to-r from-[#FF9933] via-white to-[#138808] relative z-10" />
+
+        <div className="p-5 sm:p-6 space-y-4 relative z-10">
           {/* Top Row: Authority & Badges */}
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-4 relative">
+            {/* Sovereign Directorate Seal Watermark (Right aligned background accent) */}
+            <img
+              src="/assets/gov/doca_legal_metrology_seal.svg"
+              alt="Directorate Seal Watermark"
+              className="hidden xl:block absolute right-72 -top-3 w-20 h-20 opacity-20 pointer-events-none select-none"
+              aria-hidden="true"
+            />
+
             <div className="flex items-start gap-4">
               {/* Sovereign State Emblem of India (Unboxed & Majestic) */}
               <div className="shrink-0 flex items-center justify-center pt-0.5">
@@ -336,12 +355,13 @@ export const Dashboard: React.FC = () => {
       >
         <KPICard
           delay={0.1}
-          title={t("metric.total", "Total Inspections")}
+          title={t("metric.total", "Total Registered Cases")}
           value={metrics.total}
           trend={language === "hi" ? "+12% इस सप्ताह" : "+12% this week"}
           trendPositive={true}
           subtext={t("metric.total_sub", "Recorded across all circles")}
-          icon={<ClipboardCheck size={22} />}
+          statutoryCitation={language === "hi" ? "विधिक माप अधिनियम, 2009 की धारा 15 पंजी" : "Sec. 15 Legal Metrology Act, 2009 Register"}
+          icon={<img src="/assets/gov/doca_legal_metrology_seal.svg" alt="Directorate Seal" className="w-6 h-6 object-contain" />}
           tone="normal"
           onClick={() => navigate("/inspections")}
         />
@@ -352,7 +372,8 @@ export const Dashboard: React.FC = () => {
           trend={language === "hi" ? `${metrics.passed} उत्तीर्ण` : `${metrics.passed} Pass`}
           trendPositive={metrics.complianceRate >= 70}
           subtext={t("metric.passed_sub", "Table-I & Rule 6 compliant")}
-          icon={<ShieldCheck size={22} />}
+          statutoryCitation={language === "hi" ? "तालिका-I व नियम 6 के अंतर्गत पूर्ण अनुपालन" : "Table-I & Rule 6 Statutory Benchmark Passed"}
+          icon={<img src="/assets/gov/lmpc_rule6_verified_badge.svg" alt="LMPC Verified" className="w-6 h-6 object-contain" />}
           tone={metrics.complianceRate >= 70 ? "success" : "warning"}
           onClick={() => navigate("/inspections?verdict=PASS")}
         />
@@ -363,7 +384,8 @@ export const Dashboard: React.FC = () => {
           trend={language === "hi" ? `${metrics.failed} कार्रवाई योग्य` : `${metrics.failed} Actionable`}
           trendPositive={false}
           subtext={t("metric.failed_sub", "Contraventions established")}
-          icon={<AlertTriangle size={22} />}
+          statutoryCitation={language === "hi" ? "धारा 36(1) नोटिस योग्य विधिक उल्लंघन" : "Sec. 36(1) Compounding Notice Ready"}
+          icon={<AlertTriangle size={22} className="text-rose-700" />}
           tone="danger"
           onClick={() => navigate("/inspections?verdict=FAIL")}
         />
@@ -378,7 +400,8 @@ export const Dashboard: React.FC = () => {
           }
           trendPositive={metrics.pendingTotal === 0}
           subtext={t("metric.review_sub", "Requires officer sign-off")}
-          icon={<FileWarning size={22} />}
+          statutoryCitation={language === "hi" ? "नियम 24 संवेदक अनिश्चितता व मानव सत्यापन" : "Rule 24 Sensor Uncertainty & Adjudication Desk"}
+          icon={<img src="/assets/gov/sovereign_balance_tula.svg" alt="Metrology Tula" className="w-6 h-6 object-contain" />}
           tone="warning"
           onClick={() => navigate("/review-queue")}
         />
@@ -391,13 +414,15 @@ export const Dashboard: React.FC = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Link
           to="/inspections/new"
-          className="group p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md transition-all text-left"
+          className="group p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md transition-all text-left relative overflow-hidden"
         >
           <div className="flex items-center justify-between mb-1.5">
             <div className="p-2 rounded-lg bg-amber-50 text-amber-800 group-hover:bg-[#1B365D] group-hover:text-white transition-colors">
               <Camera size={18} />
             </div>
-            <ArrowRight size={14} className="text-slate-400 group-hover:text-[#1B365D] transition-transform group-hover:translate-x-0.5" />
+            <span className="font-mono text-[9px] font-bold px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200">
+              Rule 2(h)
+            </span>
           </div>
           <h4 className="text-xs font-bold text-slate-900 group-hover:text-[#1B365D] transition-colors">
             {t("dash.quick_scan", "Physical Label Scan")}
@@ -409,13 +434,15 @@ export const Dashboard: React.FC = () => {
 
         <Link
           to="/inspections/new?mode=ecommerce"
-          className="group p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md transition-all text-left"
+          className="group p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md transition-all text-left relative overflow-hidden"
         >
           <div className="flex items-center justify-between mb-1.5">
             <div className="p-2 rounded-lg bg-blue-50 text-blue-800 group-hover:bg-[#1B365D] group-hover:text-white transition-colors">
               <FileText size={18} />
             </div>
-            <ArrowRight size={14} className="text-slate-400 group-hover:text-[#1B365D] transition-transform group-hover:translate-x-0.5" />
+            <span className="font-mono text-[9px] font-bold px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200">
+              GSR 594(E)
+            </span>
           </div>
           <h4 className="text-xs font-bold text-slate-900 group-hover:text-[#1B365D] transition-colors">
             {t("dash.quick_ecom", "E-Commerce Listing Audit")}
@@ -427,13 +454,15 @@ export const Dashboard: React.FC = () => {
 
         <Link
           to="/inspections"
-          className="group p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md transition-all text-left"
+          className="group p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md transition-all text-left relative overflow-hidden"
         >
           <div className="flex items-center justify-between mb-1.5">
             <div className="p-2 rounded-lg bg-emerald-50 text-emerald-800 group-hover:bg-[#1B365D] group-hover:text-white transition-colors">
               <ShieldCheck size={18} />
             </div>
-            <ArrowRight size={14} className="text-slate-400 group-hover:text-[#1B365D] transition-transform group-hover:translate-x-0.5" />
+            <span className="font-mono text-[9px] font-bold px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200">
+              Rule 29
+            </span>
           </div>
           <h4 className="text-xs font-bold text-slate-900 group-hover:text-[#1B365D] transition-colors">
             {t("dash.quick_notice", "Issue Form-1 Notice")}
@@ -445,13 +474,15 @@ export const Dashboard: React.FC = () => {
 
         <Link
           to="/settings"
-          className="group p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md transition-all text-left"
+          className="group p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md transition-all text-left relative overflow-hidden"
         >
           <div className="flex items-center justify-between mb-1.5">
             <div className="p-2 rounded-lg bg-indigo-50 text-indigo-800 group-hover:bg-[#1B365D] group-hover:text-white transition-colors">
               <Sliders size={18} />
             </div>
-            <ArrowRight size={14} className="text-slate-400 group-hover:text-[#1B365D] transition-transform group-hover:translate-x-0.5" />
+            <span className="font-mono text-[9px] font-bold px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200">
+              BSA § 63
+            </span>
           </div>
           <h4 className="text-xs font-bold text-slate-900 group-hover:text-[#1B365D] transition-colors">
             {t("dash.quick_settings", "Station Settings")}
@@ -718,18 +749,26 @@ export const Dashboard: React.FC = () => {
         {/* Right 4 Cols: Human-in-the-Loop Triage & Golden SKU Quick Demos */}
         <div className="lg:col-span-4 space-y-4">
           {/* Review Queue Triage Callout */}
-          <div className="p-5 border border-amber-300 bg-amber-50/70 space-y-3 rounded-xl shadow-xs">
-            <div className="flex items-center justify-between">
+          <div className="p-5 border border-amber-300 bg-amber-50/80 space-y-3 rounded-xl shadow-xs relative overflow-hidden">
+            {/* Subtle Directorate Seal Background Watermark */}
+            <img
+              src="/assets/gov/doca_legal_metrology_seal.svg"
+              alt="Seal"
+              className="absolute -right-6 -bottom-6 w-32 h-32 opacity-10 pointer-events-none select-none"
+              aria-hidden="true"
+            />
+
+            <div className="flex items-center justify-between relative z-10">
               <div className="flex items-center gap-2 text-amber-900 font-extrabold text-sm">
                 <Users size={18} className="text-amber-700" />
                 <span>{t("dash.triage_needed", "Officer Triage Needed")}</span>
               </div>
-              <span className="px-2 py-0.5 text-xs font-mono font-black rounded-full bg-amber-200/80 text-amber-900">
+              <span className="px-2 py-0.5 text-xs font-mono font-black rounded-full bg-amber-200/80 text-amber-900 border border-amber-300">
                 {metrics.pendingTotal} {t("dash.cases_count", "Cases")}
               </span>
             </div>
 
-            <p className="text-xs text-amber-900/80 leading-relaxed">
+            <p className="text-xs text-amber-900/85 leading-relaxed relative z-10">
               {t(
                 "dash.triage_desc",
                 "Automated rules have identified borderline measurements within sensor uncertainty limits or degraded photographs requiring human officer adjudication."
@@ -738,7 +777,7 @@ export const Dashboard: React.FC = () => {
 
             <Link
               to="/review-queue"
-              className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold flex items-center justify-center gap-2 text-xs py-2 rounded-lg shadow-sm transition-colors"
+              className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold flex items-center justify-center gap-2 text-xs py-2 rounded-lg shadow-sm transition-colors relative z-10"
             >
               <span>{t("dash.open_review_queue", "Open Review Queue")}</span>
               <ArrowRight size={14} />
@@ -746,10 +785,15 @@ export const Dashboard: React.FC = () => {
           </div>
 
           {/* Golden SKU Quick Demonstration Shortcuts */}
-          <div className="bg-white p-5 space-y-3 rounded-xl border border-slate-200 shadow-xs">
-            <div className="flex items-center gap-2">
-              <Sparkles size={16} className="text-[#1B365D]" />
-              <p className="font-bold text-slate-900 text-sm">{t("dash.golden_skus", "Pre-loaded Golden SKUs")}</p>
+          <div className="bg-white p-5 space-y-3 rounded-xl border border-slate-200 shadow-xs relative overflow-hidden">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <img src="/assets/gov/sovereign_balance_tula.svg" alt="Tula" className="w-5 h-5 object-contain shrink-0" />
+                <p className="font-bold text-slate-900 text-sm">{t("dash.golden_skus", "Pre-loaded Golden SKUs")}</p>
+              </div>
+              <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200">
+                LMPC 2011
+              </span>
             </div>
             <p className="text-xs text-slate-500 leading-relaxed">
               {t(
@@ -807,7 +851,7 @@ export const Dashboard: React.FC = () => {
                   key={sku.id}
                   type="button"
                   onClick={() => navigate(`/inspections/${sku.id}`)}
-                  className="w-full flex items-center justify-between p-2.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-blue-50/60 hover:border-[#1B365D]/40 text-left transition-colors text-xs group"
+                  className="w-full flex items-center justify-between p-2.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-blue-50/60 hover:border-[#1B365D]/40 text-left transition-colors text-xs group cursor-pointer"
                 >
                   <div className="min-w-0 pr-2">
                     <div className="flex items-center gap-1.5">
@@ -837,17 +881,27 @@ export const Dashboard: React.FC = () => {
           </div>
 
           {/* Section 63 BSA 2023 Digital Evidence Guarantee */}
-          <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl space-y-2 shadow-xs">
-            <div className="flex items-center gap-2 text-emerald-900 font-bold text-xs">
-              <ShieldCheck size={16} className="text-emerald-700" />
-              <span>{t("dash.sec63_title", "Section 63 BSA 2023 Evidentiary Invariant")}</span>
+          <div className="p-4 bg-emerald-50/80 border border-emerald-300 rounded-xl shadow-xs relative overflow-hidden flex items-start gap-3">
+            <img
+              src="/assets/gov/sec63_bsa_cert_badge.svg"
+              alt="BSA 2023 Tamper Proof Seal"
+              className="w-12 h-12 shrink-0 mt-0.5"
+            />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 text-emerald-950 font-bold text-xs">
+                <span>{t("dash.sec63_title", "Section 63 BSA 2023 Evidentiary Guarantee")}</span>
+              </div>
+              <p className="text-[11px] text-emerald-900/90 leading-relaxed mt-1">
+                {t(
+                  "dash.sec63_desc",
+                  "Electronic evidence certificates adhere strictly to Bharatiya Sakshya Adhiniyam, 2023. Repealed Section 65B Indian Evidence Act 1872 references are strictly forbidden."
+                )}
+              </p>
+              <div className="flex items-center gap-2 mt-1.5 text-[10px] font-mono font-bold text-emerald-800">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                <span>RFC 3161 NIC-TSA Timestamped • SHA-256 Validated</span>
+              </div>
             </div>
-            <p className="text-[11px] text-emerald-800 leading-relaxed">
-              {t(
-                "dash.sec63_desc",
-                "Electronic evidence certificates adhere strictly to Bharatiya Sakshya Adhiniyam, 2023. Repealed Section 65B Indian Evidence Act 1872 references are strictly forbidden."
-              )}
-            </p>
           </div>
         </div>
       </div>

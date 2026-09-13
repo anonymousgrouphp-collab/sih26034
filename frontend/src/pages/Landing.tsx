@@ -21,7 +21,7 @@ import { StatutoryPipelineInfographic } from "../components/common/StatutoryPipe
 import { useLanguage } from "../context/LanguageContext";
 import { m } from "framer-motion";
 import { Reveal } from "../components/common/motion";
-import { IndiaGateHeroBackdrop } from "../components/common/IndiaGateHeroBackdrop";
+import { SovereignMetrologyHeroBackdrop } from "../components/common/SovereignMetrologyHeroBackdrop";
 import { NationalLeadershipBanner } from "../components/common/NationalLeadershipBanner";
 import { StatutoryOmnibox } from "../components/common/StatutoryOmnibox";
 import { StateEmblem } from "../components/common/StateEmblem";
@@ -105,8 +105,8 @@ export const Landing: React.FC = () => {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/30 via-[#1B365D] to-[#142A4A] pointer-events-none" />
           <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-500/10 blur-[120px] rounded-full mix-blend-screen pointer-events-none [animation:glowPulse_4s_ease-in-out_infinite]" />
           
-          {/* India Gate Dusk Architectural Vector Backdrop */}
-          <IndiaGateHeroBackdrop />
+          {/* Sovereign Metrology Architectural & Colonnade Backdrop */}
+          <SovereignMetrologyHeroBackdrop />
 
           <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center space-y-7 z-10">
             {/* Centered Sovereign State Emblem & Department Authority (Exact india.gov.in Pattern) */}

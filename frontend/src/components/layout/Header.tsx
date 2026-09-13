@@ -5,7 +5,20 @@ import { OfficerRole } from "../../types/inspection";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { ApiService } from "../../services/api";
-import { Radio, Scale, ShieldCheck, CheckCircle2, ChevronDown, Search } from "lucide-react";
+import {
+  Radio,
+  Scale,
+  ShieldCheck,
+  CheckCircle2,
+  ChevronDown,
+  Search,
+  MapPin,
+  LogOut,
+  Sliders,
+  UserCheck,
+  KeyRound,
+  ExternalLink,
+} from "lucide-react";
 import { DEMO_SCENARIOS } from "../../features/demo/demoCatalog";
 import { Modal } from "../common/Modal";
 import { useCircle } from "../../context/CircleContext";
@@ -28,7 +41,7 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleSidebar,
   onOpenCommandPalette,
 }) => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { t, language } = useLanguage();
   const navigate = useNavigate();
   const isController = user?.officerRole === "CONTROLLER";
@@ -47,7 +60,7 @@ export const Header: React.FC<HeaderProps> = ({
   });
 
   const [demoMenuOpen, setDemoMenuOpen] = useState(false);
-  const [modeMenuOpen, setModeMenuOpen] = useState(false);
+  const [officerMenuOpen, setOfficerMenuOpen] = useState(false);
   const { allCircles, customCircles, addCustomCircle } = useCircle();
 
   const [isAddCircleOpen, setIsAddCircleOpen] = useState(false);
@@ -83,7 +96,6 @@ export const Header: React.FC<HeaderProps> = ({
       if (mode === "ONLINE") {
         ApiService.setOperatingMode("LIVE");
       } else {
-        // Mode B (Local Resilient Mode) enables interactive offline inspection via MockApiService
         ApiService.setOperatingMode("MOCK");
       }
     } catch {
@@ -94,152 +106,64 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <>
-      <header
-        className="bg-[#1B365D] text-white border-b border-[#0A2540] shadow-md sticky top-0 z-50 w-full"
-      >
-      {/* Tricolor National Stripe */}
-      <div className="h-0.5 bg-gradient-to-r from-[#ff9933] via-white to-[#138808] w-full" />
+      <header className="bg-[#1B365D] text-white border-b border-[#0A2540] shadow-md sticky top-0 z-50 w-full select-none">
+        {/* Tricolor Sovereign Accent Ribbon */}
+        <div className="h-0.5 bg-gradient-to-r from-[#FF9933] via-white to-[#138808] w-full" />
 
-      <div className="w-full max-w-[1750px] mx-auto px-3 sm:px-5 lg:px-6">
-        <div className="flex items-center justify-between h-14 max-h-14 gap-2 lg:gap-4">
-          {/* Brand & State Emblem of India */}
-          <div className="flex items-center space-x-2 sm:space-x-3 shrink-0 py-0.5">
-            {onToggleSidebar && (
-              <button
-                type="button"
-                onClick={onToggleSidebar}
-                className="p-1.5 rounded-lg text-slate-200 hover:text-white hover:bg-white/10 lg:hidden"
-                title="Toggle Navigation Menu"
-              >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
-            )}
-
-            <NirikshakBrandLogo tone="light" size="md" />
-          </div>
-
-            {/* Quick Command Palette Search Trigger */}
-            {onOpenCommandPalette && (
-              <button
-                type="button"
-                onClick={onOpenCommandPalette}
-                aria-label="Open universal command search palette (Ctrl+K)"
-                className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0f2847] hover:bg-[#153459] border border-white/20 text-slate-200 hover:text-white text-xs font-medium transition-colors shadow-2xs whitespace-nowrap min-w-0 overflow-hidden cursor-pointer"
-              >
-                <Search size={14} className="text-blue-300 shrink-0" />
-                <span className="hidden 2xl:inline truncate min-w-0">{t("portal.command_search", "Quick Search Cases & Rules...")}</span>
-                <span className="inline 2xl:hidden truncate min-w-0">{t("portal.command_search_short", "Search Cases...")}</span>
-                <kbd className="hidden 2xl:inline-block ml-1 font-mono text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-blue-200 border border-white/20 font-bold shrink-0">
-                  Ctrl K
-                </kbd>
-              </button>
-            )}
-
-            {/* Controls: Circle Selector, Connectivity, RBAC Toggle, Officer Profile */}
-            <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-              {/* Quick Demo Cases Dropdown Launcher */}
-              <div className="relative">
+        <div className="w-full max-w-[1750px] mx-auto px-3 sm:px-5 lg:px-6">
+          <div className="flex items-center justify-between h-14 max-h-14 gap-2 lg:gap-4">
+            {/* Left: Hamburger & Sovereign Brand Identity */}
+            <div className="flex items-center space-x-2 sm:space-x-3 shrink-0 py-0.5">
+              {onToggleSidebar && (
                 <button
                   type="button"
-                  onClick={() => {
-                    setDemoMenuOpen(!demoMenuOpen);
-                    setModeMenuOpen(false);
-                  }}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0f2847] hover:bg-[#153459] border border-blue-300/30 hover:border-blue-300/50 text-white font-semibold text-xs transition-all shadow-2xs focus:outline-none focus:ring-2 focus:ring-blue-400/30 cursor-pointer"
-                  title="Quick Access: Certified Statutory Demonstration Scenarios"
-                  aria-haspopup="true"
-                  aria-expanded={demoMenuOpen}
+                  onClick={onToggleSidebar}
+                  className="p-1.5 rounded-lg text-slate-200 hover:text-white hover:bg-white/10 lg:hidden cursor-pointer transition-colors"
+                  title="Toggle Navigation Menu"
+                  aria-label="Toggle Navigation Menu"
                 >
-                  <Scale size={14} className="text-[#FF9933] shrink-0" />
-                  <span className="hidden sm:inline">{language === "hi" ? "डेमो परिदृश्य" : "Demo Cases"}</span>
-                  <span className="px-1.5 py-0.2 rounded-md bg-white/15 text-white text-[10px] font-mono font-bold">
-                    7
-                  </span>
-                  <ChevronDown size={13} className={`text-blue-200 transition-transform duration-200 ${demoMenuOpen ? "rotate-180" : ""}`} />
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
                 </button>
-
-                {demoMenuOpen && (
-                  <>
-                    {/* Fixed Backdrop for Outside Click Dismissal */}
-                    <div
-                      className="fixed inset-0 z-40 bg-transparent"
-                      onClick={() => setDemoMenuOpen(false)}
-                      aria-hidden="true"
-                    />
-
-                    <div
-                      className="absolute left-0 mt-2 w-80 sm:w-88 rounded-xl bg-white text-slate-800 shadow-2xl border border-slate-200 p-2 z-50 animate-pop-in"
-                    >
-                      <div className="px-3 py-2 border-b border-slate-100 flex items-center justify-between">
-                        <div>
-                          <p className="font-extrabold text-xs text-[#1B365D] flex items-center gap-1.5">
-                            <Scale size={12} className="text-[#FF9933]" />
-                            <span>{language === "hi" ? "सांविधिक प्रदर्शन परिदृश्य" : "Statutory Demo Suite"}</span>
-                          </p>
-                        <p className="text-[10px] text-slate-500">
-                          {language === "hi" ? "त्वरित सांविधिक जांच हेतु 1-क्लिक लोड" : "1-Click load for statutory audit"}
-                        </p>
-                      </div>
-                      <Link
-                        to="/dashboard#demo-showcase"
-                        onClick={() => setDemoMenuOpen(false)}
-                        className="text-[11px] font-bold text-[#1B365D] hover:underline"
-                      >
-                        {language === "hi" ? "सभी 7 देखें" : "View All"}
-                      </Link>
-                    </div>
-
-                    <div className="py-1 max-h-80 overflow-y-auto space-y-1">
-                      {DEMO_SCENARIOS.map((s) => (
-                        <button
-                          key={s.caseId}
-                          type="button"
-                          onClick={() => {
-                            setDemoMenuOpen(false);
-                            navigate(`/inspections/${s.caseId}`);
-                          }}
-                          className="w-full text-left p-2 rounded-lg hover:bg-slate-50 flex items-center justify-between gap-2 text-xs transition-colors group border border-transparent hover:border-slate-200 cursor-pointer"
-                        >
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-1.5">
-                              <span className="font-mono text-[9px] font-bold text-slate-500">
-                                #{s.scenarioNumber}
-                              </span>
-                              <span className="font-bold text-slate-800 group-hover:text-[#1B365D] truncate">
-                                {language === "hi" && s.titleHi ? s.titleHi : s.title}
-                              </span>
-                            </div>
-                            <p className="text-[10.5px] text-slate-500 truncate mt-0.5">
-                              {language === "hi" && s.headlineViolationHi ? s.headlineViolationHi : s.headlineViolation}
-                            </p>
-                          </div>
-                          <span
-                            className={`text-[9.5px] font-bold px-1.5 py-0.5 rounded border shrink-0 ${
-                              s.targetVerdict === "FAIL"
-                                ? "bg-rose-50 text-rose-700 border-rose-200"
-                                : s.targetVerdict === "PASS"
-                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                                : s.targetVerdict === "REVIEW"
-                                ? "bg-amber-50 text-amber-700 border-amber-200"
-                                : "bg-slate-100 text-slate-700 border-slate-300"
-                            }`}
-                          >
-                            {s.targetVerdict}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </>
               )}
+
+              <NirikshakBrandLogo tone="light" size="md" />
             </div>
 
+            {/* Center: Integrated Universal Enforcement Search Console */}
+            {onOpenCommandPalette && (
+              <div className="hidden md:flex flex-1 max-w-sm lg:max-w-md xl:max-w-lg mx-2 lg:mx-4">
+                <button
+                  type="button"
+                  onClick={onOpenCommandPalette}
+                  aria-label="Open universal statutory enforcement search (Ctrl+K)"
+                  className="w-full flex items-center justify-between px-3.5 py-1.5 rounded-lg bg-[#0B213B] hover:bg-[#0E294A] border border-blue-400/25 hover:border-blue-300/40 text-left transition-all shadow-inner group cursor-pointer"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <Search size={14} className="text-blue-300 group-hover:text-amber-300 transition-colors shrink-0" />
+                    <span className="text-xs text-slate-300 group-hover:text-white truncate">
+                      {language === "hi"
+                        ? "सांविधिक नियम, तालिका-I या प्रकरण खोजें..."
+                        : "Universal Statutory Search (Rules, Table-I, Cases)..."}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0 ml-2">
+                    <kbd className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-blue-200 border border-white/20 font-bold">
+                      Ctrl K
+                    </kbd>
+                  </div>
+                </button>
+              </div>
+            )}
+
+            {/* Right: Administrative Circle, Demo Suite, Officer Digital ID Badge */}
+            <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
               {/* Jurisdiction Circle Selector */}
-              <div className="hidden xl:flex items-center gap-1.5 bg-[#0f2847] px-3 py-1.5 rounded-lg border border-white/20 text-xs shadow-2xs shrink-0">
-                <label htmlFor="circle-select" className="text-blue-200/80 whitespace-nowrap font-medium text-[11px]">
-                  {t("portal.circle", "Circle:")}
+              <div className="hidden lg:flex items-center gap-1.5 bg-[#0B213B] px-3 py-1.5 rounded-lg border border-blue-400/25 text-xs shadow-2xs shrink-0">
+                <MapPin size={13} className="text-amber-400 shrink-0" />
+                <label htmlFor="circle-select" className="sr-only">
+                  {t("portal.circle", "Jurisdiction Circle")}
                 </label>
                 <select
                   id="circle-select"
@@ -251,7 +175,7 @@ export const Header: React.FC<HeaderProps> = ({
                     }
                     onCircleChange(e.target.value);
                   }}
-                  className="bg-transparent text-xs text-white font-semibold focus:outline-none cursor-pointer pr-1 max-w-[160px] 2xl:max-w-[220px] truncate"
+                  className="bg-transparent text-xs text-white font-semibold focus:outline-none cursor-pointer pr-1 max-w-[150px] xl:max-w-[200px] truncate"
                 >
                   {allCircles.map((c) => (
                     <option key={c.id} value={c.id} className="bg-[#1B365D] text-white">
@@ -259,7 +183,6 @@ export const Header: React.FC<HeaderProps> = ({
                         (customCircles.some((cc) => cc.id === c.id) ? " • custom" : "")}
                     </option>
                   ))}
-                  {/* Guard: keep the select truthful if the stored circle is not in the registry */}
                   {!allCircles.some((c) => c.id === activeCircle) && (
                     <option value={activeCircle} className="bg-[#1B365D] text-white">
                       {activeCircle}
@@ -271,158 +194,266 @@ export const Header: React.FC<HeaderProps> = ({
                 </select>
               </div>
 
-              {/* Authenticated Official Cadre Display (Locked to Login Session) */}
-              <div
-                className="hidden sm:flex items-center gap-1.5 bg-[#0c1e36] px-2.5 py-1 rounded-lg border border-white/20 text-xs shrink-0 shadow-2xs"
-                title={
-                  language === "hi"
-                    ? `प्रमाणित सत्र: ${isController ? "विधिक मापविज्ञान नियंत्रक" : "विधिक मापविज्ञान अधिकारी (निरीक्षक)"} • संवर्ग परिवर्तन हेतु कृपया साइन आउट कर पुनः प्रवेश करें।`
-                    : `Authenticated Session: ${isController ? "Controller of Legal Metrology" : "Legal Metrology Officer (Inspector)"} • To switch cadre, please sign out and sign in.`
-                }
-              >
-                <div className="flex items-center gap-1 select-none text-[10px] font-bold text-blue-200/80 uppercase tracking-wider">
-                  <ShieldCheck size={12} className="text-[#FF9933] shrink-0" />
-                  <span>{language === "hi" ? "संवर्ग:" : "Cadre:"}</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span
-                    className={`px-2 py-0.5 rounded text-[10.5px] font-bold font-mono ${
-                      isController
-                        ? "bg-purple-900/80 text-purple-200 border border-purple-400/30"
-                        : "bg-blue-900/80 text-blue-200 border border-blue-400/30"
-                    }`}
-                  >
-                    {isController
-                      ? (language === "hi" ? "नियंत्रक" : "Controller")
-                      : (language === "hi" ? "निरीक्षक" : "LMO Inspector")}
-                  </span>
-                  <span className="font-mono text-[10px] text-amber-300/90 font-semibold hidden md:inline">
-                    {user?.badgeNumber || (isController ? "CTRL-DL-0012" : "INSP-DL-0842")}
-                  </span>
-                  <span
-                    className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"
-                    title={language === "hi" ? "सत्र प्रमाणित" : "Session Authenticated"}
-                  />
-                </div>
-              </div>
-
-              {/* System Operating Mode */}
-              <div className="relative hidden md:block shrink-0">
+              {/* Certified Demo Scenarios Dropdown Launcher */}
+              <div className="relative">
                 <button
                   type="button"
                   onClick={() => {
-                    setModeMenuOpen(!modeMenuOpen);
+                    setDemoMenuOpen(!demoMenuOpen);
+                    setOfficerMenuOpen(false);
+                  }}
+                  className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg bg-[#0B213B] hover:bg-[#0E294A] border border-amber-400/30 hover:border-amber-400/50 text-white font-semibold text-xs transition-all shadow-2xs focus:outline-none cursor-pointer"
+                  title="Quick Access: Certified Statutory Demonstration Scenarios"
+                  aria-haspopup="true"
+                  aria-expanded={demoMenuOpen}
+                >
+                  <Scale size={14} className="text-[#FF9933] shrink-0" />
+                  <span className="hidden sm:inline">{language === "hi" ? "सांविधिक डेमो" : "Demo Suite"}</span>
+                  <span className="px-1.5 py-0.2 rounded-md bg-amber-500/20 text-amber-300 border border-amber-400/30 text-[10px] font-mono font-bold">
+                    7
+                  </span>
+                  <ChevronDown size={13} className={`text-blue-200 transition-transform duration-200 ${demoMenuOpen ? "rotate-180" : ""}`} />
+                </button>
+
+                {demoMenuOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40 bg-transparent"
+                      onClick={() => setDemoMenuOpen(false)}
+                      aria-hidden="true"
+                    />
+
+                    <div className="absolute right-0 mt-2 w-80 sm:w-88 rounded-xl bg-white text-slate-800 shadow-2xl border border-slate-200 p-2 z-50 animate-pop-in">
+                      <div className="px-3 py-2 border-b border-slate-100 flex items-center justify-between">
+                        <div>
+                          <p className="font-extrabold text-xs text-[#1B365D] flex items-center gap-1.5">
+                            <Scale size={12} className="text-[#FF9933]" />
+                            <span>{language === "hi" ? "सांविधिक प्रदर्शन परिदृश्य" : "Statutory Demo Suite"}</span>
+                          </p>
+                          <p className="text-[10px] text-slate-500">
+                            {language === "hi" ? "त्वरित सांविधिक जांच हेतु 1-क्लिक लोड" : "1-Click load for statutory audit"}
+                          </p>
+                        </div>
+                        <Link
+                          to="/dashboard#demo-showcase"
+                          onClick={() => setDemoMenuOpen(false)}
+                          className="text-[11px] font-bold text-[#1B365D] hover:underline"
+                        >
+                          {language === "hi" ? "सभी 7 देखें" : "View All"}
+                        </Link>
+                      </div>
+
+                      <div className="py-1 max-h-80 overflow-y-auto space-y-1">
+                        {DEMO_SCENARIOS.map((s) => (
+                          <button
+                            key={s.caseId}
+                            type="button"
+                            onClick={() => {
+                              setDemoMenuOpen(false);
+                              navigate(`/inspections/${s.caseId}`);
+                            }}
+                            className="w-full text-left p-2 rounded-lg hover:bg-slate-50 flex items-center justify-between gap-2 text-xs transition-colors group border border-transparent hover:border-slate-200 cursor-pointer"
+                          >
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-mono text-[9px] font-bold text-slate-500">
+                                  #{s.scenarioNumber}
+                                </span>
+                                <span className="font-bold text-slate-800 group-hover:text-[#1B365D] truncate">
+                                  {language === "hi" && s.titleHi ? s.titleHi : s.title}
+                                </span>
+                              </div>
+                              <p className="text-[10.5px] text-slate-500 truncate mt-0.5">
+                                {language === "hi" && s.headlineViolationHi ? s.headlineViolationHi : s.headlineViolation}
+                              </p>
+                            </div>
+                            <span
+                              className={`text-[9.5px] font-bold px-1.5 py-0.5 rounded border shrink-0 ${
+                                s.targetVerdict === "FAIL"
+                                  ? "bg-rose-50 text-rose-700 border-rose-200"
+                                  : s.targetVerdict === "PASS"
+                                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                  : s.targetVerdict === "REVIEW"
+                                  ? "bg-amber-50 text-amber-700 border-amber-200"
+                                  : "bg-slate-100 text-slate-700 border-slate-300"
+                              }`}
+                            >
+                              {s.targetVerdict}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Government Officer Digital ID Badge & Popover */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOfficerMenuOpen(!officerMenuOpen);
                     setDemoMenuOpen(false);
                   }}
                   aria-haspopup="true"
-                  aria-expanded={modeMenuOpen}
-                  aria-label="System operating mode"
-                  title="Statutory System Mode: Mode A runs inspections from the central cloud server & datastore; Mode B runs standalone on this workstation (local storage) when field connectivity is unavailable."
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/20 hover:border-white/40 text-xs font-semibold transition-all bg-[#0f2847] hover:bg-[#153459] text-white shadow-2xs cursor-pointer"
+                  aria-expanded={officerMenuOpen}
+                  aria-label="Officer Profile and Telemetry"
+                  className="flex items-center gap-2 px-2 sm:px-2.5 py-1 rounded-lg bg-[#0B213B] hover:bg-[#0E294A] border border-blue-400/25 hover:border-blue-300/40 text-xs transition-all shadow-2xs focus:outline-none cursor-pointer"
                 >
-                  <span
-                    className={`w-2 h-2 rounded-full shrink-0 ${
-                      currentMode === "ONLINE"
-                        ? "bg-emerald-400 animate-pulse ring-2 ring-emerald-400/30"
-                        : "bg-amber-400 ring-2 ring-amber-400/30"
-                    }`}
-                  />
-                  <span className="text-[10px] uppercase tracking-wider text-blue-200/80 font-bold hidden 2xl:inline">
-                    System Mode
-                  </span>
-                  <span>
-                    {currentMode === "ONLINE"
-                      ? `Mode A ${language === "hi" ? "(ऑनलाइन)" : "(Online)"}`
-                      : `Mode B ${language === "hi" ? "(लचीला)" : "(Resilient)"}`}
-                  </span>
-                  <ChevronDown size={13} className={`text-blue-200 transition-transform duration-200 ${modeMenuOpen ? "rotate-180" : ""}`} />
+                  {/* Officer Monogram Crest with Gold Border */}
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 font-black text-xs flex items-center justify-center border border-amber-200 shrink-0 shadow-xs">
+                    {user?.initials || (isController ? "SKV" : "RS")}
+                  </div>
+
+                  {/* Officer Metadata (Condensed on mobile, full on desktop) */}
+                  <div className="hidden sm:flex flex-col text-left leading-none min-w-0 pr-0.5">
+                    <div className="flex items-center gap-1">
+                      <span className="font-extrabold text-white text-[11.5px] truncate max-w-[110px] xl:max-w-[140px]">
+                        {user?.name || "Rajesh Sharma"}
+                      </span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" title="Active Verified Session" />
+                    </div>
+                    <span className="text-[9.5px] font-mono font-bold text-blue-200/80 mt-0.5 truncate">
+                      {user?.badgeNumber || (isController ? "CTRL-DL-0012" : "INSP-DL-0842")}
+                    </span>
+                  </div>
+
+                  <ChevronDown size={12} className={`text-blue-200 transition-transform duration-200 ${officerMenuOpen ? "rotate-180" : ""}`} />
                 </button>
 
-              {modeMenuOpen && (
-                <>
-                  {/* Fixed Backdrop for Outside Click Dismissal */}
-                  <div
-                    className="fixed inset-0 z-40 bg-transparent"
-                    onClick={() => setModeMenuOpen(false)}
-                    aria-hidden="true"
-                  />
+                {/* Officer Digital Credentials & System Dossier Popover */}
+                {officerMenuOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40 bg-transparent"
+                      onClick={() => setOfficerMenuOpen(false)}
+                      aria-hidden="true"
+                    />
 
-                  <div className="absolute right-0 mt-2 w-80 rounded-xl bg-white text-slate-800 shadow-2xl border border-slate-200 p-2 z-50 animate-pop-in">
-                    <div className="px-3 py-2 border-b border-slate-100">
-                      <p className="font-extrabold text-xs text-[#1B365D] flex items-center gap-1.5">
-                        <Radio size={12} className="text-emerald-600" />
-                        <span>{language === "hi" ? "सिस्टम संचालन मोड" : "System Operating Mode"}</span>
-                      </p>
-                      <p className="text-[10px] text-slate-500 mt-0.5">
-                        {language === "hi"
-                          ? "चुनें कि यह निरीक्षण सत्र कहाँ चलेगा।"
-                          : "Choose where this inspection session runs."}
-                      </p>
-                    </div>
-
-                    <div className="py-1 space-y-1">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          handleModeSwitch("ONLINE");
-                          setModeMenuOpen(false);
-                        }}
-                        className={`w-full text-left p-2.5 rounded-lg flex items-start justify-between gap-2 border transition-colors ${
-                          currentMode === "ONLINE"
-                            ? "bg-emerald-50 border-emerald-300 text-emerald-950"
-                            : "border-slate-100 hover:bg-slate-50 hover:border-slate-200"
-                        }`}
-                      >
-                        <div className="min-w-0">
-                          <p className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0" />
-                            Mode A — {language === "hi" ? "ऑनलाइन मोनोलिथ" : "Online Monolith"}
-                          </p>
-                          <p className="text-[10.5px] text-slate-500 mt-0.5 leading-relaxed">
-                            Central cloud datastore &amp; server pipeline for the whole circle.
-                          </p>
+                    <div className="absolute right-0 mt-2 w-80 sm:w-84 rounded-xl bg-white text-slate-800 shadow-2xl border border-slate-200 z-50 overflow-hidden animate-pop-in">
+                      {/* Popover Header: Sovereign Navy + Golden Tricolor Ribbon */}
+                      <div className="bg-[#1B365D] text-white p-4 relative overflow-hidden">
+                        <div className="h-1 absolute top-0 left-0 right-0 bg-gradient-to-r from-[#FF9933] via-white to-[#138808]" />
+                        <div className="flex items-start gap-3 mt-1">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 font-black text-sm flex items-center justify-center border-2 border-white/80 shrink-0 shadow-md">
+                            {user?.initials || (isController ? "SKV" : "RS")}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <h4 className="font-extrabold text-sm text-white truncate">
+                              {user?.name || "Rajesh Sharma"}
+                            </h4>
+                            <p className="text-[11px] font-semibold text-amber-300 truncate">
+                              {isController ? "Controller of Legal Metrology" : "Legal Metrology Officer (Inspector)"}
+                            </p>
+                            <p className="text-[10px] text-blue-200/80 font-mono mt-0.5 truncate">
+                              Badge: {user?.badgeNumber || (isController ? "CTRL-DL-0012" : "INSP-DL-0842")}
+                            </p>
+                          </div>
                         </div>
-                        {currentMode === "ONLINE" && (
-                          <CheckCircle2 size={15} className="text-emerald-600 shrink-0 mt-0.5" />
-                        )}
-                      </button>
+                      </div>
 
-                      <button
-                        type="button"
-                        onClick={() => {
-                          handleModeSwitch("LOCAL_RESILIENT");
-                          setModeMenuOpen(false);
-                        }}
-                        className={`w-full text-left p-2.5 rounded-lg flex items-start justify-between gap-2 border transition-colors ${
-                          currentMode === "LOCAL_RESILIENT"
-                            ? "bg-amber-50 border-amber-300 text-amber-950"
-                            : "border-slate-100 hover:bg-slate-50 hover:border-slate-200"
-                        }`}
-                      >
-                        <div className="min-w-0">
-                          <p className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
-                            Mode B — {language === "hi" ? "स्थानीय लचीला मोड" : "Local Resilient"}
-                          </p>
-                          <p className="text-[10.5px] text-slate-500 mt-0.5 leading-relaxed">
-                            Standalone field inspection on this workstation (local storage) — works during connectivity blackouts.
-                          </p>
+                      {/* Officer Credentials Details */}
+                      <div className="p-3.5 space-y-3 text-xs bg-white">
+                        {/* Jurisdiction Circle */}
+                        <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-200">
+                          <div className="flex items-center gap-2">
+                            <MapPin size={14} className="text-[#1B365D]" />
+                            <span className="text-[11px] font-bold text-slate-600">
+                              {language === "hi" ? "अधिकार क्षेत्र:" : "Jurisdiction:"}
+                            </span>
+                          </div>
+                          <span className="font-mono font-bold text-[11px] text-[#1B365D]">
+                            {activeCircle}
+                          </span>
                         </div>
-                        {currentMode === "LOCAL_RESILIENT" && (
-                          <CheckCircle2 size={15} className="text-amber-600 shrink-0 mt-0.5" />
-                        )}
-                      </button>
+
+                        {/* Digital Signature Token Status */}
+                        <div className="flex items-center justify-between p-2 rounded-lg bg-emerald-50/70 border border-emerald-200">
+                          <div className="flex items-center gap-2">
+                            <KeyRound size={14} className="text-emerald-700" />
+                            <span className="text-[11px] font-bold text-emerald-950">
+                              {language === "hi" ? "डिजिटल हस्ताक्षर (DSC):" : "DSC Token:"}
+                            </span>
+                          </div>
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300">
+                            NIC Class-3 Active
+                          </span>
+                        </div>
+
+                        {/* System Telemetry Mode (Mode A / Mode B) */}
+                        <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-1.5 font-bold text-slate-800 text-[11px]">
+                              <Radio size={13} className="text-blue-600" />
+                              <span>{language === "hi" ? "सिस्टम संचालन मोड:" : "System Mode:"}</span>
+                            </div>
+                            <span className="text-[10px] font-bold font-mono px-1.5 py-0.2 rounded bg-blue-100 text-[#1B365D]">
+                              {currentMode === "ONLINE" ? "Mode A (Online)" : "Mode B (Resilient)"}
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-1.5 pt-1">
+                            <button
+                              type="button"
+                              onClick={() => handleModeSwitch("ONLINE")}
+                              className={`px-2 py-1.5 rounded text-[10.5px] font-bold text-center border transition-colors cursor-pointer ${
+                                currentMode === "ONLINE"
+                                  ? "bg-[#1B365D] text-white border-[#1B365D] shadow-xs"
+                                  : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
+                              }`}
+                            >
+                              Mode A Cloud
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleModeSwitch("LOCAL_RESILIENT")}
+                              className={`px-2 py-1.5 rounded text-[10.5px] font-bold text-center border transition-colors cursor-pointer ${
+                                currentMode === "LOCAL_RESILIENT"
+                                  ? "bg-amber-600 text-white border-amber-600 shadow-xs"
+                                  : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
+                              }`}
+                            >
+                              Mode B Offline
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Quick Action Links */}
+                        <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                          <Link
+                            to="/settings"
+                            onClick={() => setOfficerMenuOpen(false)}
+                            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1B365D] hover:underline"
+                          >
+                            <Sliders size={13} />
+                            <span>{language === "hi" ? "स्टेशन सेटिंग्स" : "Station Settings"}</span>
+                          </Link>
+                          {logout && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setOfficerMenuOpen(false);
+                                logout();
+                                navigate("/login");
+                              }}
+                              className="inline-flex items-center gap-1.5 text-xs font-bold text-rose-600 hover:text-rose-700 hover:underline cursor-pointer"
+                            >
+                              <LogOut size={13} />
+                              <span>{language === "hi" ? "साइन आउट" : "Sign Out"}</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </>
-              )}
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
 
-      {/* Add New Jurisdiction Circle (feedback #least-priority) */}
+      {/* Add New Jurisdiction Circle Modal */}
       <Modal
         isOpen={isAddCircleOpen}
         onClose={() => setIsAddCircleOpen(false)}
@@ -436,7 +467,7 @@ export const Header: React.FC<HeaderProps> = ({
       >
         <form onSubmit={handleAddCircleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="new-circle-id" className="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1">
+            <label htmlFor="new-circle-id" className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
               {language === "hi" ? "मंडल आईडी" : "Circle ID"}
             </label>
             <input
@@ -449,7 +480,7 @@ export const Header: React.FC<HeaderProps> = ({
               maxLength={40}
               required
             />
-            <p className="mt-1 text-[10px] text-slate-400">
+            <p className="mt-1 text-[10px] text-slate-500">
               {language === "hi"
                 ? "केवल A-Z, 0-9 और अंडरस्कोर (उदा. CIRCLE_DL_WEST_05)।"
                 : "A-Z, 0-9 and underscores only (e.g. CIRCLE_DL_WEST_05)."}
@@ -457,7 +488,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           <div>
-            <label htmlFor="new-circle-label" className="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1">
+            <label htmlFor="new-circle-label" className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
               {language === "hi" ? "प्रदर्शन नाम" : "Display Name"}
             </label>
             <input
@@ -473,7 +504,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           <div>
-            <label htmlFor="new-circle-label-hi" className="block text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1">
+            <label htmlFor="new-circle-label-hi" className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
               {language === "hi" ? "हिंदी नाम (वैकल्पिक)" : "Hindi Name (optional)"}
             </label>
             <input
@@ -488,7 +519,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {newCircleError && (
-            <p role="alert" className="text-xs font-semibold text-rose-200 bg-rose-950/80 border border-rose-500/50 rounded-lg px-3 py-2">
+            <p role="alert" className="text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2">
               {newCircleError}
             </p>
           )}
@@ -506,3 +537,5 @@ export const Header: React.FC<HeaderProps> = ({
     </>
   );
 };
+
+export default Header;

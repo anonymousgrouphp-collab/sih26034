@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <!-- Sovereign Gold Gradients -->
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#F5D77F"/>
+      <stop offset="35%" stopColor="#D4AF37"/>
+      <stop offset="70%" stopColor="#AA7C11"/>
+      <stop offset="100%" stopColor="#805C06"/>
+    </linearGradient>
+
+    <linearGradient id="sealNavyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stopColor="#1B365D"/>
+      <stop offset="100%" stopColor="#0B1D3A"/>
+    </linearGradient>
+
+    <radialGradient id="innerGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="75%" stopColor="#1B365D" stopOpacity="0"/>
+      <stop offset="100%" stopColor="#D4AF37" stopOpacity="0.25"/>
+    </radialGradient>
+
+    <!-- Circular Text Paths -->
+    <path id="textPathTop" d="M 36,200 A 164,164 0 1,1 364,200" fill="none"/>
+    <path id="textPathBottom" d="M 364,200 A 164,164 0 0,1 36,200" fill="none"/>
+  </defs>
+
+  <!-- 1. Outer Beaded Rims -->
+  <circle cx="200" cy="200" r="195" fill="none" stroke="url(#goldGradient)" stroke-width="3"/>
+  <circle cx="200" cy="200" r="190" fill="none" stroke="#D4AF37" stroke-width="1.5" stroke-dasharray="3 3"/>
+  <circle cx="200" cy="200" r="184" fill="none" stroke="url(#goldGradient)" stroke-width="2"/>
+
+  <!-- 2. Dark Navy Inscription Ring -->
+  <circle cx="200" cy="200" r="158" fill="url(#sealNavyGradient)" stroke="url(#goldGradient)" stroke-width="2"/>
+
+  <!-- 3. Outer Inscriptions -->
+  <!-- Top: DEPARTMENT OF CONSUMER AFFAIRS • GOVT. OF INDIA -->
+  <text font-family="'Cinzel', 'Noto Serif', serif, 'Times New Roman'" font-size="13" font-weight="900" fill="#FDF3CE" letter-spacing="2.2">
+    <textPath href="#textPathTop" startOffset="50%" text-anchor="middle">
+      DEPARTMENT OF CONSUMER AFFAIRS • GOVT. OF INDIA
+    </textPath>
+  </text>
+
+  <!-- Bottom: LEGAL METROLOGY DIVISION • विधिक मापविज्ञान प्रभाग -->
+  <text font-family="'Noto Sans Devanagari', 'Noto Serif', serif, sans-serif" font-size="12" font-weight="800" fill="#FDF3CE" letter-spacing="1.5">
+    <textPath href="#textPathBottom" startOffset="50%" text-anchor="middle">
+      LEGAL METROLOGY DIVISION • विधिक मापविज्ञान
+    </textPath>
+  </text>
+
+  <!-- Side Star Emblems -->
+  <polygon points="38,200 41,206 47,207 43,212 44,218 38,215 32,218 33,212 29,207 35,206" fill="#D4AF37"/>
+  <polygon points="362,200 365,206 371,207 367,212 368,218 362,215 356,218 357,212 353,207 359,206" fill="#D4AF37"/>
+
+  <!-- 4. Inner Medallion Border -->
+  <circle cx="200" cy="200" r="132" fill="#0B1A30" stroke="url(#goldGradient)" stroke-width="3"/>
+  <circle cx="200" cy="200" r="126" fill="url(#innerGlow)" stroke="#D4AF37" stroke-width="1" stroke-dasharray="4 2"/>
+
+  <!-- 5. Ashoka Chakra 24-Spoke Watermark in Center Base -->
+  <g transform="translate(200, 200)" opacity="0.18">
+    <circle cx="0" cy="0" r="115" stroke="#D4AF37" stroke-width="1.5" fill="none"/>
+    <circle cx="0" cy="0" r="22" stroke="#D4AF37" stroke-width="1.5" fill="none"/>
+    <circle cx="0" cy="0" r="6" fill="#D4AF37"/>
+    <path d="M0,0 L0,-115 M0,0 L0,115 M0,0 L-115,0 M0,0 L115,0" stroke="#D4AF37" stroke-width="1"/>
+    <g transform="rotate(15)"><path d="M0,0 L0,-115 M0,0 L0,115 M0,0 L-115,0 M0,0 L115,0" stroke="#D4AF37" stroke-width="1"/></g>
+    <g transform="rotate(30)"><path d="M0,0 L0,-115 M0,0 L0,115 M0,0 L-115,0 M0,0 L115,0" stroke="#D4AF37" stroke-width="1"/></g>
+    <g transform="rotate(45)"><path d="M0,0 L0,-115 M0,0 L0,115 M0,0 L-115,0 M0,0 L115,0" stroke="#D4AF37" stroke-width="1"/></g>
+    <g transform="rotate(60)"><path d="M0,0 L0,-115 M0,0 L0,115 M0,0 L-115,0 M0,0 L115,0" stroke="#D4AF37" stroke-width="1"/></g>
+    <g transform="rotate(75)"><path d="M0,0 L0,-115 M0,0 L0,115 M0,0 L-115,0 M0,0 L115,0" stroke="#D4AF37" stroke-width="1"/></g>
+  </g>
+
+  <!-- 6. Sovereign Legal Metrology Scales of Justice & Truth (Central Heraldry) -->
+  <g id="scalesOfMetrology" stroke="url(#goldGradient)" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- Center Beam Pillar -->
+    <path d="M 200,95 L 200,245" stroke-width="4.5"/>
+    <circle cx="200" cy="92" r="5" fill="#F5D77F"/>
+    <rect x="194" y="98" width="12" height="6" rx="1.5" fill="#D4AF37"/>
+
+    <!-- Horizontal Balance Fulcrum Arm -->
+    <path d="M 132,122 Q 200,110 268,122" stroke-width="4"/>
+    <circle cx="200" cy="114" r="6.5" fill="#AA7C11" stroke="#F5D77F" stroke-width="2"/>
+    <circle cx="132" cy="122" r="3.5" fill="#D4AF37"/>
+    <circle cx="268" cy="122" r="3.5" fill="#D4AF37"/>
+
+    <!-- Left Pan Suspension Cords & Pan -->
+    <path d="M 132,123 L 105,178 M 132,123 L 132,178 M 132,123 L 159,178" stroke-width="1.2" stroke="#F5D77F"/>
+    <path d="M 98,178 Q 132,196 166,178 Z" fill="url(#goldGradient)" stroke-width="1"/>
+
+    <!-- Right Pan Suspension Cords & Pan -->
+    <path d="M 268,123 L 241,178 M 268,123 L 268,178 M 268,123 L 295,178" stroke-width="1.2" stroke="#F5D77F"/>
+    <path d="M 234,178 Q 268,196 302,178 Z" fill="url(#goldGradient)" stroke-width="1"/>
+
+    <!-- Stepped Solid Pedestal -->
+    <path d="M 175,245 L 225,245 L 235,265 L 165,265 Z" fill="url(#goldGradient)" stroke-width="1.5"/>
+    <rect x="155" y="265" width="90" height="7" rx="2" fill="#805C06" stroke="#D4AF37" stroke-width="1"/>
+  </g>
+
+  <!-- 7. Satyameva Jayate Motto Banner at Base -->
+  <g transform="translate(0, 5)">
+    <!-- Tricolor Ribbon Underline -->
+    <rect x="145" y="280" width="36" height="3" fill="#FF9933" rx="1"/>
+    <rect x="183" y="280" width="34" height="3" fill="#FFFFFF" rx="1"/>
+    <rect x="219" y="280" width="36" height="3" fill="#138808" rx="1"/>
+
+    <text x="200" y="300" text-anchor="middle" font-family="'Noto Sans Devanagari', sans-serif" font-size="13" font-weight="900" fill="#FDF3CE" letter-spacing="3">
+      सत्यमेव जयते
+    </text>
+    <text x="200" y="315" text-anchor="middle" font-family="'Cinzel', serif" font-size="9" font-weight="800" fill="#D4AF37" letter-spacing="2">
+      LEGAL METROLOGY ACT, 2009
+    </text>
+  </g>
+</svg>
