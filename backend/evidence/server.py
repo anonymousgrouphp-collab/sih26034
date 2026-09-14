@@ -1508,6 +1508,11 @@ def execute_batch_pipeline(
         raise HTTPException(status_code=400, detail="No evidence images found for this inspection.")
 
     t0 = time.perf_counter()
+    inspection.ai_verdict = "PROCESSING"
+    inspection.overall_status = "PENDING_REVIEW"
+    db.commit()
+    db.refresh(inspection)
+
     package_type = inspection.package_type or "RECTANGULAR"
     is_ecom = inspection.capture_source == "ECOMMERCE_URL" or "ecommerce" in str(inspection.package_type).lower()
 

@@ -1377,7 +1377,7 @@ class StatutoryDeclarationParser:
             return "India"
 
         origin_pattern = re.compile(
-            r"(?<![a-zA-Z\u0900-\u097F])(?:Country\s*of\s*Origin|Made\s*in|Product\s*of|Manufactured\s*in|Packed\s*in|Produce\s*of|Imported\s*from|Origin\s*[:\-]|C\.?O\.?O\.?\s*[:\-]|मूल\s*देश|उत्पत्ति\s*का\s*देश)\s*[:\-]?\s*([^\n\r,;]+)",
+            r"(?<![a-zA-Z\u0900-\u097F])(?:Country\s*of\s*Origin|Made\s*in|Product\s*of|Manufactured\s*in|Packed\s*in|Produce\s*of|Imported\s*from|Origin\s*[:\-]|MFG\s*[:\-]|MFD\s*[:\-]|C\.?O\.?O\.?\s*[:\-]|COUNTR[Y]?(?:\s*OF\s*ORIGIN)?\s*[:\-]?|मूल\s*देश|उत्पत्ति\s*का\s*देश)\s*[:\-]?\s*([^\n\r,;]+)",
             re.IGNORECASE
         )
 
