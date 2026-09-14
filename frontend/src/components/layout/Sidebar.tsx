@@ -19,20 +19,19 @@ import {
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { StateEmblem } from "../common/StateEmblem";
+import { resetScrollToTop } from "../common/ScrollToTop";
 import { m } from "framer-motion";
 
 interface SidebarProps {
   pendingCasesCount?: number;
   mobileOpen?: boolean;
   onCloseMobile?: () => void;
-  onNewInspectionClick?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   pendingCasesCount = 0,
   mobileOpen = false,
   onCloseMobile,
-  onNewInspectionClick,
 }) => {
   const { user, logout } = useAuth();
   const { t, language } = useLanguage();
@@ -217,7 +216,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             to="/inspections/new"
             onClick={() => {
               onCloseMobile?.();
-              onNewInspectionClick?.();
+              resetScrollToTop();
             }}
             title={isCollapsed ? t("action.new_case", "New Inspection Case") : undefined}
             className={`w-full flex items-center justify-center gap-2 py-2.5 bg-[#1B365D] hover:bg-[#0A2540] text-white text-xs font-bold rounded-lg shadow-sm hover:shadow transition-all border border-[#152a48] group overflow-hidden ${

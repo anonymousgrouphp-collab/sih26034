@@ -5,8 +5,7 @@ import { Header } from "./Header";
 import { Sidebar } from "./Sidebar";
 import { GovFooter } from "./GovFooter";
 import { ApiService } from "../../services/api";
-import { InspectionSummary, InspectionCase } from "../../types/inspection";
-import { NewInspectionModal } from "../../features/new-inspection/NewInspectionModal";
+import { InspectionSummary } from "../../types/inspection";
 import { CommandPalette } from "../common/CommandPalette";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext";
@@ -22,7 +21,6 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   const { language } = useLanguage();
   const { activeCircle, setActiveCircle } = useCircle();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [isNewModalOpen, setIsNewModalOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [cases, setCases] = useState<InspectionSummary[]>([]);
   const [notification, setNotification] = useState<string | null>(null);
@@ -52,18 +50,6 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   useEffect(() => {
     loadCases();
   }, [loadCases]);
-
-  const handleCaseCreated = (newCase: InspectionCase) => {
-    setIsNewModalOpen(false);
-    setNotification(
-      language === "hi"
-        ? `प्रकरण ${newCase.inspection_number} सफलतापूर्वक ${activeCircle} में पंजीकृत किया गया।`
-        : `Case ${newCase.inspection_number} registered successfully in ${activeCircle}.`
-    );
-    setTimeout(() => setNotification(null), 5000);
-    loadCases();
-    navigate(`/inspections/${newCase.id}`);
-  };
 
   const pendingReviewCount = cases.filter(
     (c) =>
@@ -99,7 +85,6 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
           pendingCasesCount={pendingReviewCount}
           mobileOpen={mobileSidebarOpen}
           onCloseMobile={() => setMobileSidebarOpen(false)}
-          onNewInspectionClick={() => setIsNewModalOpen(true)}
         />
 
         <main
@@ -141,13 +126,6 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
 
       {/* Official GIGW 3.0 Government of India Portal Footer */}
       <GovFooter />
-
-      <NewInspectionModal
-        isOpen={isNewModalOpen}
-        onClose={() => setIsNewModalOpen(false)}
-        defaultCircleId={activeCircle}
-        onSuccess={handleCaseCreated}
-      />
 
       {/* Universal Command Search Palette */}
       <CommandPalette

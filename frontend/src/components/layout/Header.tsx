@@ -20,7 +20,6 @@ import {
   KeyRound,
   ExternalLink,
 } from "lucide-react";
-import { DEMO_SCENARIOS } from "../../features/demo/demoCatalog";
 import { Modal } from "../common/Modal";
 import { useCircle } from "../../context/CircleContext";
 
@@ -60,7 +59,6 @@ export const Header: React.FC<HeaderProps> = ({
     }
   });
 
-  const [demoMenuOpen, setDemoMenuOpen] = useState(false);
   const [officerMenuOpen, setOfficerMenuOpen] = useState(false);
   const { allCircles, customCircles, addCustomCircle } = useCircle();
 
@@ -195,109 +193,11 @@ export const Header: React.FC<HeaderProps> = ({
                 </select>
               </div>
 
-              {/* Certified Demo Scenarios Dropdown Launcher */}
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setDemoMenuOpen(!demoMenuOpen);
-                    setOfficerMenuOpen(false);
-                  }}
-                  className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg bg-[#0B213B] hover:bg-[#0E294A] border border-amber-400/30 hover:border-amber-400/50 text-white font-semibold text-xs transition-all shadow-2xs focus:outline-none cursor-pointer"
-                  title="Quick Access: Certified Statutory Demonstration Scenarios"
-                  aria-haspopup="true"
-                  aria-expanded={demoMenuOpen}
-                >
-                  <Scale size={14} className="text-[#FF9933] shrink-0" />
-                  <span className="hidden sm:inline">{language === "hi" ? "सांविधिक डेमो" : "Demo Suite"}</span>
-                  <span className="px-1.5 py-0.2 rounded-md bg-amber-500/20 text-amber-300 border border-amber-400/30 text-[10px] font-mono font-bold">
-                    7
-                  </span>
-                  <ChevronDown size={13} className={`text-blue-200 transition-transform duration-200 ${demoMenuOpen ? "rotate-180" : ""}`} />
-                </button>
-
-                {demoMenuOpen && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-40 bg-transparent"
-                      onClick={() => setDemoMenuOpen(false)}
-                      aria-hidden="true"
-                    />
-
-                    <div className="absolute right-0 mt-2 w-80 sm:w-88 rounded-xl bg-white text-slate-800 shadow-2xl border border-slate-200 p-2 z-50 animate-pop-in">
-                      <div className="px-3 py-2 border-b border-slate-100 flex items-center justify-between">
-                        <div>
-                          <p className="font-extrabold text-xs text-[#1B365D] flex items-center gap-1.5">
-                            <Scale size={12} className="text-[#FF9933]" />
-                            <span>{language === "hi" ? "सांविधिक प्रदर्शन परिदृश्य" : "Statutory Demo Suite"}</span>
-                          </p>
-                          <p className="text-[10px] text-slate-500">
-                            {language === "hi" ? "त्वरित सांविधिक जांच हेतु 1-क्लिक लोड" : "1-Click load for statutory audit"}
-                          </p>
-                        </div>
-                        <Link
-                          to="/dashboard#demo-showcase"
-                          onClick={() => setDemoMenuOpen(false)}
-                          className="text-[11px] font-bold text-[#1B365D] hover:underline"
-                        >
-                          {language === "hi" ? "सभी 7 देखें" : "View All"}
-                        </Link>
-                      </div>
-
-                      <div className="py-1 max-h-80 overflow-y-auto space-y-1">
-                        {DEMO_SCENARIOS.map((s) => (
-                          <button
-                            key={s.caseId}
-                            type="button"
-                            onClick={() => {
-                              setDemoMenuOpen(false);
-                              resetScrollToTop();
-                              navigate(`/inspections/${s.caseId}`);
-                            }}
-                            className="w-full text-left p-2 rounded-lg hover:bg-slate-50 flex items-center justify-between gap-2 text-xs transition-colors group border border-transparent hover:border-slate-200 cursor-pointer"
-                          >
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center gap-1.5">
-                                <span className="font-mono text-[9px] font-bold text-slate-500">
-                                  #{s.scenarioNumber}
-                                </span>
-                                <span className="font-bold text-slate-800 group-hover:text-[#1B365D] truncate">
-                                  {language === "hi" && s.titleHi ? s.titleHi : s.title}
-                                </span>
-                              </div>
-                              <p className="text-[10.5px] text-slate-500 truncate mt-0.5">
-                                {language === "hi" && s.headlineViolationHi ? s.headlineViolationHi : s.headlineViolation}
-                              </p>
-                            </div>
-                            <span
-                              className={`text-[9.5px] font-bold px-1.5 py-0.5 rounded border shrink-0 ${
-                                s.targetVerdict === "FAIL"
-                                  ? "bg-rose-50 text-rose-700 border-rose-200"
-                                  : s.targetVerdict === "PASS"
-                                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                                  : s.targetVerdict === "REVIEW"
-                                  ? "bg-amber-50 text-amber-700 border-amber-200"
-                                  : "bg-slate-100 text-slate-700 border-slate-300"
-                              }`}
-                            >
-                              {s.targetVerdict}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-
               {/* Government Officer Digital ID Badge & Popover */}
               <div className="relative">
                 <button
                   type="button"
-                  onClick={() => {
-                    setOfficerMenuOpen(!officerMenuOpen);
-                    setDemoMenuOpen(false);
-                  }}
+                  onClick={() => setOfficerMenuOpen(!officerMenuOpen)}
                   aria-haspopup="true"
                   aria-expanded={officerMenuOpen}
                   aria-label="Officer Profile and Telemetry"

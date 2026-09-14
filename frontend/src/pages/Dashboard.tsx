@@ -209,14 +209,6 @@ export const Dashboard: React.FC = () => {
         <div className="p-5 sm:p-6 space-y-4 relative z-10">
           {/* Top Row: Authority & Badges */}
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-4 relative">
-            {/* Sovereign Directorate Seal Watermark (Right aligned background accent) */}
-            <img
-              src="/assets/gov/doca_legal_metrology_seal.svg"
-              alt="Directorate Seal Watermark"
-              className="hidden xl:block absolute right-72 -top-3 w-20 h-20 opacity-20 pointer-events-none select-none"
-              aria-hidden="true"
-            />
-
             <div className="flex items-start gap-4">
               {/* Sovereign State Emblem of India (Unboxed & Majestic) */}
               <div className="shrink-0 flex items-center justify-center pt-0.5">
@@ -265,63 +257,61 @@ export const Dashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Bottom Row: Officer Telemetry, Jurisdiction, Live Time & Operational Modes */}
+          {/* Bottom Row: Official Statutory Authority & Operational Mandate */}
           <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-3 text-xs bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-            {/* Officer Persona */}
+            {/* Statutory Act Mandate */}
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-[#1B365D] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
-                {user?.officerRole === "CONTROLLER" ? "CTRL" : "LMO"}
+              <div className="w-8 h-8 rounded-lg bg-[#1B365D] text-amber-300 flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+                <Scale size={16} />
               </div>
               <div className="min-w-0">
                 <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider truncate">
-                  {user?.officerRole === "CONTROLLER"
-                    ? (language === "hi" ? "सक्रिय नियंत्रक" : "Active Controller")
-                    : t("dash.active_inspector", "Active Inspector")}
+                  {language === "hi" ? "सांविधिक प्राधिकार" : "Statutory Authority"}
                 </p>
-                <p
-                  className="font-extrabold text-[#1B365D] truncate"
-                  title={`${user?.name || "Rajesh Sharma"} (${user?.badgeNumber || "INSP-DL-0842"})`}
-                >
-                  {user?.name || "Rajesh Sharma"} ({user?.badgeNumber || "INSP-DL-0842"})
+                <p className="font-extrabold text-[#1B365D] truncate text-[11.5px]" title="The Legal Metrology Act, 2009 (Act No. 1 of 2010)">
+                  {language === "hi" ? "विधिक मापविज्ञान अधिनियम, 2009" : "Legal Metrology Act, 2009"}
                 </p>
               </div>
             </div>
 
-            {/* Jurisdiction Circle */}
+            {/* Regulatory Rules & Schedules */}
             <div className="flex items-center gap-2.5 border-t sm:border-t-0 sm:border-l border-slate-200 pt-2 sm:pt-0 sm:pl-3">
-              <Scale size={18} className="text-[#1B365D] shrink-0" />
+              <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center shrink-0">
+                <FileText size={16} />
+              </div>
               <div className="min-w-0">
                 <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider truncate">
-                  {t("dash.jurisdiction_circle", "Jurisdiction Circle")}
+                  {language === "hi" ? "विनियामक नियम" : "Regulatory Enactment"}
                 </p>
-                <p
-                  className="font-bold text-slate-900 truncate font-mono text-[11px]"
-                  title={language === "hi" ? currentCircle.labelHi : currentCircle.label}
-                >
-                  {language === "hi" ? currentCircle.labelHi : currentCircle.label}
+                <p className="font-bold text-slate-900 truncate font-mono text-[11px]" title="Legal Metrology (Packaged Commodities) Rules, 2011">
+                  {language === "hi" ? "एलएमपीसी नियम, 2011 (तालिका-I)" : "LMPC Rules, 2011 (Table-I)"}
                 </p>
               </div>
             </div>
 
-            {/* Live IST Clock */}
+            {/* Digital Evidentiary Standard */}
             <div className="flex items-center gap-2.5 border-t xl:border-t-0 xl:border-l border-slate-200 pt-2 xl:pt-0 xl:pl-3">
-              <Clock size={18} className="text-emerald-700 shrink-0" />
+              <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 flex items-center justify-center shrink-0">
+                <ShieldCheck size={16} />
+              </div>
               <div className="min-w-0">
                 <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider truncate">
-                  {t("dash.ist_time", "Live Indian Standard Time")}
+                  {language === "hi" ? "न्यायालय साक्ष्य प्रमाणन" : "Court Evidence Standard"}
                 </p>
-                <p className="font-mono font-extrabold text-slate-900 tabular-nums">
-                  {currentDateTime || "11 Sep 2026 IST"}
+                <p className="font-mono font-bold text-slate-900 truncate text-[11px]" title="Section 63, Bharatiya Sakshya Adhiniyam, 2023">
+                  {language === "hi" ? "धारा 63 बीएसए 2023 (हैश सील्ड)" : "Sec. 63 BSA 2023 (Hash Sealed)"}
                 </p>
               </div>
             </div>
 
-            {/* Operational Modes Telemetry */}
+            {/* Operational Telemetry */}
             <div className="flex items-center gap-2.5 border-t xl:border-t-0 xl:border-l border-slate-200 pt-2 xl:pt-0 xl:pl-3">
-              <Radio size={18} className="text-blue-600 shrink-0 animate-pulse" />
+              <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-700 border border-purple-200 flex items-center justify-center shrink-0">
+                <Radio size={16} className="animate-pulse" />
+              </div>
               <div className="min-w-0">
                 <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider truncate">
-                  {t("dash.system_telemetry", "System Telemetry")}
+                  {language === "hi" ? "प्रवर्तन कार्यप्रणाली" : "Operational Telemetry"}
                 </p>
                 <p className="font-bold text-slate-900 truncate text-[11px]">
                   Mode A <span className="text-emerald-700 font-extrabold">{t("dash.mode_a_online", "Online")}</span> • Mode B <span className="text-amber-800 font-extrabold">{t("dash.mode_b_resilient", "Resilient")}</span>
