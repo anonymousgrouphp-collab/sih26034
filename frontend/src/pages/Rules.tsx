@@ -117,6 +117,14 @@ export const Rules: React.FC = () => {
 
   useEffect(() => {
     resetScrollToTop();
+    const raf = requestAnimationFrame(() => resetScrollToTop());
+    const t1 = setTimeout(() => resetScrollToTop(), 80);
+    const t2 = setTimeout(() => resetScrollToTop(), 200);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
   }, [activeTab]);
 
   return (

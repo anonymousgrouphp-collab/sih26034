@@ -72,6 +72,18 @@ export const AnimatedPage: React.FC<{ children: React.ReactNode }> = ({ children
     resetScrollToTop();
   }, []);
 
+  React.useEffect(() => {
+    resetScrollToTop();
+    const raf = requestAnimationFrame(() => resetScrollToTop());
+    const t1 = setTimeout(() => resetScrollToTop(), 60);
+    const t2 = setTimeout(() => resetScrollToTop(), 180);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, []);
+
   return (
     <m.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
       {children}

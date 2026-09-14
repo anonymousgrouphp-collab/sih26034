@@ -5,6 +5,7 @@ import { StateEmblem } from "../components/common/StateEmblem";
 import { GovTopBar } from "../components/layout/GovTopBar";
 import { GovFooter } from "../components/layout/GovFooter";
 import { useLanguage } from "../context/LanguageContext";
+import { resetScrollToTop } from "../components/common/ScrollToTop";
 import {
   FileQuestion,
   Home,
@@ -73,25 +74,27 @@ export const NotFound: React.FC = () => {
             {/* Quick Recovery Options */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-left">
               <Link
-                to="/dashboard"
-                className="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100/80 transition-colors group btn-press"
+                to="/"
+                onClick={resetScrollToTop}
+                className="p-3 rounded-lg border border-slate-200 hover:border-[#1B365D] hover:bg-slate-50 transition-all flex items-center gap-3 text-left group"
               >
                 <div className="p-2 rounded-lg bg-blue-50 text-[#1B365D] group-hover:bg-[#1B365D] group-hover:text-white transition-colors shrink-0">
                   <Home size={18} />
                 </div>
                 <div>
                   <div className="text-xs font-bold text-slate-900">
-                    {language === "hi" ? "कार्यकारी डैशबोर्ड" : "Executive Dashboard"}
+                    {language === "hi" ? "मुख्य पोर्टल (होम)" : "National Home Portal"}
                   </div>
                   <div className="text-[11px] text-slate-500 mt-0.5">
-                    {language === "hi" ? "निरीक्षण नियंत्रण कक्ष पर लौटें" : "Return to inspection control centre"}
+                    {language === "hi" ? "राष्ट्रीय प्रवर्तन लैंडिंग पृष्ठ" : "Return to national public portal"}
                   </div>
                 </div>
               </Link>
 
               <Link
                 to="/inspections"
-                className="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100/80 transition-colors group btn-press"
+                onClick={resetScrollToTop}
+                className="p-3 rounded-lg border border-slate-200 hover:border-[#1B365D] hover:bg-slate-50 transition-all flex items-center gap-3 text-left group"
               >
                 <div className="p-2 rounded-lg bg-blue-50 text-[#1B365D] group-hover:bg-[#1B365D] group-hover:text-white transition-colors shrink-0">
                   <ClipboardList size={18} />
@@ -111,7 +114,10 @@ export const NotFound: React.FC = () => {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 border-t border-slate-200">
               <button
                 type="button"
-                onClick={() => navigate(-1)}
+                onClick={() => {
+                  resetScrollToTop();
+                  navigate(-1);
+                }}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors btn-press"
               >
                 <ArrowLeft size={14} />
@@ -119,6 +125,7 @@ export const NotFound: React.FC = () => {
               </button>
               <Link
                 to="/rules"
+                onClick={resetScrollToTop}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-[#1B365D] text-xs font-bold text-white hover:bg-[#0A2540] transition-colors shadow-xs btn-press"
               >
                 <span>{language === "hi" ? "एलएमपीसी सांविधिक नियम देखें" : "Browse LMPC Statutory Rules"}</span>

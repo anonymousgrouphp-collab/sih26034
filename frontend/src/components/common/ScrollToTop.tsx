@@ -71,13 +71,20 @@ export const ScrollToTop: React.FC = () => {
     }
   }, [pathname, search, hash]);
 
-  // Double check after requestAnimationFrame to catch post-exit AnimatePresence paint
+  // Staggered checks to catch post-exit AnimatePresence paint, dynamic layout shifts and route transitions
   useEffect(() => {
     if (!hash) {
-      const raf = requestAnimationFrame(() => {
-        resetScrollToTop();
-      });
-      return () => cancelAnimationFrame(raf);
+      resetScrollToTop();
+      const raf = requestAnimationFrame(() => resetScrollToTop());
+      const t1 = setTimeout(() => resetScrollToTop(), 50);
+      const t2 = setTimeout(() => resetScrollToTop(), 150);
+      const t3 = setTimeout(() => resetScrollToTop(), 300);
+      return () => {
+        cancelAnimationFrame(raf);
+        clearTimeout(t1);
+        clearTimeout(t2);
+        clearTimeout(t3);
+      };
     }
   }, [pathname, search, hash]);
 

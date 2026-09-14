@@ -6,7 +6,7 @@ import { LanguageProvider } from "./context/LanguageContext";
 import { CircleProvider } from "./context/CircleContext";
 import { AppShell } from "./components/layout/AppShell";
 import { AnimatedPage } from "./components/common/motion";
-import { ScrollToTop } from "./components/common/ScrollToTop";
+import { ScrollToTop, resetScrollToTop } from "./components/common/ScrollToTop";
 
 // Pages
 import Landing from "./pages/Landing";
@@ -43,7 +43,7 @@ const ProtectedWorkstation: React.FC<{ children: React.ReactNode }> = ({ childre
 const AnimatedRoutes: React.FC = () => {
   const location = useLocation();
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="wait" onExitComplete={() => resetScrollToTop()}>
       <Routes location={location} key={location.pathname}>
           {/* Public Portal & Login */}
           <Route path="/" element={<AnimatedPage><Landing /></AnimatedPage>} />
