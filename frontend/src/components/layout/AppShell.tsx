@@ -59,18 +59,18 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   ).length;
 
   return (
-    <div className="h-screen flex flex-col bg-slate-50 font-sans overflow-hidden text-slate-900">
+    <div className="app-shell h-screen flex flex-col bg-slate-50 font-sans overflow-hidden text-slate-900 print:h-auto print:min-h-0 print:overflow-visible print:bg-white print:block">
       {/* WCAG 2.1 AA Accessible Skip Link */}
       <a href="#main-content" className="skip-link">
         {language === "hi" ? "मुख्य वैधानिक सामग्री पर जाएं" : "Skip to main statutory content"}
       </a>
 
       {/* Official GIGW 3.0 Government of India Top Utility Bar */}
-      <div className="shrink-0 z-50">
+      <div className="shrink-0 z-50 print:hidden">
         <GovTopBar />
       </div>
 
-      <div className="shrink-0 z-40">
+      <div className="shrink-0 z-40 print:hidden">
         <Header
           activeCircle={activeCircle}
           onCircleChange={(c) => {
@@ -83,7 +83,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
         />
       </div>
 
-      <div className="flex-1 flex min-h-0 overflow-hidden w-full max-w-[1750px] mx-auto">
+      <div className="flex-1 flex min-h-0 overflow-hidden w-full max-w-[1750px] mx-auto print:h-auto print:min-h-0 print:overflow-visible print:max-w-none print:block print:w-full">
         <Sidebar
           pendingCasesCount={pendingReviewCount}
           mobileOpen={mobileSidebarOpen}
@@ -95,9 +95,9 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
           id="main-content"
           tabIndex={-1}
           role="main"
-          className="flex-1 p-3 sm:p-5 lg:p-6 overflow-y-auto min-w-0 focus:outline-none flex flex-col custom-scrollbar"
+          className="flex-1 p-3 sm:p-5 lg:p-6 overflow-y-auto min-w-0 focus:outline-none flex flex-col custom-scrollbar print:h-auto print:min-h-0 print:overflow-visible print:p-0 print:block print:w-full"
         >
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 print:h-auto print:min-h-0 print:overflow-visible print:block print:w-full">
             <AnimatePresence>
               {notification && (
                 <m.div

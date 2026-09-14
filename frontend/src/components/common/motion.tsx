@@ -85,7 +85,13 @@ export const AnimatedPage: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   return (
-    <m.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+    <m.div
+      variants={pageVariants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      className="animated-page print:transform-none print:overflow-visible print:h-auto print:block"
+    >
       {children}
     </m.div>
   );

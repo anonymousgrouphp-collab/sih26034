@@ -104,7 +104,7 @@ export const DemoCaseTourBanner: React.FC<DemoCaseTourBannerProps> = ({
       <div
         role="region"
         aria-label="Demonstration Scenario Navigation Bar"
-        className={`rounded-xl border shadow-xs p-4 sm:p-5 bg-white transition-all duration-200 relative overflow-hidden ${theme.border}`}
+        className={`demo-tour-banner screen-only no-print print:hidden rounded-xl border shadow-xs p-4 sm:p-5 bg-white transition-all duration-200 relative overflow-hidden ${theme.border}`}
       >
         {/* Subtle Top Tricolor Sovereign Accent */}
         <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#FF9933] via-slate-200 to-[#138808]" />

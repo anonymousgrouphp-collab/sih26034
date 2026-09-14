@@ -142,12 +142,12 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
       </div>
 
       {/* 2. Printable Formal Report Container */}
-      <div className="printable-report bg-white text-slate-900 p-6 sm:p-10 rounded-2xl border border-slate-300 shadow-xl space-y-6 max-w-5xl mx-auto relative overflow-hidden">
+      <div className="printable-report bg-white text-slate-900 p-6 sm:p-10 rounded-2xl border border-slate-300 shadow-xl space-y-6 max-w-5xl mx-auto relative overflow-hidden print:p-0 print:border-none print:shadow-none print:max-w-none print:overflow-visible print:rounded-none print:space-y-4 print:static">
         {/* Top Indian Tricolor Accent Ribbon */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FF9933] via-white to-[#138808] screen-only" />
 
         {/* Official National Emblem & Gazette Formal Header */}
-        <div className="border-b-2 border-slate-900 pb-5 text-center sm:text-left flex flex-col sm:flex-row items-center sm:items-start justify-between gap-5">
+        <div className="border-b-2 border-slate-900 pb-5 text-center sm:text-left flex flex-col sm:flex-row items-center sm:items-start justify-between gap-5 print-avoid-break">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
             <StateEmblem size={48} tone="navy" showMotto={true} className="shrink-0" />
             <div>
@@ -209,7 +209,7 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
         </div>
 
         {/* Section 1: Establishment & Commodity Identification */}
-        <section className="space-y-2">
+        <section className="space-y-2 print-avoid-break">
           <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B365D] border-b border-slate-200 pb-1.5">
             {language === "hi"
               ? "1. प्रतिष्ठान एवं वस्तु (कमोडिटी) पहचान"
@@ -264,7 +264,7 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
         </section>
 
         {/* Section 2: Original Evidence Asset */}
-        <section className="space-y-2">
+        <section className="space-y-2 print-avoid-break">
           <div className="flex items-center justify-between border-b border-slate-200 pb-1.5">
             <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B365D]">
               {language === "hi" ? "2. भौतिक साक्ष्य संपत्ति अभिलेख" : "2. Physical Evidence Asset Record"}
@@ -312,7 +312,7 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
         </section>
 
         {/* Section 3: Automated Diagnostic Analysis */}
-        <section className="space-y-2">
+        <section className="space-y-2 print-avoid-break">
           <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B365D] border-b border-slate-200 pb-1.5">
             {language === "hi" ? "3. स्वचालित नैदानिक विश्लेषण टेलीमेट्री" : "3. Automated Diagnostic Analysis Telemetry"}
           </h2>
@@ -395,7 +395,7 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
                 : "No statutory rule evaluations recorded for this inspection case."}
             </div>
           ) : (
-            <div className="overflow-x-auto border border-slate-200 rounded-xl shadow-2xs">
+            <div className="overflow-x-auto border border-slate-200 rounded-xl shadow-2xs print:overflow-visible print:border print:border-slate-300 print:shadow-none">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
                   <tr className="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold uppercase text-[10px]">
@@ -475,7 +475,7 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
         </section>
 
         {/* Section 5: Officer Adjudication Review */}
-        <section className="space-y-2">
+        <section className="space-y-2 print-avoid-break">
           <h2 className="text-xs font-bold uppercase tracking-wider text-[#1B365D] border-b border-slate-200 pb-1.5">
             {language === "hi"
               ? "5. मानव अधिकारी न्यायिक निर्णय एवं अंतिम निर्धारण"
@@ -541,7 +541,7 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
             </span>
           </div>
 
-          <div className="overflow-x-auto border border-slate-200 rounded-xl shadow-2xs">
+          <div className="overflow-x-auto border border-slate-200 rounded-xl shadow-2xs print:overflow-visible print:border print:border-slate-300 print:shadow-none">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
                 <tr className="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold uppercase text-[10px]">
@@ -585,7 +585,7 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
         </section>
 
         {/* Section 7: Downstream Administrative Case Readiness */}
-        <section className="space-y-2 border-t border-slate-200 pt-4">
+        <section className="space-y-2 border-t border-slate-200 pt-4 print-avoid-break">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-50/70 p-3.5 rounded-xl border border-slate-200 text-xs shadow-2xs">
             <div>
               <span className="text-slate-500 font-medium">
@@ -618,7 +618,7 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
         </section>
 
         {/* Section 8: Section 63 BSA 2023 Statutory Evidence Certificate & Gazetted Officer Seal */}
-        <section className="mt-6 pt-5 border-t-2 border-slate-900 space-y-4">
+        <section className="mt-6 pt-5 border-t-2 border-slate-900 space-y-4 print-avoid-break">
           <div className="bg-amber-50/40 border border-amber-300/80 rounded-2xl p-5 space-y-3 shadow-xs">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-amber-200 pb-2 gap-1">
               <div className="flex items-center gap-2">

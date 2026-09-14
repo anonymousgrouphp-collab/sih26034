@@ -155,7 +155,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         initial={false}
         animate={{ width: isCollapsed ? 68 : 256 }}
         transition={{ duration: 0.2, ease: [0.2, 0, 0, 1] }}
-        className="hidden lg:flex h-full shrink-0 flex-col border-r border-slate-200 bg-white text-slate-700 shadow-xs select-none z-30"
+        className="hidden lg:flex h-full shrink-0 flex-col border-r border-slate-200 bg-white text-slate-700 shadow-xs select-none z-30 print:hidden"
       >
         {/* Desktop Header / Collapse Bar */}
         <div className="flex items-center justify-between px-3.5 py-3 border-b border-slate-100 shrink-0">
@@ -307,7 +307,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ duration: 0.25, ease: [0.2, 0, 0, 1] }}
-              className="fixed inset-y-0 left-0 w-72 max-w-[85vw] h-[100dvh] flex flex-col bg-white shadow-2xl z-[71] border-r border-slate-200 select-none"
+              className="fixed inset-y-0 left-0 w-72 max-w-[85vw] h-[100dvh] flex flex-col bg-white shadow-2xl z-[71] border-r border-slate-200 select-none print:hidden"
             >
               {/* Mobile Drawer Header */}
               <div className="flex h-14 items-center justify-between border-b border-slate-200 px-4 bg-slate-50 shrink-0">

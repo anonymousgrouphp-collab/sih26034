@@ -654,28 +654,31 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
   return (
     <div className="space-y-4">
       {/* 0. Interactive Demonstration Case Tour Banner (when exploring pre-certified fixtures) */}
-      {(caseData.is_mock_fixture ||
-        ApiService.isDemoId(caseData.id) ||
-        ApiService.isDemoId(caseData.sku_demo_id || "")) && (
-        <DemoCaseTourBanner
-          currentCaseId={caseData.sku_demo_id || caseData.id}
-          onSelectCase={onSelectCase}
-        />
-      )}
+      {activeWorkspaceView !== "REPORT" &&
+        (caseData.is_mock_fixture ||
+          ApiService.isDemoId(caseData.id) ||
+          ApiService.isDemoId(caseData.sku_demo_id || "")) && (
+          <DemoCaseTourBanner
+            currentCaseId={caseData.sku_demo_id || caseData.id}
+            onSelectCase={onSelectCase}
+          />
+        )}
 
       {/* 1. Compact Case Shell Header */}
-      <CaseHeader
-        caseData={caseData}
-        onBack={onBack}
-        isProcessing={isSubmittingEvidence || isAnalyzingPipeline}
-        onDeleteCase={() => setIsDeleteDialogOpen(true)}
-      />
+      {activeWorkspaceView !== "REPORT" && (
+        <CaseHeader
+          caseData={caseData}
+          onBack={onBack}
+          isProcessing={isSubmittingEvidence || isAnalyzingPipeline}
+          onDeleteCase={() => setIsDeleteDialogOpen(true)}
+        />
+      )}
 
       {/* Action Error Banner */}
       {actionError && (
         <div
           role="alert"
-          className="p-3 bg-verdictFail-light border border-verdictFail-dark/30 rounded-md text-xs text-verdictFail-dark flex items-center justify-between"
+          className="screen-only no-print p-3 bg-verdictFail-light border border-verdictFail-dark/30 rounded-md text-xs text-verdictFail-dark flex items-center justify-between"
         >
           <div className="flex items-center gap-2">
             <svg className="w-4 h-4 text-verdictFail" fill="none" viewBox="0 0 24 24" stroke="currentColor">

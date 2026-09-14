@@ -295,7 +295,7 @@
 @media print {
   @page {
     size: A4 portrait;
-    margin: 10mm 12mm;
+    margin: 10mm 12mm 10mm 12mm;
   }
 
   /* Completely suppress all web application chrome, navigation, headers, footers and sidebars */
@@ -314,13 +314,17 @@
   [role="navigation"],
   [role="region"][aria-label*="Government Header"],
   [role="region"][aria-label*="Top"],
+  [role="region"][aria-label*="Demonstration"],
   .case-header,
-  .workspace-switcher {
+  .workspace-switcher,
+  .demo-tour-banner,
+  .command-palette {
     display: none !important;
   }
 
-  body,
-  html {
+  /* Force html and body to be unconstrained and printable */
+  html,
+  body {
     background: #FFFFFF !important;
     color: #000000 !important;
     font-size: 10pt !important;
@@ -328,21 +332,48 @@
     padding: 0 !important;
     overflow: visible !important;
     height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    width: 100% !important;
   }
 
+  /* Override ALL ancestor containers that clamp height or clip overflow */
   #root,
+  #root > div,
+  .h-screen,
   .min-h-screen,
+  .min-h-0,
+  .overflow-hidden,
+  .overflow-y-auto,
+  .overflow-x-auto,
   main,
   #main-content,
+  div[class*="overflow-"],
+  div[class*="h-screen"],
+  div[class*="flex-1"],
   .printable-report {
     overflow: visible !important;
     max-width: 100% !important;
+    width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
     box-shadow: none !important;
     border: none !important;
     background: #FFFFFF !important;
     height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    position: static !important;
+    display: block !important;
+    transform: none !important;
+    filter: none !important;
+    border-radius: 0 !important;
+  }
+
+  /* Neutralize any framer-motion inline transform that breaks CSS fragmentation */
+  div[style*="transform"],
+  [data-projection-id] {
+    transform: none !important;
   }
 
   *,
@@ -352,12 +383,32 @@
     print-color-adjust: exact !important;
   }
 
-  section,
-  table,
-  tr,
-  .print-avoid-break {
+  /* Page break rules for sections and tables */
+  section {
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  .print-avoid-break,
+  tr {
     break-inside: avoid !important;
     page-break-inside: avoid !important;
+  }
+
+  table {
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  thead {
+    display: table-header-group !important;
+  }
+
+  tbody {
+    display: table-row-group !important;
   }
 
   a {
