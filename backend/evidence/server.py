@@ -1574,6 +1574,13 @@ def execute_batch_pipeline(
                         if resp.status_code == 200:
                             nparr = np.frombuffer(resp.content, np.uint8)
                             img_bgr = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                            if img_bgr is not None and file_path_str and storage_manager:
+                                try:
+                                    save_p = storage_manager.get_file_path(file_path_str)
+                                    save_p.parent.mkdir(parents=True, exist_ok=True)
+                                    cv2.imwrite(str(save_p), img_bgr)
+                                except Exception:
+                                    pass
                 except Exception:
                     img_bgr = None
 
@@ -1720,6 +1727,15 @@ def execute_batch_pipeline(
             except Exception:
                 cached_counts[img.id] = 0
 
+    # Prioritize facets: Check database bounding boxes first, then cache, then sharpness
+    db_box_counts = {}
+    for img in ev_images:
+        try:
+            cnt = db.execute(select(func.count(BoundingBox.id)).where(BoundingBox.image_id == img.id)).scalar() or 0
+            db_box_counts[img.id] = cnt
+        except Exception:
+            db_box_counts[img.id] = 0
+
     PANEL_ORDER = {
         "PDP_FRONT": 0,
         "BACK_PANEL": 1,
@@ -1728,10 +1744,11 @@ def execute_batch_pipeline(
         "SIDE_PANEL": 4,
         "UNKNOWN": 5,
     }
-    # Sort images: prioritize highest sharpness (blur variance descending) where text contrast is highest, then panel type
+    # Sort images: prioritize packaging panels with known declarations first, then sharpness
     sorted_images = sorted(
         ev_images,
         key=lambda x: (
+            -db_box_counts.get(x.id, 0),
             -cached_counts.get(x.id, 0),
             -float(getattr(x, "blur_laplacian_variance", 0.0) or 0.0),
             PANEL_ORDER.get(x.panel_type or "UNKNOWN", 99)
@@ -1759,10 +1776,10 @@ def execute_batch_pipeline(
             "ref_box": rbox,
         })
 
-    # Execute workers sequentially with strict safety time budget (22s) to never exceed Vercel/Render proxy timeouts
+    # Execute workers sequentially with safety time budget (50s) to never exceed Vercel proxy timeouts
     import gc
     worker_results = []
-    SAFETY_BUDGET_SECONDS = 22.0
+    SAFETY_BUDGET_SECONDS = 50.0
     MAX_FACETS_TO_PROCESS = 3
 
     discovered_fields = set()
