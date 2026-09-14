@@ -38,6 +38,7 @@ import { LiveApiService } from "./liveApi";
 import { MockApiService } from "./mockApi";
 import { DemoFixtureService } from "./demoFixtures";
 import { getDeletedCaseIds, saveDeletedCaseId, deleteMockCase } from "./mockData";
+import { ApiCache } from "./apiCache";
 
 export { LiveApiService } from "./liveApi";
 export { MockApiService } from "./mockApi";
@@ -117,6 +118,7 @@ export class ApiService {
   }
 
   public static emitSiteWideUpdate(): void {
+    ApiCache.clear();
     if (typeof window !== "undefined") {
       window.dispatchEvent(new Event("nirikshak_data_updated"));
     }
@@ -127,12 +129,20 @@ export class ApiService {
   // ---------------------------------------------------------------------------
 
   public static async getDashboardSummary(circleId?: string): Promise<DashboardSummary> {
+    const cacheKey = `dashboard_summary_${this.operatingMode}_${circleId || "ALL"}`;
+    const cached = ApiCache.get<DashboardSummary>(cacheKey);
+    if (cached) return cached;
+
     try {
-      return await this.getActiveService().getDashboardSummary(circleId);
+      const summary = await this.getActiveService().getDashboardSummary(circleId);
+      ApiCache.set(cacheKey, summary, 15000);
+      return summary;
     } catch (err: any) {
       if (this.operatingMode === "LIVE") {
         console.warn("Live server dashboard summary unreachable. Engaging Mode B Local Resilient failover.");
-        return await MockApiService.getInstance().getDashboardSummary(circleId);
+        const fallback = await MockApiService.getInstance().getDashboardSummary(circleId);
+        ApiCache.set(cacheKey, fallback, 10000);
+        return fallback;
       }
       throw err;
     }
@@ -146,12 +156,18 @@ export class ApiService {
     limit?: number;
     offset?: number;
   }): Promise<{ total: number; items: InspectionSummary[] }> {
+    const cacheKey = `list_inspections_${this.operatingMode}_${JSON.stringify(params || {})}`;
+    const cached = ApiCache.get<{ total: number; items: InspectionSummary[] }>(cacheKey);
+    if (cached) return cached;
+
     const deletedIds = getDeletedCaseIds();
 
     if (this.operatingMode === "DEMO_FIXTURE") {
       const res = await DemoFixtureService.getInstance().listInspections(params);
       const filtered = res.items.filter((c) => !deletedIds.has(c.id) && !deletedIds.has(c.inspection_number));
-      return { total: filtered.length, items: filtered };
+      const result = { total: filtered.length, items: filtered };
+      ApiCache.set(cacheKey, result, 15000);
+      return result;
     }
 
     try {
@@ -175,29 +191,35 @@ export class ApiService {
         if (localCustom.length > 0) {
           const merged = [...filteredLive, ...localCustom];
           merged.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-          return {
+          const mergedResult = {
             total: merged.length,
             items: merged,
           };
+          ApiCache.set(cacheKey, mergedResult, 15000);
+          return mergedResult;
         }
       } catch {
         // Ignore mock merge errors
       }
 
-      return {
+      const result = {
         total: filteredLive.length,
         items: filteredLive,
       };
+      ApiCache.set(cacheKey, result, 15000);
+      return result;
     } catch (err: any) {
       console.warn("Live server unreachable for listInspections. Falling back to Mode B local datastore:", err);
       const mockResult = await MockApiService.getInstance().listInspections(params);
       const filtered = mockResult.items.filter(
         (c) => !deletedIds.has(c.id) && !deletedIds.has(c.inspection_number)
       );
-      return {
+      const result = {
         total: filtered.length,
         items: filtered,
       };
+      ApiCache.set(cacheKey, result, 10000);
+      return result;
     }
   }
 

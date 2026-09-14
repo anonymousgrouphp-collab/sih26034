@@ -124,6 +124,9 @@ class Inspection(Base):
         Index("idx_inspections_status", "overall_status"),
         Index("idx_inspections_timestamp", "inspection_timestamp"),
         Index("idx_inspections_jurisdiction_time", "jurisdiction_id", "inspection_timestamp"),
+        Index("idx_inspections_category", "category"),
+        Index("idx_inspections_jur_status", "jurisdiction_id", "overall_status"),
+        Index("idx_inspections_prod_name", "product_name"),
     )
 
 

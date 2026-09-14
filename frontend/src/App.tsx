@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { AuthProvider, useAuth } from "./context/AuthContext";
@@ -7,22 +7,23 @@ import { CircleProvider } from "./context/CircleContext";
 import { AppShell } from "./components/layout/AppShell";
 import { AnimatedPage } from "./components/common/motion";
 import { ScrollToTop, resetScrollToTop } from "./components/common/ScrollToTop";
+import { PageSkeleton } from "./components/common/LoadingSkeleton";
 
-// Pages
-import Landing from "./pages/Landing";
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import Inspections from "./pages/Inspections";
-import NewInspection from "./pages/NewInspection";
-import InspectionDetails from "./pages/InspectionDetails";
-import EvidenceDossier from "./pages/EvidenceDossier";
-import ReviewQueue from "./pages/ReviewQueue";
-import Rules from "./pages/Rules";
-import Reports from "./pages/Reports";
-import Settings from "./pages/Settings";
-import NotFound from "./pages/NotFound";
-import Unauthorized from "./pages/Unauthorized";
-import StatutoryDocumentPage from "./pages/statutory/StatutoryDocumentPage";
+// Route-Level Code Splitting: Lazy-load all pages to ensure minimal initial bundle size
+const Landing = lazy(() => import("./pages/Landing"));
+const Login = lazy(() => import("./pages/Login"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Inspections = lazy(() => import("./pages/Inspections"));
+const NewInspection = lazy(() => import("./pages/NewInspection"));
+const InspectionDetails = lazy(() => import("./pages/InspectionDetails"));
+const EvidenceDossier = lazy(() => import("./pages/EvidenceDossier"));
+const ReviewQueue = lazy(() => import("./pages/ReviewQueue"));
+const Rules = lazy(() => import("./pages/Rules"));
+const Reports = lazy(() => import("./pages/Reports"));
+const Settings = lazy(() => import("./pages/Settings"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const Unauthorized = lazy(() => import("./pages/Unauthorized"));
+const StatutoryDocumentPage = lazy(() => import("./pages/statutory/StatutoryDocumentPage"));
 import { LEGAL_DOCS, docBasePath } from "./pages/statutory/legalDocRegistry";
 
 // Protected Workstation Route Wrapper
@@ -44,7 +45,8 @@ const AnimatedRoutes: React.FC = () => {
   const location = useLocation();
   return (
     <AnimatePresence mode="wait" onExitComplete={() => resetScrollToTop()}>
-      <Routes location={location} key={location.pathname}>
+      <Suspense fallback={<PageSkeleton />}>
+        <Routes location={location} key={location.pathname}>
           {/* Public Portal & Login */}
           <Route path="/" element={<AnimatedPage><Landing /></AnimatedPage>} />
           <Route path="/login" element={<AnimatedPage><Login /></AnimatedPage>} />
@@ -137,7 +139,8 @@ const AnimatedRoutes: React.FC = () => {
 
           {/* Fallback 404 Not Found Page */}
           <Route path="*" element={<AnimatedPage><NotFound /></AnimatedPage>} />
-      </Routes>
+        </Routes>
+      </Suspense>
     </AnimatePresence>
   );
 };

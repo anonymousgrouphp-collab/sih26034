@@ -1687,32 +1687,17 @@ def execute_batch_pipeline(
             "tokens_count": len(ocr_output.tokens),
         }
 
-    # Fast text density probe to prioritize packaging declarations over calibration cards
-    density_scores = {}
-    ocr_eng_probe = get_cached_ocr_engine()
+    # Prioritize facets: Check cache first, then statutory panel order + image sharpness (blur variance)
     cache_adapter_probe = CacheQueueAdapter.get_instance() if CacheQueueAdapter else None
-
-    for img in ev_images:
-        score = 0
-        try:
-            if cache_adapter_probe:
+    cached_counts = {}
+    if cache_adapter_probe:
+        for img in ev_images:
+            try:
                 c_toks = cache_adapter_probe.get_tokens(img.id)
-                if c_toks:
-                    score = len(c_toks)
-            if score == 0 and ocr_eng_probe is not None:
-                p_mat = _load_image_bgr(img.file_path, getattr(img, "image_url", None))
-                if p_mat is not None:
-                    orig_side = getattr(ocr_eng_probe.detector, "max_side_len", 1280)
-                    ocr_eng_probe.detector.max_side_len = 640
-                    dets = ocr_eng_probe.detector.detect(p_mat)
-                    ocr_eng_probe.detector.max_side_len = orig_side
-                    score = len(dets)
-                    del p_mat
-        except Exception:
-            score = 0
-        density_scores[img.id] = score
+                cached_counts[img.id] = len(c_toks) if c_toks else 0
+            except Exception:
+                cached_counts[img.id] = 0
 
-    # Prioritize facets by detected text density descending, breaking ties with statutory panel order
     PANEL_ORDER = {
         "PDP_FRONT": 0,
         "BACK_PANEL": 1,
@@ -1721,9 +1706,14 @@ def execute_batch_pipeline(
         "SIDE_PANEL": 4,
         "UNKNOWN": 5,
     }
+    # Sort images: prioritize any images with cached tokens, then by panel type, then by sharpness (blur variance descending)
     sorted_images = sorted(
         ev_images,
-        key=lambda x: (-density_scores.get(x.id, 0), PANEL_ORDER.get(x.panel_type or "UNKNOWN", 99))
+        key=lambda x: (
+            -cached_counts.get(x.id, 0),
+            PANEL_ORDER.get(x.panel_type or "UNKNOWN", 99),
+            -float(getattr(x, "blur_laplacian_variance", 0.0) or 0.0)
+        )
     )
 
     # Prepare metadata for facet processing

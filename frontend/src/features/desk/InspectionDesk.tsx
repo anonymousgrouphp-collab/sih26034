@@ -5,6 +5,7 @@ import { GoldenSkuQuickSelector } from "./GoldenSkuQuickSelector";
 import { MapPin, CalendarDays, Plus, Trash2, RefreshCw, AlertTriangle, ArrowUpDown, ArrowDown, ArrowUp, X, Filter } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext";
 import { ApiService } from "../../services/api";
+import { useDebounce } from "../../hooks/useDebounce";
 
 export type DeskSortOption =
   | "DATE_DESC"
@@ -40,10 +41,18 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
   const [caseToDelete, setCaseToDelete] = useState<InspectionSummary | null>(null);
   const [deletingCaseId, setDeletingCaseId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 250);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [selectedWorkflow, setSelectedWorkflow] = useState<string>("ALL");
   const [selectedVerdict, setSelectedVerdict] = useState<string>("ALL");
   const [sortBy, setSortBy] = useState<DeskSortOption>("DATE_DESC");
   const [triageFilter, setTriageFilter] = useState<"ALL" | "CONFLICTS" | "EVIDENCE_GAPS">("ALL");
+
+  // Reset to page 1 on filter or search changes
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearchTerm, selectedWorkflow, selectedVerdict, triageFilter, sortBy, activeCircle]);
 
   // Summary Metrics calculated directly from the cases
   const metrics = useMemo(() => {
@@ -146,9 +155,9 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
         if (!isGap) return false;
       }
 
-      // Search term filter
-      if (searchTerm.trim()) {
-        const query = searchTerm.toLowerCase();
+      // Search term filter (debounced for maximum typing responsiveness)
+      if (debouncedSearchTerm.trim()) {
+        const query = debouncedSearchTerm.toLowerCase();
         const prodName = getFormattedProductName(c).toLowerCase();
         const matchProduct = prodName.includes(query);
         const matchNumber = c.inspection_number.toLowerCase().includes(query);
@@ -198,8 +207,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
           const score = (c: InspectionSummary) => {
             if (c.overall_status === "FAIL" || (c.violations_count && c.violations_count > 0)) return 1;
             if (c.overall_status === "REVIEW" || c.overall_status === "UNABLE_TO_VERIFY" || c.overall_status === "PENDING_REVIEW" || c.overall_status === "PENDING") return 2;
-            if (c.overall_status === "PASS") return 3;
-            return 4;
+            return 3;
           };
           return score(a) - score(b);
         }
@@ -219,7 +227,16 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
           return 0;
       }
     });
-  }, [cases, activeCircle, searchTerm, selectedWorkflow, selectedVerdict, triageFilter, sortBy]);
+  }, [cases, activeCircle, debouncedSearchTerm, selectedWorkflow, selectedVerdict, triageFilter, sortBy]);
+
+  // Client-Side List Pagination for Performance and Smooth DOM Rendering
+  const totalPages = Math.max(1, Math.ceil(filteredCases.length / pageSize));
+  const validCurrentPage = Math.min(currentPage, totalPages);
+  const startIndex = (validCurrentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, filteredCases.length);
+  const paginatedCases = useMemo(() => {
+    return filteredCases.slice(startIndex, endIndex);
+  }, [filteredCases, startIndex, endIndex]);
 
   const formatInspectionType = (type?: string) => {
     if (language === "hi") {
@@ -565,7 +582,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
 
             {/* Mobile View: High-Legibility Card Tiles */}
             <div className="block md:hidden divide-y divide-slate-100">
-              {filteredCases.map((c) => {
+              {paginatedCases.map((c) => {
                 const conf = getCaseConfidence(c);
                 const confPct = Math.min(100, Math.max(0, Math.round(conf * 100)));
                 return (
@@ -713,7 +730,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
-                {filteredCases.map((c) => {
+                {paginatedCases.map((c) => {
                   const conf = getCaseConfidence(c);
                   const confPct = Math.min(100, Math.max(0, Math.round(conf * 100)));
                   return (
@@ -748,38 +765,29 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                         </div>
                       </td>
 
-                      {/* Establishment & Location */}
-                      <td className="px-4 py-3.5">
-                        <div className="text-slate-800 font-medium max-w-xs truncate" title={c.establishment_name || (language === "hi" ? "क्षेत्र व्यापारी" : "Field Trader")}>
-                          {c.establishment_name || (language === "hi" ? "क्षेत्र जब्ती" : "Field Seizure")}
-                        </div>
-                        <div className="text-[11px] text-slate-500 font-medium max-w-xs truncate flex items-center gap-1 mt-0.5">
-                          <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
-                          <span className="truncate">{c.location || c.jurisdiction_id}</span>
-                        </div>
+                      {/* Establishment / Location */}
+                      <td className="px-4 py-3.5 text-slate-600">
+                        <div className="font-medium text-slate-800 truncate max-w-xs">{c.establishment_name || (language === "hi" ? "खुदरा स्टोर / डिपो" : "Retail Store / Depot")}</div>
+                        <div className="text-[11px] text-slate-400 font-mono mt-0.5 truncate">{c.location || c.jurisdiction_id}</div>
                       </td>
 
                       {/* Inspection Type */}
-                      <td className="px-4 py-3.5 whitespace-nowrap">
-                        <span className="text-slate-700 font-medium">
+                      <td className="px-4 py-3.5 whitespace-nowrap text-slate-600">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-700">
                           {formatInspectionType(c.inspection_type)}
                         </span>
                       </td>
 
-                      {/* Confidence Micro-Progress Bar */}
+                      {/* Confidence Score Bar */}
                       <td className="px-4 py-3.5 whitespace-nowrap">
-                        <div className="w-24">
-                          <span className="text-[11px] font-mono font-bold text-slate-700">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono font-bold text-xs text-slate-700 w-8 text-right">
                             {confPct}%
                           </span>
-                          <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-slate-100 border border-slate-200">
+                          <div className="h-1.5 w-16 overflow-hidden rounded-full bg-slate-100 border border-slate-200">
                             <div
                               className={`h-full rounded-full transition-all ${
-                                confPct >= 90
-                                  ? "bg-emerald-500"
-                                  : confPct >= 70
-                                  ? "bg-amber-500"
-                                  : "bg-rose-500"
+                                confPct >= 90 ? "bg-emerald-500" : confPct >= 70 ? "bg-amber-500" : "bg-rose-500"
                               }`}
                               style={{ width: `${confPct}%` }}
                             />
@@ -789,14 +797,19 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
 
                       {/* Workflow Status */}
                       <td className="px-4 py-3.5 whitespace-nowrap">
-                        <WorkflowBadge status={c.workflow_status || "OPEN"} size="sm" />
+                        {c.workflow_status ? (
+                          <WorkflowBadge status={c.workflow_status} size="sm" />
+                        ) : (
+                          <span className="text-slate-400 italic text-[11px]">{language === "hi" ? "अप्रकाशित" : "N/A"}</span>
+                        )}
                       </td>
 
                       {/* Compliance Verdict */}
                       <td className="px-4 py-3.5 whitespace-nowrap">
-                        {c.workflow_status === "DRAFT" ? (
-                          <span className="text-[11px] text-slate-400 font-mono">
-                            {language === "hi" ? "[साक्ष्य उपलब्ध नहीं]" : "[NO EVIDENCE]"}
+                        {c.violations_count && c.violations_count > 0 ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                            <AlertTriangle size={11} className="text-rose-600" />
+                            {language === "hi" ? `${c.violations_count} उल्लंघन` : `${c.violations_count} Violations`}
                           </span>
                         ) : (
                           <VerdictBadge verdict={c.overall_status} size="sm" />
@@ -836,6 +849,60 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
               </tbody>
             </table>
           </div>
+
+          {/* Performance Pagination Controls */}
+          {filteredCases.length > 0 && (
+            <div className="bg-slate-50 px-4 py-3 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
+              <div className="flex items-center gap-2">
+                <span>
+                  {language === "hi"
+                    ? `कुल ${filteredCases.length} में से ${startIndex + 1}-${endIndex} मामले`
+                    : `Showing ${startIndex + 1}-${endIndex} of ${filteredCases.length} cases`}
+                </span>
+                <span className="text-slate-300">|</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-slate-500">{language === "hi" ? "प्रति पृष्ठ:" : "Rows per page:"}</span>
+                  <select
+                    value={pageSize}
+                    onChange={(e) => {
+                      setPageSize(Number(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                    className="border border-slate-300 rounded px-1.5 py-0.5 bg-white text-slate-700 text-xs focus:ring-1 focus:ring-[#1B365D] cursor-pointer"
+                  >
+                    <option value={10}>10</option>
+                    <option value={25}>25</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  disabled={validCurrentPage <= 1}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  className="px-2.5 py-1 rounded border border-slate-200 bg-white text-slate-700 font-medium hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  {language === "hi" ? "← पिछला" : "← Prev"}
+                </button>
+
+                <span className="px-2 text-slate-700 font-bold">
+                  {validCurrentPage} / {totalPages}
+                </span>
+
+                <button
+                  type="button"
+                  disabled={validCurrentPage >= totalPages}
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  className="px-2.5 py-1 rounded border border-slate-200 bg-white text-slate-700 font-medium hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  {language === "hi" ? "अगला →" : "Next →"}
+                </button>
+              </div>
+            </div>
+          )}
         </>
       )}
       </div>
