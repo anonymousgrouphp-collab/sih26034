@@ -127,7 +127,7 @@ export const Header: React.FC<HeaderProps> = ({
                 </button>
               )}
 
-              <NirikshakBrandLogo tone="light" size="md" />
+              <NirikshakBrandLogo tone="light" size="md" showSubtitle={false} />
             </div>
 
             {/* Center: Integrated Universal Enforcement Search Console */}

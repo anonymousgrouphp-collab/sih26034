@@ -7,6 +7,7 @@ interface NirikshakBrandLogoProps {
   className?: string;
   tone?: "light" | "dark"; // "light" for dark blue backgrounds, "dark" for white/light backgrounds
   size?: "sm" | "md" | "lg";
+  showSubtitle?: boolean;
 }
 
 /**
@@ -21,6 +22,7 @@ export const NirikshakBrandLogo: React.FC<NirikshakBrandLogoProps> = ({
   className = "",
   tone = "light",
   size = "md",
+  showSubtitle = true,
 }) => {
   const { language } = useLanguage();
 
@@ -139,20 +141,22 @@ export const NirikshakBrandLogo: React.FC<NirikshakBrandLogoProps> = ({
         </div>
 
         {/* National Tricolor Accent Line — Calibrated to Wordmark & Subtitle Width */}
-        <div className={`flex items-center gap-0.5 mt-1 mb-1 w-full ${barWidthClasses[size]}`}>
+        <div className={`flex items-center gap-0.5 mt-1 ${showSubtitle ? "mb-1" : ""} w-full ${barWidthClasses[size]}`}>
           <div className="h-[2px] flex-1 bg-[#FF9933] rounded-full" />
           <div className={`h-[2px] w-1.5 rounded-full ${isLight ? "bg-white" : "bg-slate-300"}`} />
           <div className="h-[2px] flex-1 bg-[#138808] rounded-full" />
         </div>
 
         {/* Subtitle / Classification — Untruncated and clearly legible */}
-        <p
-          className={`w-full ${barWidthClasses[size]} text-[9px] sm:text-[10px] font-medium tracking-[0.01em] font-['Plus_Jakarta_Sans',_'Noto_Sans',_sans-serif] whitespace-nowrap overflow-visible hidden sm:block leading-tight ${
-            isLight ? "text-slate-200/90" : "text-slate-700"
-          }`}
-        >
-          {language === "hi" ? "निरीक्षण कार्यस्थान" : "Inspection Workstation"}
-        </p>
+        {showSubtitle && (
+          <p
+            className={`w-full ${barWidthClasses[size]} text-[9px] sm:text-[10px] font-medium tracking-[0.01em] font-['Plus_Jakarta_Sans',_'Noto_Sans',_sans-serif] whitespace-nowrap overflow-visible hidden sm:block leading-tight ${
+              isLight ? "text-slate-200/90" : "text-slate-700"
+            }`}
+          >
+            {language === "hi" ? "निरीक्षण कार्यस्थान" : "Inspection Workstation"}
+          </p>
+        )}
       </div>
     </Link>
   );

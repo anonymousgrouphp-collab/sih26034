@@ -1,10 +1,67 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <rect width="32" height="32" rx="7" fill="#071526"/>
-  <circle cx="16" cy="16" r="13" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="2 3"/>
-  <path d="M10 14H22" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
-  <line x1="16" y1="9" x2="16" y2="23" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
-  <circle cx="16" cy="9" r="1.5" fill="#F59E0B"/>
-  <path d="M10 14L8 19H12L10 14Z" fill="#38BDF8" stroke="#38BDF8" stroke-width="1"/>
-  <path d="M22 14L20 19H24L22 14Z" fill="#38BDF8" stroke="#38BDF8" stroke-width="1"/>
-  <path d="M12 23H20" stroke="#F59E0B" stroke-width="1.8" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <!-- Gold Gradient for rings & accents -->
+    <linearGradient id="favGold" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#FEF08A"/>
+      <stop offset="50%" stopColor="#F59E0B"/>
+      <stop offset="100%" stopColor="#D97706"/>
+    </linearGradient>
+
+    <!-- Cyan to Royal Blue Gradient for Balance Pans -->
+    <linearGradient id="favCyan" x1="0" y1="0" x2="0" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#38BDF8"/>
+      <stop offset="100%" stopColor="#1D4ED8"/>
+    </linearGradient>
+
+    <!-- Saffron Pupil Glow Filter -->
+    <filter id="favGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Deep Navy Rounded Container Base (Identical to Top Bar Brand Theme) -->
+  <rect width="64" height="64" rx="14" fill="#0B213D"/>
+  <rect x="1" y="1" width="62" height="62" rx="13" stroke="url(#favGold)" stroke-width="1.5" stroke-opacity="0.35"/>
+
+  <!-- Outer Precision Calibration Arc/Ring -->
+  <circle cx="32" cy="32" r="26" stroke="#38BDF8" stroke-width="1.5" stroke-opacity="0.4" stroke-dasharray="4 3"/>
+
+  <!-- Left & Right Alignment Ticks (Saffron) -->
+  <line x1="4" y1="32" x2="8" y2="32" stroke="#FF9933" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="56" y1="32" x2="60" y2="32" stroke="#FF9933" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Horizontal Balance Beam -->
+  <line x1="12" y1="32" x2="52" y2="32" stroke="#38BDF8" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Left Balance Pan Suspension & Dish -->
+  <path d="M 14 32 L 8 45 M 14 32 L 20 45" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 6 45 Q 14 53 22 45 Z" fill="url(#favCyan)" stroke="#FFFFFF" stroke-width="2" stroke-linejoin="round"/>
+  <circle cx="14" cy="46" r="1.8" fill="#FF9933"/>
+
+  <!-- Right Balance Pan Suspension & Dish -->
+  <path d="M 50 32 L 44 45 M 50 32 L 56 45" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 42 45 Q 50 53 58 45 Z" fill="url(#favCyan)" stroke="#FFFFFF" stroke-width="2" stroke-linejoin="round"/>
+  <circle cx="50" cy="46" r="1.8" fill="#FF9933"/>
+
+  <!-- Central Inspection Lens / Eye (High-Contrast Silhouette for 16px/32px Readability) -->
+  <!-- Outer Pure White Rim Contour -->
+  <path d="M 18 32 C 23 20 41 20 46 32 C 41 44 23 44 18 32 Z" fill="#071326" stroke="#FFFFFF" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- Gold Inner Precision Contour -->
+  <path d="M 21 32 C 25 23 39 23 43 32 C 39 41 25 41 21 32 Z" fill="none" stroke="url(#favGold)" stroke-width="1.8"/>
+
+  <!-- Sapphire Iris with Bold Gold Border -->
+  <circle cx="32" cy="32" r="7.5" fill="#0B213D" stroke="url(#favGold)" stroke-width="2.2"/>
+
+  <!-- Reticle Crosshair Highlights -->
+  <line x1="32" y1="25.5" x2="32" y2="38.5" stroke="#FBBF24" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="25.5" y1="32" x2="38.5" y2="32" stroke="#FBBF24" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Glowing Saffron Core / Focal Point -->
+  <circle cx="32" cy="32" r="3.2" fill="#FF9933" filter="url(#favGlow)"/>
+  <!-- Specular Catchlight -->
+  <circle cx="30.5" cy="30.5" r="1.2" fill="#FFFFFF"/>
 </svg>
