@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NIRIKSHAK Diagrams Bundle</title>
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+      mermaid.initialize({
+        startOnLoad: true,
+        securityLevel: "loose",
+        theme: "default",
+      });
+    </script>
+    <style>
+      body {
+        margin: 0;
+        background: #0f172a;
+        color: #e2e8f0;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      .wrap {
+        max-width: 1500px;
+        margin: 0 auto;
+        padding: 32px 20px 80px;
+      }
+      h1 {
+        font-size: 32px;
+        margin-bottom: 16px;
+      }
+      .section {
+        margin: 32px 0;
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        border-radius: 16px;
+        padding: 20px;
+      }
+      h2 {
+        margin-bottom: 20px;
+        font-size: 22px;
+      }
+      .mermaid {
+        background: white;
+        border-radius: 12px;
+        padding: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>NIRIKSHAK Diagrams Bundle</h1>
+
+      <div class="section">
+        <h2>Diagram 1 — Master End-to-End System Operational Flowchart</h2>
+        <div class="mermaid">
+          flowchart TD classDef inputStyle
+          fill:#1e293b,stroke:#38bdf8,stroke-width:2px,color:#f8fafc; classDef
+          stageStyle fill:#0f172a,stroke:#818cf8,stroke-width:2px,color:#f8fafc;
+          classDef decisionStyle
+          fill:#312e81,stroke:#a855f7,stroke-width:2px,color:#f8fafc; classDef
+          rejectStyle
+          fill:#450a0a,stroke:#ef4444,stroke-width:2px,color:#fca5a5; classDef
+          passStyle fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#a7f3d0;
+          classDef finalStyle
+          fill:#14532d,stroke:#22c55e,stroke-width:3px,color:#ffffff; subgraph
+          S0 ["📥 INTAKE & INGESTION TIER"] A1["📸 Physical Field Intake<br />(Smartphone
+          / Web Camera)"]:::inputStyle A2["🌐 E-Commerce URL / DOM<br />(Amazon
+          / Blinkit / Flipkart)"]:::inputStyle end subgraph S1 ["STAGE 1:
+          FORENSIC INGESTION & HASHING"] B1["🔒 Compute SHA-256 Hash<br />on Raw
+          Byte Stream"]:::stageStyle B2["⏱️ Timestamp Provenance Entry<br />(Monotonic
+          Clock + Device ID)"]:::stageStyle B1 --> B2 end A1 --> B1 A2 -->|Rule
+          6-10 Digital Pathway| B1 subgraph S2 ["STAGE 2: OPTICAL QUALITY GATE"]
+          C1["🔍 Laplacian Blur Variance<br />σ² threshold ≥
+          150.0"]:::stageStyle C2["☀️ Specular Glare Masking<br />HSV V>245,
+          S<15 (≤ 3.0%)"]:::stageStyle C3["📐 Perspective Skew Check<br />Tilt
+          angle ≤ 15.0°"]:::stageStyle C1 & C2 & C3 --> C4{"Quality Gate<br />Passed?"}:::decisionStyle
+          end B2 --> C1 R1["⚠️ Real-Time Retake Guidance<br />'Hold Steady /
+          Tilt 15° to Avoid Glare'<br />(Zero heavy ML compute
+          wasted)"]:::rejectStyle C4 -->|No - Blurry/Glare| R1 R1 -.->|Officer
+          Retakes Image| A1 subgraph S34 ["STAGES 3 & 4: FIDUCIAL CALIBRATION &
+          RECTIFICATION"] D1{"Fiducial Standard<br />Detected?"}:::decisionStyle
+          D2["🎯 ArUco 4x4_50<br />(50.0 mm Marker)"]:::stageStyle D3["💳 ISO
+          7810 ID-1 Card<br />(85.60 × 53.98 mm)"]:::stageStyle D4["⚠️
+          Uncalibrated Mode<br />(Text checked; font routed to
+          Review)"]:::rejectStyle D5["📏 Resolve Metric Scale S<br />px_to_mm =
+          px / mm"]:::stageStyle D6["📐 Compute 3×3 Homography (H)<br />cv2.warpPerspective
+          Rectification"]:::stageStyle end C4 -->|Yes - Clear Image| D1 D1
+          -->|ArUco Found| D2 --> D5 D1 -->|Card Found| D3 --> D5 D1 -->|No
+          Reference| D4 --> D6 D5 --> D6 subgraph S5 ["STAGE 5: PRINCIPAL
+          DISPLAY PANEL (PDP)"] E1["📦 Packaging Contour Segmentation<br />(Canny
+          / Morphological Edge)"]:::stageStyle E2{"Package Geometry<br />Type?"}:::decisionStyle
+          E3["Rectangular Box<br />PDP = 40% of (H × W)"]:::stageStyle
+          E4["Cylindrical Bottle<br />PDP = 40% of (H × C)"]:::stageStyle
+          E5["Flexible Pouch<br />PDP = 40% Front Face"]:::stageStyle E6["📊
+          Resolve Statutory PDP Area (cm²)<br />Select Table-I Row
+          Threshold"]:::stageStyle end D6 --> E1 --> E2 E2 -->|Rectangular| E3
+          --> E6 E2 -->|Cylindrical| E4 --> E6 E2 -->|Pouch/Other| E5 --> E6
+          subgraph S67 ["STAGES 6 & 7: MULTILINGUAL TEXT PERCEPTION"] F1["🔲
+          DBNet++ Text Detector<br />(Oriented 4-Point Bounding
+          Polygons)"]:::stageStyle F2["🔤 PaddleOCR PP-OCRv4 (Latin)<br />+
+          PP-OCRv3 (Devanagari Hindi)"]:::stageStyle F3{"Confidence<br /><
+          0.92?"}:::decisionStyle F4["🔄 180° Inversion Probing<br />(Upside-Down
+          Packaging Correction)"]:::stageStyle F5{"Confidence<br /><
+          0.65?"}:::decisionStyle F6["🤖 Tesseract v5 Consensus
+          Fallback"]:::stageStyle F7["📋 Normalized OCR Token Stream<br />(Text,
+          Polygons, Confidence)"]:::stageStyle end E6 --> F1 --> F2 --> F3 F3
+          -->|Yes| F4 --> F5 F3 -->|No| F5 F5 -->|Yes| F6 --> F7 F5 -->|No| F7
+          subgraph S89 ["STAGES 8 & 9: SEMANTIC EXTRACTION & METROLOGY"] G1["🧩
+          Multi-Facet Cross-Panel Fusion<br />(Front + Back + Side +
+          Stamp)"]:::stageStyle G2["🏷️ Statutory Entity Parsers<br />• MRP &
+          Currency (₹, Rs., /-) | Net Qty<br />• USP | Dates (Mfg/Exp) |
+          Origin<br />• Manufacturer Address & 6-Digit PIN<br />• Consumer Care
+          4-Tuple Contact"]:::stageStyle G3["🚫 Banned Unit Symbol Detector<br />(Flags
+          'gms', 'gm', 'Kgs', 'ML', 'ltrs')"]:::stageStyle G4["🔬 Physical Font
+          Measurement Engine<br />CCA Numeral x-height: h_mm = h_px /
+          px_to_mm<br />(Precision: ±0.08 mm)"]:::stageStyle end F7 --> G1 -->
+          G2 --> G3 --> G4 subgraph S10 ["STAGE 10: DETERMINISTIC STATUTORY RULE
+          ENGINE"] H1["⚖️ Rule 6(1)(h) & Table-I Schedule<br />Measured mm vs
+          Minimum Statutory mm"]:::stageStyle H2["🧮 Rule 6(1)(k) USP Math<br />|USP
+          × Qty - MRP| ≤ 0.02 Tolerance"]:::stageStyle H3["📝 Rule 6(1)(e)
+          Mandatory Clauses<br />'inclusive of all taxes'
+          verification"]:::stageStyle H4["🇮🇳 Rule 6(10) E-Commerce & Origin<br />Country
+          of Origin & Digital Listing Audit"]:::stageStyle H5["💰 Jan Vishwas
+          Act, 2023 Schedule<br />Sec 48/49 Compounding
+          Assessment"]:::stageStyle H6{"4-State Legal<br />Verdict"}:::decisionStyle
+          end G4 --> H1 & H2 & H3 & H4 & H5 --> H6 subgraph S11 ["STAGE 11:
+          HUMAN-IN-THE-LOOP ADJUDICATION"] J1["🖥️ Officer Adjudication Canvas<br />(Interactive
+          Loupe + Bounding Box Overlays)"]:::stageStyle J2{"Officer Judicial<br />Disposition"}:::decisionStyle
+          J3["✅ Confirm Violation<br />(Endorse AI Statutory
+          Finding)"]:::stageStyle J4["✏️ Judicial Override<br />(Mandatory
+          Remarks Recorded)"]:::stageStyle end H6 -->|PASS / FAIL / REVIEW /
+          UNABLE| J1 --> J2 J2 -->|Confirm| J3 J2 -->|Override| J4 subgraph S12
+          ["STAGE 12: EVIDENCE DOSSIER & NOTICE GENERATION"] K1["🔗 Merkle DAG
+          Cryptographic Root<br />(Chains Stages 1 to 11 SHA-256)"]:::stageStyle
+          K2["📜 Section 63 BSA 2023 Digital Certificate<br />(Device
+          Fingerprint + Monotonic Clock)"]:::stageStyle K3["📄 Form-1 / Form-2
+          Show-Cause Notice<br />(Court-Admissible PDF/A with Verification
+          QR)"]:::finalStyle end J3 & J4 --> K1 --> K2 --> K3
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Diagram 2 — 12-Stage Architecture Matrix</h2>
+        <div class="mermaid">
+          graph LR subgraph G1 ["🛡️ PHASE 1: FORENSICS & INTAKE"] direction TB
+          S1["<b>Stage 1: Forensic Ingestion</b><br />• SHA-256 hashing<br />•
+          Monotonic UTC provenance<br />• Immutable byte locking"] S2["<b
+            >Stage 2: Optical Quality Gate</b
+          ><br />• Laplacian blur check (≥150)<br />• Glare HSV mask (≤3%)<br />•
+          15ms instant rejection"] S1 --> S2 end subgraph G2 ["📐 PHASE 2:
+          GEOMETRIC METROLOGY"] direction TB S3["<b
+            >Stage 3: Fiducial Calibration</b
+          ><br />• 50mm ArUco / ISO card<br />• Sub-millimeter px_to_mm<br />•
+          Caliper zero-error parity"] S4["<b
+            >Stage 4: Perspective Rectification</b
+          ><br />• 3×3 Planar Homography H<br />• Un-tilts labels up to 35°<br />•
+          cv2.warpPerspective"] S5["<b>Stage 5: PDP Geometry Calc</b><br />•
+          Surface contour detection<br />• 40% area calculation<br />• Table-I
+          tier selection"] S3 --> S4 --> S5 end subgraph G3 ["🔤 PHASE 3: NEURAL
+          PERCEPTION"] direction TB S6["<b>Stage 6: Text Detection</b><br />•
+          DBNet++ ONNX INT8/FP32<br />• Oriented bounding polygons<br />•
+          Multi-angle text clusters"] S7["<b>Stage 7: Multilingual OCR</b
+          ><br />• PP-OCRv4 Latin & Indic<br />• 180° Inversion Probing<br />•
+          Tesseract consensus pass"] S6 --> S7 end subgraph G4 ["🧩 PHASE 4:
+          SEMANTICS & SENSING"] direction TB S8["<b
+            >Stage 8: Semantic Extraction</b
+          ><br />• Cross-Facet Fusion<br />• Deterministic regex parsing<br />•
+          Banned unit identification"] S9["<b>Stage 9: Font Measurement</b
+          ><br />• Connected components (CCA)<br />• Numeral x-height in mm<br />•
+          ±0.08 mm precision"] S8 --> S9 end subgraph G5 ["⚖️ PHASE 5: STATUTORY
+          REASONING"] direction TB S10["<b>Stage 10: Legal Rule Engine</b
+          ><br />• Table-I deficit calculation<br />• Rule 6(1)(k) USP
+          tolerance<br />• Jan Vishwas compounding"] end subgraph G6 ["👨‍⚖️ PHASE
+          6: ADJUDICATION & EVIDENCE"] direction TB S11["<b
+            >Stage 11: Human Adjudication</b
+          ><br />• Loupe verification canvas<br />• Officer approval /
+          override<br />• Tamper-proof audit logs"] S12["<b
+            >Stage 12: Notice & BSA Bundle</b
+          ><br />• Section 63 BSA certificate<br />• Merkle DAG tree root<br />•
+          Form-1 PDF/A generation"] S11 --> S12 end G1 --> G2 --> G3 --> G4 -->
+          G5 --> G6 classDef phase
+          fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f8fafc; class
+          G1,G2,G3,G4,G5,G6 phase;
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>
+          Diagram 3 — Data Transformation & Cryptographic Provenance Pipeline
+        </h2>
+        <div class="mermaid">
+          flowchart TD classDef contract
+          fill:#1e1e2e,stroke:#cba6f7,stroke-width:2px,color:#cdd6f4; classDef
+          tensor fill:#181825,stroke:#89b4fa,stroke-width:2px,color:#cdd6f4;
+          classDef crypto
+          fill:#11111b,stroke:#f38ba8,stroke-width:2px,color:#cdd6f4; T1["Raw
+          Image Bytes Stream<br />(JPEG / PNG / WEBP)"]:::tensor -->|SHA-256
+          Hash Digest| C1["EvidenceImage DTO<br />raw_sha256: 64-char hex
+          string"]:::crypto T1 -->|OpenCV Decode| T2["RGB Tensor<br />Shape: (H,
+          W, 3) uint8"]:::tensor T2 -->|OpenCV Filter| C2["QualityGateResult
+          DTO<br />blur_variance: float, glare_pct: float"]:::contract T2
+          -->|Fiducial Corner Mapping| C3["CalibrationDTO<br />px_to_mm: float,
+          H: (3, 3) matrix"]:::contract T2 & C3 -->|Homography Warp|
+          T3["Rectified Tensor<br />Orthogonal Label Canvas (W, H, 3)"]:::tensor
+          T3 -->|DBNet++ Inference| T4["Polygons Tensor<br />Shape: (N, 4, 2)
+          float32"]:::tensor T3 & T4 -->|PP-OCRv4 Inference| C4["OCROutput
+          DTO<br />tokens: List[OCRToken], confidence: float"]:::contract C4 &
+          C3 -->|Deterministic Regex + CCA| C5["NormalizedCommodityFacts DTO<br />MRP,
+          Net Qty, USP, Origin, Font mm"]:::contract C5 -->|AST Rule Evaluation|
+          C6["ComplianceEvaluation DTO<br />verdicts, deficits, rule
+          citations"]:::contract C6 -->|Quasi-Judicial Signoff|
+          C7["AdjudicationOrder DTO<br />officer_id, action,
+          justification"]:::contract C1 & C2 & C3 & C4 & C5 & C6 & C7 -->|Merkle
+          Tree Synthesis| M1["PipelineEvidenceDAG<br />Merkle Root Hash (32
+          bytes)"]:::crypto M1 -->|ReportLab Local Render| P1["Court-Admissible
+          Dossier<br />Form-1 Notice + Sec 63 BSA PDF/A"]:::crypto
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Diagram 4 — Dual-Engine Topology</h2>
+        <div class="mermaid">
+          flowchart TD classDef online
+          fill:#042f2e,stroke:#14b8a6,stroke-width:2px,color:#ccfbf1; classDef
+          offline fill:#1c1917,stroke:#f97316,stroke-width:2px,color:#ffedd5;
+          classDef shared
+          fill:#0f172a,stroke:#6366f1,stroke-width:2px,color:#e0e7ff; subgraph
+          Client ["CLIENT CONSUMPTION TIER"] UI1["🖥️ React 18 Web App
+          (Desktop/Tablet)"] CLI["💻 Python CLI Inspector (inspect_cli.py)"] end
+          subgraph DualPath ["OPERATIONAL MODES"] direction TB subgraph ModeA
+          ["🌐 MODE A: CENTRALIZED ONLINE PLATFORM"] direction TB MA1["FastAPI
+          REST Application Server"]:::online MA2["Multi-tenant RBAC (Inspector /
+          Controller / Admin)"]:::online MA3["PostgreSQL + pgvector / Supabase
+          Storage"]:::online MA4["MCA21 Corporate Registry
+          Verification"]:::online MA5["Cross-Device Inspection
+          Synchronization"]:::online MA1 --> MA2 & MA3 & MA4 & MA5 end subgraph
+          ModeB ["⚡ MODE B: RESILIENT LOCAL AIR-GAPPED ENGINE"] direction TB
+          MB1["Embedded SQLite (Zero external dependencies)"]:::offline
+          MB2["Local CPU ONNX Runtime (DBNet++ INT8)"]:::offline MB3["Device
+          Monotonic Clock (Section 63 BSA Compliant)"]:::offline MB4["0 Bytes
+          Transmitted (Complete Privacy & Speed)"]:::offline MB5["Local
+          ReportLab PDF/A Notice Generator"]:::offline MB1 --> MB2 & MB3 & MB4 &
+          MB5 end end subgraph SharedCore ["⚖️ SHARED CORE DETERMINISTIC
+          ASSETS"] SC1["Frozen Pydantic Interface Contracts (DTOs)"]:::shared
+          SC2["Deterministic Legal Metrology Rule Engine AST"]:::shared
+          SC3["Table-I G.S.R. 629(E) Font Metric Schedules"]:::shared
+          SC4["Section 63 BSA Merkle DAG Ledger Engine"]:::shared end UI1 -->
+          ModeA UI1 -.->|PWA Offline Cache| ModeB CLI --> ModeB ModeA & ModeB
+          --- SharedCore ModeB -.->|Late-Sync Evidence Bundle via sync-bundle
+          API| ModeA
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
