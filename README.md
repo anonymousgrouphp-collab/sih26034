@@ -484,7 +484,7 @@ Developed for the **Department of Consumer Affairs (DoCA)** under **Smart India 
 |:---|:---|:---|:---:|
 | **Kunal Raj** | **CV & Metrology** | Optical quality gate, ArUco calibration, planar homography, PDP metric schedules | [@kunal-raj-dev](https://github.com/kunal-raj-dev) |
 | **Parmarth Kumar** | **Multilingual OCR & Lead Frontend** | DBNet++ text detection, PP-OCRv4 Indic recognition, React 18 SPA, Adjudication Canvas | [@parmarth-kumar](https://github.com/parmarth-kumar) |
-| **Harsh Patel** | **Semantic Extraction & Compliance Engine** | Statutory entity parsing (MRP, Net Qty, Dates), banned unit detection, AST rule engine hardening | [@anonymousgrouphp-collab](https://github.com/anonymousgrouphp-collab) |
+| **Harsh Patel** | **Semantic Extraction, Cloud & Pipeline Architecture** | Statutory entity parsing (MRP, Net Qty, Dates), AST rule engine hardening, Oracle Cloud 24/7 VPS deployment, Vercel Edge proxy integration, and multi-facet packaging verification | [@anonymousgrouphp-collab](https://github.com/anonymousgrouphp-collab) |
 | **Ambika Bansal** | **Statutory Rule Engine** | Table-I font schedules, USP math verification, temporal epoch routing, 4-state triage | [@bansalambika12-ship-it](https://github.com/bansalambika12-ship-it) |
 | **Shailendra Pratap Singh** | **Evidence & Backend** | FastAPI REST services, PostgreSQL schema, Merkle DAG, Section 63 BSA support, Form-1 PDF | [@shailendrapratap1](https://github.com/shailendrapratap1) |
 | **Urvashi Rajput** | **UI/UX Architecture** | Workstation visual foundations, triage filter components, design tokens | [@rajputurvashi2006-bit](https://github.com/rajputurvashi2006-bit) |

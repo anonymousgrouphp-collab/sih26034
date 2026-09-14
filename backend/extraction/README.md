@@ -112,3 +112,15 @@ The module is verified against real retail commercial packaging datasets (`tests
 5. **Haldiram's Namkeen (`REAL-PKG-NAMKEEN`):** Strict SI metric symbol verification (`400 g` passes with 0 prohibited units), rate math (`Rs. 0.25/g`).
 6. **True Elements Chia Seeds (`REAL-PKG-CHIA`):** Nutritional facts isolation, alphanumeric customer care phone/email verification.
 
+---
+
+## 13. Production Cloud Architecture, Edge Proxy & Multi-Image Pipeline Delivery
+
+To ensure 24/7 high availability and zero downtime for national-scale metrology enforcement, Harsh Patel spearheaded the deployment and infrastructure overhaul:
+
+- **Oracle Cloud Infrastructure (OCI) Deployment:** Provisioned and hardened a persistent 24/7 Ubuntu VPS host running the complete Nirikshak FastAPI backend, ONNX Runtime CPU execution provider, and Merkle ledger storage. Configured a dedicated 4GB swap space (`/swapfile`) ensuring headroom for multi-megabyte high-resolution image OCR matrices.
+- **Vercel Edge Proxy Integration:** Architected the unified edge proxy configuration (`vercel.json`) connecting global edge points to the backend VPS without CORS overhead, enabling sub-80ms API routing.
+- **Multi-Image Cross-Facet Pipeline Execution:** Verified end-to-end multi-image ingestion, facet spatial fusion, and real-time evidence streaming, ensuring front packaging, nutritional matrices, and statutory side panels are consolidated seamlessly into single tamper-proof inspection dossiers.
+- **Performance Benchmarking & Dead Code Purge:** Benchmarked global TTFB latency (~78ms) and eliminated all legacy serverless/Render dependencies to ensure a clean, deterministic production codebase.
+
+
