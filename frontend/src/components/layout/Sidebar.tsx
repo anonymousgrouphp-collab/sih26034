@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Home,
@@ -42,6 +42,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const location = useLocation();
 
   const isController = user?.officerRole === "CONTROLLER";
+
+  // Global Alt+N shortcut to initiate a new inspection case
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.altKey && (e.key.toLowerCase() === "n" || e.code === "KeyN")) {
+        e.preventDefault();
+        onCloseMobile?.();
+        resetScrollToTop();
+        navigate("/inspections/new");
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [navigate, onCloseMobile]);
 
   const handleSignOut = () => {
     onCloseMobile?.();
@@ -158,27 +172,34 @@ export const Sidebar: React.FC<SidebarProps> = ({
         className="hidden lg:flex h-full shrink-0 flex-col border-r border-slate-200 bg-white text-slate-700 shadow-xs select-none z-30 print:hidden"
       >
         {/* Desktop Header / Collapse Bar */}
-        <div className="flex items-center justify-between px-3.5 py-3 border-b border-slate-100 shrink-0">
-          {!isCollapsed ? (
-            <div className="flex items-center gap-2 min-w-0">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-emerald-200 shrink-0 animate-pulse" />
-              <span className="text-[10.5px] font-mono font-bold uppercase tracking-wider text-slate-500 truncate">
-                {language === "hi" ? "विधिक कार्यस्थान" : "LMO Workstation"}
-              </span>
-            </div>
-          ) : (
-            <div className="w-full flex justify-center">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-emerald-200 shrink-0 animate-pulse" />
+        <div
+          className={`flex items-center border-b border-slate-100 shrink-0 ${
+            isCollapsed ? "justify-center py-2.5 px-2" : "justify-between px-3.5 py-2.5"
+          }`}
+        >
+          {!isCollapsed && (
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-6 h-6 rounded-lg bg-blue-50 border border-blue-200/80 text-[#1B365D] flex items-center justify-center shrink-0 shadow-2xs">
+                <Scale size={13} className="stroke-[2.5]" />
+              </div>
+              <div className="min-w-0 flex flex-col">
+                <span className="text-xs font-bold text-slate-800 tracking-tight truncate leading-tight">
+                  {language === "hi" ? "विधिक कार्यस्थान" : "LMO Workstation"}
+                </span>
+                <span className="text-[10px] text-slate-400 font-medium truncate leading-tight">
+                  {language === "hi" ? "प्रवर्तन कार्यक्षेत्र" : "Enforcement Portal"}
+                </span>
+              </div>
             </div>
           )}
           <button
             type="button"
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+            className="w-6 h-6 rounded-md bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-slate-400 hover:text-slate-700 transition-colors flex items-center justify-center cursor-pointer shadow-2xs"
             title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
-            {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+            {isCollapsed ? <ChevronRight size={13} /> : <ChevronLeft size={13} />}
           </button>
         </div>
 
@@ -190,9 +211,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onCloseMobile?.();
               resetScrollToTop();
             }}
-            title={isCollapsed ? t("action.new_case", "New Inspection Case") : undefined}
-            className={`w-full flex items-center justify-center gap-2 py-2.5 bg-[#1B365D] hover:bg-[#0A2540] text-white text-xs font-bold rounded-xl shadow-sm hover:shadow transition-all border border-[#152a48] group overflow-hidden ${
-              isCollapsed ? "px-0" : "px-3.5"
+            title={isCollapsed ? t("action.new_case", "New Inspection Case") : "New Inspection Case (Alt+N)"}
+            className={`w-full flex items-center gap-2.5 py-2.5 bg-[#1B365D] hover:bg-[#0A2540] text-white text-xs font-bold rounded-xl shadow-sm hover:shadow transition-all border border-[#152a48] group ${
+              isCollapsed ? "px-0 justify-center" : "px-3.5"
             }`}
           >
             <div className="w-5 h-5 rounded-md bg-[#FF9933] text-slate-950 flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
@@ -212,7 +233,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {navGroups.map((group, groupIdx) => (
               <div key={groupIdx} className="space-y-1">
                 {!isCollapsed ? (
-                  <p className="px-3 pb-1 text-[10.5px] font-bold uppercase tracking-wider text-slate-400">
+                  <p className="px-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">
                     {group.title}
                   </p>
                 ) : (
@@ -229,11 +250,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       to={item.path}
                       onClick={onCloseMobile}
                       title={isCollapsed ? item.label : undefined}
-                      className={`group relative w-full flex items-center justify-between py-2 text-xs font-semibold rounded-lg transition-all overflow-hidden ${
+                      className={`group relative w-full flex items-center justify-between py-2 text-xs font-semibold rounded-xl transition-all ${
                         active
-                          ? "bg-blue-50/90 text-[#1B365D] font-bold border-l-[3.5px] border-[#1B365D] rounded-l-none pl-2.5 shadow-2xs"
-                          : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 border-l-[3.5px] border-transparent pl-2.5"
-                      } ${isCollapsed ? "px-0 justify-center border-l-0" : "pr-3"}`}
+                          ? "bg-blue-50/90 text-[#1B365D] font-bold border border-blue-200/80 shadow-2xs"
+                          : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 border border-transparent"
+                      } ${isCollapsed ? "px-0 justify-center" : "px-3"}`}
                     >
                       <div className={`flex items-center gap-2.5 ${isCollapsed ? "justify-center" : ""}`}>
                         <Icon
@@ -248,17 +269,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       </div>
 
                       {!isCollapsed && item.badge !== undefined && (
-                        <span
-                          className={`px-1.5 py-0.5 text-[10.5px] font-mono font-bold rounded-md shrink-0 border ${
-                            item.badgeType === "warning"
-                              ? "bg-amber-50 text-amber-900 border-amber-300"
-                              : active
-                              ? "bg-white text-[#1B365D] border-blue-200 shadow-2xs"
-                              : "bg-blue-50 text-[#1B365D] border-blue-200"
-                          }`}
-                        >
-                          {item.badge}
-                        </span>
+                        item.badgeType === "warning" ? (
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10.5px] font-mono font-bold rounded-md shrink-0 bg-amber-50 text-amber-900 border border-amber-300 shadow-2xs">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                            <span>{item.badge}</span>
+                          </span>
+                        ) : (
+                          <span
+                            className={`px-1.5 py-0.5 text-[10.5px] font-mono font-bold rounded-md shrink-0 border ${
+                              active
+                                ? "bg-white text-[#1B365D] border-blue-200 shadow-2xs"
+                                : "bg-blue-50 text-[#1B365D] border-blue-200"
+                            }`}
+                          >
+                            {item.badge}
+                          </span>
+                        )
                       )}
                     </Link>
                   );
@@ -268,22 +294,34 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </nav>
         </div>
 
-        {/* Desktop Statutory Compliance Strip Footer (No duplicate profile card!) */}
-        <div className="shrink-0 p-3 border-t border-slate-100 bg-slate-50/60">
+        {/* Desktop Statutory Compliance Strip Footer */}
+        <div className="shrink-0 p-2.5 border-t border-slate-200/70 bg-slate-50/80">
           {!isCollapsed ? (
-            <div className="flex items-center justify-between text-[10.5px] font-mono text-slate-500 px-1">
-              <span className="flex items-center gap-1.5 font-semibold text-slate-600 truncate">
-                <ShieldCheck size={13} className="text-[#1B365D] shrink-0" />
-                <span>LMPC 2011</span>
-              </span>
-              <span className="text-slate-300">•</span>
-              <span className="font-bold text-emerald-700 truncate">
-                Sec 63 BSA
-              </span>
+            <div className="p-2 bg-white rounded-xl border border-slate-200/80 shadow-2xs space-y-1.5">
+              <div className="flex items-center justify-between text-[11px] font-mono">
+                <span className="flex items-center gap-1.5 font-bold text-slate-800">
+                  <ShieldCheck size={14} className="text-[#1B365D] shrink-0" />
+                  <span>LMPC 2011</span>
+                </span>
+                <span className="inline-flex items-center gap-1 text-[9.5px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/80 shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>Sec 63 BSA</span>
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 pt-1 border-t border-slate-100">
+                <span className="text-slate-500 shrink-0">Jurisdiction:</span>
+                {activeCircle && (
+                  <span className="font-semibold text-slate-700 truncate text-right pl-1" title={`Active Jurisdiction: ${activeCircle}`}>
+                    {activeCircle.replace(/^CIRCLE_/, "")}
+                  </span>
+                )}
+              </div>
             </div>
           ) : (
-            <div className="flex justify-center" title="LMPC 2011 • Sec 63 BSA 2023 Verified">
-              <ShieldCheck size={16} className="text-[#1B365D]" />
+            <div className="flex justify-center py-1" title="LMPC Rules, 2011 & Section 63 BSA 2023 Verified">
+              <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-[#1B365D] shadow-2xs">
+                <ShieldCheck size={16} className="text-[#1B365D]" />
+              </div>
             </div>
           )}
         </div>
@@ -317,7 +355,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <StateEmblem size={22} tone="navy" showMotto={true} className="shrink-0" />
                   <div className="leading-tight">
                     <span className="font-extrabold text-xs tracking-tight text-[#1B365D] block">NIRIKSHAK</span>
-                    <span className="text-[9.5px] font-mono text-slate-500 block">LMO Workstation</span>
+                    <span className="text-[9.5px] font-medium text-slate-500 block">LMO Workstation</span>
                   </div>
                 </div>
                 <button
@@ -354,7 +392,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <nav className="space-y-4">
                   {navGroups.map((group, groupIdx) => (
                     <div key={groupIdx} className="space-y-1">
-                      <p className="px-3 pb-1 text-[10.5px] font-bold uppercase tracking-wider text-slate-400">
+                      <p className="px-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">
                         {group.title}
                       </p>
 
@@ -367,10 +405,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             key={item.path}
                             to={item.path}
                             onClick={onCloseMobile}
-                            className={`group relative w-full flex items-center justify-between py-2.5 text-xs font-semibold rounded-lg transition-all pr-3 ${
+                            className={`group relative w-full flex items-center justify-between py-2.5 text-xs font-semibold rounded-xl transition-all px-3 ${
                               active
-                                ? "bg-blue-50/90 text-[#1B365D] font-bold border-l-[3.5px] border-[#1B365D] rounded-l-none pl-2.5 shadow-2xs"
-                                : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 border-l-[3.5px] border-transparent pl-2.5"
+                                ? "bg-blue-50/90 text-[#1B365D] font-bold border border-blue-200/80 shadow-2xs"
+                                : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 border border-transparent"
                             }`}
                           >
                             <div className="flex items-center gap-2.5">
@@ -386,17 +424,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             </div>
 
                             {item.badge !== undefined && (
-                              <span
-                                className={`px-1.5 py-0.5 text-[10.5px] font-mono font-bold rounded-md shrink-0 border ${
-                                  item.badgeType === "warning"
-                                    ? "bg-amber-50 text-amber-900 border-amber-300"
-                                    : active
-                                    ? "bg-white text-[#1B365D] border-blue-200 shadow-2xs"
-                                    : "bg-blue-50 text-[#1B365D] border-blue-200"
-                                }`}
-                              >
-                                {item.badge}
-                              </span>
+                              item.badgeType === "warning" ? (
+                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10.5px] font-mono font-bold rounded-md shrink-0 bg-amber-50 text-amber-900 border border-amber-300 shadow-2xs">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                                  <span>{item.badge}</span>
+                                </span>
+                              ) : (
+                                <span
+                                  className={`px-1.5 py-0.5 text-[10.5px] font-mono font-bold rounded-md shrink-0 border ${
+                                    active
+                                      ? "bg-white text-[#1B365D] border-blue-200 shadow-2xs"
+                                      : "bg-blue-50 text-[#1B365D] border-blue-200"
+                                  }`}
+                                >
+                                  {item.badge}
+                                </span>
+                              )
                             )}
                           </Link>
                         );
