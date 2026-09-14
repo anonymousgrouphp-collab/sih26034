@@ -53,7 +53,7 @@ export const SovereignMetrologyHeroBackdrop: React.FC<SovereignMetrologyHeroBack
 
           {/* Rotating 24-Spoke Sovereign Ashoka Chakra (Dharma Chakra Geometry) */}
           <svg
-            className="w-[280px] h-[280px] sm:w-[430px] sm:h-[430px] lg:w-[560px] lg:h-[560px] animate-[spin_100s_linear_infinite] motion-reduce:animate-none opacity-20 sm:opacity-25 lg:opacity-30"
+            className="w-[280px] h-[280px] sm:w-[430px] sm:h-[430px] lg:w-[560px] lg:h-[560px] animate-[spin_100s_linear_infinite] motion-reduce:animate-none opacity-18 sm:opacity-22 lg:opacity-25"
             viewBox="0 0 500 500"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -115,7 +115,7 @@ export const SovereignMetrologyHeroBackdrop: React.FC<SovereignMetrologyHeroBack
           </svg>
 
           {/* Upright Official Directorate Seal & State Heraldry (Static, Dignified, Upright) */}
-          <div className="absolute w-[115px] h-[115px] sm:w-[165px] sm:h-[165px] lg:w-[210px] lg:h-[210px] opacity-25 sm:opacity-30 lg:opacity-35 pointer-events-none transition-transform">
+          <div className="absolute w-[115px] h-[115px] sm:w-[165px] sm:h-[165px] lg:w-[210px] lg:h-[210px] opacity-20 sm:opacity-24 lg:opacity-28 pointer-events-none transition-transform">
             <img
               src="/assets/gov/doca_legal_metrology_seal.svg"
               alt="Official Seal of Legal Metrology Division, Government of India"

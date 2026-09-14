@@ -109,6 +109,15 @@ export const Landing: React.FC = () => {
           {/* Sovereign Metrology Architectural Skyline Backdrop */}
           <SovereignMetrologyHeroBackdrop />
 
+          {/* Central Reading Pocket Vignette (Ensures Maximum Foreground Typography Contrast) */}
+          <div
+            className="absolute inset-0 pointer-events-none z-0"
+            style={{
+              background:
+                "radial-gradient(ellipse 70% 55% at 50% 38%, rgba(6, 18, 34, 0.78) 0%, rgba(10, 34, 64, 0.45) 55%, transparent 100%)",
+            }}
+          />
+
           <div className="w-full max-w-[1750px] mx-auto px-3 sm:px-6 lg:px-8 relative z-10 flex-1 flex flex-col justify-between py-1 min-w-0">
             <div className="w-full max-w-4xl mx-auto text-center space-y-1.5 sm:space-y-2 flex-1 flex flex-col justify-center min-w-0">
               {/* Official Ministerial Authority Masthead with Sovereign State Emblem */}
@@ -131,9 +140,9 @@ export const Landing: React.FC = () => {
               {/* Sovereign Portal Title & Tagline */}
               <div className="space-y-1 sm:space-y-1.5 max-w-3xl mx-auto w-full min-w-0">
                 <div className="inline-block animate-fade-up w-full">
-                  <h1 className="text-xl sm:text-3xl lg:text-[1.95rem] font-black tracking-tight leading-snug sm:leading-[1.16] text-white">
+                  <h1 className="text-xl sm:text-3xl lg:text-[1.95rem] font-black tracking-tight leading-snug sm:leading-[1.16] text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)]">
                     {t("hero.headline_1", "Evidence-Grade Package Compliance.")}
-                    <span className="block text-amber-300 mt-0.5">
+                    <span className="block text-amber-300 mt-0.5 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
                       {t("hero.headline_2", "Statutory Transparency.")}
                     </span>
                   </h1>
@@ -145,7 +154,7 @@ export const Landing: React.FC = () => {
                   </div>
                 </div>
 
-                <p className="text-xs sm:text-[13px] text-slate-200 max-w-2xl mx-auto leading-normal animate-fade-up px-2">
+                <p className="text-xs sm:text-[13.5px] font-medium text-slate-100 max-w-2xl mx-auto leading-relaxed animate-fade-up px-2 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
                   {t(
                     "hero.description",
                     "Rule 6 Mandatory Declarations & Table-I Schedule Verification under Legal Metrology Act, 2009 with Section 63 BSA 2023 Tamper-Evident Certificates for Enforcement Officers."
@@ -172,7 +181,7 @@ export const Landing: React.FC = () => {
                 <Link
                   to="/rules"
                   onClick={resetScrollToTop}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-xl border border-white/25 bg-white/10 hover:bg-white/20 px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold text-white backdrop-blur-xs transition-all btn-press cursor-pointer whitespace-nowrap"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-xl border border-white/35 hover:border-white/60 bg-[#0c2340]/90 hover:bg-[#123157] px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold text-white shadow-md backdrop-blur-md transition-all btn-press cursor-pointer whitespace-nowrap"
                 >
                   <Scale size={16} className="text-amber-300 shrink-0" />
                   <span>{t("hero.cta_rules", "Statutory Rules & Table-I Schedule")}</span>
@@ -181,36 +190,36 @@ export const Landing: React.FC = () => {
             </div>
 
             {/* 4 Trust Pillar Badges (Grounded at Bottom of 1st Frame) */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 max-w-4xl mx-auto w-full pt-3 pb-1 border-t border-white/10 text-xs mt-3 sm:mt-5">
-              <div className="p-1.5 sm:p-2 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs text-center">
-                <p className="text-sm sm:text-base font-black text-amber-300 leading-tight">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 max-w-4xl mx-auto w-full pt-3 pb-1 border-t border-white/15 text-xs mt-3 sm:mt-5">
+              <div className="p-2 sm:p-2.5 rounded-xl bg-[#091C33]/85 hover:bg-[#0E2847] border border-white/15 hover:border-white/30 backdrop-blur-md shadow-xs text-center transition-colors">
+                <p className="text-sm sm:text-base font-black text-amber-300 leading-tight drop-shadow-xs">
                   {t("hero.trust_verdicts", "4-State")}
                 </p>
-                <p className="text-slate-300 text-[9.5px] sm:text-[10.5px] mt-0.5 truncate">
+                <p className="text-slate-200 text-[10px] sm:text-[11px] font-medium mt-0.5 truncate">
                   {t("hero.trust_verdicts_sub", "Epistemic Verdicts")}
                 </p>
               </div>
-              <div className="p-1.5 sm:p-2 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs text-center">
-                <p className="text-sm sm:text-base font-black text-emerald-400 leading-tight">
+              <div className="p-2 sm:p-2.5 rounded-xl bg-[#091C33]/85 hover:bg-[#0E2847] border border-white/15 hover:border-white/30 backdrop-blur-md shadow-xs text-center transition-colors">
+                <p className="text-sm sm:text-base font-black text-emerald-400 leading-tight drop-shadow-xs">
                   {t("hero.trust_evidence", "Sec 63 BSA")}
                 </p>
-                <p className="text-slate-300 text-[9.5px] sm:text-[10.5px] mt-0.5 truncate">
+                <p className="text-slate-200 text-[10px] sm:text-[11px] font-medium mt-0.5 truncate">
                   {t("hero.trust_evidence_sub", "Electronic Evidence")}
                 </p>
               </div>
-              <div className="p-1.5 sm:p-2 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs text-center">
-                <p className="text-sm sm:text-base font-black text-amber-300 leading-tight">
+              <div className="p-2 sm:p-2.5 rounded-xl bg-[#091C33]/85 hover:bg-[#0E2847] border border-white/15 hover:border-white/30 backdrop-blur-md shadow-xs text-center transition-colors">
+                <p className="text-sm sm:text-base font-black text-amber-300 leading-tight drop-shadow-xs">
                   {t("hero.trust_font", "Table-I")}
                 </p>
-                <p className="text-slate-300 text-[9.5px] sm:text-[10.5px] mt-0.5 truncate">
+                <p className="text-slate-200 text-[10px] sm:text-[11px] font-medium mt-0.5 truncate">
                   {t("hero.trust_font_sub", "Font Height (6.0 mm)")}
                 </p>
               </div>
-              <div className="p-1.5 sm:p-2 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs text-center">
-                <p className="text-sm sm:text-base font-black text-cyan-300 leading-tight">
+              <div className="p-2 sm:p-2.5 rounded-xl bg-[#091C33]/85 hover:bg-[#0E2847] border border-white/15 hover:border-white/30 backdrop-blur-md shadow-xs text-center transition-colors">
+                <p className="text-sm sm:text-base font-black text-cyan-300 leading-tight drop-shadow-xs">
                   {t("hero.trust_offline", "Mode B")}
                 </p>
-                <p className="text-slate-300 text-[9.5px] sm:text-[10.5px] mt-0.5 truncate">
+                <p className="text-slate-200 text-[10px] sm:text-[11px] font-medium mt-0.5 truncate">
                   {t("hero.trust_offline_sub", "Offline Resilient")}
                 </p>
               </div>

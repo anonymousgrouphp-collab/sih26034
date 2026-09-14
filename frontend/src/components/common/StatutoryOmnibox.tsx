@@ -212,8 +212,8 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
   const { t, language } = useLanguage();
   const isHero = variant === "hero";
   const pillClasses = isHero
-    ? "inline-flex items-center px-2 py-0.5 rounded-md text-[10px] sm:text-[10.5px] font-medium transition-all bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white border border-white/20 hover:border-white/35 shadow-2xs cursor-pointer backdrop-blur-xs active:scale-[0.98] whitespace-nowrap"
-    : "inline-flex items-center px-2 py-0.5 rounded-md text-[10px] sm:text-[10.5px] font-medium transition-all bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 hover:border-slate-300 shadow-2xs cursor-pointer active:scale-[0.98] whitespace-nowrap";
+    ? "inline-flex items-center px-2.5 py-0.5 rounded-md text-[10px] sm:text-[10.5px] font-medium transition-all bg-[#0A1D33]/90 hover:bg-[#102C4E] text-slate-100 hover:text-white border border-white/25 hover:border-white/45 shadow-xs cursor-pointer backdrop-blur-md active:scale-[0.98] whitespace-nowrap"
+    : "inline-flex items-center px-2.5 py-0.5 rounded-md text-[10px] sm:text-[10.5px] font-medium transition-all bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 hover:border-slate-300 shadow-2xs cursor-pointer active:scale-[0.98] whitespace-nowrap";
 
   // Lock background scroll and listen for Escape key when statutory modal is open
   useEffect(() => {
@@ -324,7 +324,7 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
                 "omnibox.placeholder",
                 "Search statutory rules, Table-I font schedule, banned units, GSR notifications..."
               )}
-              className="w-full py-1.5 sm:py-3 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 bg-transparent focus:outline-none font-medium min-w-0"
+              className="w-full py-1.5 sm:py-3 text-xs sm:text-sm text-slate-900 placeholder:text-slate-500 bg-transparent focus:outline-none font-medium min-w-0"
               aria-label="Statutory Inspection & Rule Search Omnibox"
             />
           </div>
@@ -369,11 +369,11 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
         </div>
       </form>
 
-      {/* Statutory Provisions / Quick References Row (Multi-Line Wrapping Pills) */}
-      <div className="w-full max-w-full min-w-0 flex flex-wrap items-center gap-1.5 sm:gap-2 mt-2 sm:mt-2.5 px-0.5">
+      {/* Statutory Provisions / Quick References Row (Multi-Line Wrapping Pills - Center Aligned) */}
+      <div className="w-full max-w-full min-w-0 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 mt-2 sm:mt-2.5 px-0.5">
         <span
           className={`inline-flex items-center gap-1 font-bold tracking-wider uppercase text-[9.5px] sm:text-[10px] mr-0.5 shrink-0 ${
-            isHero ? "text-slate-300" : "text-slate-600"
+            isHero ? "text-slate-200 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" : "text-slate-600"
           }`}
         >
           <Scale size={11} className={isHero ? "text-amber-300" : "text-[#1B365D]"} />
