@@ -1603,25 +1603,27 @@ def execute_batch_pipeline(
         except Exception:
             qg_passed = (blur_val >= 100.0 and glare_val <= 3.0)
 
-        # 3. Calibration
-        calib_res = None
-        px_to_mm = None
+        # 3. Calibration: reuse precomputed calibration if already resolved at upload time
+        px_to_mm = img_meta.get("px_to_mm")
+        calib_method = img_meta.get("calib_method", "UNRESOLVED")
+        ref_box = img_meta.get("ref_box")
         pdp_area = 112.0
-        ref_box = None
-        calib_method = "UNRESOLVED"
         margin_err = 1.2
-        try:
-            from calibration import CalibrationEngine
-            calib_res = CalibrationEngine.calibrate(img_bgr, package_type=package_type)
-            if calib_res and calib_res.is_calibrated and calib_res.calibration:
-                px_to_mm = float(calib_res.calibration.px_to_mm)
-                calib_method = str(calib_res.calibration.method)
-                margin_err = float(calib_res.calibration.margin_of_error_pct or 1.2)
-                ref_box = calib_res.calibration.reference_bounding_box
-                if calib_res.principal_display_panel:
-                    pdp_area = float(calib_res.principal_display_panel.pdp_area_cm2)
-        except Exception as calib_err:
-            logger.warning(f"Calibration worker failed on {img_id}: {calib_err}")
+        calib_res = None
+
+        if not px_to_mm or calib_method == "UNRESOLVED":
+            try:
+                from calibration import CalibrationEngine
+                calib_res = CalibrationEngine.calibrate(img_bgr, package_type=package_type)
+                if calib_res and calib_res.is_calibrated and calib_res.calibration:
+                    px_to_mm = float(calib_res.calibration.px_to_mm)
+                    calib_method = str(calib_res.calibration.method)
+                    margin_err = float(calib_res.calibration.margin_of_error_pct or 1.2)
+                    ref_box = calib_res.calibration.reference_bounding_box
+                    if calib_res.principal_display_panel:
+                        pdp_area = float(calib_res.principal_display_panel.pdp_area_cm2)
+            except Exception as calib_err:
+                logger.warning(f"Calibration worker failed on {img_id}: {calib_err}")
 
         # 4. Multilingual OCR with Cache Check
         cache_adapter = CacheQueueAdapter.get_instance() if CacheQueueAdapter else None
@@ -1713,19 +1715,25 @@ def execute_batch_pipeline(
         "SIDE_PANEL": 4,
         "UNKNOWN": 5,
     }
-    # Sort images: prioritize any images with cached tokens, then by panel type, then by sharpness (blur variance descending)
+    # Sort images: prioritize highest sharpness (blur variance descending) where text contrast is highest, then panel type
     sorted_images = sorted(
         ev_images,
         key=lambda x: (
             -cached_counts.get(x.id, 0),
-            PANEL_ORDER.get(x.panel_type or "UNKNOWN", 99),
-            -float(getattr(x, "blur_laplacian_variance", 0.0) or 0.0)
+            -float(getattr(x, "blur_laplacian_variance", 0.0) or 0.0),
+            PANEL_ORDER.get(x.panel_type or "UNKNOWN", 99)
         )
     )
 
-    # Prepare metadata for facet processing
+    # Prepare metadata for facet processing (including precomputed scale/calibration)
     img_metas = []
     for img in sorted_images:
+        rbox = None
+        if img.calibration_reference_box:
+            try:
+                rbox = json.loads(img.calibration_reference_box)
+            except Exception:
+                rbox = None
         img_metas.append({
             "id": img.id,
             "panel_type": img.panel_type or "UNKNOWN",
@@ -1733,18 +1741,21 @@ def execute_batch_pipeline(
             "image_url": getattr(img, "image_url", None),
             "blur_variance": img.blur_laplacian_variance,
             "glare_percentage": img.glare_pixel_percentage,
+            "px_to_mm": img.px_to_mm_scale,
+            "calib_method": img.calibration_method,
+            "ref_box": rbox,
         })
 
-    # Execute workers sequentially with safety time budget (30s) to discover all packaging declarations
+    # Execute workers sequentially with strict safety time budget (22s) to never exceed Vercel/Render proxy timeouts
     import gc
     worker_results = []
-    SAFETY_BUDGET_SECONDS = 30.0
-    MAX_FACETS_TO_PROCESS = 6
+    SAFETY_BUDGET_SECONDS = 22.0
+    MAX_FACETS_TO_PROCESS = 3
 
     discovered_fields = set()
     for idx, meta in enumerate(img_metas):
         elapsed = time.perf_counter() - t0
-        if (len(discovered_fields) >= 4 and elapsed > SAFETY_BUDGET_SECONDS) or (idx >= MAX_FACETS_TO_PROCESS):
+        if elapsed > SAFETY_BUDGET_SECONDS or idx >= MAX_FACETS_TO_PROCESS:
             logger.info(f"Batch pipeline reached budget limit ({elapsed:.1f}s, {idx} facets); proceeding to fusion.")
             break
 
