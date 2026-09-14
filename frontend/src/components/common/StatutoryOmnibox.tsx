@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Search, Scale, FileText, AlertCircle, ArrowRight, X, CheckCircle2, ShieldCheck, ChevronDown, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext";
@@ -210,6 +211,26 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
   const navigate = useNavigate();
   const { t, language } = useLanguage();
 
+  // Lock background scroll and listen for Escape key when statutory modal is open
+  useEffect(() => {
+    if (!selectedRule) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSelectedRule(null);
+      }
+    };
+
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedRule]);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const q = query.trim().toLowerCase();
@@ -392,34 +413,40 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
         </button>
       </div>
 
-      {/* Interactive Statutory Rule Dossier Modal (Popup on Search / Click) */}
-      {selectedRule && (
+      {/* Interactive Statutory Rule Dossier Modal (Rendered via Portal directly to body) */}
+      {selectedRule && typeof document !== "undefined" && createPortal(
         <div
           role="dialog"
           aria-modal="true"
           aria-labelledby="rule-modal-title"
-          className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setSelectedRule(null);
+          }}
+          className="fixed inset-0 z-[9999] bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-fade-in"
         >
-          <div className="bg-white text-slate-900 rounded-2xl shadow-2xl border border-slate-200 max-w-2xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto relative overflow-hidden">
+          <div
+            className="bg-white text-slate-900 rounded-2xl shadow-2xl border border-slate-200 max-w-xl w-full flex flex-col max-h-[90dvh] sm:max-h-[85vh] relative overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Sovereign Tricolor Accent Ribbon */}
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FF9933] via-white to-[#138808]" />
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FF9933] via-white to-[#138808] z-10" />
 
-            {/* Header */}
-            <div className="flex items-start justify-between border-b border-slate-200 pb-3 pt-1">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-amber-100 text-amber-900 border border-amber-300 shrink-0">
-                  <Scale size={22} />
+            {/* Header (Sticky at top of modal) */}
+            <div className="flex items-start justify-between border-b border-slate-200 p-3.5 sm:p-5 pt-3.5 shrink-0 bg-white">
+              <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                <div className="p-2 sm:p-2.5 rounded-xl bg-amber-100 text-amber-900 border border-amber-300 shrink-0">
+                  <Scale size={20} className="sm:w-[22px] sm:h-[22px]" />
                 </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-100 border border-amber-300 text-amber-900">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                    <span className="text-[9.5px] sm:text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-100 border border-amber-300 text-amber-900 truncate">
                       {selectedRule.gazette[language === "hi" ? "hi" : "en"]}
                     </span>
-                    <span className="text-[10px] text-slate-500 font-semibold">
+                    <span className="text-[9.5px] sm:text-[10px] text-slate-500 font-semibold truncate">
                       {selectedRule.act[language === "hi" ? "hi" : "en"]}
                     </span>
                   </div>
-                  <h3 id="rule-modal-title" className="text-base sm:text-lg font-bold text-[#1B365D] mt-1">
+                  <h3 id="rule-modal-title" className="text-sm sm:text-base font-bold text-[#1B365D] mt-1 leading-snug">
                     {selectedRule.title[language === "hi" ? "hi" : "en"]}
                   </h3>
                 </div>
@@ -427,55 +454,58 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
               <button
                 type="button"
                 onClick={() => setSelectedRule(null)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                className="p-1.5 sm:p-2 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer shrink-0 ml-2"
                 aria-label="Close dialog"
               >
                 <X size={20} />
               </button>
             </div>
 
-            {/* Statutory Summary */}
-            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed font-normal">
-              <p>{selectedRule.summary[language === "hi" ? "hi" : "en"]}</p>
+            {/* Scrollable Content Body */}
+            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5">
+              {/* Statutory Summary */}
+              <div className="p-3 sm:p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed font-normal">
+                <p>{selectedRule.summary[language === "hi" ? "hi" : "en"]}</p>
+              </div>
+
+              {/* Statutory Thresholds & Legal Defenses */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-amber-900 flex items-center gap-1.5">
+                  <ShieldCheck size={14} className="text-amber-700" />
+                  <span>
+                    {language === "hi"
+                      ? "अनिवार्य विधिक सीमाएं एवं न्यायालय साक्ष्य बचाव"
+                      : "Mandatory Statutory Schedules & Evidentiary Defenses"}
+                  </span>
+                </h4>
+                <ul className="space-y-1.5 text-xs text-slate-800">
+                  {selectedRule.thresholds[language === "hi" ? "hi" : "en"].map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-2 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+                      <CheckCircle2 size={15} className="text-emerald-600 shrink-0 mt-0.5" />
+                      <span className="leading-snug">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
 
-            {/* Statutory Thresholds & Legal Defenses */}
-            <div className="space-y-2">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-amber-900 flex items-center gap-1.5">
-                <ShieldCheck size={14} className="text-amber-700" />
-                <span>
-                  {language === "hi"
-                    ? "अनिवार्य विधिक सीमाएं एवं न्यायालय साक्ष्य बचाव"
-                    : "Mandatory Statutory Schedules & Evidentiary Defenses"}
-                </span>
-              </h4>
-              <ul className="space-y-1.5 text-xs text-slate-800">
-                {selectedRule.thresholds[language === "hi" ? "hi" : "en"].map((item, idx) => (
-                  <li key={idx} className="flex items-start gap-2 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
-                    <CheckCircle2 size={15} className="text-emerald-600 shrink-0 mt-0.5" />
-                    <span className="leading-snug">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Action Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-200">
+            {/* Action Bar (Sticky at bottom of modal, mobile-optimized) */}
+            <div className="p-3 sm:p-4 bg-slate-50 border-t border-slate-200 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2 shrink-0">
               <button
                 type="button"
                 onClick={() => setSelectedRule(null)}
-                className="px-4 py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 border border-slate-200 transition-colors cursor-pointer text-center"
               >
                 {t("omnibox.close", "Close Schedule")}
               </button>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                 <button
                   type="button"
                   onClick={() => {
                     setSelectedRule(null);
                     navigate("/rules");
                   }}
-                  className="px-4 py-2 rounded-lg text-xs font-bold text-slate-700 hover:text-slate-950 hover:bg-slate-100 border border-slate-300 transition-colors cursor-pointer"
+                  className="w-full sm:w-auto px-3 sm:px-4 py-2 rounded-lg text-xs font-bold text-slate-700 hover:text-slate-950 hover:bg-slate-200/60 border border-slate-300 transition-colors cursor-pointer text-center"
                 >
                   {t("omnibox.view_full", "View Full Rules & Schedules Dossier")}
                 </button>
@@ -485,7 +515,7 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
                     setSelectedRule(null);
                     navigate("/inspections/demo-fortune-sunlite");
                   }}
-                  className="px-4 py-2 rounded-lg text-xs font-bold bg-[#1B365D] hover:bg-[#0A2540] text-white shadow-xs transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+                  className="w-full sm:w-auto px-4 py-2 rounded-lg text-xs font-bold bg-[#1B365D] hover:bg-[#0A2540] text-white shadow-xs transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <span>{language === "hi" ? "कैनवास में परीक्षण करें" : "Test in Canvas"}</span>
                   <ArrowRight size={13} />
@@ -493,7 +523,8 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
