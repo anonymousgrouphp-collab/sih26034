@@ -7,10 +7,11 @@ export const NationalLeadershipBanner: React.FC = () => {
   const { t, language } = useLanguage();
 
   return (
-    <section className="relative z-10 py-6 sm:py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="rounded-2xl bg-white shadow-xl border border-slate-200/80 p-5 sm:p-7 relative overflow-hidden">
-        {/* Top Tricolor Accent Line */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FF9933] via-slate-200 to-[#138808]" />
+    <section className="relative z-10 py-8 sm:py-12 bg-slate-50 border-b border-slate-200/80">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="rounded-2xl bg-white shadow-md border border-slate-200/80 p-5 sm:p-7 relative overflow-hidden">
+          {/* Top Tricolor Accent Line */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FF9933] via-slate-200 to-[#138808]" />
 
         <div className="grid lg:grid-cols-12 gap-6 items-center">
           {/* Left Column (7 cols): Hon'ble Prime Minister Spotlight Card */}
@@ -100,6 +101,7 @@ export const NationalLeadershipBanner: React.FC = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </div>
+  </section>
+);
 };

@@ -102,7 +102,7 @@ export const Landing: React.FC = () => {
 
       {/* Main Hero Section Inspired by india.gov.in */}
       <main id="main-content" className="flex-1">
-        <section className="relative overflow-hidden bg-[#0A2240] text-white pt-1 pb-1.5 sm:pt-2 sm:pb-2.5 lg:h-[calc(100vh-5.25rem)] lg:min-h-[580px] lg:max-h-[800px] flex flex-col justify-between">
+        <section className="relative overflow-hidden bg-[#0A2240] text-white pt-3 pb-8 sm:pt-5 sm:pb-10 lg:pt-6 lg:pb-12 lg:min-h-[calc(100vh-5.25rem)] flex flex-col justify-between">
           {/* Subtle Sovereign Foundation Backdrop */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/40 via-[#0A2240] to-[#061426] pointer-events-none" />
           
@@ -181,7 +181,7 @@ export const Landing: React.FC = () => {
             </div>
 
             {/* 4 Trust Pillar Badges (Grounded at Bottom of 1st Frame) */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 max-w-4xl mx-auto w-full pt-1.5 pb-0.5 border-t border-white/10 text-xs mt-1.5 sm:mt-2">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 max-w-4xl mx-auto w-full pt-3 pb-1 border-t border-white/10 text-xs mt-3 sm:mt-5">
               <div className="p-1.5 sm:p-2 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs text-center">
                 <p className="text-sm sm:text-base font-black text-amber-300 leading-tight">
                   {t("hero.trust_verdicts", "4-State")}
