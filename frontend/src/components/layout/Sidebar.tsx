@@ -174,18 +174,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Desktop Header / Collapse Bar */}
         <div
           className={`flex items-center border-b border-slate-100 shrink-0 ${
-            isCollapsed ? "justify-center py-2.5 px-2" : "justify-between px-3.5 py-2.5"
+            isCollapsed ? "justify-center py-2.5" : "justify-between px-3.5 py-2.5"
           }`}
         >
           {isCollapsed ? (
             <button
               type="button"
               onClick={() => setIsCollapsed(!isCollapsed)}
-              className="w-7 h-7 rounded-md bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-slate-400 hover:text-slate-700 transition-colors flex items-center justify-center cursor-pointer shadow-2xs"
+              className="w-8 h-8 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-slate-500 hover:text-slate-800 transition-colors flex items-center justify-center cursor-pointer shadow-2xs"
               title="Expand sidebar"
               aria-label="Expand sidebar"
             >
-              <ChevronRight size={14} />
+              <ChevronRight size={15} />
             </button>
           ) : (
             <>
@@ -211,7 +211,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Primary Action Button: New Inspection Case */}
-        <div className="p-3 pb-2 shrink-0">
+        <div className={`shrink-0 ${isCollapsed ? "py-2.5 px-2 flex justify-center" : "p-3 pb-2"}`}>
           <Link
             to="/inspections/new"
             onClick={() => {
@@ -219,8 +219,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
               resetScrollToTop();
             }}
             title={isCollapsed ? t("action.new_case", "New Inspection Case") : "New Inspection Case (Alt+N)"}
-            className={`w-full flex items-center gap-2.5 py-2.5 bg-[#1B365D] hover:bg-[#0A2540] text-white text-xs font-bold rounded-xl shadow-sm hover:shadow transition-all border border-[#152a48] group ${
-              isCollapsed ? "px-0 justify-center" : "px-3.5"
+            className={`flex items-center transition-all group ${
+              isCollapsed
+                ? "w-10 h-10 justify-center rounded-xl bg-[#1B365D] hover:bg-[#0A2540] text-white shadow-sm hover:shadow border border-[#152a48]"
+                : "w-full gap-2.5 py-2.5 px-3.5 bg-[#1B365D] hover:bg-[#0A2540] text-white text-xs font-bold rounded-xl shadow-sm hover:shadow border border-[#152a48]"
             }`}
           >
             <div className="w-5 h-5 rounded-md bg-[#FF9933] text-slate-950 flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
@@ -235,7 +237,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Scrollable Navigation Links */}
-        <div className="flex-1 min-h-0 overflow-y-auto px-3 py-1 space-y-4 custom-scrollbar">
+        <div className={`flex-1 min-h-0 overflow-y-auto space-y-4 custom-scrollbar ${isCollapsed ? "px-2 py-2" : "px-3 py-1"}`}>
           <nav className="space-y-4">
             {navGroups.map((group, groupIdx) => (
               <div key={groupIdx} className="space-y-1">
@@ -244,7 +246,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     {group.title}
                   </p>
                 ) : (
-                  <div className="h-px bg-slate-100 my-2 mx-1" />
+                  <div className="h-px bg-slate-100 my-2 mx-2" />
                 )}
 
                 {group.items.map((item) => {
@@ -257,15 +259,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       to={item.path}
                       onClick={onCloseMobile}
                       title={isCollapsed ? item.label : undefined}
-                      className={`group relative w-full flex items-center justify-between py-2 text-xs font-semibold rounded-xl transition-all ${
-                        active
-                          ? "bg-blue-50/90 text-[#1B365D] font-bold border border-blue-200/80 shadow-2xs"
-                          : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 border border-transparent"
-                      } ${isCollapsed ? "px-0 justify-center" : "px-3"}`}
+                      className={`group relative flex items-center transition-all ${
+                        isCollapsed
+                          ? `w-10 h-10 mx-auto justify-center rounded-xl ${
+                              active
+                                ? "bg-blue-50/90 text-[#1B365D] font-bold border border-blue-200/80 shadow-2xs"
+                                : "text-slate-500 hover:bg-slate-100 hover:text-slate-900 border border-transparent"
+                            }`
+                          : `w-full justify-between py-2 px-3 text-xs font-semibold rounded-xl ${
+                              active
+                                ? "bg-blue-50/90 text-[#1B365D] font-bold border border-blue-200/80 shadow-2xs"
+                                : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 border border-transparent"
+                            }`
+                      }`}
                     >
-                      <div className={`flex items-center gap-2.5 ${isCollapsed ? "justify-center" : ""}`}>
+                      <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-2.5"}`}>
                         <Icon
-                          size={17}
+                          size={18}
                           className={`shrink-0 transition-colors ${
                             active
                               ? "text-[#1B365D]"
@@ -326,8 +336,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           ) : (
             <div className="flex justify-center py-1" title="LMPC Rules, 2011 & Section 63 BSA 2023 Verified">
-              <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-[#1B365D] shadow-2xs">
-                <ShieldCheck size={16} className="text-[#1B365D]" />
+              <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-[#1B365D] shadow-2xs">
+                <ShieldCheck size={18} className="text-[#1B365D]" />
               </div>
             </div>
           )}
