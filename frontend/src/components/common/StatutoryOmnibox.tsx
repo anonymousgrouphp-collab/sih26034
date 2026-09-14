@@ -370,7 +370,7 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
       </form>
 
       {/* Statutory Provisions / Quick References Row (Multi-Line Wrapping Pills - Center Aligned) */}
-      <div className="w-full max-w-full min-w-0 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 mt-2 sm:mt-2.5 px-0.5">
+      <div className="w-full max-w-full min-w-0 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 mt-2.5 sm:mt-3 px-0.5">
         <span
           className={`inline-flex items-center gap-1 font-bold tracking-wider uppercase text-[9.5px] sm:text-[10px] mr-0.5 shrink-0 ${
             isHero ? "text-slate-200 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]" : "text-slate-600"

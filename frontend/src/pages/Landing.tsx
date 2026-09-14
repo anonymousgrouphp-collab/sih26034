@@ -154,7 +154,7 @@ export const Landing: React.FC = () => {
                   </div>
                 </div>
 
-                <p className="text-xs sm:text-[13.5px] font-medium text-slate-100 max-w-2xl mx-auto leading-relaxed animate-fade-up px-2 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
+                <p className="text-xs sm:text-[13.5px] font-medium text-slate-100 max-w-3xl mx-auto leading-relaxed animate-fade-up px-2 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
                   {t(
                     "hero.description",
                     "Rule 6 Mandatory Declarations & Table-I Schedule Verification under Legal Metrology Act, 2009 with Section 63 BSA 2023 Tamper-Evident Certificates for Enforcement Officers."
@@ -163,12 +163,12 @@ export const Landing: React.FC = () => {
               </div>
 
               {/* Central Statutory Omnibox Search Engine */}
-              <div className="w-full max-w-full min-w-0 pt-0.5 animate-fade-up">
+              <div className="w-full max-w-full min-w-0 pt-1 sm:pt-1.5 animate-fade-up">
                 <StatutoryOmnibox />
               </div>
 
               {/* Action CTAs */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3.5 pt-0.5 animate-fade-up w-full max-w-md sm:max-w-none mx-auto">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3.5 pt-2 sm:pt-3 animate-fade-up w-full max-w-md sm:max-w-none mx-auto">
                 <Link
                   to="/dashboard"
                   onClick={resetScrollToTop}
