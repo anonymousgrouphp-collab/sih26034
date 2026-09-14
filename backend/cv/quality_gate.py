@@ -324,8 +324,7 @@ class QualityGateEvaluator:
 
     @classmethod
     def preprocess_for_ocr(cls, image: np.ndarray) -> np.ndarray:
-        """Applies adaptive thresholding (CLAHE) and bilateral filtering
-        to recover OCR bounding boxes lost to glare/reflections."""
+        """Passthrough for OCR. CLAHE disabled to prevent destruction of high-resolution images."""
         if image is None or image.size == 0:
             return image
             
@@ -338,19 +337,7 @@ class QualityGateEvaluator:
         else:
             return image
 
-        # Convert to LAB color space for intensity equalization
-        lab = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2LAB)
-        l, a, b = cv2.split(lab)
-        
-        # Apply CLAHE to L-channel to recover low-contrast text without destroying character edges
-        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-        cl = clahe.apply(l)
-        
-        # Merge back and convert to BGR
-        limg = cv2.merge((cl, a, b))
-        enhanced = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
-        
-        return enhanced
+        return img_bgr
 
     @classmethod
     def evaluate_image(

@@ -178,10 +178,10 @@ class CalibrationEngine:
 
             target_aspect = card_w_mm / card_h_mm  # 1.5858
             best_candidate = None
-            min_aspect_diff = 0.28  # Handheld perspective foreshortening tolerance (~17%)
+            min_aspect_diff = 0.15  # Handheld perspective foreshortening tolerance (~9%)
 
             h_img, w_img = gray.shape[:2]
-            min_card_area = (w_img * h_img) * 0.015  # At least 1.5% of total frame (>11,000 px)
+            min_card_area = (w_img * h_img) * 0.030  # At least 3.0% of total frame
             max_card_area = (w_img * h_img) * 0.40   # At most 40% of total frame
 
             for edges in edge_passes:
@@ -200,8 +200,8 @@ class CalibrationEngine:
                         continue
                     rect_area = rw * rh
                     rectangularity = hull_area / rect_area
-                    # Card standard requires high rectangularity (>=0.85) to reject trapezoids and organic shapes
-                    if rectangularity < 0.85:
+                    # Card standard requires high rectangularity (>=0.90) to reject trapezoids and organic shapes
+                    if rectangularity < 0.90:
                         continue
 
                     candidates_to_try = []

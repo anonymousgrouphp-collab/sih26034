@@ -598,9 +598,12 @@ class CommodityFactExtractor:
         raw_fields: List[ExtractedFieldDTO] = []
 
         # Helper to compute measured font height in mm if px_to_mm is available
-        def compute_font_height(bbox: List[int]) -> Tuple[Optional[float], Optional[float]]:
+        def compute_font_height(bbox: List[int], tokens: Optional[List[Dict[str, Any]]] = None) -> Tuple[Optional[float], Optional[float]]:
             if px_to_mm and px_to_mm > 0:
-                h_px = max(1, bbox[2] - bbox[0])
+                if tokens and len(tokens) > 0:
+                    h_px = sum(max(1, t["bounding_box"][2] - t["bounding_box"][0]) for t in tokens) / len(tokens)
+                else:
+                    h_px = max(1, bbox[2] - bbox[0])
                 conf = calib_confidence if calib_confidence is not None else 0.95
                 return round(h_px / px_to_mm, 2), round(conf, 2)
             return None, None
@@ -850,7 +853,7 @@ class CommodityFactExtractor:
             if parsed_addr:
                 addr_val = AddressValue(**parsed_addr)
                 role = block["role"]
-                font_mm, font_conf = compute_font_height(block["bounding_box"])
+                font_mm, font_conf = compute_font_height(block["bounding_box"], block.get("tokens"))
 
                 if role == "MANUFACTURER_AND_PACKER":
                     if extracted_mfg is None or extracted_mfg == extracted_marketer:
@@ -1095,7 +1098,8 @@ class CommodityFactExtractor:
                     care_bboxes.append(unit["bounding_box"])
 
             care_bbox = _compute_union_bbox(care_bboxes) if care_bboxes else [0, 0, 0, 0]
-            font_mm, font_conf = compute_font_height(care_bbox)
+            fake_tokens = [{"bounding_box": b} for b in care_bboxes]
+            font_mm, font_conf = compute_font_height(care_bbox, fake_tokens)
 
             extracted_consumer_care = ConsumerCareValue(
                 contact_name=contact_name,

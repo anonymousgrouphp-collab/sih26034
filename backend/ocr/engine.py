@@ -59,7 +59,8 @@ class MultilingualOCREngine:
         self.detector = detector if detector is not None else DBNetTextDetector(
             num_threads=det_num_threads,
             execution_mode=self.execution_mode,
-            allow_classical_fallback=allow_classical_fallback
+            allow_classical_fallback=allow_classical_fallback,
+            max_side_len=1920
         )
         self.recognizer = recognizer if recognizer is not None else PPOCRv4Recognizer(
             num_threads=rec_num_threads,
