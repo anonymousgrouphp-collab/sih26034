@@ -159,22 +159,22 @@ export const Landing: React.FC = () => {
               </div>
 
               {/* Action CTAs */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 pt-0.5 animate-fade-up w-full max-w-md sm:max-w-none mx-auto">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3.5 pt-0.5 animate-fade-up w-full max-w-md sm:max-w-none mx-auto">
                 <Link
                   to="/dashboard"
                   onClick={resetScrollToTop}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 px-4.5 py-2 sm:py-2.5 text-xs sm:text-sm font-black shadow-lg hover:shadow-amber-400/25 transition-all transform hover:-translate-y-0.5 btn-press cursor-pointer"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-black shadow-lg hover:shadow-amber-400/25 transition-all transform hover:-translate-y-0.5 btn-press cursor-pointer whitespace-nowrap"
                 >
-                  <ShieldCheck size={16} className="text-slate-950" />
+                  <ShieldCheck size={17} className="text-slate-950 shrink-0" />
                   <span>{t("hero.cta_workstation", "Launch Officer Workstation")}</span>
-                  <ArrowRight size={15} />
+                  <ArrowRight size={15} className="shrink-0" />
                 </Link>
                 <Link
                   to="/rules"
                   onClick={resetScrollToTop}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/10 hover:bg-white/20 px-4.5 py-2 sm:py-2.5 text-xs sm:text-sm font-bold text-white backdrop-blur-xs transition-all btn-press cursor-pointer"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-xl border border-white/25 bg-white/10 hover:bg-white/20 px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold text-white backdrop-blur-xs transition-all btn-press cursor-pointer whitespace-nowrap"
                 >
-                  <Scale size={15} className="text-amber-300" />
+                  <Scale size={16} className="text-amber-300 shrink-0" />
                   <span>{t("hero.cta_rules", "Statutory Rules & Table-I Schedule")}</span>
                 </Link>
               </div>

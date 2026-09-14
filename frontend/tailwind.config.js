@@ -91,6 +91,9 @@ export default {
       backdropBlur: {
         xs: "2px",
       },
+      spacing: {
+        4.5: "1.125rem",
+      },
     },
   },
   plugins: [],
