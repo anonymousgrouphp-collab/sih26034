@@ -79,7 +79,7 @@ class MasterPipelineTester:
         image_dir: str,
         username: str = "inspector_rajesh",
         password: str = "Officer@2026",
-        max_polls: int = 45,
+        max_polls: int = 90,
         poll_interval: float = 4.0,
         max_resize_dim: int = 2400,
         jpeg_quality: int = 92,
@@ -677,8 +677,8 @@ def main():
     parser.add_argument(
         "--max-polls",
         type=int,
-        default=45,
-        help="Maximum polling checks for batch pipeline (default: 45 = ~180s)",
+        default=90,
+        help="Maximum polling checks for batch pipeline (default: 90 = ~360s)",
     )
     parser.add_argument(
         "--poll-interval",
