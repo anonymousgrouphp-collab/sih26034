@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { NirikshakBrandLogo } from "../common/NirikshakBrandLogo";
 import { resetScrollToTop } from "../common/ScrollToTop";
 import { OfficerRole } from "../../types/inspection";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth, roleMeta } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { ApiService } from "../../services/api";
 import {
@@ -255,7 +255,11 @@ export const Header: React.FC<HeaderProps> = ({
                               {user?.name || "Rajesh Sharma"}
                             </h4>
                             <p className="text-[11px] font-semibold text-amber-300 truncate">
-                              {isController ? "Controller of Legal Metrology" : "Legal Metrology Officer (Inspector)"}
+                              {user?.designation ||
+                                (user?.role ? roleMeta[user.role]?.designation : null) ||
+                                (isController
+                                  ? "Controller of Legal Metrology"
+                                  : "Legal Metrology Officer (Inspector)")}
                             </p>
                             <p className="text-[10px] text-blue-200/80 font-mono mt-0.5 truncate">
                               Badge: {user?.badgeNumber || (isController ? "CTRL-DL-0012" : "INSP-DL-0842")}

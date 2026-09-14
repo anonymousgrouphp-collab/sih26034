@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Scale,
   ShieldCheck,
@@ -11,14 +11,16 @@ import {
   LockKeyhole,
   Workflow,
   Landmark,
-  Sparkles,
   ExternalLink,
+  LogIn,
+  LogOut,
 } from "lucide-react";
 import { NirikshakBrandLogo } from "../components/common/NirikshakBrandLogo";
 import { GovTopBar } from "../components/layout/GovTopBar";
 import { GovFooter } from "../components/layout/GovFooter";
 import { StatutoryPipelineInfographic } from "../components/common/StatutoryPipelineInfographic";
 import { useLanguage } from "../context/LanguageContext";
+import { useAuth } from "../context/AuthContext";
 import { m } from "framer-motion";
 import { Reveal } from "../components/common/motion";
 import { SovereignMetrologyHeroBackdrop } from "../components/common/SovereignMetrologyHeroBackdrop";
@@ -29,6 +31,8 @@ import { resetScrollToTop } from "../components/common/ScrollToTop";
 
 export const Landing: React.FC = () => {
   const { t, language } = useLanguage();
+  const { user, logout, roleMeta } = useAuth();
+  const navigate = useNavigate();
 
   const highlights = [
     {
@@ -88,14 +92,58 @@ export const Landing: React.FC = () => {
               <span>{language === "hi" ? "ई-माप पोर्टल" : "eMaap Portal"}</span>
               <ExternalLink size={13} />
             </a>
-            <Link
-              to="/login"
-              onClick={resetScrollToTop}
-              className="inline-flex items-center gap-2 rounded-lg bg-amber-400 hover:bg-amber-300 px-4 py-2 text-xs sm:text-sm font-bold text-slate-950 shadow-xs transition"
-            >
-              <span>{t("portal.officer_workstation", "Officer Workstation")}</span>
-              <ArrowRight size={15} />
-            </Link>
+            {!user ? (
+              <Link
+                to="/login"
+                onClick={resetScrollToTop}
+                className="inline-flex items-center gap-2 rounded-lg bg-amber-400 hover:bg-amber-300 px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-bold text-slate-950 shadow-xs hover:shadow transition-all focus:outline-none focus:ring-2 focus:ring-amber-300 focus:ring-offset-2 focus:ring-offset-[#1B365D] cursor-pointer"
+                aria-label={language === "hi" ? "अधिकारी लॉग इन पोर्टल" : "Log in to Officer Portal"}
+              >
+                <LogIn size={15} className="shrink-0 text-slate-950" />
+                <span>{t("portal.login", "Log In")}</span>
+              </Link>
+            ) : (
+              <div className="flex items-center gap-2 sm:gap-3">
+                {/* Authenticated Officer Pill */}
+                <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-[#0B213B] border border-blue-400/25 text-xs text-white shadow-xs">
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 font-black text-[10.5px] flex items-center justify-center border border-amber-200 shrink-0">
+                    {user.initials}
+                  </div>
+                  <div className="hidden sm:flex flex-col text-left leading-none">
+                    <div className="flex items-center gap-1">
+                      <span className="font-extrabold text-[11px] text-white truncate max-w-[120px]">
+                        {user.name}
+                      </span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" title="Active Session" />
+                    </div>
+                    <span className="text-[9px] font-mono text-amber-300/90 mt-0.5">
+                      {user.badgeNumber}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Direct Workstation Button */}
+                <Link
+                  to={roleMeta[user.role]?.landing || "/dashboard"}
+                  onClick={resetScrollToTop}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 px-3 sm:px-3.5 py-1.5 text-xs sm:text-sm font-bold text-slate-950 shadow-xs transition cursor-pointer"
+                >
+                  <span>{t("portal.workstation_short", "Workstation")}</span>
+                  <ArrowRight size={14} />
+                </Link>
+
+                {/* Logout Button */}
+                <button
+                  type="button"
+                  onClick={() => logout()}
+                  className="p-1.5 rounded-lg text-slate-300 hover:text-rose-400 hover:bg-white/10 transition-colors cursor-pointer"
+                  title={t("portal.logout", "Log Out")}
+                  aria-label={t("portal.logout", "Log Out")}
+                >
+                  <LogOut size={16} />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -170,12 +218,18 @@ export const Landing: React.FC = () => {
               {/* Action CTAs */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3.5 pt-2 sm:pt-3 animate-fade-up w-full max-w-md sm:max-w-none mx-auto">
                 <Link
-                  to="/dashboard"
+                  to={user ? (roleMeta[user.role]?.landing || "/dashboard") : "/login"}
                   onClick={resetScrollToTop}
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-black shadow-lg hover:shadow-amber-400/25 transition-all transform hover:-translate-y-0.5 btn-press cursor-pointer whitespace-nowrap"
                 >
                   <ShieldCheck size={17} className="text-slate-950 shrink-0" />
-                  <span>{t("hero.cta_workstation", "Launch Officer Workstation")}</span>
+                  <span>
+                    {user
+                      ? t("hero.cta_workstation", "Launch Officer Workstation")
+                      : language === "hi"
+                        ? "अधिकारी कार्यस्थान में लॉगिन करें"
+                        : "Log in to Officer Workstation"}
+                  </span>
                   <ArrowRight size={15} className="shrink-0" />
                 </Link>
                 <Link

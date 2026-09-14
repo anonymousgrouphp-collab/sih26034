@@ -2,12 +2,14 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { NirikshakLogoEmblem } from "./NirikshakLogoEmblem";
 import { useLanguage } from "../../context/LanguageContext";
+import { resetScrollToTop } from "./ScrollToTop";
 
 interface NirikshakBrandLogoProps {
   className?: string;
   tone?: "light" | "dark"; // "light" for dark blue backgrounds, "dark" for white/light backgrounds
   size?: "sm" | "md" | "lg";
   showSubtitle?: boolean;
+  onClick?: () => void;
 }
 
 /**
@@ -23,6 +25,7 @@ export const NirikshakBrandLogo: React.FC<NirikshakBrandLogoProps> = ({
   tone = "light",
   size = "md",
   showSubtitle = true,
+  onClick,
 }) => {
   const { language } = useLanguage();
 
@@ -45,6 +48,7 @@ export const NirikshakBrandLogo: React.FC<NirikshakBrandLogoProps> = ({
   return (
     <Link
       to="/"
+      onClick={onClick || resetScrollToTop}
       className={`inline-flex items-center gap-2.5 sm:gap-3 group select-none ${className}`}
       title={language === "hi" ? "निरीक्षक — विधिक मापविज्ञान कार्यस्थान" : "NIRIKSHAK — Inspection Workstation"}
     >

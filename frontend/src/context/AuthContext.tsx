@@ -69,13 +69,13 @@ export const demoUsers: Record<UserRole, SessionUser> = {
     badgeNumber: "CTRL-DL-0012",
   },
   administrator: {
-    name: "Rohan Verma",
+    name: "Dr. Alok Verma",
     email: "admin.metrology@nic.in",
     role: "administrator",
     officerRole: "CONTROLLER",
     department: "National Informatics / DoCA",
     designation: roleMeta.administrator.designation,
-    initials: "RV",
+    initials: "AV",
     badgeNumber: "ADMIN-SYS-001",
   },
   auditor: {
@@ -92,10 +92,16 @@ export const demoUsers: Record<UserRole, SessionUser> = {
 
 interface AuthContextValue {
   user: SessionUser | null;
-  login: (role: UserRole, email: string, password?: string) => { ok: boolean; message?: string };
+  login: (
+    role: UserRole,
+    email?: string,
+    password?: string,
+    customProps?: Partial<SessionUser>
+  ) => { ok: boolean; message?: string };
   logout: () => void;
   switchOfficerRole: (role: OfficerRole) => void;
   roleMeta: typeof roleMeta;
+  demoUsers: typeof demoUsers;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -104,9 +110,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [user, setUser] = useState<SessionUser | null>(() => {
     try {
       const stored = localStorage.getItem("Nirikshak_session");
-      return stored ? JSON.parse(stored) : demoUsers.inspector; // Default to inspector for instant demo
+      if (!stored || stored === "null" || stored === "undefined") {
+        return null;
+      }
+      return JSON.parse(stored);
     } catch {
-      return demoUsers.inspector;
+      return null;
     }
   });
 
@@ -119,6 +128,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } else {
       localStorage.removeItem("Nirikshak_session");
       StorageService.clearAuthToken();
+      StorageService.clearControllerAuthToken();
     }
   }, [user]);
 
@@ -126,23 +136,42 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     () => ({
       user,
       roleMeta,
-      login: (role, email, _password) => {
-        const expected = demoUsers[role];
-        setUser(expected);
-        const targetRole = expected.officerRole === "CONTROLLER" ? "controller" : "inspector";
+      demoUsers,
+      login: (role, email, _password, customProps) => {
+        const expected = demoUsers[role] || demoUsers.inspector;
+        const resolvedUser: SessionUser = {
+          ...expected,
+          email: email || expected.email,
+          ...(customProps || {}),
+        };
+        try {
+          localStorage.setItem("Nirikshak_session", JSON.stringify(resolvedUser));
+        } catch {
+          // ignore localStorage quota or access errors
+        }
+        setUser(resolvedUser);
+        const targetRole = resolvedUser.officerRole === "CONTROLLER" ? "controller" : "inspector";
         LiveApiService.getInstance().ensureAuthenticated(targetRole).catch(() => {});
         return { ok: true };
       },
       logout: () => {
+        try {
+          localStorage.removeItem("Nirikshak_session");
+        } catch {
+          // ignore
+        }
         setUser(null);
         StorageService.clearAuthToken();
+        StorageService.clearControllerAuthToken();
       },
       switchOfficerRole: (newOfficerRole: OfficerRole) => {
-        if (newOfficerRole === "CONTROLLER") {
-          setUser(demoUsers.controller);
-        } else {
-          setUser(demoUsers.inspector);
+        const target = newOfficerRole === "CONTROLLER" ? demoUsers.controller : demoUsers.inspector;
+        try {
+          localStorage.setItem("Nirikshak_session", JSON.stringify(target));
+        } catch {
+          // ignore
         }
+        setUser(target);
       },
     }),
     [user]

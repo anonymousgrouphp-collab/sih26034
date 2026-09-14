@@ -65,6 +65,26 @@ export const DICTIONARY: Record<string, TranslationEntry> = {
     en: "Officer Workstation",
     hi: "अधिकारी कार्यस्थान",
   },
+  "portal.login": {
+    en: "Log In",
+    hi: "लॉग इन",
+  },
+  "portal.officer_login": {
+    en: "Officer Log In",
+    hi: "अधिकारी लॉग इन",
+  },
+  "portal.workstation": {
+    en: "Officer Workstation",
+    hi: "अधिकारी कार्यस्थान",
+  },
+  "portal.workstation_short": {
+    en: "Workstation",
+    hi: "कार्यस्थान",
+  },
+  "portal.logout": {
+    en: "Log Out",
+    hi: "लॉग आउट",
+  },
   "portal.command_search": {
     en: "Quick Search Cases & Rules...",
     hi: "त्वरित खोज: मामले एवं नियम...",
@@ -77,6 +97,22 @@ export const DICTIONARY: Record<string, TranslationEntry> = {
   "portal.role_lmo": { en: "LMO Inspector", hi: "निरीक्षक (LMO)" },
   "portal.role_controller": { en: "Controller", hi: "नियंत्रक (Controller)" },
   "portal.signout": { en: "Sign Out", hi: "लॉग आउट" },
+  "login.title": {
+    en: "Official Workstation Sign In",
+    hi: "अधिकारी कार्यस्थान लॉगिन",
+  },
+  "login.fast_track": {
+    en: "Instant 1-Click Evaluation Suite",
+    hi: "त्वरित 1-क्लिक मूल्यांकन",
+  },
+  "login.gateway_nic": {
+    en: "National Officer Authentication Gateway",
+    hi: "राष्ट्रीय अधिकारी प्रमाणीकरण गेटवे",
+  },
+  "login.return_portal": {
+    en: "Return to Public Portal",
+    hi: "सार्वजनिक पोर्टल पर वापस जाएं",
+  },
 
   // --- Navigation ---
   "nav.dashboard": { en: "Executive Dashboard", hi: "कार्यकारी डैशबोर्ड" },
