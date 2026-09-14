@@ -133,6 +133,12 @@ export class ApiService {
     }
   }
 
+  public static emitSiteWideUpdate(): void {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("nirikshak_data_updated"));
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // 1. Dashboard & History Endpoints
   // ---------------------------------------------------------------------------
@@ -222,7 +228,9 @@ export class ApiService {
     }
 
     if (this.operatingMode === "MOCK") {
-      return await MockApiService.getInstance().createInspection(payload);
+      const mockCase = await MockApiService.getInstance().createInspection(payload);
+      this.emitSiteWideUpdate();
+      return mockCase;
     }
 
     try {
@@ -230,11 +238,14 @@ export class ApiService {
       try {
         MockApiService.getInstance().addLocalCase(liveCase);
       } catch {}
+      this.emitSiteWideUpdate();
       return liveCase;
     } catch (err: any) {
       if (err?.is_network_error || String(err?.message || "").includes("Failed to parse URL")) {
         console.warn("Live server unreachable for createInspection. Seamlessly activating Mode B local failover:", err);
-        return await MockApiService.getInstance().createInspection(payload);
+        const failoverCase = await MockApiService.getInstance().createInspection(payload);
+        this.emitSiteWideUpdate();
+        return failoverCase;
       }
       throw err;
     }
@@ -367,31 +378,37 @@ export class ApiService {
     inspectionId?: string,
     scenario?: "PASS" | "FAIL" | "REVIEW" | "UNABLE_TO_VERIFY"
   ): Promise<InspectionCase> {
+    let res;
     if (this.operatingMode === "MOCK" || (inspectionId && this.isDemoId(inspectionId))) {
-      return await MockApiService.getInstance().executePipeline(imageId, inspectionId, scenario);
+      res = await MockApiService.getInstance().executePipeline(imageId, inspectionId, scenario);
+    } else {
+      try {
+        res = await LiveApiService.getInstance().executePipeline(imageId, inspectionId, scenario);
+      } catch (err: any) {
+        console.warn("Live server executePipeline failed. Engaging Mode B Local Resilient failover:", err);
+        res = await MockApiService.getInstance().executePipeline(imageId, inspectionId, scenario);
+      }
     }
-
-    try {
-      return await LiveApiService.getInstance().executePipeline(imageId, inspectionId, scenario);
-    } catch (err: any) {
-      console.warn("Live server executePipeline failed. Engaging Mode B Local Resilient failover:", err);
-      return await MockApiService.getInstance().executePipeline(imageId, inspectionId, scenario);
-    }
+    this.emitSiteWideUpdate();
+    return res;
   }
 
   public static async executeBatchPipeline(
     inspectionId: string
   ): Promise<InspectionCase> {
+    let res;
     if (this.operatingMode === "MOCK" || this.isDemoId(inspectionId)) {
-      return await MockApiService.getInstance().executeBatchPipeline(inspectionId);
+      res = await MockApiService.getInstance().executeBatchPipeline(inspectionId);
+    } else {
+      try {
+        res = await LiveApiService.getInstance().executeBatchPipeline(inspectionId);
+      } catch (err: any) {
+        console.warn("Live server executeBatchPipeline failed. Engaging Mode B Local Resilient failover:", err);
+        res = await MockApiService.getInstance().executeBatchPipeline(inspectionId);
+      }
     }
-
-    try {
-      return await LiveApiService.getInstance().executeBatchPipeline(inspectionId);
-    } catch (err: any) {
-      console.warn("Live server executeBatchPipeline failed. Engaging Mode B Local Resilient failover:", err);
-      return await MockApiService.getInstance().executeBatchPipeline(inspectionId);
-    }
+    this.emitSiteWideUpdate();
+    return res;
   }
 
   // ---------------------------------------------------------------------------
@@ -402,6 +419,7 @@ export class ApiService {
     inspectionId: string,
     request: AdjudicationRequest
   ): Promise<OfficerDecision> {
+    let res;
     if (
       this.operatingMode === "MOCK" ||
       this.operatingMode === "DEMO_FIXTURE" ||
@@ -410,15 +428,17 @@ export class ApiService {
       inspectionId.startsWith("insp_demo_") ||
       inspectionId.startsWith("demo-")
     ) {
-      return MockApiService.getInstance().submitAdjudication(inspectionId, request);
+      res = await MockApiService.getInstance().submitAdjudication(inspectionId, request);
+    } else {
+      try {
+        res = await LiveApiService.getInstance().submitAdjudication(inspectionId, request);
+      } catch (err: any) {
+        console.warn("Live server adjudication failed. Engaging Mode B Local Resilient failover:", err);
+        res = await MockApiService.getInstance().submitAdjudication(inspectionId, request);
+      }
     }
-
-    try {
-      return await LiveApiService.getInstance().submitAdjudication(inspectionId, request);
-    } catch (err: any) {
-      console.warn("Live server adjudication failed. Engaging Mode B Local Resilient failover:", err);
-      return await MockApiService.getInstance().submitAdjudication(inspectionId, request);
-    }
+    this.emitSiteWideUpdate();
+    return res;
   }
 
   public static async submitFindingAdjudication(
@@ -428,6 +448,7 @@ export class ApiService {
     remarks: string,
     actionOrder?: OfficerActionOrder
   ): Promise<FindingAdjudication> {
+    let res;
     if (
       this.operatingMode === "MOCK" ||
       this.operatingMode === "DEMO_FIXTURE" ||
@@ -436,33 +457,35 @@ export class ApiService {
       inspectionId.startsWith("insp_demo_") ||
       inspectionId.startsWith("demo-")
     ) {
-      return MockApiService.getInstance().submitFindingAdjudication(
+      res = await MockApiService.getInstance().submitFindingAdjudication(
         inspectionId,
         findingId,
         decision,
         remarks,
         actionOrder
       );
+    } else {
+      try {
+        res = await LiveApiService.getInstance().submitFindingAdjudication(
+          inspectionId,
+          findingId,
+          decision,
+          remarks,
+          actionOrder
+        );
+      } catch (err: any) {
+        console.warn("Live server finding adjudication failed. Engaging Mode B Local Resilient failover:", err);
+        res = await MockApiService.getInstance().submitFindingAdjudication(
+          inspectionId,
+          findingId,
+          decision,
+          remarks,
+          actionOrder
+        );
+      }
     }
-
-    try {
-      return await LiveApiService.getInstance().submitFindingAdjudication(
-        inspectionId,
-        findingId,
-        decision,
-        remarks,
-        actionOrder
-      );
-    } catch (err: any) {
-      console.warn("Live server finding adjudication failed. Engaging Mode B Local Resilient failover:", err);
-      return await MockApiService.getInstance().submitFindingAdjudication(
-        inspectionId,
-        findingId,
-        decision,
-        remarks,
-        actionOrder
-      );
-    }
+    this.emitSiteWideUpdate();
+    return res;
   }
 
   // ---------------------------------------------------------------------------
@@ -513,6 +536,7 @@ export class ApiService {
     inspectionId: string,
     remarks?: string
   ): Promise<InspectionCase> {
+    let res;
     if (
       this.operatingMode === "MOCK" ||
       this.operatingMode === "DEMO_FIXTURE" ||
@@ -521,15 +545,17 @@ export class ApiService {
       inspectionId.startsWith("insp_demo_") ||
       inspectionId.startsWith("demo-")
     ) {
-      return MockApiService.getInstance().closeInspection(inspectionId, remarks);
+      res = await MockApiService.getInstance().closeInspection(inspectionId, remarks);
+    } else {
+      try {
+        res = await LiveApiService.getInstance().closeInspection(inspectionId, remarks);
+      } catch (err: any) {
+        console.warn("Live server close inspection failed. Engaging Mode B Local Resilient failover:", err);
+        res = await MockApiService.getInstance().closeInspection(inspectionId, remarks);
+      }
     }
-
-    try {
-      return await LiveApiService.getInstance().closeInspection(inspectionId, remarks);
-    } catch (err: any) {
-      console.warn("Live server close inspection failed. Engaging Mode B Local Resilient failover:", err);
-      return await MockApiService.getInstance().closeInspection(inspectionId, remarks);
-    }
+    this.emitSiteWideUpdate();
+    return res;
   }
 
   public static async getEvidenceDossier(inspectionId: string): Promise<any> {
@@ -585,12 +611,17 @@ export class ApiService {
         try {
           await MockApiService.getInstance().deleteInspection(inspectionId);
         } catch {}
+        this.emitSiteWideUpdate();
         return res;
       }
-      return await MockApiService.getInstance().deleteInspection(inspectionId);
+      const resFallback = await MockApiService.getInstance().deleteInspection(inspectionId);
+      this.emitSiteWideUpdate();
+      return resFallback;
     } catch (err: any) {
       console.warn("deleteInspection via active service failed, executing local disposal failover:", err);
-      return await MockApiService.getInstance().deleteInspection(inspectionId);
+      const resError = await MockApiService.getInstance().deleteInspection(inspectionId);
+      this.emitSiteWideUpdate();
+      return resError;
     }
   }
 

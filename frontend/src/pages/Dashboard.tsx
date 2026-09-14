@@ -53,6 +53,8 @@ export const Dashboard: React.FC = () => {
       }
     };
     fetchCases();
+    window.addEventListener("nirikshak_data_updated", fetchCases);
+    return () => window.removeEventListener("nirikshak_data_updated", fetchCases);
   }, [activeCircle]);
 
   const [tableFilter, setTableFilter] = useState<"ALL" | "PASS" | "FAIL" | "REVIEW">("ALL");

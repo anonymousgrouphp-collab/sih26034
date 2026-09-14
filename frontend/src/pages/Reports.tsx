@@ -29,25 +29,32 @@ export const Reports: React.FC = () => {
   useEffect(() => {
     resetScrollToTop();
     let isMounted = true;
-    setIsLoading(true);
-    ApiService.listInspections({
-      circleId: division && division !== "ALL" ? division : undefined,
-    })
-      .then((res) => {
-        if (isMounted) {
-          setCases(res.items || []);
-          setIsLoading(false);
-        }
+    
+    const loadCases = () => {
+      setIsLoading(true);
+      ApiService.listInspections({
+        circleId: division && division !== "ALL" ? division : undefined,
       })
-      .catch((err) => {
-        if (isMounted) {
-          console.error("Failed to load reports data:", err);
-          setIsLoading(false);
-        }
-      });
+        .then((res) => {
+          if (isMounted) {
+            setCases(res.items || []);
+            setIsLoading(false);
+          }
+        })
+        .catch((err) => {
+          if (isMounted) {
+            console.error("Failed to load reports data:", err);
+            setIsLoading(false);
+          }
+        });
+    };
+
+    loadCases();
+    window.addEventListener("nirikshak_data_updated", loadCases);
 
     return () => {
       isMounted = false;
+      window.removeEventListener("nirikshak_data_updated", loadCases);
     };
   }, [division]);
 

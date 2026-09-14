@@ -25,28 +25,34 @@ export const InspectionDetails: React.FC = () => {
     setIsLoading(true);
     setError(null);
 
-    ApiService.getInspection(id)
-      .then((data) => {
-        if (isMounted) {
-          setCaseData(data);
-          setIsLoading(false);
-        }
-      })
-      .catch((err) => {
-        if (isMounted) {
-          console.error("Failed to load inspection case:", err);
-          setError(
-            err.message ||
-              (language === "hi"
-                ? "निरीक्षण केस नहीं मिला।"
-                : "Inspection case not found.")
-          );
-          setIsLoading(false);
-        }
-      });
+    const loadData = () => {
+      ApiService.getInspection(id)
+        .then((data) => {
+          if (isMounted) {
+            setCaseData(data);
+            setIsLoading(false);
+          }
+        })
+        .catch((err) => {
+          if (isMounted) {
+            console.error("Failed to load inspection case:", err);
+            setError(
+              err.message ||
+                (language === "hi"
+                  ? "निरीक्षण केस नहीं मिला।"
+                  : "Inspection case not found.")
+            );
+            setIsLoading(false);
+          }
+        });
+    };
+
+    loadData();
+    window.addEventListener("nirikshak_data_updated", loadData);
 
     return () => {
       isMounted = false;
+      window.removeEventListener("nirikshak_data_updated", loadData);
     };
   }, [id, language]);
 

@@ -104,7 +104,20 @@ export const EvidenceDossier: React.FC = () => {
   };
 
   useEffect(() => {
-    return loadCase();
+    const cleanup = loadCase();
+    
+    // Create a stable reference for the event listener
+    const handleUpdate = () => {
+      // Don't re-run loadCase if id hasn't changed, but just fetch to sync
+      loadCase(); 
+    };
+    
+    window.addEventListener("nirikshak_data_updated", handleUpdate);
+    
+    return () => {
+      cleanup();
+      window.removeEventListener("nirikshak_data_updated", handleUpdate);
+    };
   }, [id, language]);
 
   const activeAsset = useMemo(() => {

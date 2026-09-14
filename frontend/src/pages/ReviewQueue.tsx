@@ -72,11 +72,9 @@ export const ReviewQueue: React.FC = () => {
   };
 
   useEffect(() => {
-    setIsLoading(true);
-    ApiService.listInspections()
-      .then((res) => setCases(res.items))
-      .catch((err) => console.error("Failed to load review queue:", err))
-      .finally(() => setIsLoading(false));
+    loadCases();
+    window.addEventListener("nirikshak_data_updated", loadCases);
+    return () => window.removeEventListener("nirikshak_data_updated", loadCases);
   }, []);
 
   // Filter cases that require human attention (strictly review/pending/unable)

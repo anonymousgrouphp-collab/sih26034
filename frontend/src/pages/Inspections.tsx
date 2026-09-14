@@ -31,6 +31,8 @@ export const Inspections: React.FC = () => {
 
   useEffect(() => {
     loadCases();
+    window.addEventListener("nirikshak_data_updated", loadCases);
+    return () => window.removeEventListener("nirikshak_data_updated", loadCases);
   }, [loadCases]);
 
   const handleSelectCase = (caseId: string) => {

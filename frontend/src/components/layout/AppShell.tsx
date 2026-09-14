@@ -48,6 +48,8 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
 
   useEffect(() => {
     loadCases();
+    window.addEventListener("nirikshak_data_updated", loadCases);
+    return () => window.removeEventListener("nirikshak_data_updated", loadCases);
   }, [loadCases]);
 
   const pendingReviewCount = cases.filter(
