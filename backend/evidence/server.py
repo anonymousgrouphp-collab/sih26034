@@ -1973,6 +1973,7 @@ def list_inspections(
                 "jurisdiction_id": r.jurisdiction_id,
                 "inspection_timestamp": r.inspection_timestamp.isoformat() if r.inspection_timestamp else None,
                 "created_at": r.created_at.isoformat() if r.created_at else (r.inspection_timestamp.isoformat() if r.inspection_timestamp else None),
+                "violations_count": 1 if r.overall_status == "FAIL" else 0,
             }
             for r in records
         ],
@@ -2941,7 +2942,7 @@ def get_dashboard_summary(
     compliant_query = base_query.where(Inspection.overall_status == "PASS")
     compliant_count = db.execute(select(func.count()).select_from(compliant_query.subquery())).scalar() or 0
 
-    pending_query = base_query.where(Inspection.overall_status == "PENDING_REVIEW")
+    pending_query = base_query.where(Inspection.overall_status.in_(["PENDING_REVIEW", "REVIEW", "UNABLE_TO_VERIFY", "PENDING"]))
     pending_count = db.execute(select(func.count()).select_from(pending_query.subquery())).scalar() or 0
 
     notices_count = db.execute(select(func.count(LegalNotice.id))).scalar() or 0

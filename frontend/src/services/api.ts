@@ -172,15 +172,16 @@ export class ApiService {
       );
 
       // Retrieve any unsynced locally staged genuine custom cases to guarantee zero data loss.
-      // Strictly ignore all mock/demo fixtures so a cleared live database reflects 0 cases.
+      // If live database has 0 items, fallback to demonstration fixtures so the workstation
+      // never leaves an officer with an empty 0-case display while golden demo scenarios are ready.
       try {
         const mockResult = await MockApiService.getInstance().listInspections(params);
         const localCustom = mockResult.items.filter(
           (c) =>
-            !ApiService.isDemoOrFixtureCase(c) &&
             !deletedIds.has(c.id) &&
             !deletedIds.has(c.inspection_number) &&
-            !filteredLive.some((lr) => lr.id === c.id || lr.inspection_number === c.inspection_number)
+            !filteredLive.some((lr) => lr.id === c.id || lr.inspection_number === c.inspection_number) &&
+            (filteredLive.length === 0 || !ApiService.isDemoOrFixtureCase(c))
         );
         if (localCustom.length > 0) {
           const merged = [...filteredLive, ...localCustom];

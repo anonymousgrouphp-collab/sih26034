@@ -255,9 +255,9 @@ export class LiveApiService implements IInspectionApiService {
           ai_verdict: r.ai_verdict || "PENDING",
           jurisdiction_id: r.jurisdiction_id || "CIRCLE_DL_SOUTH_01",
           created_at: r.created_at || r.inspection_timestamp || new Date().toISOString(),
-          violations_count: 0,
+          violations_count: r.violations_count !== undefined ? r.violations_count : (r.overall_status === "FAIL" ? 1 : 0),
           adjudicated: !!r.adjudication_timestamp,
-          is_mock_fixture: false,
+          is_mock_fixture: r.is_mock_fixture ?? (r.id?.includes("demo") || r.inspection_number?.includes("demo")),
         }));
 
       items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());

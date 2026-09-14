@@ -3,7 +3,6 @@ import { AnimatePresence, m } from "framer-motion";
 import { GovTopBar } from "./GovTopBar";
 import { Header } from "./Header";
 import { Sidebar } from "./Sidebar";
-import { GovFooter } from "./GovFooter";
 import { ApiService } from "../../services/api";
 import { InspectionSummary } from "../../types/inspection";
 import { CommandPalette } from "../common/CommandPalette";
@@ -127,11 +126,6 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
             </AnimatePresence>
 
             {children}
-          </div>
-
-          {/* Official GIGW 3.0 Government of India Portal Footer */}
-          <div className="mt-8 shrink-0">
-            <GovFooter />
           </div>
         </main>
       </div>
