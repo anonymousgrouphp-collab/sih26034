@@ -487,7 +487,7 @@ export const EvidenceDossier: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
             {(caseData.evidence_assets || []).map((asset) => {
-              const apiBase = (import.meta as any).env?.VITE_API_BASE_URL || "https://nyayadrishti-backend.onrender.com/api/v1";
+              const apiBase = (import.meta as any).env?.VITE_API_BASE_URL || "/api/v1";
               const rawSrc = asset.preview_url || asset.file_path || "";
               const effectiveSrc = (() => {
                 if (asset.image_id && (rawSrc.includes("uploads/202") || rawSrc.startsWith("/storage/uploads/202"))) {

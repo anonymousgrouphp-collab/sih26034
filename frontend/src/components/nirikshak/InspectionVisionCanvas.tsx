@@ -241,7 +241,7 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
                 alt={activeImage.filename}
                 onLoad={handleImageLoad}
                 onError={(e) => {
-                  const apiBase = ((import.meta as any)?.env?.VITE_API_BASE_URL as string) || "https://nyayadrishti-backend.onrender.com/api/v1";
+                  const apiBase = ((import.meta as any)?.env?.VITE_API_BASE_URL as string) || "/api/v1";
                   const target = e.currentTarget;
                   if (activeImage?.id && !target.src.includes(`/evidence/image/${activeImage.id}`)) {
                     target.src = `${apiBase}/evidence/image/${activeImage.id}`;
@@ -429,7 +429,7 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
                 alt={img.filename}
                 loading="lazy"
                 onError={(e) => {
-                  const apiBase = ((import.meta as any)?.env?.VITE_API_BASE_URL as string) || "https://nyayadrishti-backend.onrender.com/api/v1";
+                  const apiBase = ((import.meta as any)?.env?.VITE_API_BASE_URL as string) || "/api/v1";
                   const target = e.currentTarget;
                   if (img.id && !target.src.includes(`/evidence/image/${img.id}`)) {
                     target.src = `${apiBase}/evidence/image/${img.id}`;

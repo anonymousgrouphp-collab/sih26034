@@ -134,7 +134,7 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
   // Image error state & resilient fallback
   const [imageError, setImageError] = useState(false);
   const [retryWithBackend, setRetryWithBackend] = useState(false);
-  const apiBaseUrl = ((import.meta as any)?.env?.VITE_API_BASE_URL as string) || "https://nyayadrishti-backend.onrender.com/api/v1";
+  const apiBaseUrl = ((import.meta as any)?.env?.VITE_API_BASE_URL as string) || "/api/v1";
 
   const getEffectiveImageSrc = (): string => {
     const raw = (asset.preview_url || asset.file_path || "").trim();

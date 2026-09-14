@@ -380,7 +380,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
 
   const canvasImages: CanvasImageItem[] = useMemo(() => {
     const normalizeUrl = (u?: string, imgId?: string) => {
-      const apiBase = ((import.meta as any)?.env?.VITE_API_BASE_URL as string) || "https://nyayadrishti-backend.onrender.com/api/v1";
+      const apiBase = ((import.meta as any)?.env?.VITE_API_BASE_URL as string) || "/api/v1";
       if (!u) return imgId ? `${apiBase}/evidence/image/${imgId}` : "";
       if (u.startsWith("http://") || u.startsWith("https://") || u.startsWith("data:") || u.startsWith("blob:")) return u;
       if (imgId && (u.includes("uploads/202") || (!u.includes("sku_demo_") && !u.includes("real_products") && !u.includes("REAL-PKG-")))) {
@@ -1344,14 +1344,14 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                           (activeAsset.preview_url || activeAsset.file_path || "").startsWith("data:")
                             ? (activeAsset.preview_url || activeAsset.file_path)
                             : activeAsset.image_id && (activeAsset.preview_url || activeAsset.file_path || "").includes("uploads/202")
-                            ? `${((import.meta as any)?.env?.VITE_API_BASE_URL as string) || "https://nyayadrishti-backend.onrender.com/api/v1"}/evidence/image/${activeAsset.image_id}`
+                            ? `${((import.meta as any)?.env?.VITE_API_BASE_URL as string) || "/api/v1"}/evidence/image/${activeAsset.image_id}`
                             : (activeAsset.preview_url || activeAsset.file_path || "").startsWith("/")
                             ? (activeAsset.preview_url || activeAsset.file_path)
                             : `/storage/${activeAsset.preview_url || activeAsset.file_path}`
                         }
                         alt={`Packaging evidence for ${caseData.product_name}`}
                         onError={(e) => {
-                          const apiBase = ((import.meta as any)?.env?.VITE_API_BASE_URL as string) || "https://nyayadrishti-backend.onrender.com/api/v1";
+                          const apiBase = ((import.meta as any)?.env?.VITE_API_BASE_URL as string) || "/api/v1";
                           if (activeAsset.image_id && !e.currentTarget.src.includes("/evidence/image/")) {
                             e.currentTarget.src = `${apiBase}/evidence/image/${activeAsset.image_id}`;
                             return;

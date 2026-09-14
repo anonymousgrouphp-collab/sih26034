@@ -430,14 +430,14 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
                               (asset.preview_url || asset.file_path || "").startsWith("data:")
                                 ? (asset.preview_url || asset.file_path)
                                 : asset.image_id && (asset.preview_url || asset.file_path || "").includes("uploads/202")
-                                ? `${((import.meta as any)?.env?.VITE_API_BASE_URL as string) || "https://nyayadrishti-backend.onrender.com/api/v1"}/evidence/image/${asset.image_id}`
+                                ? `${((import.meta as any)?.env?.VITE_API_BASE_URL as string) || "/api/v1"}/evidence/image/${asset.image_id}`
                                 : (asset.preview_url || asset.file_path || "").startsWith("/")
                                 ? (asset.preview_url || asset.file_path)
                                 : `/storage/${asset.preview_url || asset.file_path}`
                             }
                             alt={`Facet ${index + 1}`}
                             onError={(e) => {
-                              const apiBase = ((import.meta as any)?.env?.VITE_API_BASE_URL as string) || "https://nyayadrishti-backend.onrender.com/api/v1";
+                              const apiBase = ((import.meta as any)?.env?.VITE_API_BASE_URL as string) || "/api/v1";
                               if (asset.image_id && !e.currentTarget.src.includes("/evidence/image/")) {
                                 e.currentTarget.src = `${apiBase}/evidence/image/${asset.image_id}`;
                               }
