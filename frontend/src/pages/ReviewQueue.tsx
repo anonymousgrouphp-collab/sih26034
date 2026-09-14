@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useLanguage } from "../context/LanguageContext";
 import { ApiService } from "../services/api";
 import { InspectionSummary } from "../types/inspection";
+import { resetScrollToTop } from "../components/common/ScrollToTop";
 import { VerdictBadge, WorkflowBadge } from "../components/common/StatusBadge";
 import {
   AlertTriangle,
@@ -25,6 +26,10 @@ export const ReviewQueue: React.FC = () => {
   const [triageFilter, setTriageFilter] = useState<"ALL" | "REVIEW" | "UNABLE">("ALL");
   const [caseToDelete, setCaseToDelete] = useState<InspectionSummary | null>(null);
   const [deletingCaseId, setDeletingCaseId] = useState<string | null>(null);
+
+  useEffect(() => {
+    resetScrollToTop();
+  }, [triageFilter]);
 
   const formatDateTime = (dateStr?: string) => {
     if (!dateStr) return "—";
@@ -269,7 +274,10 @@ export const ReviewQueue: React.FC = () => {
                     </button>
                     <button
                       type="button"
-                      onClick={() => navigate(`/inspections/${c.id}`)}
+                      onClick={() => {
+                        resetScrollToTop();
+                        navigate(`/inspections/${c.id}`);
+                      }}
                       className="py-2 px-3.5 text-xs font-bold whitespace-nowrap bg-[#1B365D] hover:bg-[#0A2540] text-white rounded-lg shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
                     >
                       <UserCheck size={14} />

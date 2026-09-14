@@ -16,6 +16,7 @@ import {
 import { Link } from "react-router-dom";
 import { ApiService } from "../services/api";
 import { InspectionSummary } from "../types/inspection";
+import { resetScrollToTop } from "../components/common/ScrollToTop";
 
 export const Reports: React.FC = () => {
   const { language } = useLanguage();
@@ -26,6 +27,7 @@ export const Reports: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    resetScrollToTop();
     let isMounted = true;
     setIsLoading(true);
     ApiService.listInspections({

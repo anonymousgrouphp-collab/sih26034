@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { ApiService } from "../services/api";
 import { InspectionCase } from "../types/inspection";
 import { CaseWorkspace } from "../features/case/CaseWorkspace";
+import { resetScrollToTop } from "../components/common/ScrollToTop";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import { ArrowLeft, FileText, AlertCircle } from "lucide-react";
@@ -19,6 +20,7 @@ export const InspectionDetails: React.FC = () => {
 
   useEffect(() => {
     if (!id) return;
+    resetScrollToTop();
     let isMounted = true;
     setIsLoading(true);
     setError(null);

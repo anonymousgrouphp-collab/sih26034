@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { m } from "framer-motion";
 import { Reveal } from "../components/common/motion";
 import { useLanguage } from "../context/LanguageContext";
+import { resetScrollToTop } from "../components/common/ScrollToTop";
 import {
   Scale,
   GitBranch,
@@ -113,6 +114,10 @@ export const Rules: React.FC = () => {
   const { language } = useLanguage();
   const [activeTab, setActiveTab] = useState<"SCHEDULES" | "CATALOG" | "INVARIANTS">("SCHEDULES");
   const [expandedRule, setExpandedRule] = useState<string | null>("RULE_6_1_H_TABLE_I");
+
+  useEffect(() => {
+    resetScrollToTop();
+  }, [activeTab]);
 
   return (
     <div className="space-y-6">

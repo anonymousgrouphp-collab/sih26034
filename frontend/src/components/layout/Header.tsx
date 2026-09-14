@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { NirikshakBrandLogo } from "../common/NirikshakBrandLogo";
+import { resetScrollToTop } from "../common/ScrollToTop";
 import { OfficerRole } from "../../types/inspection";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
@@ -250,6 +251,7 @@ export const Header: React.FC<HeaderProps> = ({
                             type="button"
                             onClick={() => {
                               setDemoMenuOpen(false);
+                              resetScrollToTop();
                               navigate(`/inspections/${s.caseId}`);
                             }}
                             className="w-full text-left p-2 rounded-lg hover:bg-slate-50 flex items-center justify-between gap-2 text-xs transition-colors group border border-transparent hover:border-slate-200 cursor-pointer"

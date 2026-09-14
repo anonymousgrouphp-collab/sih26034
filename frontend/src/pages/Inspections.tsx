@@ -5,6 +5,7 @@ import { InspectionSummary, InspectionCase } from "../types/inspection";
 import { InspectionDesk } from "../features/desk/InspectionDesk";
 import { NewInspectionModal } from "../features/new-inspection/NewInspectionModal";
 import { useCircle } from "../context/CircleContext";
+import { resetScrollToTop } from "../components/common/ScrollToTop";
 
 export const Inspections: React.FC = () => {
   const [cases, setCases] = useState<InspectionSummary[]>([]);
@@ -33,11 +34,13 @@ export const Inspections: React.FC = () => {
   }, [loadCases]);
 
   const handleSelectCase = (caseId: string) => {
+    resetScrollToTop();
     navigate(`/inspections/${caseId}`);
   };
 
   const handleCaseCreated = (newCase: InspectionCase) => {
     setIsModalOpen(false);
+    resetScrollToTop();
     navigate(`/inspections/${newCase.id}`);
   };
 

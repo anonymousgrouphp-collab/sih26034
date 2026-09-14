@@ -1,5 +1,6 @@
 import React from "react";
 import { m, type Variants } from "framer-motion";
+import { resetScrollToTop } from "./ScrollToTop";
 
 /**
  * Shared motion system — "Corporate" personality per the motion design doctrine:
@@ -66,8 +67,14 @@ export const Reveal: React.FC<RevealProps> = ({ children, className, delay = 0, 
  * exit runs via variant propagation while <AnimatePresence> holds the old
  * <Routes key={pathname}> subtree during the transition.
  */
-export const AnimatedPage: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <m.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
-    {children}
-  </m.div>
-);
+export const AnimatedPage: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  React.useLayoutEffect(() => {
+    resetScrollToTop();
+  }, []);
+
+  return (
+    <m.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+      {children}
+    </m.div>
+  );
+};

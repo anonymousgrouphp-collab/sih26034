@@ -29,6 +29,7 @@ import { InspectionCameraModal } from "../components/camera";
 import { useCircle } from "../context/CircleContext";
 import { useLanguage } from "../context/LanguageContext";
 import { StorageService } from "../services/storage";
+import { resetScrollToTop } from "../components/common/ScrollToTop";
 
 interface PipelineStepItem {
   id: string;
@@ -99,6 +100,10 @@ export const NewInspection: React.FC = () => {
   // Mode: Field Capture vs Benchmark Scenarios
   const [activeTab, setActiveTab] = useState<"FIELD_CAPTURE" | "BENCHMARK_SKUS">("FIELD_CAPTURE");
   const { activeCircle, setActiveCircle, allCircles } = useCircle();
+
+  useEffect(() => {
+    resetScrollToTop();
+  }, [activeTab]);
 
   const [files, setFiles] = useState<File[]>([]);
   const [filePreviews, setFilePreviews] = useState<string[]>([]);
@@ -356,6 +361,7 @@ export const NewInspection: React.FC = () => {
       StorageService.clearDraft();
 
       // Navigate directly into the Adjudication Canvas for this case
+      resetScrollToTop();
       navigate(`/inspections/${newCase.id}`);
     } catch (err: any) {
       console.error("Failed to execute inspection:", err);
@@ -1059,7 +1065,12 @@ export const NewInspection: React.FC = () => {
             </p>
           </div>
 
-          <GoldenSkuQuickSelector onSelectSku={(id) => navigate(`/inspections/${id}`)} />
+          <GoldenSkuQuickSelector
+            onSelectSku={(id) => {
+              resetScrollToTop();
+              navigate(`/inspections/${id}`);
+            }}
+          />
         </div>
       )}
 

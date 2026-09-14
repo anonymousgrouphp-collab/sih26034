@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useCircle } from "../context/CircleContext";
 import { ApiService } from "../services/api";
 import { StorageService } from "../services/storage";
+import { resetScrollToTop } from "../components/common/ScrollToTop";
 import {
   Settings as SettingsIcon,
   ShieldCheck,
@@ -44,6 +45,10 @@ export const Settings: React.FC = () => {
 
   // Active Tab
   const [activeTab, setActiveTab] = useState<SettingsTab>("jurisdiction");
+
+  useEffect(() => {
+    resetScrollToTop();
+  }, [activeTab]);
 
   // State: Tab 1 - Jurisdiction & Officer Profile
   const [selectedCircle, setSelectedCircle] = useState(activeCircle || "CIRCLE_DL_SOUTH_01");

@@ -1,5 +1,6 @@
 import React from "react";
 import { useLanguage } from "../../context/LanguageContext";
+import { resetScrollToTop } from "../../components/common/ScrollToTop";
 
 export interface GoldenSkuItem {
   skuId: string;
@@ -255,7 +256,10 @@ export const GoldenSkuQuickSelector: React.FC<GoldenSkuQuickSelectorProps> = ({
             <button
               key={item.skuId}
               type="button"
-              onClick={() => onSelectSku(item.caseId)}
+              onClick={() => {
+                resetScrollToTop();
+                onSelectSku(item.caseId);
+              }}
               className={`px-2.5 py-1 rounded-lg text-xs font-mono font-medium flex items-center gap-1.5 border transition shrink-0 cursor-pointer ${
                 isSelected
                   ? "bg-[#1B365D] text-white font-bold border-[#1B365D] shadow-xs"
@@ -334,7 +338,10 @@ export const GoldenSkuQuickSelector: React.FC<GoldenSkuQuickSelectorProps> = ({
             <button
               key={item.skuId}
               type="button"
-              onClick={() => onSelectSku(item.caseId)}
+              onClick={() => {
+                resetScrollToTop();
+                onSelectSku(item.caseId);
+              }}
               className={`p-3 rounded-xl text-left transition-all duration-200 border flex flex-col justify-between group focus:outline-none focus:ring-2 focus:ring-[#1B365D] cursor-pointer ${cardStyles}`}
             >
               <div>

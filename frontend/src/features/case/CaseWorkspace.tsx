@@ -13,6 +13,7 @@ import { InspectionOutcome } from "./InspectionOutcome";
 import { InspectionReportView } from "./InspectionReportView";
 import { ApiService } from "../../services/api";
 import { DemoCaseTourBanner } from "../demo/DemoCaseTourBanner";
+import { resetScrollToTop } from "../../components/common/ScrollToTop";
 import {
   CalibrationCard,
   MeasurementCard,
@@ -113,6 +114,10 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
       }
     }
   }, [caseData?.id]);
+
+  useEffect(() => {
+    resetScrollToTop();
+  }, [caseData?.id, activeWorkspaceView]);
 
   const activeAsset: EvidenceAsset | undefined = useMemo(() => {
     if (!caseData.evidence_assets || caseData.evidence_assets.length === 0) return undefined;

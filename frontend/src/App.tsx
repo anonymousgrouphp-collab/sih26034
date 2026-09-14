@@ -6,6 +6,7 @@ import { LanguageProvider } from "./context/LanguageContext";
 import { CircleProvider } from "./context/CircleContext";
 import { AppShell } from "./components/layout/AppShell";
 import { AnimatedPage } from "./components/common/motion";
+import { ScrollToTop } from "./components/common/ScrollToTop";
 
 // Pages
 import Landing from "./pages/Landing";
@@ -144,15 +145,16 @@ const AnimatedRoutes: React.FC = () => {
 export const App: React.FC = () => {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <LanguageProvider>
         <AuthProvider>
           <CircleProvider>
             <AnimatedRoutes />
           </CircleProvider>
-      </AuthProvider>
-    </LanguageProvider>
-  </BrowserRouter>
-);
+        </AuthProvider>
+      </LanguageProvider>
+    </BrowserRouter>
+  );
 };
 
 export default App;

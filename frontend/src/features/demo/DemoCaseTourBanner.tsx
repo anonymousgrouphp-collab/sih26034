@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext";
+import { resetScrollToTop } from "../../components/common/ScrollToTop";
 import { DEMO_SCENARIOS, getDemoScenarioById, DemoScenarioItem } from "./demoCatalog";
 import {
   ChevronLeft,
@@ -43,6 +44,7 @@ export const DemoCaseTourBanner: React.FC<DemoCaseTourBannerProps> = ({
       : DEMO_SCENARIOS[0];
 
   const handleNavigateTo = (targetCaseId: string) => {
+    resetScrollToTop();
     if (onSelectCase) {
       onSelectCase(targetCaseId);
     } else {
