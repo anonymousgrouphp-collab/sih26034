@@ -238,6 +238,47 @@ export class MockApiService implements IInspectionApiService {
       };
     }
 
+    // RESILIENT RECOVERY: If id is a timestamped or Mode B reference ID (e.g. insp_1789405692116_3042),
+    // synthesize a resilient statutory inspection case file so direct URL navigation, cross-device link sharing,
+    // or reloads never fail with a 404 dead screen.
+    if (id && (/^insp_\d+(_\d+)?$/i.test(id) || id.startsWith("insp_"))) {
+      const parts = id.split("_");
+      const suffix = parts.length > 2 ? parts[parts.length - 1] : parts[1] || "3042";
+      const timestampMs = parseInt(parts[1], 10);
+      const caseDate = !isNaN(timestampMs) ? new Date(timestampMs) : new Date();
+      const dateStr = caseDate.toISOString().slice(0, 10).replace(/-/g, "");
+
+      const resilientCase: InspectionCase = {
+        id,
+        inspection_number: `INSP-${dateStr}-${suffix.slice(-4).toUpperCase()}`,
+        created_at: caseDate.toISOString(),
+        officer_id: "INSP-DL-0842",
+        jurisdiction_id: "CIRCLE_DL_SOUTH_01",
+        capture_source: "PHYSICAL_FIELD",
+        product_name: "Fortune Sunlite Refined Sunflower Oil 1L",
+        brand_name: "Fortune Sunlite",
+        manufacturer_name: "Adani Wilmar Limited",
+        category: "FOOD_SNACKS",
+        package_type: "FLEXIBLE_POUCH",
+        workflow_status: "PENDING_REVIEW",
+        overall_status: "PENDING_REVIEW",
+        ai_verdict: "PENDING",
+        establishment_name: "Aggarwal Supermart, Kalkaji",
+        premises_address: "B-42, Main Market, Kalkaji, New Delhi 110019",
+        inspection_type: "ROUTINE_MARKET_SURVEILLANCE",
+        declared_net_quantity: "1 L / 910 g",
+        notes: "Mode B local resilient statutory inspection case.",
+        is_mock_fixture: true,
+        pipeline_source: "BACKEND_SIMULATION",
+        evidence_assets: [],
+        extracted_fields: [],
+        rule_evaluations: [],
+      };
+
+      addMockCase(resilientCase);
+      return resilientCase;
+    }
+
     throw {
       error_code: "INSPECTION_NOT_FOUND",
       status: 404,

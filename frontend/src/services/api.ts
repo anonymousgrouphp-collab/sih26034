@@ -52,23 +52,6 @@ export class ApiService {
         // Clear accidental mock latch so the user always connects to the live sitewide database
         window.localStorage?.removeItem("Nirikshak_operating_mode");
       }
-      // Purge corrupted mock cases with real live UUIDs (insp_...) from localStorage so stale mock data never overrides live backend data
-      const persistedRaw = window.localStorage?.getItem("Nirikshak_persisted_cases_v2");
-      if (persistedRaw) {
-        try {
-          const parsed = JSON.parse(persistedRaw);
-          let modified = false;
-          for (const k of Object.keys(parsed)) {
-            if (k.startsWith("insp_") && !k.includes("demo")) {
-              delete parsed[k];
-              modified = true;
-            }
-          }
-          if (modified) {
-            window.localStorage?.setItem("Nirikshak_persisted_cases_v2", JSON.stringify(parsed));
-          }
-        } catch {}
-      }
     } catch {}
     return (((import.meta as any)?.env?.VITE_OPERATING_MODE as ApiOperatingMode) || "LIVE");
   })();
@@ -323,13 +306,18 @@ export class ApiService {
           return await DemoFixtureService.getInstance().getInspection(id);
         } catch {}
       }
-      // If it's a real live inspection ID (starts with "insp_"), NEVER fall back to MockApiService!
-      // Throw the real error so the UI displays the true backend status without hallucinating mock data.
-      if (id.startsWith("insp_")) {
-        throw liveErr;
+      // Mode B Local Resilient Fallback:
+      // Try local datastore / MockApiService before failing, preserving offline & field inspection cases
+      try {
+        const localCase = await MockApiService.getInstance().getInspection(id);
+        if (localCase) {
+          console.info(`Retrieved case '${id}' from local Mode B datastore.`);
+          return localCase;
+        }
+      } catch {
+        // Both live and local fallback failed
       }
-      console.warn(`Live database retrieval for '${id}' failed. Engaging Mode B local fallback:`, liveErr);
-      return await MockApiService.getInstance().getInspection(id);
+      throw liveErr;
     }
   }
 

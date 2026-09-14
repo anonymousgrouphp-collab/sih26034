@@ -119,11 +119,30 @@ export const InspectionDetails: React.FC = () => {
             </>
           )}
         </p>
-        <div className="pt-2 flex justify-center gap-3">
+        <div className="pt-2 flex flex-wrap justify-center gap-3">
           <Link to="/inspections" className="btn-secondary text-xs">
             {language === "hi" ? "केस पंजी पर वापस जाएं" : "Back to Case Register"}
           </Link>
-          <Link to="/inspections/demo-fortune-sunlite" className="btn-primary text-xs">
+          <button
+            type="button"
+            onClick={() => {
+              if (!id) return;
+              setIsLoading(true);
+              setError(null);
+              ApiService.getInspection(id)
+                .then((data) => {
+                  setCaseData(data);
+                  setIsLoading(false);
+                })
+                .catch(() => {
+                  navigate("/inspections/demo-fortune-sunlite");
+                });
+            }}
+            className="btn-primary text-xs cursor-pointer"
+          >
+            {language === "hi" ? "केस कार्यक्षेत्र पुनर्प्राप्त करें" : "Recover Case Workspace"}
+          </button>
+          <Link to="/inspections/demo-fortune-sunlite" className="btn-secondary text-xs">
             {language === "hi" ? "फॉर्च्यून सनलाइट डेमो लोड करें" : "Load Fortune Sunlite Demo"}
           </Link>
         </div>

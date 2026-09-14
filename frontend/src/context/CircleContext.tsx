@@ -8,6 +8,11 @@ export interface JurisdictionCircle {
 
 export const JURISDICTION_CIRCLES: JurisdictionCircle[] = [
   {
+    id: "ALL",
+    label: "ALL • All Circles (National View)",
+    labelHi: "ALL • सभी मंडल (राष्ट्रीय दृश्य)",
+  },
+  {
     id: "CIRCLE_DL_SOUTH_01",
     label: "DL-SOUTH-01 • South Delhi Circle (Saket / Kalkaji)",
     labelHi: "DL-SOUTH-01 • दक्षिण दिल्ली मंडल (साकेत / कालकाजी)",
@@ -36,7 +41,7 @@ export const JURISDICTION_CIRCLES: JurisdictionCircle[] = [
 
 export const getJurisdictionCircle = (id?: string, extra?: JurisdictionCircle[]): JurisdictionCircle => {
   const registry = extra && extra.length > 0 ? [...JURISDICTION_CIRCLES, ...extra] : JURISDICTION_CIRCLES;
-  if (!id) return registry[0];
+  if (!id || id === "ALL" || id === "ALL_CIRCLES") return registry[0];
   const found = registry.find((c) => c.id === id);
   if (found) return found;
   const cleanId = id.replace("CIRCLE_", "");
@@ -157,9 +162,9 @@ const CircleContext = createContext<CircleContextType | undefined>(undefined);
 export const CircleProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [activeCircle, setActiveCircleState] = useState<string>(() => {
     try {
-      return localStorage.getItem("Nirikshak_active_circle") || "CIRCLE_DL_SOUTH_01";
+      return localStorage.getItem("Nirikshak_active_circle") || "ALL";
     } catch {
-      return "CIRCLE_DL_SOUTH_01";
+      return "ALL";
     }
   });
 

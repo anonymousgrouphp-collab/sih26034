@@ -428,18 +428,25 @@ def init_database(engine):
 
 def seed_default_platform_data(session: Session):
     """Seeds default jurisdiction circle and administrative accounts if database is fresh."""
-    existing_jur = session.execute(select(Jurisdiction)).first()
-    if not existing_jur:
-        jur = Jurisdiction(
-            id="CIRCLE_DL_SOUTH_01",
-            state_code="DL",
-            district_name="South Delhi",
-            zone="South Zone",
-            office_address="Office of the Assistant Controller of Legal Metrology, South Zone, Pushp Vihar, New Delhi - 110017",
-            contact_email="aclm.south@dl.gov.in",
-        )
-        session.add(jur)
-        session.flush()
+    default_jurisdictions = [
+        ("CIRCLE_DL_SOUTH_01", "DL", "South Delhi", "South Zone", "Office of the Assistant Controller of Legal Metrology, South Zone, Pushp Vihar, New Delhi - 110017", "aclm.south@dl.gov.in"),
+        ("CIRCLE_DL_CENTRAL_02", "DL", "Central Delhi", "Central Zone", "Office of ACLM, Central Zone, Connaught Place, New Delhi - 110001", "aclm.central@dl.gov.in"),
+        ("CIRCLE_UP_GBN_01", "UP", "Gautam Buddha Nagar", "Western Zone", "Collectorate Complex, Surajpur, Greater Noida, UP - 201306", "aclm.gbn@up.gov.in"),
+        ("CIRCLE_MH_MUM_01", "MH", "Mumbai Suburban", "Konkan Division", "Old Secretariat Annex, Fort, Mumbai, MH - 400032", "aclm.mumbai@mh.gov.in"),
+        ("CIRCLE_KA_BLR_01", "KA", "Bengaluru Urban", "Bengaluru Division", "Khandaya Bhavana, KG Road, Bengaluru, KA - 560009", "aclm.blr@ka.gov.in"),
+    ]
+    for jur_id, st, dist, zn, addr, email in default_jurisdictions:
+        exists = session.execute(select(Jurisdiction).where(Jurisdiction.id == jur_id)).first()
+        if not exists:
+            session.add(Jurisdiction(
+                id=jur_id,
+                state_code=st,
+                district_name=dist,
+                zone=zn,
+                office_address=addr,
+                contact_email=email,
+            ))
+    session.flush()
 
     existing_user = session.execute(select(User)).first()
     if not existing_user:
