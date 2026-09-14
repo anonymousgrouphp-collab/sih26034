@@ -13,7 +13,7 @@
 The Nirikshak Frontend is a statutory digital inspection workstation designed for Legal Metrology Officers (LMOs) and Controllers under the **Department of Consumer Affairs (DoCA)**. It delivers a fast, responsive, bilingual (English & Hindi) single-page application (SPA) running on the **Vercel Global Edge Network**.
 
 - **Live Production URL:** [https://sih26034.vercel.app](https://sih26034.vercel.app)
-- **Backend API Integration:** Proxied via Vercel Edge Rewrites directly to the **Oracle Cloud Always Free VPS** (`68.233.117.16:8000/api/v1`).
+- **Backend API Integration:** Proxied via Vercel Edge Rewrites directly to **Oracle Cloud Infrastructure (OCI)** (`68.233.117.16:8000/api/v1`).
 
 ---
 
@@ -53,7 +53,7 @@ The Nirikshak Frontend is a statutory digital inspection workstation designed fo
        └── /api/:path*     ──> Serverless Rewrite Proxy (Sub-300ms)
                                      │
                                      ▼ HTTP (Port 8000)
-                       [Oracle Cloud Always Free VPS] (68.233.117.16:8000)
+                       [Oracle Cloud Infrastructure] (68.233.117.16:8000)
                                      │
                                      ├── FastAPI Application Monolith
                                      └── PostgreSQL 16 Dedicated Container
