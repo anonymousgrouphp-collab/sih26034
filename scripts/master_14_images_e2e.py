@@ -1,4 +1,4 @@
-﻿import argparse
+import argparse
 import dataclasses
 import glob
 import hashlib
@@ -84,6 +84,7 @@ class MasterPipelineTester:
         max_resize_dim: int = 2400,
         jpeg_quality: int = 92,
         timeout_upload: int = 60,
+        case_id: Optional[str] = None,
     ):
         self.base_url = base_url.rstrip("/")
         self.image_dir = image_dir
@@ -98,7 +99,7 @@ class MasterPipelineTester:
         self.session = None
         self.token = None
         self.headers = {}
-        self.case_id = None
+        self.case_id = case_id
         self.inspection_number = None
         self.uploaded_images = []
         self.pipeline_data = {}
@@ -478,11 +479,16 @@ class MasterPipelineTester:
             )
             dur = time.time() - t0
 
-            if res.status_code != 200:
-                trail = self.pipeline_data.get("audit_trail", [])
-            else:
+            if res.status_code == 200:
                 t_data = res.json()
-                trail = t_data.get("audit_trail", t_data) if isinstance(t_data, dict) else t_data
+                if isinstance(t_data, dict):
+                    trail = t_data.get("events") or t_data.get("audit_trail") or []
+                elif isinstance(t_data, list):
+                    trail = t_data
+                else:
+                    trail = []
+            else:
+                trail = self.pipeline_data.get("audit_trail", [])
 
             if not trail or len(trail) == 0:
                 err_msg = "Audit ledger returned empty trail"
@@ -491,13 +497,32 @@ class MasterPipelineTester:
                 return False
 
             log_pass(f"Audit ledger retrieved: {len(trail)} cryptographic events verified")
-            action_types = [a.get("action_type") or a.get("event_type") for a in trail]
+            action_types = []
+            for a in trail:
+                if isinstance(a, dict):
+                    act = a.get("action") or a.get("action_type") or a.get("event_type")
+                    if act:
+                        action_types.append(act)
             log_info(f"Recorded event types: {', '.join(set(filter(None, action_types)))}")
 
-            batch_event = next((a for a in trail if "BATCH" in str(a.get("action_type", "")).upper() or "PIPELINE" in str(a.get("action_type", "")).upper()), None)
+            batch_event = None
+            for a in trail:
+                if isinstance(a, dict):
+                    act = str(a.get("action") or a.get("action_type") or "").upper()
+                    if "BATCH" in act or "PIPELINE" in act:
+                        batch_event = a
+                        break
+
             if batch_event:
-                merkle_root = (batch_event.get("payload") or {}).get("merkle_root") or batch_event.get("event_hash")
-                log_pass(f"Merkle DAG Root: {Colors.BOLD}{merkle_root}{Colors.RESET}")
+                raw_p = batch_event.get("payload") or batch_event.get("payload_summary") or {}
+                if isinstance(raw_p, str):
+                    try:
+                        raw_p = json.loads(raw_p)
+                    except Exception:
+                        raw_p = {}
+                merkle_root = raw_p.get("merkle_root") or batch_event.get("current_hash") or batch_event.get("event_hash")
+                if merkle_root:
+                    log_pass(f"Merkle DAG Root: {Colors.BOLD}{merkle_root}{Colors.RESET}")
 
             self.step_results.append(TestStepResult(
                 "Audit Verification",
@@ -577,17 +602,26 @@ class MasterPipelineTester:
         if not s1:
             return self._finalize_report(start_time, False)
 
-        s2 = self.run_step_2_create_case()
-        if not s2:
-            return self._finalize_report(start_time, False)
+        if not self.case_id:
+            s2 = self.run_step_2_create_case()
+            if not s2:
+                return self._finalize_report(start_time, False)
 
-        s3 = self.run_step_3_upload_images()
-        if not s3:
-            return self._finalize_report(start_time, False)
+            s3 = self.run_step_3_upload_images()
+            if not s3:
+                return self._finalize_report(start_time, False)
 
-        s4 = self.run_step_4_execute_pipeline()
-        if not s4:
-            return self._finalize_report(start_time, False)
+            s4 = self.run_step_4_execute_pipeline()
+            if not s4:
+                return self._finalize_report(start_time, False)
+        else:
+            log_info(f"Targeting designated inspection case: {self.case_id}")
+            s2 = True
+            s3 = True
+            self.step_results.append(TestStepResult("Targeted Case Ingestion", True, 0.0, details={"case_id": self.case_id}))
+            s4 = self.run_step_4_execute_pipeline()
+            if not s4:
+                return self._finalize_report(start_time, False)
 
         s5 = self.run_step_5_audit_verification()
         s6 = self.run_step_6_dossier_and_emaap()
@@ -670,6 +704,11 @@ def main():
         default=60,
         help="HTTP request timeout in seconds per upload (default: 60)",
     )
+    parser.add_argument(
+        "--case-id",
+        default=None,
+        help="Designated inspection case ID to verify/audit (skips creation & upload)",
+    )
 
     args = parser.parse_args()
 
@@ -683,6 +722,7 @@ def main():
         max_resize_dim=args.max_resize_dim,
         jpeg_quality=args.jpeg_quality,
         timeout_upload=args.timeout_upload,
+        case_id=args.case_id,
     )
 
     success = tester.run_all()
