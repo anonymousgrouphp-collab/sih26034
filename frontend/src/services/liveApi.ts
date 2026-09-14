@@ -822,6 +822,19 @@ export class LiveApiService implements IInspectionApiService {
   public async executeBatchPipeline(
     inspectionId: string
   ): Promise<InspectionCase> {
+    const pollForCompletion = async (maxAttempts = 35, intervalMs = 4000): Promise<InspectionCase | null> => {
+      for (let poll = 0; poll < maxAttempts; poll++) {
+        await new Promise((r) => setTimeout(r, intervalMs));
+        try {
+          const liveCase = await this.getInspection(inspectionId);
+          if (liveCase && liveCase.ai_verdict && liveCase.ai_verdict !== "PENDING") {
+            return liveCase;
+          }
+        } catch {}
+      }
+      return null;
+    };
+
     try {
       const res = await this.fetchWithAuth(`${this.baseUrl}/inspections/${inspectionId}/pipeline/batch`, {
         method: "POST",
@@ -832,14 +845,9 @@ export class LiveApiService implements IInspectionApiService {
         // Poll getInspection to seamlessly retrieve completed results.
         if (res.status >= 500) {
           console.warn(`Batch pipeline POST returned HTTP ${res.status}. Polling live case for async completion...`);
-          for (let poll = 0; poll < 12; poll++) {
-            await new Promise((r) => setTimeout(r, 3500));
-            try {
-              const liveCase = await this.getInspection(inspectionId);
-              if (liveCase && liveCase.ai_verdict && liveCase.ai_verdict !== "PENDING") {
-                return liveCase;
-              }
-            } catch {}
+          const completedCase = await pollForCompletion(35, 4000);
+          if (completedCase) {
+            return completedCase;
           }
         }
 
@@ -871,13 +879,12 @@ export class LiveApiService implements IInspectionApiService {
 
       return await this.getInspection(inspectionId);
     } catch (e: any) {
-      // If network/proxy dropped, try one final check to see if database has the completed inspection
-      try {
-        const fallbackCheck = await this.getInspection(inspectionId);
-        if (fallbackCheck && fallbackCheck.ai_verdict && fallbackCheck.ai_verdict !== "PENDING") {
-          return fallbackCheck;
-        }
-      } catch {}
+      // If network/proxy dropped or socket timed out, poll to retrieve completed inspection from live database
+      console.warn("Batch pipeline network disconnected or timed out, polling live DB for async completion...", e);
+      const asyncCase = await pollForCompletion(30, 4000);
+      if (asyncCase) {
+        return asyncCase;
+      }
 
       throw this.normalizeError(e, "Parallel multi-facet AI pipeline execution failed on live server.");
     }

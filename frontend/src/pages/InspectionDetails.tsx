@@ -50,6 +50,32 @@ export const InspectionDetails: React.FC = () => {
     };
   }, [id, language]);
 
+  // If the statutory AI pipeline is running asynchronously on the live cloud server,
+  // poll getInspection until the verdict and evaluations are written to PostgreSQL.
+  useEffect(() => {
+    if (!caseData || (caseData.ai_verdict !== "PENDING" && (caseData.rule_evaluations?.length || 0) > 0)) {
+      return;
+    }
+
+    let isCancelled = false;
+    const pollInterval = setInterval(async () => {
+      try {
+        const fresh = await ApiService.getInspection(caseData.id);
+        if (!isCancelled && fresh && fresh.ai_verdict && fresh.ai_verdict !== "PENDING") {
+          setCaseData(fresh);
+          clearInterval(pollInterval);
+        }
+      } catch {
+        // Silently retry on transient network drops
+      }
+    }, 3500);
+
+    return () => {
+      isCancelled = true;
+      clearInterval(pollInterval);
+    };
+  }, [caseData?.id, caseData?.ai_verdict, caseData?.rule_evaluations?.length]);
+
   if (isLoading) {
     return (
       <div className="bg-white p-12 text-center rounded-xl border border-slate-200 shadow-xs space-y-3">
@@ -101,6 +127,27 @@ export const InspectionDetails: React.FC = () => {
 
   return (
     <div className="space-y-4">
+      {caseData.ai_verdict === "PENDING" && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-3 text-amber-900 shadow-xs">
+          <div className="relative flex h-3 w-3">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+          </div>
+          <div className="text-xs flex-1">
+            <span className="font-bold">
+              {language === "hi"
+                ? "विधिक AI पाइपलाइन क्लाउड सर्वर पर सक्रिय रूप से विश्लेषित कर रही है..."
+                : "Statutory AI Pipeline is actively analyzing packaging facets on cloud server..."}
+            </span>
+            <span className="ml-2 text-amber-800">
+              {language === "hi"
+                ? "बहुभाषी OCR और नियम 6 अनुपालन परिणाम स्वतः यहाँ प्रदर्शित होंगे (पृष्ठ रीलोड की आवश्यकता नहीं)।"
+                : "Multilingual OCR tokens, calibration scales, and Rule 6 evaluations will automatically appear as processing completes (no reload needed)."}
+            </span>
+          </div>
+        </div>
+      )}
+
       <CaseWorkspace
         caseData={caseData}
         onBack={() => navigate("/inspections")}
