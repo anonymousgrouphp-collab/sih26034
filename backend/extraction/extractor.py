@@ -650,7 +650,7 @@ class CommodityFactExtractor:
 
         mrp_kw_re = re.compile(r"(?:MRP|M\.R\.P\.?|Maximum\s*Retail\s*Price|Max\.?\s*Retail\s*Price|अ\.वि\.मू\.?|अधिकतम\s*खुदरा\s*मूल्य|एमआरपी)", re.IGNORECASE)
 
-        for unit in text_units:
+        for unit in text_units + composite_lines:
             text = unit["text"]
             parsed_mrp = self.parser.parse_mrp(text)
             if parsed_mrp:
@@ -690,7 +690,7 @@ class CommodityFactExtractor:
             )
 
         # 3. UNIT SALE PRICE (USP)
-        for unit in text_units:
+        for unit in text_units + composite_lines:
             text = unit["text"]
             parsed_usp = self.parser.parse_usp(text)
             if parsed_usp and extracted_usp is None:
@@ -729,7 +729,7 @@ class CommodityFactExtractor:
 
         # 4. MANUFACTURING & EXPIRY DATES
         extracted_mfg_has_prefix = False
-        for unit in text_units:
+        for unit in text_units + composite_lines:
             text = unit["text"]
             parsed_dates = self.parser.parse_mfg_and_expiry_dates(text)
             font_mm, font_conf = compute_font_height(unit["bounding_box"])
@@ -803,7 +803,7 @@ class CommodityFactExtractor:
                 )
 
         # 5. COUNTRY OF ORIGIN
-        for unit in text_units:
+        for unit in text_units + composite_lines:
             text = unit["text"]
             origin = self.parser.parse_country_of_origin(text)
             if origin and extracted_origin is None:
