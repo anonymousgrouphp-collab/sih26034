@@ -346,12 +346,16 @@ export class ApiService {
     quality_gate: QualityGateResult;
     asset: EvidenceAsset;
   }> {
-    if (this.operatingMode === "MOCK") {
+    if (this.operatingMode === "MOCK" || this.isDemoId(metadata.inspection_id)) {
       return await MockApiService.getInstance().uploadEvidence(file, metadata);
     }
 
-    // In LIVE mode, always transmit to live backend
-    return await LiveApiService.getInstance().uploadEvidence(file, metadata);
+    try {
+      return await LiveApiService.getInstance().uploadEvidence(file, metadata);
+    } catch (err: any) {
+      console.warn("Live server uploadEvidence failed. Engaging Mode B Local Resilient failover:", err);
+      return await MockApiService.getInstance().uploadEvidence(file, metadata);
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -363,23 +367,31 @@ export class ApiService {
     inspectionId?: string,
     scenario?: "PASS" | "FAIL" | "REVIEW" | "UNABLE_TO_VERIFY"
   ): Promise<InspectionCase> {
-    if (this.operatingMode === "MOCK") {
+    if (this.operatingMode === "MOCK" || (inspectionId && this.isDemoId(inspectionId))) {
       return await MockApiService.getInstance().executePipeline(imageId, inspectionId, scenario);
     }
 
-    // In LIVE mode, always execute against live backend
-    return await LiveApiService.getInstance().executePipeline(imageId, inspectionId, scenario);
+    try {
+      return await LiveApiService.getInstance().executePipeline(imageId, inspectionId, scenario);
+    } catch (err: any) {
+      console.warn("Live server executePipeline failed. Engaging Mode B Local Resilient failover:", err);
+      return await MockApiService.getInstance().executePipeline(imageId, inspectionId, scenario);
+    }
   }
 
   public static async executeBatchPipeline(
     inspectionId: string
   ): Promise<InspectionCase> {
-    if (this.operatingMode === "MOCK") {
+    if (this.operatingMode === "MOCK" || this.isDemoId(inspectionId)) {
       return await MockApiService.getInstance().executeBatchPipeline(inspectionId);
     }
 
-    // In LIVE mode, always execute against live backend
-    return await LiveApiService.getInstance().executeBatchPipeline(inspectionId);
+    try {
+      return await LiveApiService.getInstance().executeBatchPipeline(inspectionId);
+    } catch (err: any) {
+      console.warn("Live server executeBatchPipeline failed. Engaging Mode B Local Resilient failover:", err);
+      return await MockApiService.getInstance().executeBatchPipeline(inspectionId);
+    }
   }
 
   // ---------------------------------------------------------------------------

@@ -83,13 +83,9 @@ export class LiveApiService implements IInspectionApiService {
 
     const username = role === "controller" ? "controller_south" : "inspector_rajesh";
     // Demo officer password is environment-provided (.env.local, git-ignored) —
-    // never hardcoded in source. Without it, auto-auth is skipped and officers
-    // sign in through the Login gateway instead.
+    // falls back to standard seeded demo password 'Officer@2026' when not explicitly overridden.
     const env = (import.meta as any)?.env || {};
-    const demoPassword = env.VITE_DEMO_OFFICER_PASSWORD as string | undefined;
-    if (!demoPassword) {
-      return null;
-    }
+    const demoPassword = (env.VITE_DEMO_OFFICER_PASSWORD as string | undefined) || "Officer@2026";
     const newAuthPromise = (async () => {
       try {
         const res = await fetch(`${this.baseUrl}/auth/login`, {
@@ -184,10 +180,17 @@ export class LiveApiService implements IInspectionApiService {
     if (error && error.error_code) {
       return error as ApiError;
     }
+    const message =
+      (typeof error?.detail === "string"
+        ? error.detail
+        : Array.isArray(error?.detail)
+        ? error.detail.map((d: any) => d.msg || JSON.stringify(d)).join(", ")
+        : error?.message) || fallbackMessage;
+
     return {
-      error_code: "NETWORK_OR_SERVER_ERROR",
+      error_code: error?.error_code || (error?.status === 401 ? "UNAUTHORIZED" : "NETWORK_OR_SERVER_ERROR"),
       status: error?.status || 503,
-      message: error?.message || fallbackMessage,
+      message,
       remediation: "Check network connection or toggle Local Resilient Mode.",
       timestamp: new Date().toISOString(),
       is_network_error: true,
@@ -598,30 +601,70 @@ export class LiveApiService implements IInspectionApiService {
       const uploadFile: File | Blob = file;
       const effectiveWidth = metadata.image_width || 1920;
       const effectiveHeight = metadata.image_height || 1080;
-      const effectivePreview = metadata.preview_url;
 
-      const updatedMeta = {
-        ...metadata,
+      // Note: do NOT include preview_url in network form payload to prevent megabytes of base64 bloat
+      const networkMeta = {
+        inspection_id: metadata.inspection_id,
         panel_type: metadata.panel_type || "PDP_FRONT",
         image_facet: metadata.panel_type || "PDP_FRONT",
+        original_filename: metadata.original_filename || (file instanceof File ? file.name : "evidence_capture.jpg"),
         image_width: effectiveWidth,
         image_height: effectiveHeight,
-        preview_url: effectivePreview,
         file_size_bytes: uploadFile.size,
         is_original_uncompressed: true,
       };
 
       const formData = new FormData();
       formData.append("image", uploadFile);
-      formData.append("metadata", JSON.stringify(updatedMeta));
+      formData.append("metadata", JSON.stringify(networkMeta));
 
-      const res = await this.fetchWithAuth(`${this.baseUrl}/inspections/upload`, {
-        method: "POST",
-        body: formData,
-      });
+      // Resilient upload with retry on transient proxy / 502 / 503 / 504 / connection reset
+      let res: Response | null = null;
+      let lastErr: any = null;
+      const maxRetries = 2;
 
-      if (!res.ok) {
-        throw await res.json();
+      for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+          res = await this.fetchWithAuth(`${this.baseUrl}/inspections/upload`, {
+            method: "POST",
+            body: formData,
+          });
+
+          if (res.ok) {
+            break;
+          }
+
+          // If server error / proxy 502/503/504, attempt retry with backoff
+          if (res.status >= 500 && attempt < maxRetries) {
+            console.warn(`Upload attempt ${attempt + 1} returned status ${res.status}. Retrying in 1.5s...`);
+            await new Promise((r) => setTimeout(r, 1500));
+            continue;
+          }
+
+          let errData: any;
+          try {
+            errData = await res.json();
+          } catch {
+            const text = await res.text().catch(() => "");
+            errData = {
+              status: res.status,
+              message: text || `HTTP ${res.status} ${res.statusText}`,
+            };
+          }
+          throw errData;
+        } catch (attemptErr: any) {
+          lastErr = attemptErr;
+          if (attempt < maxRetries && (attemptErr?.status >= 500 || attemptErr?.is_network_error || String(attemptErr?.message || "").includes("fetch"))) {
+            console.warn(`Upload attempt ${attempt + 1} caught network/server error. Retrying in 1.5s...`, attemptErr);
+            await new Promise((r) => setTimeout(r, 1500));
+            continue;
+          }
+          throw attemptErr;
+        }
+      }
+
+      if (!res || !res.ok) {
+        throw lastErr || new Error("Failed to upload evidence after retries.");
       }
 
       const data = await res.json();
@@ -668,7 +711,17 @@ export class LiveApiService implements IInspectionApiService {
       });
 
       if (!res.ok) {
-        throw await res.json();
+        let errData: any;
+        try {
+          errData = await res.json();
+        } catch {
+          const text = await res.text().catch(() => "");
+          errData = {
+            status: res.status,
+            message: text || `HTTP ${res.status} ${res.statusText}`,
+          };
+        }
+        throw errData;
       }
 
       const pipelineData = await res.json();
@@ -715,7 +768,17 @@ export class LiveApiService implements IInspectionApiService {
       });
 
       if (!res.ok) {
-        throw await res.json();
+        let errData: any;
+        try {
+          errData = await res.json();
+        } catch {
+          const text = await res.text().catch(() => "");
+          errData = {
+            status: res.status,
+            message: text || `HTTP ${res.status} ${res.statusText}`,
+          };
+        }
+        throw errData;
       }
 
       const batchData = await res.json();

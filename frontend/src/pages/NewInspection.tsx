@@ -110,6 +110,7 @@ export const NewInspection: React.FC = () => {
   const [filePreviews, setFilePreviews] = useState<string[]>([]);
   const [steps, setSteps] = useState<PipelineStepItem[]>(INITIAL_STEPS);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [uploadProgressMessage, setUploadProgressMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showGuidanceModal, setShowGuidanceModal] = useState(false);
   const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
@@ -277,6 +278,12 @@ export const NewInspection: React.FC = () => {
       if (files.length > 0) {
         for (let i = 0; i < files.length; i++) {
           const rawFile = files[i];
+          setUploadProgressMessage(
+            language === "hi"
+              ? `साक्ष्य फोटो अपलोड हो रहा है (${i + 1}/${files.length}): ${rawFile.name}`
+              : `Uploading photo (${i + 1}/${files.length}): ${rawFile.name}`
+          );
+
           let previewUrl = filePreviews[i];
           let imgWidth = 1920;
           let imgHeight = 1080;
@@ -331,6 +338,12 @@ export const NewInspection: React.FC = () => {
         }
       }
 
+      setUploadProgressMessage(
+        language === "hi"
+          ? "विधिक AI पाइपलाइन विश्लेषित की जा रही है..."
+          : "Analyzing statutory AI pipeline..."
+      );
+
       // Step simulation for visual feedback
       for (let i = 1; i < currentSteps.length; i++) {
         currentSteps.forEach((s, idx) => {
@@ -376,6 +389,7 @@ export const NewInspection: React.FC = () => {
       setSteps(INITIAL_STEPS);
     } finally {
       setIsProcessing(false);
+      setUploadProgressMessage(null);
     }
   };
 
@@ -848,12 +862,19 @@ export const NewInspection: React.FC = () => {
               <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div
                   className={`text-xs font-semibold px-3 py-1.5 rounded-lg border flex items-center gap-2 ${
-                    files.length === 0
+                    uploadProgressMessage
+                      ? "bg-blue-50 border-blue-200 text-blue-900"
+                      : files.length === 0
                       ? "bg-amber-50 border-amber-200 text-amber-900"
                       : "bg-emerald-50 border-emerald-200 text-emerald-900"
                   }`}
                 >
-                  {files.length === 0 ? (
+                  {uploadProgressMessage ? (
+                    <>
+                      <ScanLine size={14} className="text-blue-600 animate-spin shrink-0" />
+                      <span className="font-medium">{uploadProgressMessage}</span>
+                    </>
+                  ) : files.length === 0 ? (
                     <>
                       <Info size={14} className="text-amber-600 shrink-0" />
                       <span>
@@ -888,7 +909,7 @@ export const NewInspection: React.FC = () => {
                   {isProcessing ? (
                     <>
                       <ScanLine size={18} className="animate-spin text-amber-300" />
-                      <span>{language === "hi" ? "विधिक पाइपलाइन निष्पादित हो रही है..." : "Running Statutory Pipeline..."}</span>
+                      <span>{uploadProgressMessage || (language === "hi" ? "विधिक पाइपलाइन निष्पादित हो रही है..." : "Running Statutory Pipeline...")}</span>
                     </>
                   ) : (
                     <>
