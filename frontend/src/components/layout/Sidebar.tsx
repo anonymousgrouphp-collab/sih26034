@@ -231,7 +231,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       title={isCollapsed ? item.label : undefined}
                       className={`group relative w-full flex items-center justify-between py-2 text-xs font-semibold rounded-lg transition-all overflow-hidden ${
                         active
-                          ? "bg-[#1B365D]/8 text-[#1B365D] font-bold border-l-[3.5px] border-[#1B365D] rounded-l-none pl-2.5"
+                          ? "bg-blue-50/90 text-[#1B365D] font-bold border-l-[3.5px] border-[#1B365D] rounded-l-none pl-2.5 shadow-2xs"
                           : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 border-l-[3.5px] border-transparent pl-2.5"
                       } ${isCollapsed ? "px-0 justify-center border-l-0" : "pr-3"}`}
                     >
@@ -252,6 +252,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           className={`px-1.5 py-0.5 text-[10.5px] font-mono font-bold rounded-md shrink-0 border ${
                             item.badgeType === "warning"
                               ? "bg-amber-50 text-amber-900 border-amber-300"
+                              : active
+                              ? "bg-white text-[#1B365D] border-blue-200 shadow-2xs"
                               : "bg-blue-50 text-[#1B365D] border-blue-200"
                           }`}
                         >
@@ -367,7 +369,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             onClick={onCloseMobile}
                             className={`group relative w-full flex items-center justify-between py-2.5 text-xs font-semibold rounded-lg transition-all pr-3 ${
                               active
-                                ? "bg-[#1B365D]/8 text-[#1B365D] font-bold border-l-[3.5px] border-[#1B365D] rounded-l-none pl-2.5"
+                                ? "bg-blue-50/90 text-[#1B365D] font-bold border-l-[3.5px] border-[#1B365D] rounded-l-none pl-2.5 shadow-2xs"
                                 : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 border-l-[3.5px] border-transparent pl-2.5"
                             }`}
                           >
@@ -388,6 +390,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                 className={`px-1.5 py-0.5 text-[10.5px] font-mono font-bold rounded-md shrink-0 border ${
                                   item.badgeType === "warning"
                                     ? "bg-amber-50 text-amber-900 border-amber-300"
+                                    : active
+                                    ? "bg-white text-[#1B365D] border-blue-200 shadow-2xs"
                                     : "bg-blue-50 text-[#1B365D] border-blue-200"
                                 }`}
                               >
