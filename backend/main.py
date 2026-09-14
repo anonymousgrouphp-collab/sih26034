@@ -38,10 +38,16 @@ app.mount("/storage", StaticFiles(directory=str(STORAGE_DIR)), name="storage")
 # 4. Mount React 18 Production Build (from frontend/dist)
 DIST_DIR = REPO_ROOT / "frontend" / "dist"
 if DIST_DIR.is_dir():
-    # Mount assets folder
+    # Mount assets folder with immutable caching (HTTP 304 / 1-year browser cache)
     assets_dir = DIST_DIR / "assets"
     if assets_dir.is_dir():
-        app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="spa_assets")
+        class CachedStaticFiles(StaticFiles):
+            def file_response(self, *args, **kwargs):
+                resp = super().file_response(*args, **kwargs)
+                resp.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+                return resp
+
+        app.mount("/assets", CachedStaticFiles(directory=str(assets_dir)), name="spa_assets")
 
     # Catch-all route to serve index.html for client-side routing (SPA)
     @app.get("/{full_path:path}", include_in_schema=False)
@@ -66,11 +72,18 @@ if DIST_DIR.is_dir():
 
         file_path = DIST_DIR / full_path
         if file_path.is_file():
-            return FileResponse(file_path)
-        return FileResponse(DIST_DIR / "index.html")
+            headers = {}
+            if full_path.startswith("assets/"):
+                headers["Cache-Control"] = "public, max-age=31536000, immutable"
+            return FileResponse(file_path, headers=headers)
+        return FileResponse(DIST_DIR / "index.html", headers={"Cache-Control": "no-cache"})
 
 if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", 8000))
     host = os.getenv("HOST", "0.0.0.0")
-    uvicorn.run("backend.main:app", host=host, port=port, reload=False)
+    workers = int(os.getenv("WORKERS", "1"))
+    if workers > 1:
+        uvicorn.run("backend.main:app", host=host, port=port, workers=workers, reload=False)
+    else:
+        uvicorn.run("backend.main:app", host=host, port=port, reload=False)

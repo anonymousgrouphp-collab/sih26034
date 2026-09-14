@@ -27,8 +27,10 @@ from sqlalchemy import (
     String,
     Text,
     create_engine,
+    event,
     select,
 )
+from sqlalchemy.pool import QueuePool
 from sqlalchemy.orm import (
     DeclarativeBase,
     Mapped,
@@ -154,6 +156,7 @@ class EvidenceImage(Base):
     __table_args__ = (
         Index("idx_evidence_images_inspection", "inspection_id"),
         Index("idx_evidence_images_hash", "raw_sha256"),
+        Index("idx_evidence_images_insp_panel", "inspection_id", "panel_type"),
     )
 
 
@@ -202,6 +205,7 @@ class ComplianceEvaluation(Base):
         Index("idx_compliance_evals_inspection", "inspection_id"),
         Index("idx_compliance_evals_rule", "rule_code"),
         Index("idx_compliance_evals_status", "status"),
+        Index("idx_compliance_evals_insp_status", "inspection_id", "status"),
     )
 
 
@@ -385,40 +389,100 @@ class AuditLedgerService:
         return True, None
 
 
+_global_engines: Dict[str, Any] = {}
+
+
 def get_database_engine(url: Optional[str] = None):
-    """Creates a SQLAlchemy engine supporting SQLite and PostgreSQL."""
+    """Creates or returns a singleton pooled SQLAlchemy engine supporting SQLite and PostgreSQL.
+    Configures high-throughput connection pooling (ADR-09) and SQLite concurrency PRAGMAs (WAL mode).
+    """
+    global _global_engines
     db_url = url or os.getenv("DATABASE_URL", "sqlite:///legal_metrology.db")
     if db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql://", 1)
-    connect_args = {"check_same_thread": False} if "sqlite" in db_url else {}
-    return create_engine(db_url, connect_args=connect_args, echo=False)
+
+    if db_url in _global_engines:
+        return _global_engines[db_url]
+
+    is_sqlite = "sqlite" in db_url
+    if is_sqlite:
+        connect_args = {"check_same_thread": False, "timeout": 30}
+        engine = create_engine(
+            db_url,
+            connect_args=connect_args,
+            poolclass=QueuePool,
+            pool_size=10,
+            max_overflow=20,
+            pool_pre_ping=True,
+            echo=False,
+        )
+
+        @event.listens_for(engine, "connect")
+        def set_sqlite_pragma(dbapi_connection, connection_record):
+            cursor = dbapi_connection.cursor()
+            try:
+                cursor.execute("PRAGMA journal_mode = WAL;")
+                cursor.execute("PRAGMA synchronous = NORMAL;")
+                cursor.execute("PRAGMA cache_size = -64000;")  # 64MB memory page cache
+                cursor.execute("PRAGMA temp_store = MEMORY;")
+                cursor.execute("PRAGMA busy_timeout = 5000;")
+            finally:
+                cursor.close()
+    else:
+        engine = create_engine(
+            db_url,
+            pool_size=20,
+            max_overflow=10,
+            pool_pre_ping=True,
+            pool_recycle=3600,
+            echo=False,
+        )
+
+    _global_engines[db_url] = engine
+    return engine
 
 
 def migrate_database_schema(engine_or_conn):
-    """Executes idempotent schema migrations across PostgreSQL and SQLite."""
+    """Executes idempotent schema migrations and database indexing across PostgreSQL and SQLite."""
+    index_statements = [
+        "CREATE INDEX IF NOT EXISTS idx_inspections_category ON inspections (category);",
+        "CREATE INDEX IF NOT EXISTS idx_inspections_jur_status ON inspections (jurisdiction_id, overall_status);",
+        "CREATE INDEX IF NOT EXISTS idx_inspections_prod_name ON inspections (product_name);",
+        "CREATE INDEX IF NOT EXISTS idx_compliance_evals_insp_status ON compliance_evaluations (inspection_id, status);",
+        "CREATE INDEX IF NOT EXISTS idx_evidence_images_insp_panel ON evidence_images (inspection_id, panel_type);",
+    ]
+
     try:
         if hasattr(engine_or_conn, "exec_driver_sql"):
             conn = engine_or_conn
             dialect_name = getattr(conn.dialect, "name", "").lower()
             if "postgres" in dialect_name or "psycopg" in dialect_name:
                 conn.exec_driver_sql("ALTER TABLE evidence_images ADD COLUMN IF NOT EXISTS calibration_reference_box TEXT;")
-                conn.commit()
             else:
                 cols = [row[1] for row in conn.exec_driver_sql("PRAGMA table_info(evidence_images)").fetchall()]
                 if cols and "calibration_reference_box" not in cols:
                     conn.exec_driver_sql("ALTER TABLE evidence_images ADD COLUMN calibration_reference_box TEXT;")
-                    conn.commit()
+            for idx_stmt in index_statements:
+                try:
+                    conn.exec_driver_sql(idx_stmt)
+                except Exception:
+                    pass
+            conn.commit()
         elif hasattr(engine_or_conn, "connect"):
             with engine_or_conn.connect() as conn:
                 dialect_name = getattr(engine_or_conn.dialect, "name", "").lower()
                 if "postgres" in dialect_name or "psycopg" in dialect_name:
                     conn.exec_driver_sql("ALTER TABLE evidence_images ADD COLUMN IF NOT EXISTS calibration_reference_box TEXT;")
-                    conn.commit()
                 else:
                     cols = [row[1] for row in conn.exec_driver_sql("PRAGMA table_info(evidence_images)").fetchall()]
                     if cols and "calibration_reference_box" not in cols:
                         conn.exec_driver_sql("ALTER TABLE evidence_images ADD COLUMN calibration_reference_box TEXT;")
-                        conn.commit()
+                for idx_stmt in index_statements:
+                    try:
+                        conn.exec_driver_sql(idx_stmt)
+                    except Exception:
+                        pass
+                conn.commit()
     except Exception as exc:
         logger.warning(f"Database schema migration warning: {exc}")
 

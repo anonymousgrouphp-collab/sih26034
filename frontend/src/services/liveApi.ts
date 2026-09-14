@@ -827,7 +827,8 @@ export class LiveApiService implements IInspectionApiService {
         await new Promise((r) => setTimeout(r, intervalMs));
         try {
           const liveCase = await this.getInspection(inspectionId);
-          if (liveCase && liveCase.ai_verdict && liveCase.ai_verdict !== "PENDING" && liveCase.ai_verdict !== "PROCESSING") {
+          const verdictStr = String(liveCase?.ai_verdict || "");
+          if (liveCase && verdictStr && verdictStr !== "PENDING" && verdictStr !== "PROCESSING") {
             return liveCase;
           }
         } catch {}

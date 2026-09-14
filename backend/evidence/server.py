@@ -32,6 +32,7 @@ from fastapi import (
     status,
 )
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field
 from sqlalchemy import delete, func, select
@@ -228,6 +229,9 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# High-Performance API Payload Compression (GZip for responses > 1KB)
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+
 # CORS Configuration
 app.add_middleware(
     CORSMiddleware,
@@ -236,6 +240,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# In-Memory TTL Cache for Expensive Computed Aggregations (e.g. Dashboard Summary)
+_DASHBOARD_SUMMARY_CACHE: Dict[str, Any] = {}
 
 
 # -----------------------------------------------------------------------------
@@ -2966,10 +2973,19 @@ def download_notice_pdf(
 @app.get("/api/v1/dashboard/summary")
 def get_dashboard_summary(
     circle_id: Optional[str] = None,
+    response: Response = None,
     user: UserContext = Depends(get_current_user),
     db: Session = Depends(get_db_session),
 ):
-    """Aggregates violation statistics, compounding fees, and circle metrics."""
+    """Aggregates violation statistics, compounding fees, and circle metrics with in-memory TTL caching."""
+    circle_key = circle_id or "ALL_CIRCLES"
+    now_ts = time.time()
+    cached = _DASHBOARD_SUMMARY_CACHE.get(circle_key)
+    if cached and (now_ts - cached["ts"]) < 15.0:
+        if response:
+            response.headers["Cache-Control"] = "public, max-age=15, stale-while-revalidate=30"
+        return cached["data"]
+
     base_query = select(Inspection)
     if circle_id and circle_id not in ("ALL", "ALL_CIRCLES"):
         base_query = base_query.where(Inspection.jurisdiction_id == circle_id)
@@ -2987,7 +3003,7 @@ def get_dashboard_summary(
 
     notices_count = db.execute(select(func.count(LegalNotice.id))).scalar() or 0
 
-    return {
+    res_data = {
         "jurisdiction_circle": circle_id or "ALL_CIRCLES",
         "total_inspections": total_inspections,
         "violations_detected": violations_count,
@@ -2996,6 +3012,11 @@ def get_dashboard_summary(
         "form1_notices_issued": notices_count,
         "compliance_rate_pct": round((compliant_count / total_inspections * 100), 1) if total_inspections > 0 else 100.0,
     }
+
+    _DASHBOARD_SUMMARY_CACHE[circle_key] = {"ts": now_ts, "data": res_data}
+    if response:
+        response.headers["Cache-Control"] = "public, max-age=15, stale-while-revalidate=30"
+    return res_data
 
 
 @app.get("/api/v1/audit/chain-verify")
