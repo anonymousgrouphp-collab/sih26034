@@ -1687,7 +1687,32 @@ def execute_batch_pipeline(
             "tokens_count": len(ocr_output.tokens),
         }
 
-    # Prioritize facets by statutory likelihood: PDP_FRONT and BACK_PANEL first!
+    # Fast text density probe to prioritize packaging declarations over calibration cards
+    density_scores = {}
+    ocr_eng_probe = get_cached_ocr_engine()
+    cache_adapter_probe = CacheQueueAdapter.get_instance() if CacheQueueAdapter else None
+
+    for img in ev_images:
+        score = 0
+        try:
+            if cache_adapter_probe:
+                c_toks = cache_adapter_probe.get_tokens(img.id)
+                if c_toks:
+                    score = len(c_toks)
+            if score == 0 and ocr_eng_probe is not None:
+                p_mat = _load_image_bgr(img.file_path, getattr(img, "image_url", None))
+                if p_mat is not None:
+                    orig_side = getattr(ocr_eng_probe.detector, "max_side_len", 1280)
+                    ocr_eng_probe.detector.max_side_len = 640
+                    dets = ocr_eng_probe.detector.detect(p_mat)
+                    ocr_eng_probe.detector.max_side_len = orig_side
+                    score = len(dets)
+                    del p_mat
+        except Exception:
+            score = 0
+        density_scores[img.id] = score
+
+    # Prioritize facets by detected text density descending, breaking ties with statutory panel order
     PANEL_ORDER = {
         "PDP_FRONT": 0,
         "BACK_PANEL": 1,
@@ -1696,7 +1721,10 @@ def execute_batch_pipeline(
         "SIDE_PANEL": 4,
         "UNKNOWN": 5,
     }
-    sorted_images = sorted(ev_images, key=lambda x: PANEL_ORDER.get(x.panel_type or "UNKNOWN", 99))
+    sorted_images = sorted(
+        ev_images,
+        key=lambda x: (-density_scores.get(x.id, 0), PANEL_ORDER.get(x.panel_type or "UNKNOWN", 99))
+    )
 
     # Prepare metadata for facet processing
     img_metas = []
@@ -1710,15 +1738,16 @@ def execute_batch_pipeline(
             "glare_percentage": img.glare_pixel_percentage,
         })
 
-    # Execute workers sequentially with safety time budget (18s) to never exceed Vercel/Render proxy timeouts
+    # Execute workers sequentially with safety time budget (30s) to discover all packaging declarations
     import gc
     worker_results = []
-    SAFETY_BUDGET_SECONDS = 18.0
-    MAX_FACETS_TO_PROCESS = 2
+    SAFETY_BUDGET_SECONDS = 30.0
+    MAX_FACETS_TO_PROCESS = 6
 
+    discovered_fields = set()
     for idx, meta in enumerate(img_metas):
         elapsed = time.perf_counter() - t0
-        if (idx >= 1 and elapsed > SAFETY_BUDGET_SECONDS) or (idx >= MAX_FACETS_TO_PROCESS):
+        if (len(discovered_fields) >= 4 and elapsed > SAFETY_BUDGET_SECONDS) or (idx >= MAX_FACETS_TO_PROCESS):
             logger.info(f"Batch pipeline reached budget limit ({elapsed:.1f}s, {idx} facets); proceeding to fusion.")
             break
 
@@ -1726,23 +1755,27 @@ def execute_batch_pipeline(
         worker_results.append(w_res)
         gc.collect()
 
+        for f in w_res.get("raw_fields", []):
+            discovered_fields.add(f.get("field_type"))
+
         # Early completion check: if primary declarations already discovered across processed facets
-        if len(worker_results) >= 2:
-            discovered_fields = set()
-            for r in worker_results:
-                for f in r.get("raw_fields", []):
-                    discovered_fields.add(f.get("field_type"))
-            CORE_FIELDS = {"MRP", "NET_QUANTITY", "MANUFACTURER", "COUNTRY_OF_ORIGIN", "CONSUMER_CARE"}
-            if CORE_FIELDS.issubset(discovered_fields):
-                logger.info(f"All core statutory declarations identified after {len(worker_results)} facets; proceeding to fusion.")
-                break
+        CORE_FIELDS = {"MRP", "NET_QUANTITY", "MANUFACTURER_ADDRESS", "COUNTRY_OF_ORIGIN", "CONSUMER_CARE_CONTACT"}
+        if CORE_FIELDS.issubset(discovered_fields):
+            logger.info(f"All core statutory declarations identified after {len(worker_results)} facets; proceeding to fusion.")
+            break
 
     # Cross-calibrate: If any image successfully detected a scale, inherit to uncalibrated siblings
     best_scale = next((r["px_to_mm"] for r in worker_results if r["px_to_mm"]), None)
     best_calib_method = next((r["calib_method"] for r in worker_results if r["calib_method"] != "UNRESOLVED"), "UNRESOLVED")
     best_ref_box = next((r["ref_box"] for r in worker_results if r["ref_box"]), None)
 
-    # Database updates for each image sub-element
+    # Database updates: clear all previous bounding boxes for all images in this inspection
+    all_img_ids = [img.id for img in ev_images]
+    if all_img_ids:
+        old_bboxes = db.execute(select(BoundingBox).where(BoundingBox.image_id.in_(all_img_ids))).scalars().all()
+        for ob in old_bboxes:
+            db.delete(ob)
+
     all_fused_raw_fields = []
     for r in worker_results:
         ev_img = next((img for img in ev_images if img.id == r["image_id"]), None)
@@ -1755,11 +1788,6 @@ def execute_batch_pipeline(
                 ev_img.calibration_method = method_to_set
                 ev_img.calibration_reference_id = "MARKER-4X4-50MM" if "ARUCO" in method_to_set else "ISO-7810-CARD"
                 ev_img.calibration_reference_box = json.dumps(box_to_set) if box_to_set else None
-
-        # Delete previous bounding boxes for this specific image
-        old_bboxes = db.execute(select(BoundingBox).where(BoundingBox.image_id == r["image_id"])).scalars().all()
-        for ob in old_bboxes:
-            db.delete(ob)
 
         # Save new bounding boxes tagged with this image_id
         for f in r["raw_fields"]:

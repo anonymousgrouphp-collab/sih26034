@@ -494,19 +494,24 @@ class StatutoryDeclarationParser:
                     "tablets", "tablet", "capsules", "capsule", "sachets", "sachet",
                     "wipes", "sheets", "packs", "pair", "pairs", "rolls", "नग", "इकाई"
                 )
-                # 2. Disallow uppercase 'M' (denoting Million/Ratings/Mega, e.g. '4.5M ratings') as metre
                 is_valid_standalone_length = (
                     first_w in ("m", "meter", "meters", "metre", "metres", "मीटर")
                     and (not cand_unit_raw or cand_unit_raw[0] != "M")
                     and bool(re.search(r"\b(?:length|dimensions?|width|height|tape|wire|cable|cord|rope|roll|मीटर|लंबाई)\b", norm_text, re.IGNORECASE) or first_w in ("meter", "meters", "metre", "metres", "मीटर"))
+                )
+                # 3. Disallow bare single-letter volume symbols "l" or "ltr" without volume context
+                is_valid_standalone_volume = (
+                    first_w in ("litre", "litres", "liter", "liters", "ml", "millilitre", "millilitres", "cl")
+                    or (first_w in ("l", "ltr") and bool(re.search(r"\b(?:vol|volume|contents?|net|capacity|लीटर)\b", norm_text, re.IGNORECASE)))
                 )
 
                 is_valid_unit = (
                     has_banned_cand or
                     is_standalone_count or
                     is_valid_standalone_length or
-                    (first_w in RECOGNIZED_VALID_UNITS and first_w not in ("n", "u", "m")) or
-                    (two_w in RECOGNIZED_VALID_UNITS and two_w not in ("n", "u", "m"))
+                    is_valid_standalone_volume or
+                    (first_w in RECOGNIZED_VALID_UNITS and first_w not in ("n", "u", "m", "l", "ltr")) or
+                    (two_w in RECOGNIZED_VALID_UNITS and two_w not in ("n", "u", "m", "l", "ltr"))
                 )
                 if is_valid_unit:
                     match = m
@@ -644,7 +649,7 @@ class StatutoryDeclarationParser:
             r"including\s*(?:of)?\s*all\s*(?:taxes?|gst)|"
             r"कर\s*सहित|सभी\s*कर(?:ों)?\s*सहित)"
         )
-        curr = r"(?:(?<![a-zA-Z])(?:Rs\.?|R\s*s\.?|R[58]\.?|Ps\.?|Re\.?|INR|₹|रु\.?|रू\.?|रुपये|रुपए|र\.?|र))"
+        curr = r"(?:(?<![a-zA-Z])(?:Rs\.?|R\s*s\.?|R[58]\.?|Ps\.?|Re\.(?=\s*[0-9])|INR|₹|रु\.?|रू\.?|रुपये|रुपए))"
         amount_re = r"((?=[0-9Ool]*[0-9])[0-9Ool]+(?:[,\s]\s*[0-9Ool]{3})*(?:\s*\.\s*[0-9Ool]{1,2})?)"
         unit_den_re = r"\s*(?:/|per|प्रति)\s*(?:[0-9]+\s*)?(?:g(?:m|ms)?|kg(?:m|ms)?|m?l|ltrs?|units?|pcs?|nos?|items?|packs?|सेंटीमीटर|सेमी|मीटर|ग्राम|ग्रा|किग्रा|कि\.ग्रा|मिलीलीटर|मिली|मि\.ली|लीटर|ली|नग|इकाई|N)\b"
 

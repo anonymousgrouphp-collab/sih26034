@@ -580,6 +580,102 @@ class CommodityFactExtractor:
         calib_arg = calibration if calibration is not None else explicit_calibration
         image_id, tokens, full_text = self._normalize_tokens(ocr_data)
         px_to_mm, calib_confidence = self._resolve_calibration(ocr_data, calib_arg)
+
+        # ---------------------------------------------------------------------
+        # Fiducial Reference Card Suppression Filter:
+        # Reference cards (ISO-7810 debit/credit/ID cards) are placed in photos
+        # SOLELY for physical scale calibration (px_to_mm). Under no circumstances
+        # should text from a fiducial card (e.g. bank names, cardholder terms,
+        # helpline numbers, PIN instructions, CVV) be extracted as packaging data.
+        # ---------------------------------------------------------------------
+        CARD_FIDUCIAL_KEYWORDS = (
+            "electronic use only", "electronic use onl", "authorized signature", "authorised signature",
+            "non transferable", "pin confidential", "keep your pin", "valid thru", "valid from",
+            "debit card", "credit card", "atm card", "global debit", "international debit",
+            "state bank of india", "sbi", "state bank", "rupay", "mastercard", "visa", "maestro",
+            "sbfinka", "ssffinka", "bfinka", "cvv", "cash withdrawal", "property of", "branch of",
+            "cardholder", "1800-11-22", "18001122", "1800-426-3800", "18004263800", "18001234",
+            "1800-1234", "1840111", "18002100",
+            # Inverted / rotated card tokens from inverted photos:
+            "mnivnois", "c3znohln", "inossio", "kldk000", "tectdnic", "rinivndis", "o3zisoh",
+            "161523-1/1806-500", "kld0 k000"
+        )
+
+        ref_card_box = None
+        if hasattr(calib_arg, "calibration") and calib_arg.calibration:
+            ref_card_box = getattr(calib_arg.calibration, "reference_bounding_box", None)
+        elif isinstance(calib_arg, dict):
+            ref_card_box = calib_arg.get("reference_bounding_box") or (
+                calib_arg.get("calibration", {}).get("reference_bounding_box")
+                if isinstance(calib_arg.get("calibration"), dict) else None
+            )
+
+        # Detect card presence via optical keywords
+        seed_card_tokens = [
+            t for t in tokens
+            if any(k in str(t.get("text", "")).lower() for k in CARD_FIDUCIAL_KEYWORDS)
+        ]
+        
+        # If card tokens found, synthesize or expand the exclusion zone (seed tokens take precedence)
+        card_exclusion_box = None
+        if len(seed_card_tokens) >= 1:
+            s_ymin = min(t["bounding_box"][0] for t in seed_card_tokens)
+            s_xmin = min(t["bounding_box"][1] for t in seed_card_tokens)
+            s_ymax = max(t["bounding_box"][2] for t in seed_card_tokens)
+            s_xmax = max(t["bounding_box"][3] for t in seed_card_tokens)
+            pad_y = int((s_ymax - s_ymin) * 0.30)
+            pad_x = int((s_xmax - s_xmin) * 0.30)
+            card_exclusion_box = [s_ymin - pad_y, s_xmin - pad_x, s_ymax + pad_y, s_xmax + pad_x]
+        elif ref_card_box and len(ref_card_box) == 4:
+            pad_y = int((ref_card_box[2] - ref_card_box[0]) * 0.15)
+            pad_x = int((ref_card_box[3] - ref_card_box[1]) * 0.15)
+            card_exclusion_box = [
+                ref_card_box[0] - pad_y,
+                ref_card_box[1] - pad_x,
+                ref_card_box[2] + pad_y,
+                ref_card_box[3] + pad_x,
+            ]
+
+        def is_card_noise_token(t_dict: Dict[str, Any]) -> bool:
+            txt = str(t_dict.get("text", "")).lower()
+            if any(k in txt for k in CARD_FIDUCIAL_KEYWORDS):
+                return True
+            bbox = t_dict.get("bounding_box")
+            if card_exclusion_box and bbox and len(card_exclusion_box) == 4 and len(bbox) == 4:
+                cy = (bbox[0] + bbox[2]) / 2.0
+                cx = (bbox[1] + bbox[3]) / 2.0
+                if card_exclusion_box[0] <= cy <= card_exclusion_box[2] and card_exclusion_box[1] <= cx <= card_exclusion_box[3]:
+                    return True
+            return False
+
+        STATUTORY_DECLARATION_RE = re.compile(
+            r"\b(?:mrp|net\s*qty|net\s*quantity|country\s*of\s*origin|customer\s*care|consumer\s*care|mfg|packed|pkd|marketed|titan|watch|commodity)\b",
+            re.IGNORECASE
+        )
+        has_statutory_text = any(
+            STATUTORY_DECLARATION_RE.search(str(t.get("text", "")))
+            for t in tokens
+        )
+
+        filtered_tokens = [t for t in tokens if not is_card_noise_token(t)]
+        
+        # If the image is solely a reference card standard (few non-card tokens OR zero statutory declarations), return empty facts immediately
+        if (len(seed_card_tokens) >= 1 or (ref_card_box and len(ref_card_box) == 4)) and not has_statutory_text:
+            logger.info(f"Image {image_id} is a fiducial reference card without statutory declarations. Skipping fact extraction.")
+            return NormalizedCommodityFacts(
+                image_id=image_id,
+                raw_fields=[],
+            )
+        if len(filtered_tokens) < 8 and not has_statutory_text:
+            logger.info(f"Image {image_id} has insufficient non-fiducial tokens ({len(filtered_tokens)}). Skipping fact extraction.")
+            return NormalizedCommodityFacts(
+                image_id=image_id,
+                raw_fields=[],
+            )
+
+        tokens = filtered_tokens
+        full_text = " ".join(t.get("text", "") for t in tokens)
+
         sorted_tokens = self._sort_tokens_reading_order(tokens)
         composite_lines = self._cluster_horizontal_lines(tokens)
         text_units = self._build_spatial_linked_candidates(composite_lines, sorted_tokens)
