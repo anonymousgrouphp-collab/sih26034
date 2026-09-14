@@ -158,7 +158,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             {/* Right: Administrative Circle, Demo Suite, Officer Digital ID Badge */}
             <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-              {/* Jurisdiction Circle Selector */}
+              {/* Jurisdiction Circle Selector (Desktop) */}
               <div className="hidden lg:flex items-center gap-1.5 bg-[#0B213B] px-3 py-1.5 rounded-lg border border-blue-400/25 text-xs shadow-2xs shrink-0">
                 <MapPin size={13} className="text-amber-400 shrink-0" />
                 <label htmlFor="circle-select" className="sr-only">
@@ -193,8 +193,17 @@ export const Header: React.FC<HeaderProps> = ({
                 </select>
               </div>
 
+              {/* Mobile Active Circle Pill */}
+              <div 
+                title={`Active Circle: ${activeCircle}`}
+                className="flex lg:hidden items-center gap-1 bg-[#0B213B] px-2 py-1 rounded-lg border border-blue-400/25 text-[10.5px] font-mono font-bold text-amber-300 shrink-0 shadow-2xs"
+              >
+                <MapPin size={11} className="text-amber-400 shrink-0" />
+                <span className="truncate max-w-[80px]">{activeCircle.replace("CIRCLE_", "")}</span>
+              </div>
+
               {/* Government Officer Digital ID Badge & Popover */}
-              <div className="relative">
+              <div className="relative shrink-0">
                 <button
                   type="button"
                   onClick={() => setOfficerMenuOpen(!officerMenuOpen)}
@@ -233,7 +242,7 @@ export const Header: React.FC<HeaderProps> = ({
                       aria-hidden="true"
                     />
 
-                    <div className="absolute right-0 mt-2 w-80 sm:w-84 rounded-xl bg-white text-slate-800 shadow-2xl border border-slate-200 z-50 overflow-hidden animate-pop-in">
+                    <div className="absolute right-0 mt-2 w-80 sm:w-84 max-w-[calc(100vw-1.5rem)] rounded-xl bg-white text-slate-800 shadow-2xl border border-slate-200 z-50 overflow-hidden animate-pop-in">
                       {/* Popover Header: Sovereign Navy + Golden Tricolor Ribbon */}
                       <div className="bg-[#1B365D] text-white p-4 relative overflow-hidden">
                         <div className="h-1 absolute top-0 left-0 right-0 bg-gradient-to-r from-[#FF9933] via-white to-[#138808]" />

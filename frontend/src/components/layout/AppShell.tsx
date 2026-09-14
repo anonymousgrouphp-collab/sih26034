@@ -60,72 +60,81 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   ).length;
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans relative overflow-x-clip text-slate-900">
+    <div className="h-screen flex flex-col bg-slate-50 font-sans overflow-hidden text-slate-900">
       {/* WCAG 2.1 AA Accessible Skip Link */}
       <a href="#main-content" className="skip-link">
         {language === "hi" ? "मुख्य वैधानिक सामग्री पर जाएं" : "Skip to main statutory content"}
       </a>
 
       {/* Official GIGW 3.0 Government of India Top Utility Bar */}
-      <GovTopBar />
+      <div className="shrink-0 z-50">
+        <GovTopBar />
+      </div>
 
-      <Header
-        activeCircle={activeCircle}
-        onCircleChange={(c) => {
-          setActiveCircle(c);
-          loadCases();
-        }}
-        onRefresh={loadCases}
-        onToggleSidebar={() => setMobileSidebarOpen((prev) => !prev)}
-        onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
-      />
+      <div className="shrink-0 z-40">
+        <Header
+          activeCircle={activeCircle}
+          onCircleChange={(c) => {
+            setActiveCircle(c);
+            loadCases();
+          }}
+          onRefresh={loadCases}
+          onToggleSidebar={() => setMobileSidebarOpen((prev) => !prev)}
+          onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+        />
+      </div>
 
-      <div className="flex-1 flex w-full max-w-[1750px] mx-auto min-w-0">
+      <div className="flex-1 flex min-h-0 overflow-hidden w-full max-w-[1750px] mx-auto">
         <Sidebar
           pendingCasesCount={pendingReviewCount}
           mobileOpen={mobileSidebarOpen}
           onCloseMobile={() => setMobileSidebarOpen(false)}
+          activeCircle={activeCircle}
         />
 
         <main
           id="main-content"
           tabIndex={-1}
           role="main"
-          className="flex-1 p-3 sm:p-5 lg:p-6 overflow-y-auto min-w-0 focus:outline-none"
+          className="flex-1 p-3 sm:p-5 lg:p-6 overflow-y-auto min-w-0 focus:outline-none flex flex-col custom-scrollbar"
         >
-          <AnimatePresence>
-            {notification && (
-              <m.div
-                role="status"
-                initial={{ opacity: 0, y: -8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2, ease: [0.2, 0, 0, 1] }}
-                className="mb-4 p-3 bg-emerald-50 border border-emerald-300 rounded-lg text-xs text-emerald-800 flex items-center justify-between shadow-xs"
-              >
-                <div className="flex items-center gap-2">
-                  <svg className="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span>{notification}</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setNotification(null)}
-                  className="text-emerald-700 hover:text-emerald-950 font-bold"
+          <div className="flex-1 min-w-0">
+            <AnimatePresence>
+              {notification && (
+                <m.div
+                  role="status"
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.2, ease: [0.2, 0, 0, 1] }}
+                  className="mb-4 p-3 bg-emerald-50 border border-emerald-300 rounded-lg text-xs text-emerald-800 flex items-center justify-between shadow-xs"
                 >
-                  ✕
-                </button>
-              </m.div>
-            )}
-          </AnimatePresence>
+                  <div className="flex items-center gap-2">
+                    <svg className="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>{notification}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setNotification(null)}
+                    className="text-emerald-700 hover:text-emerald-950 font-bold"
+                  >
+                    ✕
+                  </button>
+                </m.div>
+              )}
+            </AnimatePresence>
 
-          {children}
+            {children}
+          </div>
+
+          {/* Official GIGW 3.0 Government of India Portal Footer */}
+          <div className="mt-8 shrink-0">
+            <GovFooter />
+          </div>
         </main>
       </div>
-
-      {/* Official GIGW 3.0 Government of India Portal Footer */}
-      <GovFooter />
 
       {/* Universal Command Search Palette */}
       <CommandPalette
