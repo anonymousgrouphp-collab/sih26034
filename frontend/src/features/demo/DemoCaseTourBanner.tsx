@@ -109,23 +109,23 @@ export const DemoCaseTourBanner: React.FC<DemoCaseTourBannerProps> = ({
         {/* Subtle Top Tricolor Sovereign Accent */}
         <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#FF9933] via-slate-200 to-[#138808]" />
 
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pt-0.5">
+        <div className="flex flex-col 2xl:flex-row 2xl:items-center 2xl:justify-between gap-4 pt-0.5">
           {/* Left: Prominent Demo Identification & Scenario Summary */}
-          <div className="flex items-start gap-3 min-w-0">
+          <div className="flex items-start gap-3 min-w-0 2xl:flex-1">
             <div className="w-11 h-11 rounded-xl bg-blue-50 text-[#1B365D] border border-blue-200/80 shrink-0 shadow-2xs hidden sm:flex items-center justify-center">
               <Scale size={22} className="text-[#1B365D]" />
             </div>
 
-            <div className="min-w-0 space-y-1.5">
+            <div className="min-w-0 space-y-1.5 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 {/* Official Statutory Fixture Badge */}
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-mono font-bold uppercase tracking-wider bg-blue-50 text-[#1B365D] border border-blue-200 shadow-2xs">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-mono font-bold uppercase tracking-wider bg-blue-50 text-[#1B365D] border border-blue-200 shadow-2xs shrink-0 whitespace-nowrap">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#1B365D]" />
                   <span>{language === "hi" ? "सांविधिक डेमो मामला" : "DEMO CASE FIXTURE"}</span>
                 </span>
 
                 {/* Scenario Counter */}
-                <span className="text-xs font-mono font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded border border-slate-200">
+                <span className="text-xs font-mono font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded border border-slate-200 shrink-0 whitespace-nowrap">
                   {language === "hi"
                     ? `परिदृश्य ${scenario.scenarioNumber} / ${scenario.totalScenarios}`
                     : `Scenario ${scenario.scenarioNumber} of ${scenario.totalScenarios}`}
@@ -133,29 +133,29 @@ export const DemoCaseTourBanner: React.FC<DemoCaseTourBannerProps> = ({
 
                 {/* Target Verdict Pill */}
                 <span
-                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-bold uppercase border shadow-2xs ${theme.pill}`}
+                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-bold uppercase border shadow-2xs shrink-0 whitespace-nowrap ${theme.pill}`}
                 >
                   <VerdictIcon size={13} />
                   <span>{label}</span>
                 </span>
 
-                <span className="text-sm font-mono font-bold text-[#1B365D] hidden md:inline">
+                <span className="text-sm font-mono font-bold text-[#1B365D] shrink-0 whitespace-nowrap">
                   [{scenario.skuId}]
                 </span>
               </div>
 
               {/* Title & Headline Infraction */}
-              <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-base sm:text-lg font-bold text-slate-900 truncate" title={title}>
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <h2 className="text-base sm:text-lg font-bold text-slate-900" title={title}>
                   {title}
                 </h2>
                 <span className="text-slate-400 hidden sm:inline">•</span>
-                <p className={`text-sm font-bold ${theme.accent} truncate max-w-xl`} title={headline}>
+                <p className={`text-sm font-bold ${theme.accent}`} title={headline}>
                   {headline}
                 </p>
               </div>
 
-              <p className="text-xs text-slate-500 line-clamp-1 font-normal">
+              <p className="text-xs text-slate-500 line-clamp-2 sm:line-clamp-1 font-normal">
                 {language === "hi"
                   ? "विधिक मापविज्ञान नियम 2011 एवं धारा 63 बीएसए 2023 के अंतर्गत पूर्व-प्रमाणित प्रदर्शन मामला।"
                   : "Pre-certified statutory scenario modeling automated LMPC compliance, calibrated optics, and BSA 2023 evidence proofs."}
@@ -164,12 +164,12 @@ export const DemoCaseTourBanner: React.FC<DemoCaseTourBannerProps> = ({
           </div>
 
           {/* Right: Quick Tour Navigation Controls */}
-          <div className="flex flex-wrap items-center justify-between lg:justify-end gap-2.5 shrink-0 pt-2 lg:pt-0 border-t lg:border-t-0 border-slate-200">
+          <div className="flex flex-wrap items-center justify-between sm:justify-start 2xl:justify-end gap-2.5 shrink-0 pt-3 2xl:pt-0 border-t 2xl:border-t-0 border-slate-100">
             {/* Previous Scenario Button */}
             <button
               type="button"
               onClick={() => handleNavigateTo(prevScenario.caseId)}
-              className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 shadow-2xs transition-all cursor-pointer"
+              className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 shadow-2xs transition-all cursor-pointer shrink-0 whitespace-nowrap"
               title={`Previous: Scenario ${prevScenario.scenarioNumber} - ${prevScenario.title}`}
             >
               <ChevronLeft size={17} className="text-slate-600" />
@@ -181,7 +181,7 @@ export const DemoCaseTourBanner: React.FC<DemoCaseTourBannerProps> = ({
               value={scenario.caseId}
               onChange={(e) => handleNavigateTo(e.target.value)}
               aria-label="Select demonstration scenario"
-              className="text-sm font-semibold bg-white text-slate-800 border border-slate-300 rounded-lg px-3 py-2 shadow-2xs focus:outline-none focus:ring-1 focus:ring-[#1B365D] cursor-pointer max-w-[200px] sm:max-w-[260px] truncate"
+              className="text-sm font-semibold bg-white text-slate-800 border border-slate-300 rounded-lg px-3 py-2 shadow-2xs focus:outline-none focus:ring-1 focus:ring-[#1B365D] cursor-pointer flex-1 sm:flex-initial min-w-[160px] max-w-full sm:max-w-[280px] truncate"
             >
               {DEMO_SCENARIOS.map((s) => (
                 <option key={s.caseId} value={s.caseId}>
@@ -194,7 +194,7 @@ export const DemoCaseTourBanner: React.FC<DemoCaseTourBannerProps> = ({
             <button
               type="button"
               onClick={() => handleNavigateTo(nextScenario.caseId)}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold text-white bg-[#1B365D] hover:bg-[#0A2540] border border-[#1B365D] shadow-xs transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold text-white bg-[#1B365D] hover:bg-[#0A2540] border border-[#1B365D] shadow-xs transition-all cursor-pointer shrink-0 whitespace-nowrap"
               title={`Next: Scenario ${nextScenario.scenarioNumber} - ${nextScenario.title}`}
             >
               <span>{language === "hi" ? "अगला डेमो" : "Next Demo"}</span>
@@ -205,7 +205,7 @@ export const DemoCaseTourBanner: React.FC<DemoCaseTourBannerProps> = ({
             <button
               type="button"
               onClick={() => setShowGuideModal(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-300 transition-colors shadow-2xs cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-300 transition-colors shadow-2xs cursor-pointer shrink-0 whitespace-nowrap"
               title="View Demonstration Objectives & Statutory Rules"
             >
               <BookOpen size={16} className="text-[#1B365D]" />
