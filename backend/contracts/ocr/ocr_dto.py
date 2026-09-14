@@ -23,8 +23,8 @@ class OCRToken(BaseModel):
 
 class OCROutput(BaseModel):
     image_id: str = Field(..., description="Associated image identifier")
-    total_tokens: int = Field(..., ge=0, description="Total count of text tokens recognized")
-    mean_confidence: float = Field(..., ge=0.0, le=1.0, description="Mean recognition confidence score")
+    total_tokens: int = Field(0, ge=0, description="Total count of text tokens recognized")
+    mean_confidence: float = Field(0.0, ge=0.0, le=1.0, description="Mean recognition confidence score")
     tokens: List[OCRToken] = Field(default_factory=list, description="List of recognized OCR tokens")
     full_text: str = Field("", description="Concatenated newline-separated full text representation")
-    execution_time_ms: int = Field(..., ge=0, description="Inference latency in milliseconds")
+    execution_time_ms: int = Field(0, ge=0, description="Inference latency in milliseconds")

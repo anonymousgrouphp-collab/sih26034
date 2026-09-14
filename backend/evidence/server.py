@@ -1248,10 +1248,10 @@ def execute_pipeline(
                         except Exception as ocr_proc_err:
                             logger.error(f"OCR process_image failed: {ocr_proc_err}")
                             from backend.contracts.ocr.ocr_dto import OCROutput
-                            ocr_output = OCROutput(image_id=ev_image.id, tokens=[], primary_language="en")
+                            ocr_output = OCROutput(image_id=ev_image.id, total_tokens=0, mean_confidence=0.0, tokens=[], full_text="", execution_time_ms=0)
                     else:
                         from backend.contracts.ocr.ocr_dto import OCROutput
-                        ocr_output = OCROutput(image_id=ev_image.id, tokens=[], primary_language="en")
+                        ocr_output = OCROutput(image_id=ev_image.id, total_tokens=0, mean_confidence=0.0, tokens=[], full_text="", execution_time_ms=0)
 
                     # 4. Real Semantic Extractor (Member 3)
                     from extractor import CommodityFactExtractor
@@ -1638,7 +1638,17 @@ def execute_batch_pipeline(
         from backend.contracts.ocr.ocr_dto import OCROutput, OCRToken
         if cached_tokens is not None:
             tokens_objs = [OCRToken(**t) if isinstance(t, dict) else t for t in cached_tokens]
-            ocr_output = OCROutput(image_id=img_id, tokens=tokens_objs, primary_language="en")
+            total_cnt = len(tokens_objs)
+            mean_conf = float(round(sum(t.confidence for t in tokens_objs) / max(total_cnt, 1), 3)) if total_cnt else 0.0
+            full_txt = "\n".join(t.text for t in tokens_objs)
+            ocr_output = OCROutput(
+                image_id=img_id,
+                total_tokens=total_cnt,
+                mean_confidence=mean_conf,
+                tokens=tokens_objs,
+                full_text=full_txt,
+                execution_time_ms=0,
+            )
         else:
             ocr_engine = get_cached_ocr_engine()
             if ocr_engine is not None:
@@ -1646,9 +1656,9 @@ def execute_batch_pipeline(
                     ocr_output = ocr_engine.process_image(img_bgr, image_id=img_id)
                 except Exception as ocr_err:
                     logger.error(f"OCR failed for {img_id}: {ocr_err}")
-                    ocr_output = OCROutput(image_id=img_id, tokens=[], primary_language="en")
+                    ocr_output = OCROutput(image_id=img_id, total_tokens=0, mean_confidence=0.0, tokens=[], full_text="", execution_time_ms=0)
             else:
-                ocr_output = OCROutput(image_id=img_id, tokens=[], primary_language="en")
+                ocr_output = OCROutput(image_id=img_id, total_tokens=0, mean_confidence=0.0, tokens=[], full_text="", execution_time_ms=0)
 
             if cache_adapter and ocr_output.tokens:
                 tokens_dump = [t.model_dump() if hasattr(t, "model_dump") else t.dict() for t in ocr_output.tokens]
