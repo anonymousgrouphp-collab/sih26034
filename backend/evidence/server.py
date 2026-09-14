@@ -195,17 +195,15 @@ def get_cached_ocr_engine():
             spec.loader.exec_module(m2_mod)
             OCREngineClass = getattr(m2_mod, "MultilingualOCREngine", None)
             if OCREngineClass is not None:
-                int8_det = REPO_ROOT / "backend" / "ocr" / "models" / "int8" / "ch_PP-OCRv4_det_int8.onnx"
-                exec_mode = "INT8" if int8_det.exists() else "FP32"
-                # Set fallback_threshold=0.0 so high-speed neural PP-OCRv4 runs in ~2.5s without blocking CPU on sequential Tesseract calls
+                # Use FP32 neural PP-OCRv4 for maximum accuracy without INT8 quantization degradation
                 _CACHED_OCR_ENGINE = OCREngineClass(
-                    execution_mode=exec_mode,
-                    allow_classical_fallback=True,
+                    execution_mode="FP32",
+                    allow_classical_fallback=False,
                     fallback_threshold=0.0,
                     det_num_threads=2,
                     rec_num_threads=2,
                 )
-                logger.info(f"Initialized cached MultilingualOCREngine in {exec_mode} mode with fallback_threshold=0.0")
+                logger.info("Initialized cached MultilingualOCREngine in FP32 mode with fallback_threshold=0.0")
     except Exception as err:
         logger.error(f"Failed to initialize OCR engine singleton: {err}")
         _CACHED_OCR_ENGINE = None
@@ -378,7 +376,7 @@ def system_health_status(db: Session = Depends(get_db_session)):
         "repealed_acts_cited": None,
         "audit_chain_valid": chain_valid,
         "database": "CONNECTED",
-        "version": "1.0.2-batch-fusion",
+        "version": "1.0.3-high-precision",
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),
     }
 
@@ -1630,20 +1628,25 @@ def execute_batch_pipeline(
         cached_tokens = cache_adapter.get_tokens(img_id) if cache_adapter else None
 
         from backend.contracts.ocr.ocr_dto import OCROutput, OCRToken
-        if cached_tokens is not None:
+        ocr_output = None
+        # Only reuse cached tokens if they are rich and contain statutory text
+        if cached_tokens is not None and len(cached_tokens) >= 15:
             tokens_objs = [OCRToken(**t) if isinstance(t, dict) else t for t in cached_tokens]
             total_cnt = len(tokens_objs)
             mean_conf = float(round(sum(t.confidence for t in tokens_objs) / max(total_cnt, 1), 3)) if total_cnt else 0.0
             full_txt = "\n".join(t.text for t in tokens_objs)
-            ocr_output = OCROutput(
-                image_id=img_id,
-                total_tokens=total_cnt,
-                mean_confidence=mean_conf,
-                tokens=tokens_objs,
-                full_text=full_txt,
-                execution_time_ms=0,
-            )
-        else:
+            STAT_KW = ("mrp", "rs.", "₹", "net", "qty", "titan", "origin", "consumer", "customer", "care", "mfg", "pkd")
+            if any(k in full_txt.lower() for k in STAT_KW):
+                ocr_output = OCROutput(
+                    image_id=img_id,
+                    total_tokens=total_cnt,
+                    mean_confidence=mean_conf,
+                    tokens=tokens_objs,
+                    full_text=full_txt,
+                    execution_time_ms=0,
+                )
+
+        if ocr_output is None:
             ocr_engine = get_cached_ocr_engine()
             if ocr_engine is not None:
                 try:
@@ -1659,10 +1662,20 @@ def execute_batch_pipeline(
                 cache_adapter.set_tokens(img_id, tokens_dump)
 
         # 5. Semantic Fact Extraction
+        calib_dict_for_extractor = calib_res or ({
+            "px_to_mm": px_to_mm,
+            "reference_bounding_box": ref_box,
+            "calibration": {
+                "px_to_mm": px_to_mm,
+                "reference_bounding_box": ref_box,
+                "method": calib_method,
+            }
+        } if px_to_mm else None)
+
         try:
             from extractor import CommodityFactExtractor
             extractor = CommodityFactExtractor()
-            facts = extractor.extract(ocr_output, calibration=calib_res)
+            facts = extractor.extract(ocr_output, calibration=calib_dict_for_extractor)
             extracted_fields = []
             font_mm = None
             for rf in facts.raw_fields:

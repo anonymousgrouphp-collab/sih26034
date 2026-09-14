@@ -1155,19 +1155,40 @@ class CommodityFactExtractor:
         if extracted_mfg is None and extracted_marketer is not None:
             extracted_mfg = extracted_marketer
 
-        # Priority E: If manufacturer has address/state/PIN but name is missing or is not a recognized corporate name, look for declared corporate entity name on panel
-        if extracted_mfg is not None and (not extracted_mfg.name or not re.search(r"\b(?:Pvt\.?\s*Ltd\.?|Private\s*Limited|Ltd\.?|Limited|LLP|Inc\.?|Corp\.?|Company|Co\.?|Industries|Enterprises|Wellness|Laboratories)\b", extracted_mfg.name, re.IGNORECASE)):
+        # Priority E: Clean up manufacturer corporate name with exact corporate token match if present
+        found_exact_name = None
+        for t in tokens:
+            t_txt = t.get("text", "").strip()
+            if re.fullmatch(r"[A-Za-z0-9\s.,&-]{3,}\b(?:LIMITED|COMPANY\s*LIMITED|PVT\.?\s*LTD\.?|PRIVATE\s*LIMITED|LTD\.?|LLP|CORP|INC)\b", t_txt, re.IGNORECASE):
+                if not any(k in t_txt.lower() for k in ["sbi", "bank", "card", "signature", "rupay", "visa", "mastercard", "electronic"]):
+                    found_exact_name = t_txt
+                    break
+
+        if found_exact_name and extracted_mfg is not None:
+            mfg_dict = extracted_mfg.model_dump() if hasattr(extracted_mfg, "model_dump") else extracted_mfg.dict()
+            mfg_dict["name"] = found_exact_name
+            extracted_mfg = AddressValue(**mfg_dict)
+        elif extracted_mfg is not None and (not extracted_mfg.name or not re.search(r"\b(?:Pvt\.?\s*Ltd\.?|Private\s*Limited|Ltd\.?|Limited|LLP|Inc\.?|Corp\.?|Company|Co\.?|Industries|Enterprises|Wellness|Laboratories)\b", extracted_mfg.name, re.IGNORECASE)):
+            found_corp_name = None
             for cl in composite_lines:
                 cand_t = cl["text"]
                 if re.search(r"\b(?:Pvt\.?\s*Ltd\.?|Private\s*Limited|Ltd\.?|Limited|LLP|Inc\.?|Corp\.?|Company|Co\.?|Industries|Enterprises|Wellness|Laboratories|Healthcare|Pharma|Foods|Products)\b", cand_t, re.IGNORECASE):
-                    parsed_cand = self.parser.parse_address(cand_t)
-                    cand_name = (parsed_cand.get("name") if parsed_cand else None) or cand_t.strip()
-                    cand_name = re.sub(r"^(?:or\s+queries,\s+contact\s+|Manager\s*-\s*Customer\s*Care\s+)", "", cand_name, flags=re.IGNORECASE).strip()
+                    m_trailing = re.search(r"\b([A-Z][A-Za-z0-9\s.,&-]+?\b(?:LIMITED|COMPANY\s*LIMITED|PVT\.?\s*LTD\.?|PRIVATE\s*LIMITED|LTD\.?|LLP|CORP|INC))\b", cand_t)
+                    if m_trailing:
+                        cand_name = m_trailing.group(1).strip()
+                    else:
+                        parsed_cand = self.parser.parse_address(cand_t)
+                        cand_name = (parsed_cand.get("name") if parsed_cand else None) or cand_t.strip()
+                        cand_name = re.sub(r"^(?:or\s+queries,\s+contact\s+|Manager\s*-\s*Customer\s*Care\s+)", "", cand_name, flags=re.IGNORECASE).strip()
                     if len(cand_name) >= 3 and not any(cand_name.lower().startswith(x) for x in ["email", "call", "phone", "website", "http", "for "]):
-                        mfg_dict = extracted_mfg.model_dump()
-                        mfg_dict["name"] = cand_name
-                        extracted_mfg = AddressValue(**mfg_dict)
-                        break
+                        if not any(k in cand_name.lower() for k in ["sbi", "bank", "card", "signature", "rupay", "visa", "mastercard"]):
+                            found_corp_name = cand_name
+                            break
+
+            if found_corp_name:
+                mfg_dict = extracted_mfg.model_dump() if hasattr(extracted_mfg, "model_dump") else extracted_mfg.dict()
+                mfg_dict["name"] = found_corp_name
+                extracted_mfg = AddressValue(**mfg_dict)
 
         # Priority F: Under Rule 6(1)(p), domestic manufacture established by domestic address or sale statement
         if extracted_origin is None and extracted_importer is None:
