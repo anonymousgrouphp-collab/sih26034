@@ -473,6 +473,7 @@ class StatutoryDeclarationParser:
             rf"{unit_pattern}"
         )
         match = re.search(prefix_pattern, norm_text, re.IGNORECASE)
+        has_prefix = bool(match)
 
         # 2. Fallback to standalone magnitude + unit if recognized
         if not match:
@@ -486,10 +487,28 @@ class StatutoryDeclarationParser:
                 two_w = f"{words[0]} {words[1]}".lower() if len(words) >= 2 else ""
 
                 has_banned_cand, _ = cls.detect_banned_units(cand_unit_raw)
-                if (has_banned_cand or
-                    first_w in RECOGNIZED_VALID_UNITS or
-                    two_w in RECOGNIZED_VALID_UNITS or
-                    cand_unit_raw in ("N", "U")):
+                # In standalone fallback without statutory prefix:
+                # 1. Disallow bare single-letter count symbols "n" or "u" (which cause false positives from random text/cards)
+                is_standalone_count = first_w in (
+                    "units", "unit", "pcs", "piece", "pieces", "nos", "nos.", "no", "no.",
+                    "tablets", "tablet", "capsules", "capsule", "sachets", "sachet",
+                    "wipes", "sheets", "packs", "pair", "pairs", "rolls", "नग", "इकाई"
+                )
+                # 2. Disallow uppercase 'M' (denoting Million/Ratings/Mega, e.g. '4.5M ratings') as metre
+                is_valid_standalone_length = (
+                    first_w in ("m", "meter", "meters", "metre", "metres", "मीटर")
+                    and (not cand_unit_raw or cand_unit_raw[0] != "M")
+                    and bool(re.search(r"\b(?:length|dimensions?|width|height|tape|wire|cable|cord|rope|roll|मीटर|लंबाई)\b", norm_text, re.IGNORECASE) or first_w in ("meter", "meters", "metre", "metres", "मीटर"))
+                )
+
+                is_valid_unit = (
+                    has_banned_cand or
+                    is_standalone_count or
+                    is_valid_standalone_length or
+                    (first_w in RECOGNIZED_VALID_UNITS and first_w not in ("n", "u", "m")) or
+                    (two_w in RECOGNIZED_VALID_UNITS and two_w not in ("n", "u", "m"))
+                )
+                if is_valid_unit:
                     match = m
                     break
 
@@ -563,8 +582,10 @@ class StatutoryDeclarationParser:
             elif u_lower in ("cl", "centilitre", "centilitres"):
                 clean_unit = "cl"
             elif u_lower in ("m", "meter", "meters", "metre", "metres", "मीटर", "मी", "मी."):
-                # Check for optical truncation of 'ml' in liquid/content contexts (e.g. 'Net Content 20m' -> '20 ml')
-                if re.search(r"\b(?:content|contents|volume|vol\.?|perfume|parfum|spray|lotion|oil|serum|drink|liquid|beverage)\b", norm_text, re.IGNORECASE):
+                # Check for optical truncation of 'ml' ONLY when explicit volume/contents keyword is present
+                # Guard against ingredient composition listings (e.g. '0.50m Brahmi')
+                is_ingred = bool(re.search(r"\b(?:composition|ingredients?|contains?)\b", norm_text, re.IGNORECASE))
+                if not is_ingred and re.search(r"\b(?:net\s*(?:content|contents|volume|vol\.?)|volume|vol\.?)\b", norm_text, re.IGNORECASE):
                     clean_unit = "ml"
                 else:
                     clean_unit = "m"
@@ -578,7 +599,7 @@ class StatutoryDeclarationParser:
                 clean_unit = "sq cm"
             elif u_lower in ("sq mm", "mm2", "mm²", "sq.mm"):
                 clean_unit = "sq mm"
-            elif u_lower in (
+            elif u_lower.rstrip(".,;:-") in (
                 "n", "u", "units", "unit", "pcs", "piece", "pieces", "nos", "nos.", "no", "no.",
                 "number", "numbers", "items", "item", "sachets", "sachet", "tablets", "tablet", "capsules", "capsule",
                 "packs", "pack", "pair", "pairs", "sheet", "sheets", "wipe", "wipes", "set", "sets", "roll", "rolls",
@@ -591,6 +612,7 @@ class StatutoryDeclarationParser:
             "unit": clean_unit,
             "has_banned_unit": has_banned,
             "banned_unit_found": banned_sym,
+            "has_prefix": has_prefix,
         }
 
     @classmethod
@@ -720,7 +742,7 @@ class StatutoryDeclarationParser:
 
         usp_prefix = r"(?:Unit\s*Sale\s*Price|USP|इकाई\s*विक्रय\s*मूल्य|इकाई\s*बिक्री\s*मूल्य)"
         curr = r"(?:Rs\.?|INR|₹|रु\.?|रू\.?|रुपये|र\.?|र)?"
-        amount_re = r"([0-9]+(?:,\s*[0-9]+)*(?:\.[0-9]{1,4})?)"
+        amount_re = r"([0-9]+(?:,\s*[0-9]+)*(?:\s*\.\s*[0-9]{1,4})?)"
         # Restrict denominator strictly to recognized statutory metric and count units (with Unicode-safe word boundary for Indic matras)
         denom_re = r"((?:100\s*)?(?:g|kg|mg|ml|l|cl|m|cm|mm|sq\s*m|sq\s*cm|sq\s*mm|n|u|pieces?|pcs|units?|items?|nos?|tablets?|tabs?\.?|tae\.?|capsules?|caps?\.?|sachets?|packs?|ग्राम|किग्रा|मिली|लीटर|मीटर|नग|इकाई))(?!\w|[\u0900-\u097F])"
 
@@ -746,7 +768,7 @@ class StatutoryDeclarationParser:
         elif m_inv:
             match = m_inv
             unit_raw, price_str = m_inv.groups()
-        elif not re.search(r"(?:MRP|Maximum\s*Retail\s*Price|अ\.वि\.मू)", norm_text, re.IGNORECASE):
+        else:
             p2 = re.compile(
                 rf"(?:Rs\.?|INR|₹|रु\.?|रू\.?|रुपये)\s*{amount_re}\s*(?:/|per|प्रति|\s*)\s*{denom_re}",
                 re.IGNORECASE
@@ -756,7 +778,7 @@ class StatutoryDeclarationParser:
                 price_str, unit_raw = match.groups()
             else:
                 p2_no_curr = re.compile(
-                    rf"(?:{amount_re}\s*(?:/|per|प्रति)\s*{denom_re}|([0-9]+\.[0-9]{{1,4}})\s*{denom_re})",
+                    rf"(?:{amount_re}\s*(?:/|per|प्रति)\s*{denom_re}|([0-9]+(?:\s*\.\s*[0-9]{{1,4}})?)\s*(?:/|per|प्रति)\s*{denom_re})",
                     re.IGNORECASE
                 )
                 m_nc = p2_no_curr.search(norm_text)
@@ -1158,7 +1180,7 @@ class StatutoryDeclarationParser:
         # Approach B: Fallback to corporate suffix pattern (English & Hindi) - Linear ReDoS-free extraction
         if not entity_name:
             corp_suffix_re = re.compile(
-                r"\b(?:Company\s+(?:Limited|Ltd\.?)|Co\.\s*(?:Limited|Ltd\.?)|Private\s*Limited|Pvt\.?\s*Ltd\.?|Ltd\.?|Limited|LLP|Inc\.?|Corp\.?|Company|Co\.?|Cooperative|लिमिटेड|प्राइवेट\s*लिमिटेड)(?:\.|\b)",
+                r"\b(?:Company\s+(?:Limited|Ltd\.?)|Co\.\s*(?:Limited|Ltd\.?)|Private\s*Limited|Pvt\.?\s*Ltd\.?|Ltd\.?|Limited|LLP|Inc\.?|Corp\.?|Company|Co\.?|Industries|Enterprises|Wellness|Laboratories|Healthcare|Pharma|Foods|Beverages|Products|Cooperative|लिमिटेड|प्राइवेट\s*लिमिटेड)(?:\.|\b)",
                 re.IGNORECASE
             )
             suffix_match = corp_suffix_re.search(norm_text)
@@ -1349,6 +1371,11 @@ class StatutoryDeclarationParser:
             return None
 
         norm_text = cls.convert_indic_digits(text)
+
+        # Check domestic statutory sale/origin markers
+        if re.search(r"\b(?:For\s*sale\s*in\s*India|Toll-free\s*in\s*India|Made\s*in\s*India|Product\s*of\s*India|Produced\s*in\s*India|Manufactured\s*in\s*India)\b", norm_text, re.IGNORECASE):
+            return "India"
+
         origin_pattern = re.compile(
             r"(?<![a-zA-Z\u0900-\u097F])(?:Country\s*of\s*Origin|Made\s*in|Product\s*of|Manufactured\s*in|Packed\s*in|Produce\s*of|Imported\s*from|Origin\s*[:\-]|C\.?O\.?O\.?\s*[:\-]|मूल\s*देश|उत्पत्ति\s*का\s*देश)\s*[:\-]?\s*([^\n\r,;]+)",
             re.IGNORECASE

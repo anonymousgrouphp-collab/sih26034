@@ -136,16 +136,76 @@ export function useCameraStream() {
     }
   }, []);
 
+  // Helper to reliably bind active stream to the video DOM element
+  const attachStreamToVideo = useCallback(() => {
+    const video = videoRef.current;
+    const activeStream = streamRef.current;
+    if (video && activeStream) {
+      if (video.srcObject !== activeStream) {
+        video.srcObject = activeStream;
+      }
+      // Guarantee iOS / Android inline playback settings
+      video.setAttribute("playsinline", "true");
+      video.setAttribute("webkit-playsinline", "true");
+      video.muted = true;
+      video.play().catch((playErr) => {
+        console.warn("Video play interrupted/prevented:", playErr);
+      });
+    }
+  }, []);
+
+  // Whenever stream or status transitions to STREAMING, attach to videoRef
+  useEffect(() => {
+    if (status === "STREAMING" && stream) {
+      attachStreamToVideo();
+    }
+  }, [stream, status, attachStreamToVideo]);
+
+  // Callback ref for video element mounting
+  const setVideoRef = useCallback(
+    (node: HTMLVideoElement | null) => {
+      videoRef.current = node;
+      if (node && streamRef.current) {
+        if (node.srcObject !== streamRef.current) {
+          node.srcObject = streamRef.current;
+        }
+        node.setAttribute("playsinline", "true");
+        node.setAttribute("webkit-playsinline", "true");
+        node.muted = true;
+        node.play().catch((playErr) => console.warn("Video play interrupted on ref mount:", playErr));
+      }
+    },
+    []
+  );
+
   // Request camera stream
   const requestCamera = useCallback(
     async (targetFacing: "environment" | "user" = "environment", specificDeviceId?: string) => {
-      // 1. Check browser mediaDevices support
+      // 1. Check browser mediaDevices support & Secure Context (HTTPS or localhost)
+      const isSecure = typeof window !== "undefined" ? window.isSecureContext : true;
+      const isLocal =
+        typeof window !== "undefined" &&
+        (window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1" ||
+          window.location.hostname === "[::1]");
+
+      if (!isSecure && !isLocal) {
+        setError({
+          code: "SECURITY",
+          message: "Camera requires HTTPS on mobile / network devices.",
+          userGuidance:
+            "Mobile browsers require a secure HTTPS connection to stream camera video. Please connect via HTTPS or use the 'Open Phone Camera' button below for instant native capture.",
+        });
+        setStatus("ERROR");
+        return;
+      }
+
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         setError({
           code: "NOT_FOUND",
-          message: "Camera API is not supported by this browser.",
+          message: "Camera API is not supported or accessible in this browser.",
           userGuidance:
-            "Please open NIRIKSHAK in a modern browser (Google Chrome, Apple Safari, or Mozilla Firefox).",
+            "Please open NIRIKSHAK in a modern browser (Google Chrome, Apple Safari, or Mozilla Firefox) or use the 'Open Phone Camera' button.",
         });
         setStatus("ERROR");
         return;
@@ -160,15 +220,15 @@ export function useCameraStream() {
       setStatus("REQUESTING");
       setError(null);
 
-      // Constraints: prefer 1080p full HD for sharp legal metrology OCR & Table-I font schedule
+      // Constraints: prefer 1080p full HD without rigid 'min' dimensions that crash portrait mobile sensors
       const highResConstraints: MediaStreamConstraints = {
         audio: false, // ZERO MICROPHONE ACCESS per privacy guidelines
         video: specificDeviceId
-          ? { deviceId: { exact: specificDeviceId }, width: { ideal: 1920, min: 1280 }, height: { ideal: 1080, min: 720 } }
+          ? { deviceId: { exact: specificDeviceId }, width: { ideal: 1920 }, height: { ideal: 1080 } }
           : {
               facingMode: { ideal: targetFacing },
-              width: { ideal: 1920, min: 1280 },
-              height: { ideal: 1080, min: 720 },
+              width: { ideal: 1920 },
+              height: { ideal: 1080 },
             },
       };
 
@@ -177,12 +237,23 @@ export function useCameraStream() {
         try {
           activeStream = await navigator.mediaDevices.getUserMedia(highResConstraints);
         } catch (firstErr: any) {
-          // If high-res or specific facing failed, fall back to basic video constraint
-          console.warn("High-res constraints failed, falling back to basic video:", firstErr);
-          activeStream = await navigator.mediaDevices.getUserMedia({
-            audio: false,
-            video: specificDeviceId ? { deviceId: { exact: specificDeviceId } } : true,
-          });
+          // If high-res constraints failed (e.g. mobile portrait OverconstrainedError), fall back to facingMode only
+          console.warn("High-res constraints failed, falling back to facingMode constraint:", firstErr);
+          try {
+            activeStream = await navigator.mediaDevices.getUserMedia({
+              audio: false,
+              video: specificDeviceId
+                ? { deviceId: { exact: specificDeviceId } }
+                : { facingMode: { ideal: targetFacing } },
+            });
+          } catch (secondErr: any) {
+            // Final fallback: any video device
+            console.warn("FacingMode failed, falling back to basic video:", secondErr);
+            activeStream = await navigator.mediaDevices.getUserMedia({
+              audio: false,
+              video: true,
+            });
+          }
         }
 
         streamRef.current = activeStream;
@@ -203,9 +274,12 @@ export function useCameraStream() {
           setTorchSupported(Boolean(capabilities?.torch));
         }
 
-        // Attach to video ref if already rendered
+        // Attach to video element immediately if ref is already bound
         if (videoRef.current) {
           videoRef.current.srcObject = activeStream;
+          videoRef.current.setAttribute("playsinline", "true");
+          videoRef.current.setAttribute("webkit-playsinline", "true");
+          videoRef.current.muted = true;
           videoRef.current.play().catch((playErr) => console.warn("Video play interrupted:", playErr));
         }
 
@@ -334,92 +408,97 @@ export function useCameraStream() {
     }
   }, [videoDevices, currentDeviceId, facingMode, requestCamera]);
 
-  // Capture still photograph
-  const capturePhoto = useCallback(async (): Promise<CapturedPhoto> => {
-    const activeStream = streamRef.current;
-    if (!activeStream) {
-      throw new Error("Cannot capture photo: No active camera stream.");
-    }
-
-    const videoTrack = activeStream.getVideoTracks()[0];
-    if (!videoTrack) {
-      throw new Error("No video track found in stream.");
-    }
-
-    // Try haptic feedback on mobile
-    if (typeof navigator !== "undefined" && navigator.vibrate) {
-      try {
-        navigator.vibrate(50);
-      } catch (e) {
-        // Haptics optional
-      }
-    }
-
-    let blob: Blob | null = null;
-    let width = 1920;
-    let height = 1080;
-
-    // Method 1: ImageCapture API (Highest native sensor resolution on Android/Chrome)
-    if (typeof window !== "undefined" && "ImageCapture" in window) {
-      try {
-        const imageCapture = new (window as any).ImageCapture(videoTrack);
-        blob = await imageCapture.takePhoto();
-        
-        // Extract native dimensions
-        const imgBitmap = await createImageBitmap(blob);
-        width = imgBitmap.width;
-        height = imgBitmap.height;
-        imgBitmap.close();
-      } catch (icErr) {
-        console.warn("ImageCapture.takePhoto failed, falling back to Canvas drawImage:", icErr);
-        blob = null;
-      }
-    }
-
-    // Method 2: High-resolution Canvas capture fallback (Safari iOS, Desktop)
-    if (!blob && videoRef.current) {
-      const video = videoRef.current;
-      width = video.videoWidth || 1920;
-      height = video.videoHeight || 1080;
-
-      const canvas = document.createElement("canvas");
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) {
-        throw new Error("Failed to initialize 2D canvas context for capture.");
+  // Capture still photograph (continuous multi-photo capture supported)
+  const capturePhoto = useCallback(
+    async (options?: { stopStream?: boolean }): Promise<CapturedPhoto> => {
+      const activeStream = streamRef.current;
+      if (!activeStream) {
+        throw new Error("Cannot capture photo: No active camera stream.");
       }
 
-      ctx.drawImage(video, 0, 0, width, height);
+      const videoTrack = activeStream.getVideoTracks()[0];
+      if (!videoTrack) {
+        throw new Error("No video track found in stream.");
+      }
 
-      blob = await new Promise<Blob | null>((resolve) => {
-        canvas.toBlob(
-          (b) => resolve(b),
-          "image/jpeg",
-          0.94 // High quality preservation for OCR & ArUco
-        );
-      });
-    }
+      // Try haptic feedback on mobile
+      if (typeof navigator !== "undefined" && navigator.vibrate) {
+        try {
+          navigator.vibrate(50);
+        } catch (e) {
+          // Haptics optional
+        }
+      }
 
-    if (!blob) {
-      throw new Error("Failed to generate packaging photograph blob.");
-    }
+      let blob: Blob | null = null;
+      let width = 1920;
+      let height = 1080;
 
-    const previewUrl = URL.createObjectURL(blob);
-    const result: CapturedPhoto = {
-      blob,
-      previewUrl,
-      width,
-      height,
-      sizeBytes: blob.size,
-      timestamp: new Date().toISOString(),
-    };
+      // Method 1: ImageCapture API (Highest native sensor resolution on Android/Chrome)
+      if (typeof window !== "undefined" && "ImageCapture" in window) {
+        try {
+          const imageCapture = new (window as any).ImageCapture(videoTrack);
+          blob = await imageCapture.takePhoto();
 
-    // IMMEDIATELY stop camera tracks to preserve battery, privacy and resources
-    stopCamera();
+          // Extract native dimensions
+          const imgBitmap = await createImageBitmap(blob);
+          width = imgBitmap.width;
+          height = imgBitmap.height;
+          imgBitmap.close();
+        } catch (icErr) {
+          console.warn("ImageCapture.takePhoto failed, falling back to Canvas drawImage:", icErr);
+          blob = null;
+        }
+      }
 
-    return result;
-  }, [stream, stopCamera]);
+      // Method 2: High-resolution Canvas capture fallback (Safari iOS, Desktop)
+      if (!blob && videoRef.current) {
+        const video = videoRef.current;
+        width = video.videoWidth || 1920;
+        height = video.videoHeight || 1080;
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          throw new Error("Failed to initialize 2D canvas context for capture.");
+        }
+
+        ctx.drawImage(video, 0, 0, width, height);
+
+        blob = await new Promise<Blob | null>((resolve) => {
+          canvas.toBlob(
+            (b) => resolve(b),
+            "image/jpeg",
+            0.94 // High quality preservation for OCR & ArUco
+          );
+        });
+      }
+
+      if (!blob) {
+        throw new Error("Failed to generate packaging photograph blob.");
+      }
+
+      const previewUrl = URL.createObjectURL(blob);
+      const result: CapturedPhoto = {
+        blob,
+        previewUrl,
+        width,
+        height,
+        sizeBytes: blob.size,
+        timestamp: new Date().toISOString(),
+      };
+
+      // Only stop stream if explicitly requested (allows taking multiple photos sequentially)
+      if (options?.stopStream) {
+        stopCamera();
+      }
+
+      return result;
+    },
+    [stopCamera]
+  );
 
   // Cleanup on unmount or page hide
   useEffect(() => {
@@ -438,6 +517,8 @@ export function useCameraStream() {
 
   return {
     videoRef,
+    setVideoRef,
+    attachStreamToVideo,
     stream,
     status,
     error,

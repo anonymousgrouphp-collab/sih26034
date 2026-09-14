@@ -6,3 +6,4 @@ export * from "./PipelineStepper";
 export * from "./InspectionVisionCanvas";
 export * from "./InspectionTable";
 export * from "./StatutoryDeclarationsCard";
+export * from "./StatutoryPipelineRail";

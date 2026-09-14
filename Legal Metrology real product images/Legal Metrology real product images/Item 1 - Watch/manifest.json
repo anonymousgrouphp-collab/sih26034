@@ -1,0 +1,256 @@
+{
+  "dataset_name": "Nirikshak Physical Validation Dataset - SIH 2026",
+  "item_folder": "Item 1 - Watch",
+  "total_images": 14,
+  "product_details": {
+    "brand": "Wyb by Fastrack",
+    "commodity": "Watch",
+    "category": "Other packaged commodities (Horology / Consumer Lifestyle)",
+    "packaging_type": "Two-piece rigid cardboard/paperboard gift box with slip-on lid",
+    "model_no": "FV60024QM01W",
+    "style_code": "FVFASHN T BRN",
+    "barcode_ean13": "8905906309597",
+    "qr_code": "2D DataMatrix QR Code",
+    "mrp": "₹ 2 425.00 (Inclusive of all taxes)",
+    "net_quantity": "01 NUMBER",
+    "unit_sale_price_usp": "NOT AVAILABLE (Statutorily exempt under Rule 6(1)(da) proviso as Net Qty = 1 Number)",
+    "mfg_date": "07/2026",
+    "country_of_origin": "CHINA",
+    "importer_marketed_by": "TITAN COMPANY LIMITED, 3, SIPCOT INDUSTRIAL COMPLEX, HOSUR - 635126, TAMIL NADU",
+    "consumer_care_toll_free": "1800-266-0123",
+    "consumer_care_email": "helpdesk@titan.co.in",
+    "serial_number": "W0308ANWH202912KX",
+    "tag_number": "WWH 08AN"
+  },
+  "physical_measurements": {
+    "box_width_mm": 105.0,
+    "box_height_mm": 85.0,
+    "box_depth_mm": 75.0,
+    "box_volume_cm3": 669.4,
+    "pdp_area_cm2": 89.25,
+    "device": "Digital Vernier Caliper (0.01 mm Least Count) & ISO/IEC 7810 Reference Scale"
+  },
+  "reference_object": {
+    "type": "State Bank of India (SBI) Global RuPay Debit Card",
+    "standard": "ISO/IEC 7810 ID-1",
+    "dimensions_mm": {
+      "width": 85.60,
+      "height": 53.98,
+      "thickness": 0.76,
+      "corner_radius": 3.18
+    },
+    "calibrated_spatial_scale_px_per_mm": 20.56
+  },
+  "file_mapping": [
+    {
+      "index": 1,
+      "original_filename": "IMG_20260911_151600.jpg",
+      "new_filename": "front_01.jpg",
+      "nomenclature_class": "Standard Guide #1",
+      "angle_description": "Orthographic perpendicular straight-on view (90°)",
+      "packaging_face": "Top Lid / Principal Display Panel (PDP) with Wyb by Fastrack logo",
+      "exif_metadata": {
+        "iso": 459,
+        "shutter_speed_s": 0.030,
+        "f_number": 1.79,
+        "focal_length_mm": 4.74,
+        "flash": "Off (16)"
+      }
+    },
+    {
+      "index": 2,
+      "original_filename": "IMG_20260911_151614.jpg",
+      "new_filename": "bottom_01.jpg",
+      "nomenclature_class": "Guide Extension",
+      "angle_description": "Orthographic perpendicular straight-on view (90°)",
+      "packaging_face": "Bottom Base Panel (plain unprinted coral cardboard)",
+      "exif_metadata": {
+        "iso": 433,
+        "shutter_speed_s": 0.030,
+        "f_number": 1.79,
+        "focal_length_mm": 4.74,
+        "flash": "Off (16)"
+      }
+    },
+    {
+      "index": 3,
+      "original_filename": "IMG_20260911_151640.jpg",
+      "new_filename": "left_01.jpg",
+      "nomenclature_class": "Standard Guide #3",
+      "angle_description": "Orthographic perpendicular straight-on lateral view",
+      "packaging_face": "Left Side Panel (Barcode, QR code, Style & Model sticker)",
+      "exif_metadata": {
+        "iso": 317,
+        "shutter_speed_s": 0.030,
+        "f_number": 1.79,
+        "focal_length_mm": 4.74,
+        "flash": "Off (16)"
+      }
+    },
+    {
+      "index": 4,
+      "original_filename": "IMG_20260911_151655.jpg",
+      "new_filename": "back_01.jpg",
+      "nomenclature_class": "Standard Guide #2 (Primary Declaration)",
+      "angle_description": "Orthographic perpendicular straight-on lateral view",
+      "packaging_face": "Back Side Panel (Mandatory Legal Metrology declaration label)",
+      "exif_metadata": {
+        "iso": 198,
+        "shutter_speed_s": 0.030,
+        "f_number": 1.79,
+        "focal_length_mm": 4.74,
+        "flash": "Off (16)"
+      }
+    },
+    {
+      "index": 5,
+      "original_filename": "IMG_20260911_151712.jpg",
+      "new_filename": "right_01.jpg",
+      "nomenclature_class": "Standard Guide #4",
+      "angle_description": "Orthographic perpendicular straight-on lateral view",
+      "packaging_face": "Right Side Panel (plain unprinted lateral wall)",
+      "exif_metadata": {
+        "iso": 390,
+        "shutter_speed_s": 0.030,
+        "f_number": 1.79,
+        "focal_length_mm": 4.74,
+        "flash": "Off (16)"
+      }
+    },
+    {
+      "index": 6,
+      "original_filename": "IMG_20260911_151720.jpg",
+      "new_filename": "side_02.jpg",
+      "nomenclature_class": "Guide Extension",
+      "angle_description": "Orthographic perpendicular straight-on lateral view",
+      "packaging_face": "Fourth Perimeter Side Panel (completing 360° perimeter)",
+      "exif_metadata": {
+        "iso": 408,
+        "shutter_speed_s": 0.030,
+        "f_number": 1.79,
+        "focal_length_mm": 4.74,
+        "flash": "Off (16)"
+      }
+    },
+    {
+      "index": 7,
+      "original_filename": "IMG_20260911_152152.jpg",
+      "new_filename": "front_angle_01.jpg",
+      "nomenclature_class": "Standard Guide #5",
+      "angle_description": "Moderate perspective angle (~25°–30° elevation)",
+      "packaging_face": "Dual-face: Top Lid (Logo) + Back Panel (Declaration Label)",
+      "exif_metadata": {
+        "iso": 266,
+        "shutter_speed_s": 0.030,
+        "f_number": 1.79,
+        "focal_length_mm": 4.74,
+        "flash": "Off (16)"
+      }
+    },
+    {
+      "index": 8,
+      "original_filename": "IMG_20260911_152202.jpg",
+      "new_filename": "back_angle_01.jpg",
+      "nomenclature_class": "Standard Guide #6",
+      "angle_description": "Moderate perspective angle (~25°–30° elevation)",
+      "packaging_face": "Dual-face: Top Lid (Logo) + Left Panel (Barcode Sticker)",
+      "exif_metadata": {
+        "iso": 439,
+        "shutter_speed_s": 0.030,
+        "f_number": 1.79,
+        "focal_length_mm": 4.74,
+        "flash": "Off (16)"
+      }
+    },
+    {
+      "index": 9,
+      "original_filename": "IMG_20260911_152235.jpg",
+      "new_filename": "far_01.jpg",
+      "nomenclature_class": "Standard Guide #9",
+      "angle_description": "Elevated long distance capture (~1.1 to 1.2 m distance)",
+      "packaging_face": "Full package overview under low pixel density",
+      "exif_metadata": {
+        "iso": 342,
+        "shutter_speed_s": 0.030,
+        "f_number": 1.79,
+        "focal_length_mm": 4.74,
+        "flash": "Off (16)"
+      }
+    },
+    {
+      "index": 10,
+      "original_filename": "IMG_20260911_152307.jpg",
+      "new_filename": "glare_01.jpg",
+      "nomenclature_class": "Standard Guide #7",
+      "angle_description": "Directional reflective angle inducing specular hotspot",
+      "packaging_face": "Legal Metrology Declaration Label under direct glare",
+      "exif_metadata": {
+        "iso": 352,
+        "shutter_speed_s": 0.030,
+        "f_number": 1.79,
+        "focal_length_mm": 4.74,
+        "flash": "Off (16)"
+      }
+    },
+    {
+      "index": 11,
+      "original_filename": "IMG_20260911_152321.jpg",
+      "new_filename": "side_angle_01.jpg",
+      "nomenclature_class": "Custom Addition",
+      "angle_description": "Oblique perspective angle (~35°–45° tilt) with raking shadow",
+      "packaging_face": "Left Side Panel (Barcode & SKU sticker under directional rake)",
+      "exif_metadata": {
+        "iso": 357,
+        "shutter_speed_s": 0.030,
+        "f_number": 1.79,
+        "focal_length_mm": 4.74,
+        "flash": "Off (16)"
+      }
+    },
+    {
+      "index": 12,
+      "original_filename": "IMG_20260911_152437.jpg",
+      "new_filename": "low_contrast_01.jpg",
+      "nomenclature_class": "Standard Guide #8",
+      "angle_description": "Muted lighting / underexposed capture (1/144s, ISO 53)",
+      "packaging_face": "Top Lid / Front Face under low contrast",
+      "exif_metadata": {
+        "iso": 53,
+        "shutter_speed_s": 0.007,
+        "f_number": 1.79,
+        "focal_length_mm": 4.74,
+        "flash": "Fired (1)"
+      }
+    },
+    {
+      "index": 13,
+      "original_filename": "IMG_20260911_152449.jpg",
+      "new_filename": "close_01.jpg",
+      "nomenclature_class": "Standard Guide #10 (Macro Close-up)",
+      "angle_description": "High-magnification perpendicular macro (~15–20 cm distance)",
+      "packaging_face": "Mandatory Legal Metrology Declaration Label at pin-sharp resolution",
+      "exif_metadata": {
+        "iso": 53,
+        "shutter_speed_s": 0.002,
+        "f_number": 1.79,
+        "focal_length_mm": 4.74,
+        "flash": "Fired (1)"
+      }
+    },
+    {
+      "index": 14,
+      "original_filename": "IMG_20260911_152505.jpg",
+      "new_filename": "close_02.jpg",
+      "nomenclature_class": "Guide Extension",
+      "angle_description": "High-magnification perpendicular macro (~15–20 cm distance)",
+      "packaging_face": "Left Side Barcode & SKU Sticker at pin-sharp resolution",
+      "exif_metadata": {
+        "iso": 53,
+        "shutter_speed_s": 0.009,
+        "f_number": 1.79,
+        "focal_length_mm": 4.74,
+        "flash": "Fired (1)"
+      }
+    }
+  ]
+}

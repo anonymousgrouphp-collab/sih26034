@@ -12,6 +12,7 @@ class NetQuantityValue(BaseModel):
     unit: str = Field(..., description="Metric unit symbol (e.g. 'g', 'kg', 'ml', 'l')")
     has_banned_unit: bool = Field(False, description="Flagged true if prohibited unit (e.g. 'gms', 'gm', 'Kgs', 'ML', 'ltrs')")
     banned_unit_found: Optional[str] = Field(None, description="Exact prohibited unit found")
+    has_prefix: bool = Field(False, description="Whether explicit statutory quantity prefix was detected")
 
 
 class MRPValue(BaseModel):

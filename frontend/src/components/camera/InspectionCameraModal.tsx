@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   useCameraStream,
   CapturedPhoto,
@@ -13,7 +13,8 @@ import { useLanguage } from "../../context/LanguageContext";
 interface InspectionCameraModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onPhotoCaptured: (file: File, previewUrl: string, width: number, height: number) => void;
+  onPhotoCaptured?: (file: File, previewUrl: string, width: number, height: number) => void;
+  onPhotosCaptured?: (photos: Array<{ file: File; previewUrl: string; width: number; height: number }>) => void;
   onFallbackToUpload: () => void;
   retakeReason?: string;
 }
@@ -22,12 +23,14 @@ export const InspectionCameraModal: React.FC<InspectionCameraModalProps> = ({
   isOpen,
   onClose,
   onPhotoCaptured,
+  onPhotosCaptured,
   onFallbackToUpload,
   retakeReason,
 }) => {
   const { language } = useLanguage();
   const {
     videoRef,
+    stream,
     status,
     error,
     guidance,
@@ -42,32 +45,43 @@ export const InspectionCameraModal: React.FC<InspectionCameraModalProps> = ({
     capturePhoto,
   } = useCameraStream();
 
-  const [currentPhoto, setCurrentPhoto] = useState<CapturedPhoto | null>(null);
+  const [capturedPhotos, setCapturedPhotos] = useState<CapturedPhoto[]>([]);
+  const [isReviewing, setIsReviewing] = useState(false);
+  const [reviewIndex, setReviewIndex] = useState(0);
   const [showFramingGuide, setShowFramingGuide] = useState(true);
   const [isCapturing, setIsCapturing] = useState(false);
+  const [isFlashing, setIsFlashing] = useState(false);
   const [isAccepting, setIsAccepting] = useState(false);
+
+  const nativeInputRef = useRef<HTMLInputElement | null>(null);
 
   // Handle opening / closing
   useEffect(() => {
     if (isOpen) {
-      setCurrentPhoto(null);
+      setCapturedPhotos([]);
+      setIsReviewing(false);
+      setReviewIndex(0);
       setIsCapturing(false);
       setIsAccepting(false);
-      // Automatically request rear camera on mount if not in review
+      // Automatically request camera on mount
       requestCamera("environment");
     } else {
       stopCamera();
-      setCurrentPhoto(null);
+      setCapturedPhotos([]);
+      setIsReviewing(false);
     }
   }, [isOpen]);
 
-  // Handle capture trigger
+  // Handle capture trigger (continuous: camera stays streaming)
   const handleCapture = async () => {
     if (isCapturing) return;
     setIsCapturing(true);
+    setIsFlashing(true);
+    setTimeout(() => setIsFlashing(false), 200);
+
     try {
-      const photo = await capturePhoto();
-      setCurrentPhoto(photo);
+      const photo = await capturePhoto({ stopStream: false });
+      setCapturedPhotos((prev) => [...prev, photo]);
     } catch (err) {
       console.error("Capture failed:", err);
     } finally {
@@ -75,22 +89,93 @@ export const InspectionCameraModal: React.FC<InspectionCameraModalProps> = ({
     }
   };
 
-  // Handle retake trigger
-  const handleRetake = () => {
-    if (currentPhoto) {
-      URL.revokeObjectURL(currentPhoto.previewUrl);
-      setCurrentPhoto(null);
+  // Handle Native Phone Camera Capture (Direct hardware camera fallback)
+  const handleNativeFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const newPhotos: CapturedPhoto[] = [];
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const previewUrl = URL.createObjectURL(file);
+      const dims = await new Promise<{ width: number; height: number }>((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
+        img.onerror = () => resolve({ width: 1920, height: 1080 });
+        img.src = previewUrl;
+      });
+
+      newPhotos.push({
+        blob: file,
+        previewUrl,
+        width: dims.width,
+        height: dims.height,
+        sizeBytes: file.size,
+        timestamp: new Date().toISOString(),
+      });
     }
-    requestCamera(facingMode);
+
+    setCapturedPhotos((prev) => {
+      const combined = [...prev, ...newPhotos];
+      setReviewIndex(combined.length - 1);
+      return combined;
+    });
+    setIsReviewing(true);
+
+    if (nativeInputRef.current) {
+      nativeInputRef.current.value = "";
+    }
   };
 
-  // Handle accept photo
-  const handleAccept = (photo: CapturedPhoto) => {
-    setIsAccepting(true);
-    const filename = `package_capture_${new Date().toISOString().slice(0, 10)}_${Date.now().toString().slice(-4)}.jpg`;
-    const file = new File([photo.blob], filename, { type: "image/jpeg" });
+  // Trigger native phone camera input
+  const triggerNativeCapture = () => {
+    nativeInputRef.current?.click();
+  };
 
-    onPhotoCaptured(file, photo.previewUrl, photo.width, photo.height);
+  // Delete a specific captured photo from tray
+  const handleDeletePhoto = (indexToDelete: number) => {
+    setCapturedPhotos((prev) => {
+      const updated = prev.filter((_, idx) => idx !== indexToDelete);
+      if (updated.length === 0) {
+        setIsReviewing(false);
+        if (status !== "STREAMING") {
+          requestCamera(facingMode);
+        }
+      } else if (reviewIndex >= updated.length) {
+        setReviewIndex(updated.length - 1);
+      }
+      return updated;
+    });
+  };
+
+  // Switch back to live camera view from review screen
+  const handleAddMorePhotos = () => {
+    setIsReviewing(false);
+    if (status !== "STREAMING") {
+      requestCamera(facingMode);
+    }
+  };
+
+  // Handle accept all captured photos
+  const handleAcceptAll = (photosToAccept: CapturedPhoto[] = capturedPhotos) => {
+    if (photosToAccept.length === 0) return;
+    setIsAccepting(true);
+
+    const items = photosToAccept.map((photo, idx) => {
+      const filename = `package_capture_${new Date().toISOString().slice(0, 10)}_${Date.now().toString().slice(-4)}_${idx + 1}.jpg`;
+      const file = new File([photo.blob], filename, { type: "image/jpeg" });
+      return { file, previewUrl: photo.previewUrl, width: photo.width, height: photo.height };
+    });
+
+    if (onPhotosCaptured) {
+      onPhotosCaptured(items);
+    }
+    if (onPhotoCaptured) {
+      items.forEach((item) => {
+        onPhotoCaptured(item.file, item.previewUrl, item.width, item.height);
+      });
+    }
+
     stopCamera();
     onClose();
   };
@@ -104,9 +189,20 @@ export const InspectionCameraModal: React.FC<InspectionCameraModalProps> = ({
       aria-label={language === "hi" ? "विधिक मापविज्ञान कैमरा साक्ष्य कैप्चर" : "Legal Metrology Camera Evidence Capture"}
       className="fixed inset-0 z-50 bg-black/90 sm:bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center p-0 sm:p-4 overflow-hidden animate-fade-in"
     >
+      {/* Hidden Native Phone Camera file input (100% reliable hardware camera trigger on any phone) */}
+      <input
+        ref={nativeInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        multiple
+        className="hidden"
+        onChange={handleNativeFileChange}
+      />
+
       {/* Smartphone-first Fullscreen / Desktop Contained Modal Shell */}
       <div className="w-full h-full sm:h-auto sm:max-h-[92vh] sm:max-w-2xl bg-slate-950 sm:rounded-2xl sm:border sm:border-slate-800 shadow-2xl flex flex-col overflow-hidden relative">
-        {/* Top Mini Government Bar (Screen reader & Officer HUD) */}
+        {/* Top Mini Government Bar */}
         <div className="bg-[#091422] text-white px-4 py-2 border-b border-slate-800 flex items-center justify-between text-xs select-none">
           <div className="flex items-center gap-2">
             <ShieldCheck size={16} className="text-amber-400" />
@@ -129,24 +225,29 @@ export const InspectionCameraModal: React.FC<InspectionCameraModalProps> = ({
 
         {/* Modal Body State Switcher */}
         <div className="flex-1 flex flex-col relative overflow-hidden">
-          {currentPhoto ? (
-            /* State 1: Photo Review Screen */
+          {isReviewing && capturedPhotos.length > 0 ? (
+            /* State 1: Multi-Photo Review Screen */
             <PhotoReview
-              photo={currentPhoto}
-              onRetake={handleRetake}
-              onAccept={handleAccept}
+              photos={capturedPhotos}
+              currentIndex={reviewIndex}
+              onSelectIndex={(idx) => setReviewIndex(idx)}
+              onDeletePhoto={handleDeletePhoto}
+              onAddMorePhotos={handleAddMorePhotos}
+              onAcceptAll={handleAcceptAll}
               isSubmitting={isAccepting}
             />
           ) : status === "STREAMING" ? (
-            /* State 2: Live Video Stream & Real-time Framing HUD */
+            /* State 2: Live Video Stream & Continuous Multi-Capture Controls */
             <>
               <div className="flex-1 relative overflow-hidden flex items-center justify-center">
                 <CameraPreview
                   videoRef={videoRef}
+                  stream={stream}
                   guidance={guidance}
                   showFramingGuide={showFramingGuide}
                   retakeReason={retakeReason}
                   facingMode={facingMode}
+                  isFlashing={isFlashing}
                 />
               </div>
 
@@ -157,6 +258,10 @@ export const InspectionCameraModal: React.FC<InspectionCameraModalProps> = ({
                 onToggleTorch={toggleTorch}
                 onToggleFramingGuide={() => setShowFramingGuide((prev) => !prev)}
                 onClose={onClose}
+                onDone={() => handleAcceptAll()}
+                onReviewPhotos={() => setIsReviewing(true)}
+                onNativeCaptureClick={triggerNativeCapture}
+                capturedCount={capturedPhotos.length}
                 isCapturing={isCapturing}
                 canSwitchCamera={videoDevices.length > 1}
                 torchSupported={torchSupported}
@@ -170,6 +275,7 @@ export const InspectionCameraModal: React.FC<InspectionCameraModalProps> = ({
               <CameraPermissionCard
                 error={error}
                 onRequestPermission={() => requestCamera("environment")}
+                onNativeCaptureClick={triggerNativeCapture}
                 onFallbackToUpload={() => {
                   stopCamera();
                   onClose();

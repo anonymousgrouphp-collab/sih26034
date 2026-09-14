@@ -1,5 +1,5 @@
 import React from "react";
-import { Camera, ShieldCheck, AlertCircle, RefreshCw, UploadCloud, X } from "lucide-react";
+import { Camera, ShieldCheck, AlertCircle, RefreshCw, UploadCloud, X, Smartphone, ShieldAlert } from "lucide-react";
 import { CameraError } from "./useCameraStream";
 import { useLanguage } from "../../context/LanguageContext";
 
@@ -8,6 +8,7 @@ interface CameraPermissionCardProps {
   onRequestPermission: () => void;
   onFallbackToUpload: () => void;
   onClose: () => void;
+  onNativeCaptureClick?: () => void;
   isLoading?: boolean;
 }
 
@@ -16,6 +17,7 @@ export const CameraPermissionCard: React.FC<CameraPermissionCardProps> = ({
   onRequestPermission,
   onFallbackToUpload,
   onClose,
+  onNativeCaptureClick,
   isLoading = false,
 }) => {
   const { language } = useLanguage();
@@ -71,6 +73,22 @@ export const CameraPermissionCard: React.FC<CameraPermissionCardProps> = ({
           </div>
 
           <div className="w-full space-y-2.5 pt-2">
+            {/* Direct Native Camera Fallback - Always works on any phone */}
+            {onNativeCaptureClick && (
+              <button
+                type="button"
+                onClick={onNativeCaptureClick}
+                className="w-full py-3.5 px-4 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Smartphone size={16} />
+                <span>
+                  {language === "hi"
+                    ? "फोन के मुख्य कैमरे से फोटो लें (100% समर्थित)"
+                    : "Use Phone Camera (Native HD • 100% Supported)"}
+                </span>
+              </button>
+            )}
+
             <button
               type="button"
               onClick={onRequestPermission}
@@ -85,7 +103,7 @@ export const CameraPermissionCard: React.FC<CameraPermissionCardProps> = ({
               ) : (
                 <>
                   <RefreshCw size={15} />
-                  <span>{language === "hi" ? "पुनः प्रयास करें" : "Try Again"}</span>
+                  <span>{language === "hi" ? "लाइव कैमरा पुनः प्रयास करें" : "Retry Live Camera"}</span>
                 </>
               )}
             </button>
@@ -93,10 +111,10 @@ export const CameraPermissionCard: React.FC<CameraPermissionCardProps> = ({
             <button
               type="button"
               onClick={onFallbackToUpload}
-              className="w-full py-3 px-4 rounded-xl border border-slate-600 bg-slate-900/70 hover:bg-slate-800/60 text-slate-200 text-xs font-bold transition-colors flex items-center justify-center gap-2"
+              className="w-full py-2.5 px-4 rounded-xl border border-slate-700 bg-slate-900/70 hover:bg-slate-800/60 text-slate-300 text-xs font-semibold transition-colors flex items-center justify-center gap-2"
             >
-              <UploadCloud size={15} className="text-slate-500" />
-              <span>{language === "hi" ? "इसके बजाय पैकेजिंग फोटो अपलोड करें" : "Upload Packaging Photo Instead"}</span>
+              <UploadCloud size={15} className="text-slate-400" />
+              <span>{language === "hi" ? "गैलरी अथवा फ़ाइल से चुनें" : "Choose from Gallery / Files"}</span>
             </button>
           </div>
         </>
@@ -137,9 +155,9 @@ export const CameraPermissionCard: React.FC<CameraPermissionCardProps> = ({
               <ShieldCheck size={16} className="text-emerald-400 shrink-0" />
               <span>
                 {language === "hi" ? (
-                  <><strong>गोपनीयता की गारंटी:</strong> कैप्चर के तुरंत बाद कैमरा बंद हो जाता है।</>
+                  <><strong>मल्टी-फोटो समर्थित:</strong> पैकेज के सभी फलक (PDP, MRP, बैच) एक साथ कैप्चर करें।</>
                 ) : (
-                  <><strong>Privacy Guaranteed:</strong> Camera stops immediately after capture.</>
+                  <><strong>Multi-Angle Capture:</strong> Photograph PDP, MRP, batch details in one session.</>
                 )}
               </span>
             </div>
@@ -160,25 +178,37 @@ export const CameraPermissionCard: React.FC<CameraPermissionCardProps> = ({
               type="button"
               onClick={onRequestPermission}
               disabled={isLoading}
-              className="w-full py-3.5 px-4 rounded-xl bg-govNavy hover:bg-govNavy-light text-white text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full py-3.5 px-4 rounded-xl bg-govNavy hover:bg-govNavy-light text-white text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
             >
               {isLoading ? (
                 <>
                   <RefreshCw size={16} className="animate-spin" />
-                  <span>{language === "hi" ? "कैमरा एक्सेस का अनुरोध किया जा रहा है..." : "Requesting Camera Access..."}</span>
+                  <span>{language === "hi" ? "कैमरा प्रारंभ हो रहा है..." : "Starting Camera Stream..."}</span>
                 </>
               ) : (
                 <>
                   <Camera size={16} />
-                  <span>{language === "hi" ? "कैमरा की अनुमति दें व कैप्चर शुरू करें" : "Allow Camera & Start Capture"}</span>
+                  <span>{language === "hi" ? "लाइव कैमरा शुरू करें" : "Allow Camera & Start Stream"}</span>
                 </>
               )}
             </button>
 
+            {/* Native Mobile Camera Option */}
+            {onNativeCaptureClick && (
+              <button
+                type="button"
+                onClick={onNativeCaptureClick}
+                className="w-full py-3 px-4 rounded-xl bg-amber-400/90 hover:bg-amber-300 text-slate-950 text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Smartphone size={15} />
+                <span>{language === "hi" ? "फोन कैमरा से कैप्चर करें (HD)" : "Capture with Phone Camera (Native HD)"}</span>
+              </button>
+            )}
+
             <button
               type="button"
               onClick={onFallbackToUpload}
-              className="w-full py-2.5 px-4 text-xs font-semibold text-slate-400 hover:text-white transition-colors flex items-center justify-center gap-1.5"
+              className="w-full py-2.5 px-4 text-xs font-semibold text-slate-400 hover:text-white transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <UploadCloud size={14} className="text-slate-400" />
               <span>{language === "hi" ? "मौजूदा फ़ाइल / गैलरी से चुनें" : "Choose Existing File / Gallery"}</span>

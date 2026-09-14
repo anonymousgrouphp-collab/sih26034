@@ -122,8 +122,8 @@ export const Landing: React.FC = () => {
             <div className="w-full max-w-4xl mx-auto text-center space-y-1.5 sm:space-y-2 flex-1 flex flex-col justify-center min-w-0">
               {/* Official Ministerial Authority Masthead with Sovereign State Emblem */}
               <div className="inline-flex items-center justify-center gap-2.5 sm:gap-3.5 animate-fade-up">
-                <StateEmblem size={38} tone="gold" showMotto={true} />
-                <div className="text-left border-l border-amber-400/40 pl-2.5 sm:pl-3">
+                <StateEmblem size={38} tone="white" showMotto={true} />
+                <div className="text-left border-l border-white/20 pl-2.5 sm:pl-3">
                   <p className="text-[10px] sm:text-xs font-black tracking-widest uppercase text-amber-300 font-mono">
                     {language === "hi"
                       ? "भारत सरकार • विधिक मापविज्ञान प्रभाग"

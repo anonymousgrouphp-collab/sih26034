@@ -5,20 +5,38 @@ import { useLanguage } from "../../context/LanguageContext";
 
 interface CameraPreviewProps {
   videoRef: React.RefObject<HTMLVideoElement | null>;
+  stream?: MediaStream | null;
   guidance: GuidanceFeedback;
   showFramingGuide: boolean;
   retakeReason?: string;
   facingMode: "environment" | "user";
+  isFlashing?: boolean;
 }
 
 export const CameraPreview: React.FC<CameraPreviewProps> = ({
   videoRef,
+  stream,
   guidance,
   showFramingGuide,
   retakeReason,
   facingMode,
+  isFlashing = false,
 }) => {
   const { language } = useLanguage();
+
+  // Guarantee that whenever stream is available and video element is mounted, they bind and play
+  React.useEffect(() => {
+    const video = videoRef.current;
+    if (video && stream) {
+      if (video.srcObject !== stream) {
+        video.srcObject = stream;
+      }
+      video.setAttribute("playsinline", "true");
+      video.setAttribute("webkit-playsinline", "true");
+      video.muted = true;
+      video.play().catch((err) => console.warn("Video play failed in CameraPreview effect:", err));
+    }
+  }, [stream, videoRef]);
 
   const getLocalizedGuidanceText = () => {
     if (guidance.lighting !== "OPTIMAL") {
@@ -43,7 +61,20 @@ export const CameraPreview: React.FC<CameraPreviewProps> = ({
     <div className="relative w-full h-full min-h-[440px] sm:min-h-[520px] bg-black overflow-hidden flex items-center justify-center select-none">
       {/* 1. Underlying Live Video Stream */}
       <video
-        ref={videoRef as any}
+        ref={(el) => {
+          if (typeof videoRef === "function") {
+            (videoRef as any)(el);
+          } else if (videoRef) {
+            (videoRef as React.MutableRefObject<HTMLVideoElement | null>).current = el;
+          }
+          if (el && stream && el.srcObject !== stream) {
+            el.srcObject = stream;
+            el.setAttribute("playsinline", "true");
+            el.setAttribute("webkit-playsinline", "true");
+            el.muted = true;
+            el.play().catch((err) => console.warn("Video play failed on ref attach:", err));
+          }
+        }}
         playsInline
         autoPlay
         muted
@@ -51,6 +82,11 @@ export const CameraPreview: React.FC<CameraPreviewProps> = ({
           facingMode === "user" ? "scale-x-[-1]" : ""
         }`}
       />
+
+      {/* Shutter Snap Flash Feedback */}
+      {isFlashing && (
+        <div className="absolute inset-0 z-30 bg-white/90 pointer-events-none transition-opacity duration-200" />
+      )}
 
       {/* 2. Top Status HUD Bar */}
       <div className="absolute top-3 inset-x-3 z-20 flex flex-col gap-2 pointer-events-none">

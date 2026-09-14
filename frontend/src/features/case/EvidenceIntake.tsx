@@ -523,6 +523,11 @@ export const EvidenceIntake: React.FC<EvidenceIntakeProps> = ({
         isOpen={isCameraOpen}
         onClose={() => setIsCameraOpen(false)}
         onPhotoCaptured={(file) => stageFile(file)}
+        onPhotosCaptured={(photos) => {
+          if (photos.length > 0) {
+            stageFile(photos[0].file);
+          }
+        }}
         onFallbackToUpload={() => fileInputRef.current?.click()}
         retakeReason={retakeReason}
       />

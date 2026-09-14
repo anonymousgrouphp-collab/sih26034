@@ -26,6 +26,7 @@ import { ApiService } from "../services/api";
 import { GoldenSkuQuickSelector } from "../features/desk/GoldenSkuQuickSelector";
 import { PackagingType, InspectionType } from "../types/inspection";
 import { InspectionCameraModal } from "../components/camera";
+import { StatutoryPipelineRail } from "../components/nirikshak";
 import { useCircle } from "../context/CircleContext";
 import { useLanguage } from "../context/LanguageContext";
 import { StorageService } from "../services/storage";
@@ -455,67 +456,8 @@ export const NewInspection: React.FC = () => {
         </div>
       </div>
 
-      {/* Statutory Pipeline Stepper (Visual Progress Indicator) */}
-      <div className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 mb-4 border-b border-slate-100">
-          <div>
-            <h2 className="text-sm font-bold text-slate-900">
-              {language === "hi" ? "विधिक प्रवर्तन सत्यापन अनुक्रम" : "Statutory Verification Pipeline Stages"}
-            </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
-              {language === "hi"
-                ? "विधिक मापविज्ञान अधिनियम, 2009 की धारा 15 के अंतर्गत 6-चरणीय स्वचालित सत्यापन अनुक्रम।"
-                : "6-stage automated verification sequence under Section 15 of Legal Metrology Act, 2009."}
-            </p>
-          </div>
-          <span className="text-xs font-bold text-[#1B365D] bg-blue-50 px-3 py-1 rounded-full border border-blue-200 self-start sm:self-auto">
-            {language === "hi" ? "सक्रिय चरण: 1 / 6 (साक्ष्य अधिग्रहण)" : "Active Stage: 1 / 6 (Evidence Intake)"}
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5">
-          {steps.map((s, idx) => {
-            const isCompleted = s.status === "completed";
-            const isActive = s.status === "active";
-            return (
-              <div
-                key={s.id}
-                className={`p-3 rounded-xl border transition-all ${
-                  isActive
-                    ? "border-[#1B365D] bg-blue-50/70 ring-1 ring-blue-500/30"
-                    : isCompleted
-                    ? "border-emerald-500 bg-emerald-50/70"
-                    : "border-slate-200 bg-slate-50/70"
-                }`}
-              >
-                <div className="flex items-center gap-2 mb-1.5">
-                  <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shrink-0 ${
-                      isCompleted
-                        ? "bg-emerald-600 text-white"
-                        : isActive
-                        ? "bg-[#1B365D] text-white shadow-xs"
-                        : "bg-slate-200 text-slate-700"
-                    }`}
-                  >
-                    {isCompleted ? <CheckCircle2 size={13} /> : idx + 1}
-                  </div>
-                  <span
-                    className={`text-xs font-bold truncate ${
-                      isActive ? "text-[#1B365D]" : isCompleted ? "text-emerald-900" : "text-slate-800"
-                    }`}
-                  >
-                    {getStepLabel(s.id)}
-                  </span>
-                </div>
-                <p className="text-[11px] text-slate-600 leading-snug line-clamp-2">
-                  {getStepDesc(s.id)}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      {/* Statutory Verification Pipeline Rail (Compact, Animated, Single-line Stepper) */}
+      <StatutoryPipelineRail steps={steps} language={language} />
 
       {/* MODE 1: FIELD PACKAGE CAPTURE */}
       {activeTab === "FIELD_CAPTURE" && (
@@ -1081,6 +1023,10 @@ export const NewInspection: React.FC = () => {
         onPhotoCaptured={(file, previewUrl) => {
           setFiles((prev) => [...prev, file]);
           setFilePreviews((prev) => [...prev, previewUrl]);
+        }}
+        onPhotosCaptured={(photos) => {
+          setFiles((prev) => [...prev, ...photos.map((p) => p.file)]);
+          setFilePreviews((prev) => [...prev, ...photos.map((p) => p.previewUrl)]);
         }}
         onFallbackToUpload={() => fileInputRef.current?.click()}
       />

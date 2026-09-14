@@ -17,6 +17,7 @@ from dataclasses import dataclass, field
 import json
 import logging
 from pathlib import Path
+import re
 import sys
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -208,12 +209,30 @@ class CrossFacetSemanticFusionEngine:
                 # Score quality: valid magnitude + standard SI unit
                 score = p_weight
                 unit = str(nq.get("unit", "")).lower()
-                if unit in ("g", "kg", "ml", "l", "n", "u"):
-                    score += 5
-                if not nq.get("has_banned_unit"):
-                    score += 5
+                if unit in ("g", "kg", "ml", "l"):
+                    score += 8
+                elif unit in ("n", "u"):
+                    score += 4
+                if nq.get("has_prefix"):
+                    score += 15
+
+                # Find associated raw text for this candidate
+                raw_txt = ""
+                for rf in fields_list:
+                    rf_dict = rf if isinstance(rf, dict) else (rf.dict() if hasattr(rf, "dict") else {})
+                    if rf_dict.get("field_type") == "NET_QUANTITY":
+                        raw_txt = str(rf_dict.get("raw_ocr_text", ""))
+                        break
+
+                if re.search(r"\b(?:net\s*(?:quantity|qty\.?|weight|wt\.?|volume|vol\.?|content|contents)|शुद्ध|निवल)\b", raw_txt, re.IGNORECASE):
+                    score += 15
+
+                # Penalize ingredient / composition table noise
+                if re.search(r"\b(?:composition|ingredients?|contains?|each\s*(?:100|10|tablet|capsule))\b", raw_txt, re.IGNORECASE):
+                    score -= 30
+
                 font_val = facet.get("primary_font_height_mm")
-                candidate_net_quantities.append((score, nq, img_id, font_val))
+                candidate_net_quantities.append((score, nq, img_id, font_val, raw_txt))
 
             # B. MRP Candidate
             mrp_val = facts.get("mrp")
@@ -277,11 +296,54 @@ class CrossFacetSemanticFusionEngine:
                 g_weight = p_weight + (10 if p_type == "PDP_FRONT" else 0)
                 candidate_generic_names.append((g_weight, g_name.strip(), img_id))
 
-        # 2. Select best candidates and build panel attribution
+        # Resolve MRP and USP first to enable cross-facet mathematical consistency validation
+        resolved_mrp: Optional[Dict[str, Any]] = None
+        best_mrp_amt: Optional[float] = None
+        if candidate_mrps:
+            candidate_mrps.sort(key=lambda x: x[0], reverse=True)
+            best_mrp_entry = candidate_mrps[0]
+            resolved_mrp = dict(best_mrp_entry[1])
+            best_mrp_amt = resolved_mrp.get("amount")
+            panel_attribution["MRP"] = {
+                "source_image_id": best_mrp_entry[2],
+                "score": best_mrp_entry[0],
+            }
+
+        resolved_usp: Optional[Dict[str, Any]] = None
+        best_usp_rate: Optional[float] = None
+        if candidate_usps:
+            candidate_usps.sort(key=lambda x: x[0], reverse=True)
+            resolved_usp = dict(candidate_usps[0][1])
+            best_usp_rate = resolved_usp.get("price_per_unit")
+            panel_attribution["UNIT_SALE_PRICE"] = {
+                "source_image_id": candidate_usps[0][2],
+                "score": candidate_usps[0][0],
+            }
+
+        # 2. Select best net quantity candidate using statutory precedence and mathematical consistency
         resolved_net_qty: Optional[Dict[str, Any]] = None
         if candidate_net_quantities:
-            candidate_net_quantities.sort(key=lambda x: x[0], reverse=True)
-            best_nq_entry = candidate_net_quantities[0]
+            rescored_nq = []
+            for sc, nq_dict, i_id, f_val, r_txt in candidate_net_quantities:
+                cur_score = sc
+                # Mathematical synergy boost: if MRP and USP are available, check consistency
+                if best_mrp_amt and best_usp_rate and best_usp_rate > 0:
+                    exp_mag = best_mrp_amt / best_usp_rate
+                    mag = float(nq_dict.get("magnitude", 0))
+                    if mag > 0:
+                        # Direct magnitude match (|mag - exp| / exp < 0.05)
+                        if abs(mag - exp_mag) / max(exp_mag, 1.0) < 0.05:
+                            cur_score += 30
+                        # Gram to kg / ml to litre conversion match
+                        elif abs(mag / 1000.0 - exp_mag) / max(exp_mag, 1.0) < 0.05 or abs(mag * 1000.0 - exp_mag) / max(exp_mag, 1.0) < 0.05:
+                            cur_score += 30
+                        # 100g / 100ml commercial rate match
+                        elif abs(mag / 100.0 - exp_mag) / max(exp_mag, 1.0) < 0.05:
+                            cur_score += 30
+                rescored_nq.append((cur_score, nq_dict, i_id, f_val))
+
+            rescored_nq.sort(key=lambda x: x[0], reverse=True)
+            best_nq_entry = rescored_nq[0]
             resolved_net_qty = dict(best_nq_entry[1])
             # Propagate banned unit flag across the entire packaging if any panel violated
             if has_banned_unit:
@@ -293,25 +355,6 @@ class CrossFacetSemanticFusionEngine:
             }
             if best_nq_entry[3] and best_nq_entry[3] > 0:
                 best_font_height_mm = best_nq_entry[3]
-
-        resolved_mrp: Optional[Dict[str, Any]] = None
-        if candidate_mrps:
-            candidate_mrps.sort(key=lambda x: x[0], reverse=True)
-            best_mrp_entry = candidate_mrps[0]
-            resolved_mrp = dict(best_mrp_entry[1])
-            panel_attribution["MRP"] = {
-                "source_image_id": best_mrp_entry[2],
-                "score": best_mrp_entry[0],
-            }
-
-        resolved_usp: Optional[Dict[str, Any]] = None
-        if candidate_usps:
-            candidate_usps.sort(key=lambda x: x[0], reverse=True)
-            resolved_usp = dict(candidate_usps[0][1])
-            panel_attribution["UNIT_SALE_PRICE"] = {
-                "source_image_id": candidate_usps[0][2],
-                "score": candidate_usps[0][0],
-            }
 
         # Multi-panel address reconciliation:
         # If one panel has the corporate name and another has the address/pin, merge them!

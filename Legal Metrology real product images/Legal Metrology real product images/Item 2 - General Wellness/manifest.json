@@ -1,0 +1,226 @@
+{
+  "dataset_name": "Nirikshak Physical Validation Dataset - SIH 2026",
+  "item_folder": "Item 2 - General Wellness",
+  "total_images": 12,
+  "product_details": {
+    "brand": "Himalaya (Since 1930) Pure Herbs",
+    "commodity": "Brahmi Mind Wellness (Bacopa)",
+    "category": "Ayurvedic Medicine / Herbal Supplement",
+    "packaging_type": "Single-unit folding cardboard carton (tuck-end rectangular paperboard box)",
+    "barcode_ean13": "8901138834265",
+    "sku_code": "IND-5061447",
+    "mrp": "RS. 260. 00 (MRP Rs. Incl. of all taxes and USP, see below:)",
+    "unit_sale_price_usp": "RS. 4.33/TAB. (Statutory Rule 6(1)(da) declaration)",
+    "net_quantity": "60 Tablets",
+    "batch_no": "372600253",
+    "mfg_date": "05/2026",
+    "expiry_date": "04/2029",
+    "cpcb_number": "BO-22-000-07-AADFT3025B-22",
+    "manufacturer": "Himalaya Wellness Company, At: (37) No. 473/C, 13th Cross, 4th Phase, Peenya Industrial Estate, Bengaluru 560 058, Karnataka (Mfg. Lic. No. L-AUS-127)",
+    "consumer_care_helpline": "1-800-208-1930 (Toll-Free in India)",
+    "consumer_care_email": "contactus@himalayawellness.com",
+    "consumer_care_address": "Manager - Customer Care, Himalaya Wellness Company, Makali, Bengaluru 562 162, Karnataka",
+    "country_of_origin": "INDIA"
+  },
+  "physical_measurements": {
+    "carton_width_mm": 65.2,
+    "carton_height_mm": 88.2,
+    "carton_depth_mm": 60.1,
+    "carton_volume_cm3": 343.2,
+    "pdp_area_cm2": 57.2,
+    "device": "Digital Vernier Caliper (0.01 mm Least Count) & ISO/IEC 7810 Reference Scale"
+  },
+  "reference_object": {
+    "type": "State Bank of India (SBI) Global RuPay Debit Card",
+    "standard": "ISO/IEC 7810 ID-1",
+    "dimensions_mm": {
+      "width": 85.60,
+      "height": 53.98,
+      "thickness": 0.76,
+      "corner_radius": 3.18
+    },
+    "calibrated_spatial_scale_px_per_mm": 18.69
+  },
+  "file_mapping": [
+    {
+      "index": 1,
+      "original_filename": "IMG_20260911_153123.jpg",
+      "new_filename": "front_01.jpg",
+      "nomenclature_class": "Standard Guide #1",
+      "angle_description": "Orthographic perpendicular straight-on view (90°)",
+      "packaging_face": "Front Principal Display Panel (PDP) with Himalaya Brahmi Mind Wellness branding & claim",
+      "exif_metadata": {
+        "iso": 641,
+        "shutter_speed_s": 0.040,
+        "f_number": 1.79,
+        "focal_length_mm": 4.74,
+        "flash": "Off (16)"
+      }
+    },
+    {
+      "index": 2,
+      "original_filename": "IMG_20260911_153134.jpg",
+      "new_filename": "right_01.jpg",
+      "nomenclature_class": "Standard Guide #4",
+      "angle_description": "Orthographic perpendicular straight-on lateral view",
+      "packaging_face": "Right Lateral Side Panel (EAN-13 Barcode 8901138834265 & Corporate Vision charter)",
+      "exif_metadata": {
+        "iso": 388,
+        "shutter_speed_s": 0.040,
+        "f_number": 1.79,
+        "focal_length_mm": 4.74,
+        "flash": "Off (16)"
+      }
+    },
+    {
+      "index": 3,
+      "original_filename": "IMG_20260911_153142.jpg",
+      "new_filename": "back_01.jpg",
+      "nomenclature_class": "Standard Guide #2",
+      "angle_description": "Orthographic perpendicular straight-on view",
+      "packaging_face": "Back Opposite Panel (Dosage, Bacopa monnieri 250mg composition & CPCB Registration)",
+      "exif_metadata": {
+        "iso": 360,
+        "shutter_speed_s": 0.040,
+        "f_number": 1.79,
+        "focal_length_mm": 4.74,
+        "flash": "Off (16)"
+      }
+    },
+    {
+      "index": 4,
+      "original_filename": "IMG_20260911_153152.jpg",
+      "new_filename": "left_01.jpg",
+      "nomenclature_class": "Standard Guide #3 (Primary Declaration Hub)",
+      "angle_description": "Orthographic perpendicular straight-on lateral view",
+      "packaging_face": "Left Lateral Side Panel (Primary Legal Metrology: Net Qty, Batch, Dates, MRP, USP, Addresses)",
+      "exif_metadata": {
+        "iso": 439,
+        "shutter_speed_s": 0.030,
+        "f_number": 1.79,
+        "focal_length_mm": 4.74,
+        "flash": "Off (16)"
+      }
+    },
+    {
+      "index": 5,
+      "original_filename": "IMG_20260911_153209.jpg",
+      "new_filename": "top_01.jpg",
+      "nomenclature_class": "Guide Extension",
+      "angle_description": "Orthographic perpendicular straight-on view (90°)",
+      "packaging_face": "Top Flap Closure Panel (Himalaya Brahmi Mind Wellness logo & commodity name)",
+      "exif_metadata": {
+        "iso": 405,
+        "shutter_speed_s": 0.040,
+        "f_number": 1.79,
+        "focal_length_mm": 4.74,
+        "flash": "Off (16)"
+      }
+    },
+    {
+      "index": 6,
+      "original_filename": "IMG_20260911_153215.jpg",
+      "new_filename": "bottom_01.jpg",
+      "nomenclature_class": "Guide Extension",
+      "angle_description": "Orthographic perpendicular straight-on view (90°)",
+      "packaging_face": "Bottom Base Tuck-in Flap (Clean white base panel confirming zero hidden markings)",
+      "exif_metadata": {
+        "iso": 888,
+        "shutter_speed_s": 0.040,
+        "f_number": 1.79,
+        "focal_length_mm": 4.74,
+        "flash": "Off (16)"
+      }
+    },
+    {
+      "index": 7,
+      "original_filename": "IMG_20260911_153312.jpg",
+      "new_filename": "front_angle_01.jpg",
+      "nomenclature_class": "Standard Guide #5",
+      "angle_description": "Moderate perspective oblique angle (~25°–30° elevation, ~35° yaw)",
+      "packaging_face": "Dual-Face Perspective: Front PDP + Left Legal Metrology Panel",
+      "exif_metadata": {
+        "iso": 295,
+        "shutter_speed_s": 0.030,
+        "f_number": 1.79,
+        "focal_length_mm": 4.74,
+        "flash": "Off (16)"
+      }
+    },
+    {
+      "index": 8,
+      "original_filename": "IMG_20260911_153315.jpg",
+      "new_filename": "side_angle_01.jpg",
+      "nomenclature_class": "Custom Addition",
+      "angle_description": "Moderate oblique angle (~30° elevation, focused on Left Declaration Panel)",
+      "packaging_face": "Oblique Perspective Focused on Legal Metrology Panel (Net Qty, Batch, Dates, MRP, USP)",
+      "exif_metadata": {
+        "iso": 295,
+        "shutter_speed_s": 0.030,
+        "f_number": 1.79,
+        "focal_length_mm": 4.74,
+        "flash": "Off (16)"
+      }
+    },
+    {
+      "index": 9,
+      "original_filename": "IMG_20260911_153400.jpg",
+      "new_filename": "back_angle_01.jpg",
+      "nomenclature_class": "Standard Guide #6",
+      "angle_description": "Moderate perspective oblique angle (~30°–45° elevation)",
+      "packaging_face": "Dual-Face Perspective: Back Opposite Panel + Right Barcode Panel",
+      "exif_metadata": {
+        "iso": 439,
+        "shutter_speed_s": 0.030,
+        "f_number": 1.79,
+        "focal_length_mm": 4.74,
+        "flash": "Off (16)"
+      }
+    },
+    {
+      "index": 10,
+      "original_filename": "IMG_20260911_153416.jpg",
+      "new_filename": "glare_01.jpg",
+      "nomenclature_class": "Standard Guide #7",
+      "angle_description": "Direct camera flash strobe inducing specular glare hotspot across declarations",
+      "packaging_face": "Left Legal Metrology Panel under Direct Flash (Net Qty, MRP, USP under specular hotspot)",
+      "exif_metadata": {
+        "iso": 92,
+        "shutter_speed_s": 0.010,
+        "f_number": 1.79,
+        "focal_length_mm": 4.74,
+        "flash": "Fired (1)"
+      }
+    },
+    {
+      "index": 11,
+      "original_filename": "IMG_20260911_153424.jpg",
+      "new_filename": "glare_front_01.jpg",
+      "nomenclature_class": "Custom Addition",
+      "angle_description": "Direct camera flash strobe at ultra-fast shutter (1/205s) creating central bloom",
+      "packaging_face": "Front Principal Display Panel under Direct Flash (Brahmi botanical artwork & title)",
+      "exif_metadata": {
+        "iso": 53,
+        "shutter_speed_s": 0.005,
+        "f_number": 1.79,
+        "focal_length_mm": 4.74,
+        "flash": "Fired (1)"
+      }
+    },
+    {
+      "index": 12,
+      "original_filename": "IMG_20260911_153430.jpg",
+      "new_filename": "glare_barcode_01.jpg",
+      "nomenclature_class": "Custom Addition",
+      "angle_description": "Direct camera flash strobe at high-speed sync (1/355s) testing barcode reflexivity",
+      "packaging_face": "Right Lateral Barcode Panel under Direct Flash (EAN-13 Barcode 8901138834265 reflection)",
+      "exif_metadata": {
+        "iso": 53,
+        "shutter_speed_s": 0.003,
+        "f_number": 1.79,
+        "focal_length_mm": 4.74,
+        "flash": "Fired (1)"
+      }
+    }
+  ]
+}

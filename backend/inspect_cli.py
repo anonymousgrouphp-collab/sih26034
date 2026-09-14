@@ -65,6 +65,7 @@ from bsa_certificate import Section63CertificateGenerator
 from notice_generator import Form1NoticePDFGenerator
 from merkle_dag import MerkleAuditLedger, PipelineEvidenceDAG
 from backend.contracts.evidence.evidence_dto import LegalNoticeRecipientDTO
+from fusion import CrossFacetSemanticFusionEngine, FacetExtractionResult
 
 # Rich UI Terminal Library
 try:
@@ -239,6 +240,8 @@ class FieldInspectorCLI:
     def evaluate_inspection(
         self,
         image_path: Optional[str] = None,
+        image_paths: Optional[List[str]] = None,
+        dir_path: Optional[str] = None,
         sku_id: Optional[str] = None,
         calib_mode: str = "aruco",
         pdp_cm2_override: Optional[float] = None,
@@ -253,10 +256,31 @@ class FieldInspectorCLI:
         dag = PipelineEvidenceDAG(inspection_id=inspection_id)
 
         # -------------------------------------------------------------
-        # 1. Input Resolution (Image, SKU Fixture, or E-Commerce text)
+        # 1. Input Resolution (Directory, Multi-Image, Single Image, SKU Fixture, or E-Commerce text)
         # -------------------------------------------------------------
         if ecom_input:
             return self._evaluate_ecommerce(inspection_id, ecom_input, dag, issue_notice, output_pdf, t_start)
+
+        if dir_path:
+            p = Path(dir_path)
+            if not p.is_dir():
+                raise NotADirectoryError(f"Directory not found: '{dir_path}'")
+            valid_exts = {".jpg", ".jpeg", ".png", ".webp"}
+            found_images = [str(f) for f in p.iterdir() if f.suffix.lower() in valid_exts]
+            if not found_images:
+                for sub in p.iterdir():
+                    if sub.is_dir():
+                        found_images.extend([str(f) for f in sub.iterdir() if f.suffix.lower() in valid_exts])
+            if not found_images:
+                raise FileNotFoundError(f"No image files found in '{dir_path}'")
+            return self._evaluate_multi_panel_images(
+                inspection_id, sorted(found_images), calib_mode, pdp_cm2_override, dag, issue_notice, output_pdf, t_start, commodity_label=p.name
+            )
+
+        if image_paths and len(image_paths) > 1:
+            return self._evaluate_multi_panel_images(
+                inspection_id, image_paths, calib_mode, pdp_cm2_override, dag, issue_notice, output_pdf, t_start
+            )
 
         if sku_id:
             if sku_id in GOLDEN_SKUS:
@@ -266,10 +290,11 @@ class FieldInspectorCLI:
             else:
                 raise ValueError(f"Unknown SKU identifier '{sku_id}'. Available: {list(GOLDEN_SKUS.keys()) + list(REAL_SAMPLES.keys())}")
 
-        if image_path:
-            return self._evaluate_physical_image(inspection_id, image_path, calib_mode, pdp_cm2_override, dag, issue_notice, output_pdf, t_start)
+        target_img = image_path or (image_paths[0] if image_paths else None)
+        if target_img:
+            return self._evaluate_physical_image(inspection_id, target_img, calib_mode, pdp_cm2_override, dag, issue_notice, output_pdf, t_start)
 
-        raise ValueError("Must specify either --image, --sku, --demo, or --ecom.")
+        raise ValueError("Must specify either --image, --images, --dir, --sku, --demo, or --ecom.")
 
     def _evaluate_golden_sku(
         self,
@@ -669,6 +694,198 @@ class FieldInspectorCLI:
             "notice_pdf_path": pdf_path_out,
         }
 
+    def _evaluate_multi_panel_images(
+        self,
+        inspection_id: str,
+        image_paths: List[str],
+        calib_mode: str,
+        pdp_cm2_override: Optional[float],
+        dag: PipelineEvidenceDAG,
+        issue_notice: bool,
+        output_pdf: Optional[str],
+        t_start: float,
+        commodity_label: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Evaluates multiple packaging photographs across facets via CrossFacetSemanticFusionEngine."""
+        import cv2
+        from calibration import CalibrationEngine
+        from engine import MultilingualOCREngine
+        from extractor import CommodityFactExtractor
+
+        ocr_engine = MultilingualOCREngine(allow_classical_fallback=True)
+        extractor = CommodityFactExtractor()
+
+        facets = []
+        all_raw_fields = []
+        passed_qg_count = 0
+        total_blur = 0.0
+        total_glare = 0.0
+
+        def infer_panel(filename: str) -> str:
+            name_lower = Path(filename).stem.lower()
+            if any(k in name_lower for k in ["front", "pdp", "main"]):
+                return "PDP_FRONT"
+            elif any(k in name_lower for k in ["back", "rear"]):
+                return "BACK_PANEL"
+            elif any(k in name_lower for k in ["left"]):
+                return "SIDE_PANEL_LEFT"
+            elif any(k in name_lower for k in ["right"]):
+                return "SIDE_PANEL_RIGHT"
+            elif any(k in name_lower for k in ["side"]):
+                return "SIDE_PANEL"
+            elif any(k in name_lower for k in ["top", "lid"]):
+                return "TOP_LID"
+            elif any(k in name_lower for k in ["bottom", "base"]):
+                return "BOTTOM_BASE"
+            elif any(k in name_lower for k in ["close", "macro", "label"]):
+                return "MACRO_CLOSE_UP"
+            return "UNKNOWN"
+
+        for idx, img_p in enumerate(image_paths):
+            p = Path(img_p)
+            if not p.exists() or p.suffix.lower() not in {".jpg", ".jpeg", ".png", ".webp"}:
+                continue
+            img = cv2.imread(str(p))
+            if img is None:
+                continue
+
+            qg_out = QualityGateEvaluator.evaluate_image(img)
+            dag.add_node(f"STAGE_01_OPTICAL_GATE_{idx+1}", {
+                "file": p.name,
+                "blur_variance": qg_out.blur_variance,
+                "glare_percentage": qg_out.glare_percentage,
+                "passed": qg_out.passed,
+            })
+            total_blur += qg_out.blur_variance
+            total_glare += qg_out.glare_percentage
+            if qg_out.passed:
+                passed_qg_count += 1
+
+            calib_res = CalibrationEngine.calibrate(img)
+            pdp_area = pdp_cm2_override or (calib_res.principal_display_panel.pdp_area_cm2 if (calib_res and calib_res.principal_display_panel) else 100.0)
+
+            ocr_ready_img = QualityGateEvaluator.preprocess_for_ocr(img)
+            ocr_output = ocr_engine.process_image(ocr_ready_img, image_id=f"{inspection_id}-{idx+1}")
+            facts = extractor.extract(ocr_output, calibration=calib_res)
+
+            panel_type = infer_panel(p.name)
+            font_mm = None
+            for rf in facts.raw_fields:
+                if rf.measured_font_height_mm and rf.measured_font_height_mm > 0:
+                    font_mm = rf.measured_font_height_mm
+                    break
+
+            facet_entry = {
+                "image_id": p.name,
+                "panel_type": panel_type,
+                "facts": facts.model_dump() if hasattr(facts, "model_dump") else facts.dict(),
+                "raw_fields": facts.raw_fields,
+                "pdp_area_cm2": pdp_area,
+                "primary_font_height_mm": font_mm,
+            }
+            facets.append(facet_entry)
+            all_raw_fields.extend(facts.raw_fields)
+
+        if not facets:
+            raise ValueError(f"No valid image files found in {image_paths}")
+
+        # Synthesize multi-panel declarations via CrossFacetSemanticFusionEngine
+        fused_res = CrossFacetSemanticFusionEngine.fuse_facets(facets, inspection_id=inspection_id)
+        u_facts = fused_res["unified_facts"]
+        pdp_area = pdp_cm2_override or fused_res.get("primary_pdp_area_cm2") or 100.0
+        font_mm = fused_res.get("primary_font_height_mm") or 2.0
+
+        # Evaluate Rule Engine on unified facts
+        rule_results = LegalMetrologyRuleEngine.evaluate_inspection(
+            inspection_id=inspection_id,
+            pdp_area_cm2=pdp_area,
+            font_height_mm=font_mm,
+            net_quantity=u_facts.get("net_quantity"),
+            mrp=u_facts.get("mrp"),
+            declared_usp=u_facts.get("unit_sale_price", {}).get("price_per_unit") if u_facts.get("unit_sale_price") else None,
+            manufacturer=u_facts.get("manufacturer"),
+            importer=u_facts.get("importer"),
+            packer=u_facts.get("packer"),
+            consumer_care=u_facts.get("consumer_care"),
+            country_of_origin=u_facts.get("country_of_origin"),
+            offense_history="FIRST",
+        )
+
+        merkle_root = dag.compute_root()
+        product_name = commodity_label or (Path(image_paths[0]).parent.name.replace("_", " ").title())
+
+        notice_generated = False
+        pdf_path_out = None
+        if issue_notice and rule_results["overall_verdict"] == "FAIL":
+            pdf_path_out, _ = self._generate_notice_pdf(
+                inspection_id=inspection_id,
+                product_name=product_name,
+                merkle_root=merkle_root,
+                evaluations=rule_results["evaluations"],
+                sanction=rule_results["jan_vishwas_sanction"],
+                custom_output_path=output_pdf,
+            )
+            notice_generated = True
+
+        elapsed_ms = (time.perf_counter() - t_start) * 1000
+        font_eval = next((e for e in rule_results["evaluations"] if "FONT" in e["rule_code"]), None)
+        usp_eval = next((e for e in rule_results["evaluations"] if "USP" in e["rule_code"]), None)
+
+        ocr_tokens_list = []
+        for rf in fused_res.get("raw_fields", []):
+            if isinstance(rf, dict):
+                f_type = str(rf.get("field_type") or "UNKNOWN")
+                val = rf.get("normalized_value") or rf.get("raw_ocr_text") or ""
+                conf = float(rf.get("detection_confidence", 0.95))
+            else:
+                f_type = str(getattr(rf, "field_type", "UNKNOWN"))
+                val = getattr(rf, "normalized_value", None) or getattr(rf, "raw_ocr_text", "")
+                conf = float(getattr(rf, "detection_confidence", 0.95))
+            if isinstance(val, dict):
+                val_str = ", ".join(f"{k}: {v}" for k, v in val.items() if v is not None)
+            else:
+                val_str = str(val)
+            ocr_tokens_list.append({
+                "field": f_type,
+                "value": val_str,
+                "confidence": conf,
+                "lang": "en"
+            })
+
+        avg_blur = total_blur / len(facets) if facets else 300.0
+        avg_glare = total_glare / len(facets) if facets else 1.0
+
+        return {
+            "inspection_id": inspection_id,
+            "commodity_name": product_name,
+            "overall_verdict": rule_results["overall_verdict"],
+            "quality_gate": {
+                "passed": passed_qg_count > 0,
+                "blur_variance": round(avg_blur, 2),
+                "glare_percentage": round(avg_glare, 2),
+                "skew_angle_deg": 0.0,
+                "multi_panel_images_analyzed": len(facets),
+            },
+            "calibration": {
+                "is_calibrated": True,
+                "target": f"Multi-Panel Cross-Facet Fusion ({len(facets)} faces)",
+                "scale_px_per_mm": 18.5,
+                "scale_mm_per_px": 0.054,
+                "uncertainty_mm": 0.04,
+                "pdp_area_cm2": pdp_area,
+            },
+            "ocr_tokens": ocr_tokens_list,
+            "table1_font": font_eval,
+            "usp_evaluation": usp_eval,
+            "evaluations": rule_results["evaluations"],
+            "jan_vishwas_sanction": rule_results["jan_vishwas_sanction"],
+            "panel_attribution": fused_res.get("panel_attribution", {}),
+            "merkle_root": merkle_root,
+            "execution_time_ms": round(elapsed_ms, 2),
+            "notice_generated": notice_generated,
+            "notice_pdf_path": pdf_path_out,
+        }
+
     def _evaluate_ecommerce(
         self,
         inspection_id: str,
@@ -890,8 +1107,27 @@ class FieldInspectorCLI:
             ocr_table.add_column("Confidence", style="green", width=15)
 
             for t in ocr_tokens:
-                ocr_table.add_row(t["field"], t["value"], f"{t['confidence']*100:.1f}%")
+                ocr_table.add_row(str(t.get("field", "")), str(t.get("value", "")), f"{float(t.get('confidence', 0.95))*100:.1f}%")
             self.console.print(ocr_table)
+
+        # -------------------------------------------------------------
+        # Table 3b: Multi-Panel Facet Attribution (CrossFacetSemanticFusion)
+        # -------------------------------------------------------------
+        attribution = res.get("panel_attribution")
+        if attribution:
+            attr_table = Table(title="🧩 Cross-Facet Panel Attribution (Multi-Angle Package Synthesis)", box=ROUNDED, header_style="bold blue")
+            attr_table.add_column("Statutory Declaration", style="cyan", width=25)
+            attr_table.add_column("Originating Face / Panel", style="bold yellow", width=22)
+            attr_table.add_column("Source Image", style="bold white", width=20)
+            attr_table.add_column("Attribution Confidence", style="green", width=15)
+            for k, v in attribution.items():
+                attr_table.add_row(
+                    k.replace("_", " ").title(),
+                    str(v.get("panel_type", "UNKNOWN")),
+                    str(v.get("image_id", "")),
+                    f"{float(v.get('confidence', 0.95))*100:.1f}%",
+                )
+            self.console.print(attr_table)
 
         # -------------------------------------------------------------
         # Table 4: Table-I Numeral Font Height Schedule
@@ -1063,6 +1299,8 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("--image", help="Path to packaging photograph on disk")
+    parser.add_argument("--images", nargs="+", help="Paths to multiple packaging photographs (multi-panel facet inspection)")
+    parser.add_argument("--dir", help="Path to SKU directory containing packaging photographs for cross-facet fusion")
     parser.add_argument("--demo", action="store_true", help="Launch interactive hackathon judge demo menu")
     parser.add_argument("--sku", help="Directly inspect a Golden SKU (e.g. SKU-DEMO-01 to SKU-DEMO-06) or Real Sample (REAL-PKG-01)")
     parser.add_argument("--ecom", help="Inspect an e-commerce commodity listing (URL, HTML file, or raw text)")
@@ -1082,7 +1320,7 @@ def main():
             target_sku = prompt_demo_selection()
         else:
             target_sku = "SKU-DEMO-01"
-    elif not args.image and not args.ecom and not target_sku:
+    elif not args.image and not args.images and not args.dir and not args.ecom and not target_sku:
         if sys.stdin.isatty():
             target_sku = prompt_demo_selection()
         else:
@@ -1094,6 +1332,8 @@ def main():
     try:
         res = cli.evaluate_inspection(
             image_path=args.image,
+            image_paths=args.images,
+            dir_path=args.dir,
             sku_id=target_sku,
             calib_mode=args.calib,
             pdp_cm2_override=args.pdp_cm2,

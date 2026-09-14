@@ -235,11 +235,11 @@ export const Dashboard: React.FC = () => {
                   {t("dash.welcome", "Executive Inspection Control Centre")}
                 </h1>
 
-                {/* Official Underline Accent */}
-                <div className="flex items-center gap-0.5 mt-1.5 w-28">
-                  <div className="h-1 flex-1 bg-[#FF9933] rounded-full" />
-                  <div className="h-1 w-1 bg-slate-300 rounded-full" />
-                  <div className="h-1 w-6 bg-[#138808] rounded-full" />
+                {/* Official Sovereign National Tricolor Underline Accent */}
+                <div className="flex items-center gap-1.5 mt-2 w-48 sm:w-64" aria-hidden="true">
+                  <div className="h-1 flex-1 bg-[#FF9933] rounded-full shadow-2xs" />
+                  <div className="h-1 flex-1 bg-slate-200/90 rounded-full border border-slate-300/80" />
+                  <div className="h-1 flex-1 bg-[#138808] rounded-full shadow-2xs" />
                 </div>
               </div>
             </div>

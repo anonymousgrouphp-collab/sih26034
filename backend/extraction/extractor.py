@@ -273,13 +273,20 @@ class CommodityFactExtractor:
     def _cluster_horizontal_lines(self, tokens: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Merges adjacent tokens on approximately the same vertical level into composite lines.
 
-        Guards against multi-column layout contamination by enforcing a tight lower bound
-        on negative x-gaps (-20 px max overlap), preventing distant adjacent columns from merging.
+        Uses dynamic vertical overlap and bi-directional horizontal adjacency, then sorts
+        tokens horizontally left-to-right within each line to guarantee correct reading order.
         """
         if not tokens:
             return []
 
-        sorted_tokens = self._sort_tokens_reading_order(tokens)
+        # Sort primarily by vertical center
+        sorted_tokens = sorted(
+            tokens,
+            key=lambda t: (
+                (t.get("bounding_box", [0, 0, 0, 0])[0] + t.get("bounding_box", [0, 0, 0, 0])[2]) / 2.0,
+                t.get("bounding_box", [0, 0, 0, 0])[1],
+            )
+        )
         lines: List[List[Dict[str, Any]]] = []
 
         for token in sorted_tokens:
@@ -288,24 +295,37 @@ class CommodityFactExtractor:
                 bbox = [0, 0, 0, 0]
             ymin, xmin, ymax, xmax = bbox[0], bbox[1], bbox[2], bbox[3]
             token_mid_y = (ymin + ymax) / 2.0
+            token_h = max(1, ymax - ymin)
 
-            placed = False
+            matched_line = None
             for line in lines:
-                prev_bbox = line[-1].get("bounding_box")
-                if not isinstance(prev_bbox, (list, tuple)) or len(prev_bbox) < 4:
-                    prev_bbox = [0, 0, 0, 0]
-                prev_mid_y = (prev_bbox[0] + prev_bbox[2]) / 2.0
-                y_diff = abs(token_mid_y - prev_mid_y)
-                x_gap = xmin - prev_bbox[3]
+                line_ymin = min(t.get("bounding_box", [0, 0, 0, 0])[0] for t in line)
+                line_ymax = max(t.get("bounding_box", [0, 0, 0, 0])[2] for t in line)
+                line_xmin = min(t.get("bounding_box", [0, 0, 0, 0])[1] for t in line)
+                line_xmax = max(t.get("bounding_box", [0, 0, 0, 0])[3] for t in line)
+                line_mid_y = (line_ymin + line_ymax) / 2.0
+                line_h = max(1, line_ymax - line_ymin)
 
-                # Check vertical alignment and strict horizontal proximity (-20 <= x_gap <= gap_threshold)
-                # Prevents merging text from different columns on the same horizontal level
-                if y_diff <= self.line_y_tolerance and (-20 <= x_gap <= self.horizontal_gap_threshold):
-                    line.append(token)
-                    placed = True
-                    break
+                v_overlap = max(0, min(ymax, line_ymax) - max(ymin, line_ymin))
+                is_vertically_aligned = (
+                    (v_overlap / min(token_h, line_h) >= 0.40) or
+                    (abs(token_mid_y - line_mid_y) <= max(self.line_y_tolerance, 0.55 * max(token_h, line_h)))
+                )
 
-            if not placed:
+                if is_vertically_aligned:
+                    gap_right = xmin - line_xmax
+                    gap_left = line_xmin - xmax
+                    if (
+                        (-25 <= gap_right <= self.horizontal_gap_threshold) or
+                        (-25 <= gap_left <= self.horizontal_gap_threshold) or
+                        (xmin >= line_xmin - 25 and xmax <= line_xmax + 25)
+                    ):
+                        matched_line = line
+                        break
+
+            if matched_line is not None:
+                matched_line.append(token)
+            else:
                 lines.append([token])
 
         composite_lines: List[Dict[str, Any]] = []
@@ -467,13 +487,13 @@ class CommodityFactExtractor:
             if any(k in line_lower for k in ["complaint", "customer care", "consumer care", "helpline", "feedback", "care@"]):
                 continue
 
-            has_starter = any(starter in line_lower for starter in address_starters)
+            has_starter = any(starter in line_lower for starter in address_starters) or bool(re.search(r"\b(?:m[tf][td][\s\.]*(?:by|4y)|mfg\s*lic|lic\s*no)\b", line_lower))
 
             # Also detect blocks starting directly with corporate entity names (e.g. "Parle Products Pvt. Ltd.")
             # followed by address / state / city / PIN in subsequent lines
             is_corp_starter = False
             if not has_starter and i + 1 < n:
-                if re.search(r"\b(?:Pvt\.?\s*Ltd\.?|Private\s*Limited|Ltd\.?|Limited|LLP|Inc\.?|Corp\.?|उद्योग|लिमिटेड)\b", line_text, re.IGNORECASE):
+                if re.search(r"\b(?:Pvt\.?\s*Ltd\.?|Private\s*Limited|Ltd\.?|Limited|LLP|Inc\.?|Corp\.?|Company|Co\.?|Industries|Enterprises|Wellness|Laboratories|Healthcare|Pharma|Foods|Products|उद्योग|लिमिटेड)\b", line_text, re.IGNORECASE):
                     for next_idx in range(i + 1, min(i + 4, n)):
                         nl_text = composite_lines[next_idx]["text"]
                         if (self.parser.parse_pin_code(nl_text) or
@@ -1035,6 +1055,27 @@ class CommodityFactExtractor:
         # Priority D: Fallback to marketer if manufacturer was not declared separately
         if extracted_mfg is None and extracted_marketer is not None:
             extracted_mfg = extracted_marketer
+
+        # Priority E: If manufacturer has address/state/PIN but name is missing or is not a recognized corporate name, look for declared corporate entity name on panel
+        if extracted_mfg is not None and (not extracted_mfg.name or not re.search(r"\b(?:Pvt\.?\s*Ltd\.?|Private\s*Limited|Ltd\.?|Limited|LLP|Inc\.?|Corp\.?|Company|Co\.?|Industries|Enterprises|Wellness|Laboratories)\b", extracted_mfg.name, re.IGNORECASE)):
+            for cl in composite_lines:
+                cand_t = cl["text"]
+                if re.search(r"\b(?:Pvt\.?\s*Ltd\.?|Private\s*Limited|Ltd\.?|Limited|LLP|Inc\.?|Corp\.?|Company|Co\.?|Industries|Enterprises|Wellness|Laboratories|Healthcare|Pharma|Foods|Products)\b", cand_t, re.IGNORECASE):
+                    parsed_cand = self.parser.parse_address(cand_t)
+                    cand_name = (parsed_cand.get("name") if parsed_cand else None) or cand_t.strip()
+                    cand_name = re.sub(r"^(?:or\s+queries,\s+contact\s+|Manager\s*-\s*Customer\s*Care\s+)", "", cand_name, flags=re.IGNORECASE).strip()
+                    if len(cand_name) >= 3 and not any(cand_name.lower().startswith(x) for x in ["email", "call", "phone", "website", "http", "for "]):
+                        mfg_dict = extracted_mfg.model_dump()
+                        mfg_dict["name"] = cand_name
+                        extracted_mfg = AddressValue(**mfg_dict)
+                        break
+
+        # Priority F: Under Rule 6(1)(p), domestic manufacture established by domestic address or sale statement
+        if extracted_origin is None and extracted_importer is None:
+            if (extracted_mfg and extracted_mfg.state and extracted_mfg.pin_code) or (extracted_packer and extracted_packer.state and extracted_packer.pin_code):
+                extracted_origin = "India"
+            elif full_text and re.search(r"\b(?:For\s+sale\s+in\s+India|Toll-free\s+in\s+India|Made\s+in\s+India|Product\s+of\s+India)\b", full_text, re.IGNORECASE):
+                extracted_origin = "India"
 
         # 7. CONSUMER CARE
         care_status = self.parser.check_consumer_care_completeness(full_text)
