@@ -16,10 +16,10 @@ Because all underlying Computer Vision, Multilingual OCR (DBNet++ / PP-OCRv4 / P
 
 | Component | Recommended Cloud Host | Alternative Host | Local / Offline Host |
 | :--- | :--- | :--- | :--- |
-| **Frontend Workstation** (React 18 + Vite) | **Vercel** (Global Edge CDN) | Netlify / Cloudflare Pages | Nginx / FastAPI static mount |
-| **Backend API & ML Pipeline** (FastAPI) | **Render** (Docker Web Service) | **Railway** / **Hugging Face Spaces** | `python backend/main.py` on `localhost:8000` |
-| **Relational Datastore** (Mode A) | **Supabase PostgreSQL 16** | Render Managed PostgreSQL / Neon | `postgres:16-alpine` in Docker |
-| **Evidence Object Storage** (Mode A) | **Supabase Cloud Storage** (`evidence-images`) | AWS S3 / Cloudflare R2 | Local File System (`uploads/`) |
+| **Frontend Workstation** (React 18 + Vite) | **Vercel** (`sih26034.vercel.app`) | Cloudflare Pages / Netlify | Nginx / Docker port 3000 |
+| **Backend API & ML Pipeline** (FastAPI) | **Oracle Cloud Always Free VPS** (`68.233.117.16:8000`) | Dedicated Linux VPS | `python backend/main.py` on `localhost:8000` |
+| **Relational Datastore** (Mode A) | **PostgreSQL 16 on Oracle VPS** | Supabase PostgreSQL 16 | `postgres:16-alpine` in Docker |
+| **Evidence Object Storage** (Mode A) | **Decoupled Local Volume + Supabase Cloud Storage** | AWS S3 / Cloudflare R2 | Local File System (`uploads/`) |
 | **Resilient Datastore** (Mode B) | Embedded SQLite 3.45+ | Embedded SQLite 3.45+ | Embedded `legal_metrology.db` |
 
 
@@ -27,49 +27,32 @@ Because all underlying Computer Vision, Multilingual OCR (DBNet++ / PP-OCRv4 / P
 
 ## 2. When to Host (Timeline & Milestones)
 
-1. **Pre-Demo Staging (Now):**
-   - Deploy backend to Render/Railway and frontend to Vercel.
-   - Verify live SSL endpoints (`https://...`), upload latency, and Form-1 PDF generation.
+1. **Production Deployment (Active):**
+   - **Frontend:** Hosted on Vercel Global Edge CDN at `https://sih26034.vercel.app`.
+   - **Backend & Database:** Hosted on Oracle Cloud Always Free VM (Region: `ap-hyderabad-1`, IP: `68.233.117.16:8000`) with 5GB usable memory (1GB physical + 4GB persistent swap) and Docker Compose v2.
+   - **Proxy:** Vercel automatically proxies `/api/*` requests to the Oracle Cloud backend.
 2. **Jury Evaluation & Hackathon Presentation:**
-   - Keep Tier 1 (Cloud Web Application) active as primary.
-   - Keep Tier 2 (Docker Compose / Local Mode B Standalone on `localhost:8000`) pre-warmed on the presenter's laptop to ensure 100% demo resilience during venue network disruptions (ADL-07 / `CONNECTIVITY_REQUIREMENTS.md`).
+   - Tier 1 (Vercel + Oracle Always Free) is active 24/7 with zero cold starts, zero 15-minute sleep, and zero cost.
+   - Tier 2 (Docker Compose / Local Standalone on presenter's laptop) is available as an offline fallback if venue Wi-Fi drops.
 
 ---
 
-## 3. Hosting Method 1: Cloud Deployment (Vercel + Render / Railway)
+## 3. Production Deployment Architecture (Vercel + Oracle Cloud Always Free)
 
-### Step 1: Deploy Backend to Render
+### Step 1: Oracle Cloud VPS Backend Setup
 
-1. Log in to [Render Dashboard](https://dashboard.render.com/).
-2. Click **New +** $\rightarrow$ **Blueprint**.
-3. Connect your GitHub repository: `https://github.com/anonymousgrouphp-collab/sih26034`.
-4. Select the `main` branch. Render will automatically detect [`render.yaml`](../render.yaml) and create:
-   - A managed **PostgreSQL 16** database (`nirikshak-db`).
-   - A containerized **FastAPI Web Service** (`nirikshak-backend`) built from the root [`Dockerfile`](../Dockerfile).
-5. Click **Apply**.
-6. Once deployed, note your live backend URL:
-   `https://nirikshak-backend.onrender.com`
-
-> **Note on Railway Alternative:** If using Railway, simply click **New Project** $\rightarrow$ **Deploy from GitHub Repo**, add a PostgreSQL database service, and set `DATABASE_URL=${{Postgres.DATABASE_URL}}`.
+1. **Instance:** Oracle Cloud Always Free VM (`VM.Standard.E2.1.Micro`, Ubuntu 20.04, `ap-hyderabad-1`).
+2. **4GB Swap Space:** Configured for 5.0 GB total virtual memory, preventing OOM during multi-image ONNX OCR processing.
+3. **Docker Compose:** Runs `nyayadrishti-backend` (port 8000) and `nyayadrishti-db` (PostgreSQL 16, port 5432).
+4. **Permanent Uptime:** Runs independently of the developer's laptop, 24/7.
 
 ---
 
-### Step 2: Deploy Frontend to Vercel
+### Step 2: Vercel Frontend Edge Proxy
 
-1. Log in to [Vercel Dashboard](https://vercel.com/dashboard).
-2. Click **Add New...** $\rightarrow$ **Project**.
-3. Import the GitHub repository: `anonymousgrouphp-collab/sih26034`.
-4. Configure Project Settings:
-   - **Framework Preset:** `Vite`
-   - **Root Directory:** Leave as repository root (recommended; root [`vercel.json`](../vercel.json) handles building `frontend`), or select `frontend`.
-   - **Build Command:** `npm run build`
-   - **Output Directory:** `dist`
-5. Set Environment Variables under **Environment Variables**:
-   - `VITE_API_BASE_URL`: `https://nirikshak-backend.onrender.com/api/v1`
-   - `VITE_OPERATING_MODE`: `LIVE`
-6. Click **Deploy**.
-7. Vercel will build and assign an edge-cached domain:
-   `https://nirikshak.vercel.app`
+1. Vercel deploys `frontend/` to `https://sih26034.vercel.app`.
+2. `vercel.json` and `frontend/vercel.json` rewrite `/api/:path*` to `http://68.233.117.16:8000/api/:path*`.
+3. All image assets, legal metrology rule evaluations, and authentication requests are seamlessly proxied with sub-300ms latency.
 
 ---
 
