@@ -147,8 +147,8 @@ class MultilingualOCREngine:
             # Multilingual recognition (PP-OCRv4)
             p_text, p_conf, p_lang = self.recognizer.recognize(crop)
 
-            # Inversion probe: if initial confidence is sub-optimal (< 0.92), test 180-degree flipped crop
-            if crop is not None and crop.size > 0 and p_conf < 0.92:
+            # Inversion probe: if initial confidence is broken/inverted (< 0.40), test 180-degree flipped crop
+            if crop is not None and crop.size > 0 and p_conf < 0.40:
                 try:
                     crop_180 = cv2.rotate(crop, cv2.ROTATE_180)
                     p_text_180, p_conf_180, p_lang_180 = self.recognizer.recognize(crop_180)
@@ -220,11 +220,11 @@ class MultilingualOCREngine:
 
         orig_h, orig_w = image.shape[:2]
 
-        # Memory-safe downsample: cap max dimension to 1920
+        # Memory-safe downsample: cap max dimension to 1280
         scale = 1.0
         proc_image = image
-        if max(orig_h, orig_w) > 1920:
-            scale = 1920.0 / max(orig_h, orig_w)
+        if max(orig_h, orig_w) > 1280:
+            scale = 1280.0 / max(orig_h, orig_w)
             proc_w = max(int(round(orig_w * scale)), 16)
             proc_h = max(int(round(orig_h * scale)), 16)
             proc_image = cv2.resize(image, (proc_w, proc_h), interpolation=cv2.INTER_AREA)

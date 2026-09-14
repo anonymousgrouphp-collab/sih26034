@@ -1705,15 +1705,15 @@ def execute_batch_pipeline(
             "glare_percentage": img.glare_pixel_percentage,
         })
 
-    # Execute workers sequentially with safety time budget (25s) to never exceed Vercel/Render proxy timeouts
+    # Execute workers sequentially with safety time budget (18s) to never exceed Vercel/Render proxy timeouts
     import gc
     worker_results = []
-    SAFETY_BUDGET_SECONDS = 25.0
-    MAX_FACETS_TO_PROCESS = 3
+    SAFETY_BUDGET_SECONDS = 18.0
+    MAX_FACETS_TO_PROCESS = 2
 
     for idx, meta in enumerate(img_metas):
         elapsed = time.perf_counter() - t0
-        if (idx >= 2 and elapsed > SAFETY_BUDGET_SECONDS) or (idx >= MAX_FACETS_TO_PROCESS):
+        if (idx >= 1 and elapsed > SAFETY_BUDGET_SECONDS) or (idx >= MAX_FACETS_TO_PROCESS):
             logger.info(f"Batch pipeline reached budget limit ({elapsed:.1f}s, {idx} facets); proceeding to fusion.")
             break
 
