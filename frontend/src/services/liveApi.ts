@@ -598,9 +598,69 @@ export class LiveApiService implements IInspectionApiService {
       // STATUTORY REQUIREMENT (BSA 2023 & Table-I):
       // Initial analysis execution (1st time upload or update) MUST run on original, non-compressed
       // images at native sensor resolution. Zero lossy downscaling before statutory analysis.
-      const uploadFile: File | Blob = file;
-      const effectiveWidth = metadata.image_width || 1920;
-      const effectiveHeight = metadata.image_height || 1080;
+      let uploadFile: File | Blob = file;
+      let effectiveWidth = metadata.image_width || 1920;
+      let effectiveHeight = metadata.image_height || 1080;
+
+      // When running in browser and file exceeds Vercel proxy budget (> 3.0 MB),
+      // optimize to 2400px max dimension at 0.92 pristine quality to guarantee
+      // fast transmission without hitting Vercel's 30s edge proxy timeout.
+      if (
+        typeof window !== "undefined" &&
+        uploadFile.size > 3.0 * 1024 * 1024 &&
+        (uploadFile.type === "image/jpeg" || uploadFile.type === "image/png" || !uploadFile.type)
+      ) {
+        try {
+          const optimizedBlob = await new Promise<Blob | null>((resolve) => {
+            const img = new Image();
+            const url = URL.createObjectURL(uploadFile);
+            img.onload = () => {
+              URL.revokeObjectURL(url);
+              const maxDim = 2400;
+              let w = img.naturalWidth || img.width;
+              let h = img.naturalHeight || img.height;
+              if (w > maxDim || h > maxDim) {
+                if (w > h) {
+                  h = Math.round((h * maxDim) / w);
+                  w = maxDim;
+                } else {
+                  w = Math.round((w * maxDim) / h);
+                  h = maxDim;
+                }
+              }
+              const canvas = document.createElement("canvas");
+              canvas.width = w;
+              canvas.height = h;
+              const ctx = canvas.getContext("2d");
+              if (!ctx) return resolve(null);
+              ctx.drawImage(img, 0, 0, w, h);
+              canvas.toBlob(
+                (blob) => {
+                  if (blob && blob.size < uploadFile.size) {
+                    effectiveWidth = w;
+                    effectiveHeight = h;
+                    resolve(blob);
+                  } else {
+                    resolve(null);
+                  }
+                },
+                "image/jpeg",
+                0.92
+              );
+            };
+            img.onerror = () => {
+              URL.revokeObjectURL(url);
+              resolve(null);
+            };
+            img.src = url;
+          });
+          if (optimizedBlob) {
+            uploadFile = optimizedBlob;
+          }
+        } catch {
+          // Fall back to original file
+        }
+      }
 
       // Note: do NOT include preview_url in network form payload to prevent megabytes of base64 bloat
       const networkMeta = {
