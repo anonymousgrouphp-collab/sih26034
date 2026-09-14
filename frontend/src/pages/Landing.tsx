@@ -102,137 +102,127 @@ export const Landing: React.FC = () => {
 
       {/* Main Hero Section Inspired by india.gov.in */}
       <main id="main-content" className="flex-1">
-        <section className="relative overflow-hidden bg-[#1B365D] text-white pt-12 pb-24 sm:pt-16 sm:pb-32">
-          {/* Subtle Sovereign Backdrop */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/30 via-[#1B365D] to-[#142A4A] pointer-events-none" />
-          <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-500/10 blur-[120px] rounded-full mix-blend-screen pointer-events-none [animation:glowPulse_4s_ease-in-out_infinite]" />
+        <section className="relative overflow-hidden bg-[#0A2240] text-white pt-1 pb-1.5 sm:pt-2 sm:pb-2.5 lg:h-[calc(100vh-5.25rem)] lg:min-h-[580px] lg:max-h-[800px] flex flex-col justify-between">
+          {/* Subtle Sovereign Foundation Backdrop */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/40 via-[#0A2240] to-[#061426] pointer-events-none" />
           
-          {/* Sovereign Metrology Architectural & Colonnade Backdrop */}
+          {/* Sovereign Metrology Architectural Skyline Backdrop */}
           <SovereignMetrologyHeroBackdrop />
 
-          <div className="w-full max-w-[1750px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="max-w-5xl mx-auto text-center space-y-6">
-              {/* Official Ministerial Pre-Title Strip with State Emblem */}
-              <div className="inline-flex flex-col items-center gap-2 animate-fade-up">
-                <div className="flex items-center gap-3">
-                  <StateEmblem size={52} tone="gold" showMotto={true} />
-                  <div className="text-left border-l border-amber-400/40 pl-3">
-                    <p className="text-[11px] sm:text-xs font-black tracking-widest uppercase text-amber-300 font-mono">
-                      {language === "hi"
-                        ? "विधिक मापविज्ञान प्रभाग"
-                        : "Legal Metrology Division"}
-                    </p>
-                    <p className="text-[10px] sm:text-[11px] text-slate-300 font-medium">
-                      {language === "hi"
-                        ? "उपभोक्ता मामले विभाग • भारत सरकार"
-                        : "Department of Consumer Affairs • Government of India"}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-1.5 text-xs font-semibold text-amber-300 backdrop-blur-xs shadow-xs mt-1">
-                  <ShieldCheck size={14} className="text-amber-400" />
-                  <span>
+          <div className="w-full max-w-[1750px] mx-auto px-3 sm:px-6 lg:px-8 relative z-10 flex-1 flex flex-col justify-between py-1 min-w-0">
+            <div className="w-full max-w-4xl mx-auto text-center space-y-1.5 sm:space-y-2 flex-1 flex flex-col justify-center min-w-0">
+              {/* Official Ministerial Authority Masthead with Sovereign State Emblem */}
+              <div className="inline-flex items-center justify-center gap-2.5 sm:gap-3.5 animate-fade-up">
+                <StateEmblem size={38} tone="gold" showMotto={true} />
+                <div className="text-left border-l border-amber-400/40 pl-2.5 sm:pl-3">
+                  <p className="text-[10px] sm:text-xs font-black tracking-widest uppercase text-amber-300 font-mono">
                     {language === "hi"
-                      ? "शासकीय सेवा स्तर • पैक वस्तु वैधानिक प्रवर्तन"
-                      : "Government-Service-Grade • Packaged Commodities Statutory Enforcement"}
-                  </span>
+                      ? "भारत सरकार • विधिक मापविज्ञान प्रभाग"
+                      : "GOVERNMENT OF INDIA • LEGAL METROLOGY DIVISION"}
+                  </p>
+                  <p className="text-[9.5px] sm:text-[11px] text-slate-300 font-medium">
+                    {language === "hi"
+                      ? "उपभोक्ता मामले विभाग • राष्ट्रीय विधिक प्रवर्तन प्रणाली"
+                      : "Department of Consumer Affairs • National Statutory Enforcement System"}
+                  </p>
                 </div>
               </div>
 
               {/* Sovereign Portal Title & Tagline */}
-              <div className="space-y-3.5 max-w-4xl mx-auto">
-                <div className="inline-block animate-fade-up">
-                  <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] text-white">
+              <div className="space-y-1 sm:space-y-1.5 max-w-3xl mx-auto w-full min-w-0">
+                <div className="inline-block animate-fade-up w-full">
+                  <h1 className="text-xl sm:text-3xl lg:text-[1.95rem] font-black tracking-tight leading-snug sm:leading-[1.16] text-white">
                     {t("hero.headline_1", "Evidence-Grade Package Compliance.")}
-                    <span className="block text-amber-300 mt-1">
+                    <span className="block text-amber-300 mt-0.5">
                       {t("hero.headline_2", "Statutory Transparency.")}
                     </span>
-                  </h2>
+                  </h1>
                   {/* Official National Portal Tricolor Accent Ribbon */}
-                  <div className="flex items-center justify-center gap-1 mt-3 mx-auto max-w-xs">
-                    <div className="h-1 flex-1 bg-[#FF9933] rounded-full" />
-                    <div className="h-1 w-2 bg-white rounded-full" />
-                    <div className="h-1 flex-1 bg-[#138808] rounded-full" />
+                  <div className="flex items-center justify-center gap-1 mt-1.5 mx-auto max-w-[150px]">
+                    <div className="h-0.5 flex-1 bg-[#FF9933] rounded-full" />
+                    <div className="h-0.5 w-2 bg-white rounded-full" />
+                    <div className="h-0.5 flex-1 bg-[#138808] rounded-full" />
                   </div>
                 </div>
 
-                <p className="text-sm sm:text-base text-slate-200 max-w-3xl mx-auto leading-relaxed pt-1 animate-fade-up" style={{ animationDelay: "100ms" }}>
+                <p className="text-xs sm:text-[13px] text-slate-200 max-w-2xl mx-auto leading-normal animate-fade-up px-2">
                   {t(
                     "hero.description",
-                    "Empowering Legal Metrology Officers with automated optical quality gates, ArUco metric calibration, multilingual OCR (English + Hindi), Table-I numeral font schedule checks, and Section 63 BSA 2023 tamper-evident digital certificates."
+                    "Rule 6 Mandatory Declarations & Table-I Schedule Verification under Legal Metrology Act, 2009 with Section 63 BSA 2023 Tamper-Evident Certificates for Enforcement Officers."
                   )}
                 </p>
               </div>
 
-              {/* Central Statutory Omnibox Search Engine (Signature Feature inspired by india.gov.in) */}
-              <div className="pt-2 animate-fade-up" style={{ animationDelay: "200ms" }}>
+              {/* Central Statutory Omnibox Search Engine */}
+              <div className="w-full max-w-full min-w-0 pt-0.5 animate-fade-up">
                 <StatutoryOmnibox />
               </div>
 
               {/* Action CTAs */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-3 animate-fade-up" style={{ animationDelay: "300ms" }}>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 pt-0.5 animate-fade-up w-full max-w-md sm:max-w-none mx-auto">
                 <Link
                   to="/dashboard"
                   onClick={resetScrollToTop}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-govNavy px-6 py-3.5 text-sm font-black shadow-xl hover:shadow-amber-500/25 transition-all transform hover:-translate-y-0.5 btn-press"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 px-4.5 py-2 sm:py-2.5 text-xs sm:text-sm font-black shadow-lg hover:shadow-amber-400/25 transition-all transform hover:-translate-y-0.5 btn-press cursor-pointer"
                 >
+                  <ShieldCheck size={16} className="text-slate-950" />
                   <span>{t("hero.cta_workstation", "Launch Officer Workstation")}</span>
-                  <ArrowRight size={17} />
+                  <ArrowRight size={15} />
                 </Link>
                 <Link
                   to="/rules"
                   onClick={resetScrollToTop}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/10 hover:bg-white/20 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-xs transition-all btn-press"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/10 hover:bg-white/20 px-4.5 py-2 sm:py-2.5 text-xs sm:text-sm font-bold text-white backdrop-blur-xs transition-all btn-press cursor-pointer"
                 >
+                  <Scale size={15} className="text-amber-300" />
                   <span>{t("hero.cta_rules", "Statutory Rules & Table-I Schedule")}</span>
                 </Link>
               </div>
             </div>
 
-            {/* 4 Trust Pillar Badges */}
-            <Reveal className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-4xl mx-auto pt-6 border-t border-white/15 text-xs mt-8" delay={0.12}>
-              <div className="p-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs card-lift">
-                <p className="text-lg sm:text-xl font-black text-amber-300">
+            {/* 4 Trust Pillar Badges (Grounded at Bottom of 1st Frame) */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 max-w-4xl mx-auto w-full pt-1.5 pb-0.5 border-t border-white/10 text-xs mt-1.5 sm:mt-2">
+              <div className="p-1.5 sm:p-2 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs text-center">
+                <p className="text-sm sm:text-base font-black text-amber-300 leading-tight">
                   {t("hero.trust_verdicts", "4-State")}
                 </p>
-                <p className="text-slate-300 text-[11px] mt-0.5">
+                <p className="text-slate-300 text-[9.5px] sm:text-[10.5px] mt-0.5 truncate">
                   {t("hero.trust_verdicts_sub", "Epistemic Verdicts")}
                 </p>
               </div>
-              <div className="p-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs card-lift">
-                <p className="text-lg sm:text-xl font-black text-emerald-400">
+              <div className="p-1.5 sm:p-2 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs text-center">
+                <p className="text-sm sm:text-base font-black text-emerald-400 leading-tight">
                   {t("hero.trust_evidence", "Sec 63 BSA")}
                 </p>
-                <p className="text-slate-300 text-[11px] mt-0.5">
+                <p className="text-slate-300 text-[9.5px] sm:text-[10.5px] mt-0.5 truncate">
                   {t("hero.trust_evidence_sub", "Electronic Evidence")}
                 </p>
               </div>
-              <div className="p-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs card-lift">
-                <p className="text-lg sm:text-xl font-black text-amber-300">
+              <div className="p-1.5 sm:p-2 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs text-center">
+                <p className="text-sm sm:text-base font-black text-amber-300 leading-tight">
                   {t("hero.trust_font", "Table-I")}
                 </p>
-                <p className="text-slate-300 text-[11px] mt-0.5">
-                  {t("hero.trust_font_sub", "Font Height (6.0 mm)")
-                }</p>
+                <p className="text-slate-300 text-[9.5px] sm:text-[10.5px] mt-0.5 truncate">
+                  {t("hero.trust_font_sub", "Font Height (6.0 mm)")}
+                </p>
               </div>
-              <div className="p-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs card-lift">
-                <p className="text-lg sm:text-xl font-black text-cyan-300">
+              <div className="p-1.5 sm:p-2 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs text-center">
+                <p className="text-sm sm:text-base font-black text-cyan-300 leading-tight">
                   {t("hero.trust_offline", "Mode B")}
                 </p>
-                <p className="text-slate-300 text-[11px] mt-0.5">
+                <p className="text-slate-300 text-[9.5px] sm:text-[10.5px] mt-0.5 truncate">
                   {t("hero.trust_offline_sub", "Offline Resilient")}
                 </p>
               </div>
-            </Reveal>
+            </div>
           </div>
         </section>
 
-        {/* National Leadership & DPI Vision Spotlight Banner (Image 3 Inspiration) */}
+        {/* National Leadership & DPI Vision Spotlight Banner */}
         <NationalLeadershipBanner />
 
         {/* Official Statutory Benchmark & Physical Laboratory Testing Docket */}
-        <section className="py-14 bg-slate-100/80 border-b border-slate-200">
+        <section className="py-8 sm:py-14 bg-slate-100/80 border-b border-slate-200 scroll-mt-16">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <Reveal className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 pb-5 gap-4">

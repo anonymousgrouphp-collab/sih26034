@@ -16,7 +16,20 @@ import {
   Filter,
   Trash2,
   RefreshCw,
+  Search,
+  ArrowUpDown,
+  X,
 } from "lucide-react";
+
+export type ReviewSortOption =
+  | "DATE_DESC"
+  | "DATE_ASC"
+  | "SEVERITY"
+  | "DEGRADED"
+  | "CASE_ASC"
+  | "CASE_DESC"
+  | "NAME_ASC"
+  | "NAME_DESC";
 
 export const ReviewQueue: React.FC = () => {
   const navigate = useNavigate();
@@ -24,12 +37,14 @@ export const ReviewQueue: React.FC = () => {
   const [cases, setCases] = useState<InspectionSummary[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [triageFilter, setTriageFilter] = useState<"ALL" | "REVIEW" | "UNABLE">("ALL");
+  const [sortBy, setSortBy] = useState<ReviewSortOption>("DATE_DESC");
+  const [searchQuery, setSearchQuery] = useState("");
   const [caseToDelete, setCaseToDelete] = useState<InspectionSummary | null>(null);
   const [deletingCaseId, setDeletingCaseId] = useState<string | null>(null);
 
   useEffect(() => {
     resetScrollToTop();
-  }, [triageFilter]);
+  }, [triageFilter, sortBy]);
 
   const formatDateTime = (dateStr?: string) => {
     if (!dateStr) return "—";
@@ -75,32 +90,6 @@ export const ReviewQueue: React.FC = () => {
     );
   }, [cases]);
 
-  const filtered = useMemo(() => {
-    if (triageFilter === "REVIEW") {
-      return reviewCases.filter(
-        (c) =>
-          c.overall_status === "REVIEW" ||
-          c.overall_status === "PENDING_REVIEW" ||
-          c.overall_status === "PENDING"
-      );
-    }
-    if (triageFilter === "UNABLE") {
-      return reviewCases.filter((c) => c.overall_status === "UNABLE_TO_VERIFY");
-    }
-    return reviewCases;
-  }, [reviewCases, triageFilter]);
-
-  const counts = useMemo(() => {
-    const borderline = reviewCases.filter(
-      (c) =>
-        c.overall_status === "REVIEW" ||
-        c.overall_status === "PENDING_REVIEW" ||
-        c.overall_status === "PENDING"
-    ).length;
-    const degraded = reviewCases.filter((c) => c.overall_status === "UNABLE_TO_VERIFY").length;
-    return { total: reviewCases.length, borderline, degraded };
-  }, [reviewCases]);
-
   const getFormattedProductName = (c: InspectionSummary): string => {
     if (
       !c.product_name ||
@@ -115,6 +104,81 @@ export const ReviewQueue: React.FC = () => {
     }
     return c.product_name;
   };
+
+  const filtered = useMemo(() => {
+    let result = reviewCases;
+
+    // 1. Triage Filter
+    if (triageFilter === "REVIEW") {
+      result = result.filter(
+        (c) =>
+          c.overall_status === "REVIEW" ||
+          c.overall_status === "PENDING_REVIEW" ||
+          c.overall_status === "PENDING"
+      );
+    } else if (triageFilter === "UNABLE") {
+      result = result.filter((c) => c.overall_status === "UNABLE_TO_VERIFY");
+    }
+
+    // 2. Search Query Filter
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter((c) => {
+        const prod = getFormattedProductName(c).toLowerCase();
+        const num = (c.inspection_number || "").toLowerCase();
+        const brand = (c.brand_name || "").toLowerCase();
+        const est = (c.establishment_name || "").toLowerCase();
+        const circle = (c.jurisdiction_id || "").toLowerCase();
+        return prod.includes(q) || num.includes(q) || brand.includes(q) || est.includes(q) || circle.includes(q);
+      });
+    }
+
+    // 3. Sorting
+    return [...result].sort((a, b) => {
+      switch (sortBy) {
+        case "DATE_ASC": {
+          const tA = new Date(a.created_at || (a as any).inspection_timestamp || 0).getTime();
+          const tB = new Date(b.created_at || (b as any).inspection_timestamp || 0).getTime();
+          return tA - tB;
+        }
+        case "DATE_DESC": {
+          const tA = new Date(a.created_at || (a as any).inspection_timestamp || 0).getTime();
+          const tB = new Date(b.created_at || (b as any).inspection_timestamp || 0).getTime();
+          return tB - tA;
+        }
+        case "SEVERITY": {
+          const order: Record<string, number> = { REVIEW: 1, PENDING_REVIEW: 2, PENDING: 3, UNABLE_TO_VERIFY: 4 };
+          return (order[a.overall_status] || 99) - (order[b.overall_status] || 99);
+        }
+        case "DEGRADED": {
+          const isAUnable = a.overall_status === "UNABLE_TO_VERIFY" ? 0 : 1;
+          const isBUnable = b.overall_status === "UNABLE_TO_VERIFY" ? 0 : 1;
+          return isAUnable - isBUnable;
+        }
+        case "CASE_ASC":
+          return (a.inspection_number || "").localeCompare(b.inspection_number || "");
+        case "CASE_DESC":
+          return (b.inspection_number || "").localeCompare(a.inspection_number || "");
+        case "NAME_ASC":
+          return getFormattedProductName(a).localeCompare(getFormattedProductName(b));
+        case "NAME_DESC":
+          return getFormattedProductName(b).localeCompare(getFormattedProductName(a));
+        default:
+          return 0;
+      }
+    });
+  }, [reviewCases, triageFilter, searchQuery, sortBy]);
+
+  const counts = useMemo(() => {
+    const borderline = reviewCases.filter(
+      (c) =>
+        c.overall_status === "REVIEW" ||
+        c.overall_status === "PENDING_REVIEW" ||
+        c.overall_status === "PENDING"
+    ).length;
+    const degraded = reviewCases.filter((c) => c.overall_status === "UNABLE_TO_VERIFY").length;
+    return { total: reviewCases.length, borderline, degraded };
+  }, [reviewCases]);
 
   return (
     <div className="space-y-6">
@@ -196,10 +260,104 @@ export const ReviewQueue: React.FC = () => {
         </div>
       </div>
 
+      {/* Search, Sort & Triage Control Toolbar */}
+      <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        {/* Search Input */}
+        <div className="relative flex-1 max-w-md">
+          <Search size={16} className="text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={
+              language === "hi"
+                ? "मामला संख्या, वस्तु, ब्रांड या अधिकार क्षेत्र खोजें..."
+                : "Search case ID, commodity, brand, jurisdiction..."
+            }
+            className="w-full text-xs sm:text-sm pl-9 pr-8 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1B365D]/20 focus:border-[#1B365D] bg-white text-slate-900 placeholder:text-slate-400"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery("")}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
+
+        {/* Sorting Controls */}
+        <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600">
+            <ArrowUpDown size={14} className="text-[#1B365D]" />
+            <span>{language === "hi" ? "क्रमबद्ध:" : "Sort:"}</span>
+          </div>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as ReviewSortOption)}
+            className="text-xs font-semibold px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#1B365D]/20 focus:border-[#1B365D] cursor-pointer"
+          >
+            <option value="DATE_DESC">{language === "hi" ? "नवीनतम पहले (Newest)" : "Date: Newest First"}</option>
+            <option value="DATE_ASC">{language === "hi" ? "पुरातन पहले (Oldest)" : "Date: Oldest First"}</option>
+            <option value="SEVERITY">{language === "hi" ? "समीक्षा प्राथमिकता (Borderline First)" : "Priority: Borderline First"}</option>
+            <option value="DEGRADED">{language === "hi" ? "निम्न साक्ष्य पहले (Degraded First)" : "Evidence: Degraded First"}</option>
+            <option value="CASE_ASC">{language === "hi" ? "प्रकरण संख्या (A → Z)" : "Case ID: A → Z"}</option>
+            <option value="CASE_DESC">{language === "hi" ? "प्रकरण संख्या (Z → A)" : "Case ID: Z → A"}</option>
+            <option value="NAME_ASC">{language === "hi" ? "वस्तु नाम (A → Z)" : "Commodity: A → Z"}</option>
+            <option value="NAME_DESC">{language === "hi" ? "वस्तु नाम (Z → A)" : "Commodity: Z → A"}</option>
+          </select>
+
+          {/* Active Results Count */}
+          <span className="text-xs font-bold text-[#1B365D] bg-blue-50 border border-blue-200 px-2.5 py-1.5 rounded-lg shrink-0">
+            {language === "hi" ? `${filtered.length} मामले` : `${filtered.length} Cases`}
+          </span>
+
+          {/* Clear Button if filters active */}
+          {(searchQuery || triageFilter !== "ALL" || sortBy !== "DATE_DESC") && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery("");
+                setTriageFilter("ALL");
+                setSortBy("DATE_DESC");
+              }}
+              className="text-xs font-bold text-rose-600 hover:text-rose-700 px-2 py-1 underline cursor-pointer shrink-0"
+            >
+              {language === "hi" ? "रीसेट" : "Reset"}
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* Case List */}
       <div className="space-y-3">
-        <AnimatePresence>
-          {filtered.map((c) => {
+        {filtered.length === 0 ? (
+          <div className="bg-white rounded-xl border border-slate-200 p-10 text-center space-y-3 shadow-xs">
+            <Filter size={36} className="text-slate-300 mx-auto" />
+            <h3 className="text-sm font-bold text-slate-800">
+              {language === "hi" ? "कोई मेल खाने वाले मामले नहीं मिले" : "No matching review cases found"}
+            </h3>
+            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+              {language === "hi"
+                ? "कृपया अपने खोज शब्द बदलें या सक्रिय फ़िल्टर साफ़ करें।"
+                : "Try adjusting your search query or clearing the active triage filter."}
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery("");
+                setTriageFilter("ALL");
+                setSortBy("DATE_DESC");
+              }}
+              className="px-4 py-2 text-xs font-bold text-[#1B365D] bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
+            >
+              {language === "hi" ? "सभी फ़िल्टर साफ़ करें" : "Clear All Filters"}
+            </button>
+          </div>
+        ) : (
+          <AnimatePresence>
+            {filtered.map((c) => {
             const isReview = c.overall_status === "REVIEW";
             return (
               <m.div
@@ -290,36 +448,8 @@ export const ReviewQueue: React.FC = () => {
             );
           })}
         </AnimatePresence>
-
-        {filtered.length === 0 && (
-          <div className="bg-white p-10 text-center space-y-3 border border-slate-200/90 rounded-xl shadow-xs">
-            <img
-              src="/assets/empty-states/empty_review_queue.svg"
-              alt="Review queue is clear with zero pending adjudications"
-              className="w-36 h-32 mx-auto object-contain"
-            />
-            <div>
-              <p className="text-sm font-bold text-slate-900">
-                {language === "hi" ? "इस श्रेणी में कोई लंबित मामला नहीं है" : "No Pending Cases in this Category"}
-              </p>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto mt-0.5">
-                {language === "hi"
-                  ? "सभी सीमावर्ती मापों और सेंसर अनिश्चितता मामलों का विधिक मापविज्ञान अधिकारी द्वारा अधिनिर्णय किया जा चुका है।"
-                  : "All borderline measurements and sensor uncertainty cases have been adjudicated by the Legal Metrology Officer."}
-              </p>
-            </div>
-            <div className="pt-1">
-              <button
-                type="button"
-                onClick={() => navigate("/inspections")}
-                className="px-4 py-2 text-xs font-bold rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 shadow-2xs transition-colors cursor-pointer"
-              >
-                {language === "hi" ? "पूर्ण निरीक्षण रजिस्टर देखें →" : "View Complete Inspection Register →"}
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+      )}
+    </div>
 
       {/* Deletion Confirmation Modal */}
       {caseToDelete && (

@@ -211,8 +211,8 @@ export const StatutoryPipelineInfographic: React.FC = () => {
         </div>
       </div>
 
-      {/* Stepper Navigation Track */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+      {/* Stepper Navigation Track (Swipeable Tab Strip on Mobile, 5-col Grid on Desktop) */}
+      <div className="flex sm:grid sm:grid-cols-5 gap-2 overflow-x-auto no-scrollbar pb-1 snap-x">
         {steps.map((step) => {
           const Icon = step.icon;
           const isActive = step.id === activeStepId;
@@ -222,7 +222,7 @@ export const StatutoryPipelineInfographic: React.FC = () => {
               type="button"
               key={step.id}
               onClick={() => setActiveStepId(step.id)}
-              className={`p-3 rounded-xl text-left border transition-all relative ${
+              className={`shrink-0 min-w-[140px] sm:min-w-0 snap-start p-2.5 sm:p-3 rounded-xl text-left border transition-all relative ${
                 isActive
                   ? "border-govNavy bg-govNavy text-white shadow-md ring-2 ring-amber-400"
                   : "border-slate-200 bg-slate-50 text-slate-800 hover:border-slate-300 hover:bg-slate-100/80"
@@ -247,9 +247,9 @@ export const StatutoryPipelineInfographic: React.FC = () => {
                 </span>
               </div>
 
-              <div className="mt-2 flex items-center gap-2">
+              <div className="mt-2 flex items-center gap-1.5 sm:gap-2">
                 <Icon
-                  size={16}
+                  size={15}
                   className={isActive ? "text-amber-300" : "text-slate-600"}
                 />
                 <p className="text-xs font-bold truncate">
@@ -367,6 +367,11 @@ export const StatutoryPipelineInfographic: React.FC = () => {
           <span className="text-[10px] text-slate-400 font-mono hidden sm:inline">
             {language === "hi" ? "वेक्टर विनिर्देश • जीआईजीडब्ल्यू 3.0 मानक" : "Vector Specification • GIGW 3.0 Standard"}
           </span>
+        </div>
+
+        {/* Mobile Swipe Hint */}
+        <div className="flex sm:hidden items-center justify-end gap-1 text-[10px] text-slate-500 font-medium">
+          <span>{language === "hi" ? "👉 पूरा आरेख देखने के लिए स्क्रॉल करें" : "👉 Swipe to view full pipeline architecture"}</span>
         </div>
 
         <div className="p-2 sm:p-3 bg-slate-50/70 rounded-lg border border-slate-200/80 overflow-x-auto">

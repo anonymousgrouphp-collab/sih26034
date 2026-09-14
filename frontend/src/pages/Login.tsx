@@ -28,7 +28,7 @@ export const Login: React.FC = () => {
   const navigate = useNavigate();
   const { language, t } = useLanguage();
   const [selectedRole, setSelectedRole] = useState<UserRole>("inspector");
-  const [email, setEmail] = useState("inspector@nirikshak.gov.in");
+  const [email, setEmail] = useState("inspector.lmo@nic.in");
   const [password, setPassword] = useState("Demo@123");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -91,10 +91,10 @@ export const Login: React.FC = () => {
   const handleRoleSelect = (roleId: UserRole) => {
     setSelectedRole(roleId);
     const emails: Record<UserRole, string> = {
-      inspector: "inspector@nirikshak.gov.in",
-      controller: "controller@nirikshak.gov.in",
-      administrator: "admin@nirikshak.gov.in",
-      auditor: "audit@nirikshak.gov.in",
+      inspector: "inspector.lmo@nic.in",
+      controller: "controller.clm@nic.in",
+      administrator: "admin.metrology@nic.in",
+      auditor: "auditor.doca@nic.in",
     };
     setEmail(emails[roleId]);
     setError(null);

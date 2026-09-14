@@ -50,7 +50,7 @@ export const roleMeta: Record<UserRole, { label: string; designation: string; la
 export const demoUsers: Record<UserRole, SessionUser> = {
   inspector: {
     name: "Rajesh Sharma",
-    email: "inspector@nirikshak.gov.in",
+    email: "inspector.lmo@nic.in",
     role: "inspector",
     officerRole: "INSPECTOR",
     department: "Department of Consumer Affairs",
@@ -60,7 +60,7 @@ export const demoUsers: Record<UserRole, SessionUser> = {
   },
   controller: {
     name: "S.K. Verma",
-    email: "controller@nirikshak.gov.in",
+    email: "controller.clm@nic.in",
     role: "controller",
     officerRole: "CONTROLLER",
     department: "Directorate of Legal Metrology",
@@ -70,7 +70,7 @@ export const demoUsers: Record<UserRole, SessionUser> = {
   },
   administrator: {
     name: "Rohan Verma",
-    email: "admin@nirikshak.gov.in",
+    email: "admin.metrology@nic.in",
     role: "administrator",
     officerRole: "CONTROLLER",
     department: "National Informatics / DoCA",
@@ -80,7 +80,7 @@ export const demoUsers: Record<UserRole, SessionUser> = {
   },
   auditor: {
     name: "Neha Gupta",
-    email: "audit@nirikshak.gov.in",
+    email: "auditor.doca@nic.in",
     role: "auditor",
     officerRole: "INSPECTOR",
     department: "Legal Metrology Audit Cell",

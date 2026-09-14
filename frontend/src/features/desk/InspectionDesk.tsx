@@ -2,9 +2,20 @@ import React, { useState, useMemo } from "react";
 import { InspectionSummary } from "../../types/inspection";
 import { VerdictBadge, WorkflowBadge } from "../../components/common/StatusBadge";
 import { GoldenSkuQuickSelector } from "./GoldenSkuQuickSelector";
-import { MapPin, CalendarDays, Plus, Trash2, RefreshCw, AlertTriangle } from "lucide-react";
+import { MapPin, CalendarDays, Plus, Trash2, RefreshCw, AlertTriangle, ArrowUpDown, ArrowDown, ArrowUp, X, Filter } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext";
 import { ApiService } from "../../services/api";
+
+export type DeskSortOption =
+  | "DATE_DESC"
+  | "DATE_ASC"
+  | "VERDICT_SEV"
+  | "CONF_ASC"
+  | "CONF_DESC"
+  | "CASE_ASC"
+  | "CASE_DESC"
+  | "PRODUCT_ASC"
+  | "PRODUCT_DESC";
 
 interface InspectionDeskProps {
   cases: InspectionSummary[];
@@ -31,6 +42,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedWorkflow, setSelectedWorkflow] = useState<string>("ALL");
   const [selectedVerdict, setSelectedVerdict] = useState<string>("ALL");
+  const [sortBy, setSortBy] = useState<DeskSortOption>("DATE_DESC");
   const [triageFilter, setTriageFilter] = useState<"ALL" | "CONFLICTS" | "EVIDENCE_GAPS">("ALL");
 
   // Summary Metrics calculated directly from the cases
@@ -109,7 +121,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
 
   // Filtered case records
   const filteredCases = useMemo(() => {
-    return cases.filter((c) => {
+    const matched = cases.filter((c) => {
       // Circle filter
       if (activeCircle && activeCircle !== "ALL" && c.jurisdiction_id && c.jurisdiction_id !== activeCircle) {
         return false;
@@ -167,7 +179,47 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
 
       return true;
     });
-  }, [cases, activeCircle, searchTerm, selectedWorkflow, selectedVerdict, triageFilter]);
+
+    // Sorting stage
+    return [...matched].sort((a, b) => {
+      switch (sortBy) {
+        case "DATE_ASC": {
+          const tA = new Date(a.created_at || (a as any).inspection_timestamp || 0).getTime();
+          const tB = new Date(b.created_at || (b as any).inspection_timestamp || 0).getTime();
+          return tA - tB;
+        }
+        case "DATE_DESC": {
+          const tA = new Date(a.created_at || (a as any).inspection_timestamp || 0).getTime();
+          const tB = new Date(b.created_at || (b as any).inspection_timestamp || 0).getTime();
+          return tB - tA;
+        }
+        case "VERDICT_SEV": {
+          // Violations (FAIL) first, then REVIEW/UNABLE, then PASS
+          const score = (c: InspectionSummary) => {
+            if (c.overall_status === "FAIL" || (c.violations_count && c.violations_count > 0)) return 1;
+            if (c.overall_status === "REVIEW" || c.overall_status === "UNABLE_TO_VERIFY" || c.overall_status === "PENDING_REVIEW" || c.overall_status === "PENDING") return 2;
+            if (c.overall_status === "PASS") return 3;
+            return 4;
+          };
+          return score(a) - score(b);
+        }
+        case "CONF_ASC":
+          return getCaseConfidence(a) - getCaseConfidence(b);
+        case "CONF_DESC":
+          return getCaseConfidence(b) - getCaseConfidence(a);
+        case "CASE_ASC":
+          return (a.inspection_number || "").localeCompare(b.inspection_number || "");
+        case "CASE_DESC":
+          return (b.inspection_number || "").localeCompare(a.inspection_number || "");
+        case "PRODUCT_ASC":
+          return getFormattedProductName(a).localeCompare(getFormattedProductName(b));
+        case "PRODUCT_DESC":
+          return getFormattedProductName(b).localeCompare(getFormattedProductName(a));
+        default:
+          return 0;
+      }
+    });
+  }, [cases, activeCircle, searchTerm, selectedWorkflow, selectedVerdict, triageFilter, sortBy]);
 
   const formatInspectionType = (type?: string) => {
     if (language === "hi") {
@@ -416,7 +468,30 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
             </select>
           </div>
 
-          {(searchTerm || selectedWorkflow !== "ALL" || selectedVerdict !== "ALL" || triageFilter !== "ALL") && (
+          {/* Sort By Filter */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            <span className="text-xs font-semibold text-slate-600 flex items-center gap-1">
+              <ArrowUpDown size={12} className="text-[#1B365D]" />
+              <span>{language === "hi" ? "क्रमबद्ध:" : "Sort:"}</span>
+            </span>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as DeskSortOption)}
+              className="text-xs px-2.5 py-1.5 border border-slate-200 rounded-lg bg-white text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#1B365D] cursor-pointer"
+            >
+              <option value="DATE_DESC">{language === "hi" ? "नवीनतम पहले (Newest)" : "Date: Newest First"}</option>
+              <option value="DATE_ASC">{language === "hi" ? "पुरातन पहले (Oldest)" : "Date: Oldest First"}</option>
+              <option value="VERDICT_SEV">{language === "hi" ? "उल्लंघन पहले (Violations First)" : "Violations First"}</option>
+              <option value="CONF_ASC">{language === "hi" ? "निम्न विश्वास (Low Confidence)" : "Confidence: Low First"}</option>
+              <option value="CONF_DESC">{language === "hi" ? "उच्च विश्वास (High Confidence)" : "Confidence: High First"}</option>
+              <option value="CASE_ASC">{language === "hi" ? "प्रकरण संख्या (A → Z)" : "Case ID: A → Z"}</option>
+              <option value="CASE_DESC">{language === "hi" ? "प्रकरण संख्या (Z → A)" : "Case ID: Z → A"}</option>
+              <option value="PRODUCT_ASC">{language === "hi" ? "वस्तु नाम (A → Z)" : "Commodity: A → Z"}</option>
+              <option value="PRODUCT_DESC">{language === "hi" ? "वस्तु नाम (Z → A)" : "Commodity: Z → A"}</option>
+            </select>
+          </div>
+
+          {(searchTerm || selectedWorkflow !== "ALL" || selectedVerdict !== "ALL" || triageFilter !== "ALL" || sortBy !== "DATE_DESC") && (
             <button
               type="button"
               onClick={() => {
@@ -424,8 +499,9 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                 setSelectedWorkflow("ALL");
                 setSelectedVerdict("ALL");
                 setTriageFilter("ALL");
+                setSortBy("DATE_DESC");
               }}
-              className="text-xs text-rose-600 hover:text-rose-700 font-semibold px-2 py-1 underline"
+              className="text-xs text-rose-600 hover:text-rose-700 font-semibold px-2 py-1 underline cursor-pointer"
             >
               {language === "hi" ? "फ़िल्टर हटाएं" : "Clear"}
             </button>
@@ -467,6 +543,26 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
           </div>
         ) : (
           <>
+            {/* Mobile View: Top Status Bar with Count & Active Sort */}
+            <div className="flex md:hidden bg-slate-50 px-3.5 py-2 border-b border-slate-200 items-center justify-between text-[11px]">
+              <span className="text-slate-600 font-bold">
+                {language === "hi" ? `${filteredCases.length} मामले प्रदर्शित` : `${filteredCases.length} Cases Listed`}
+              </span>
+              <span className="text-[#1B365D] font-mono font-bold bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                {sortBy === "DATE_DESC"
+                  ? "↓ Newest"
+                  : sortBy === "DATE_ASC"
+                  ? "↑ Oldest"
+                  : sortBy === "VERDICT_SEV"
+                  ? "! Violations"
+                  : sortBy === "CONF_ASC"
+                  ? "↓ Confidence"
+                  : sortBy === "CASE_ASC"
+                  ? "A-Z ID"
+                  : "Sorted"}
+              </span>
+            </div>
+
             {/* Mobile View: High-Legibility Card Tiles */}
             <div className="block md:hidden divide-y divide-slate-100">
               {filteredCases.map((c) => {
@@ -542,15 +638,77 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
             {/* Desktop View: Full Data Table with Workstation Micro-Interactions */}
             <div className="hidden md:block overflow-x-auto">
               <table className="min-w-full divide-y divide-slate-200 text-left">
-              <thead className="bg-slate-50 text-[11px] font-bold text-slate-600 uppercase tracking-wider border-b border-slate-200">
+              <thead className="bg-slate-50 text-[11px] font-bold text-slate-600 uppercase tracking-wider border-b border-slate-200 select-none">
                 <tr>
-                  <th scope="col" className="px-4 py-3">{language === "hi" ? "केस आईडी / दिनांक एवं समय" : "Case ID / Date & Time"}</th>
-                  <th scope="col" className="px-4 py-3">{language === "hi" ? "वस्तु एवं ब्रांड" : "Commodity & Brand"}</th>
+                  <th
+                    scope="col"
+                    className="px-4 py-3 cursor-pointer hover:bg-slate-100 transition-colors"
+                    onClick={() => setSortBy(sortBy === "DATE_DESC" ? "DATE_ASC" : "DATE_DESC")}
+                    title="Sort by Date"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span>{language === "hi" ? "केस आईडी / दिनांक" : "Case ID / Date"}</span>
+                      {sortBy === "DATE_DESC" ? (
+                        <ArrowDown size={13} className="text-[#1B365D]" />
+                      ) : sortBy === "DATE_ASC" ? (
+                        <ArrowUp size={13} className="text-[#1B365D]" />
+                      ) : (
+                        <ArrowUpDown size={12} className="text-slate-400" />
+                      )}
+                    </div>
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-4 py-3 cursor-pointer hover:bg-slate-100 transition-colors"
+                    onClick={() => setSortBy(sortBy === "PRODUCT_ASC" ? "PRODUCT_DESC" : "PRODUCT_ASC")}
+                    title="Sort by Commodity Name"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span>{language === "hi" ? "वस्तु एवं ब्रांड" : "Commodity & Brand"}</span>
+                      {sortBy === "PRODUCT_ASC" ? (
+                        <ArrowUp size={13} className="text-[#1B365D]" />
+                      ) : sortBy === "PRODUCT_DESC" ? (
+                        <ArrowDown size={13} className="text-[#1B365D]" />
+                      ) : (
+                        <ArrowUpDown size={12} className="text-slate-400" />
+                      )}
+                    </div>
+                  </th>
                   <th scope="col" className="px-4 py-3">{language === "hi" ? "प्रतिष्ठान / स्थान" : "Establishment / Location"}</th>
                   <th scope="col" className="px-4 py-3">{language === "hi" ? "निरीक्षण प्रकार" : "Inspection Type"}</th>
-                  <th scope="col" className="px-4 py-3">{language === "hi" ? "विश्वसनीयता" : "Confidence"}</th>
+                  <th
+                    scope="col"
+                    className="px-4 py-3 cursor-pointer hover:bg-slate-100 transition-colors"
+                    onClick={() => setSortBy(sortBy === "CONF_ASC" ? "CONF_DESC" : "CONF_ASC")}
+                    title="Sort by Confidence"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span>{language === "hi" ? "विश्वसनीयता" : "Confidence"}</span>
+                      {sortBy === "CONF_ASC" ? (
+                        <ArrowUp size={13} className="text-[#1B365D]" />
+                      ) : sortBy === "CONF_DESC" ? (
+                        <ArrowDown size={13} className="text-[#1B365D]" />
+                      ) : (
+                        <ArrowUpDown size={12} className="text-slate-400" />
+                      )}
+                    </div>
+                  </th>
                   <th scope="col" className="px-4 py-3">{language === "hi" ? "कार्यप्रवाह" : "Workflow"}</th>
-                  <th scope="col" className="px-4 py-3">{language === "hi" ? "अनुपालन निर्णय" : "Compliance Verdict"}</th>
+                  <th
+                    scope="col"
+                    className="px-4 py-3 cursor-pointer hover:bg-slate-100 transition-colors"
+                    onClick={() => setSortBy(sortBy === "VERDICT_SEV" ? "DATE_DESC" : "VERDICT_SEV")}
+                    title="Sort by Verdict Severity"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span>{language === "hi" ? "अनुपालन निर्णय" : "Compliance Verdict"}</span>
+                      {sortBy === "VERDICT_SEV" ? (
+                        <ArrowDown size={13} className="text-rose-600" />
+                      ) : (
+                        <ArrowUpDown size={12} className="text-slate-400" />
+                      )}
+                    </div>
+                  </th>
                   <th scope="col" className="px-4 py-3 text-right">{language === "hi" ? "कार्रवाई" : "Action"}</th>
                 </tr>
               </thead>

@@ -83,7 +83,7 @@ export const GovTopBar: React.FC = () => {
             <div className="h-3 w-px bg-slate-700 hidden sm:block" />
 
             {/* Font Size Adjuster A- | A | A+ */}
-            <div className="flex items-center rounded border border-slate-700 bg-slate-800/80 p-0.5 font-mono text-[10px] font-bold">
+            <div className="hidden sm:flex items-center rounded border border-slate-700 bg-slate-800/80 p-0.5 font-mono text-[10px] font-bold">
               <button
                 type="button"
                 onClick={() => setFontSize("sm")}
