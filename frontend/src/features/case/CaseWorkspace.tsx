@@ -668,7 +668,6 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
         caseData={caseData}
         onBack={onBack}
         isProcessing={isSubmittingEvidence || isAnalyzingPipeline}
-        onSelectSku={onSelectCase}
         onDeleteCase={() => setIsDeleteDialogOpen(true)}
       />
 

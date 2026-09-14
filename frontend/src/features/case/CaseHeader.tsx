@@ -3,14 +3,12 @@ import { useLanguage } from "../../context/LanguageContext";
 import { InspectionCase } from "../../types/inspection";
 import { VerdictBadge, WorkflowBadge } from "../../components/common/StatusBadge";
 import { ApiService } from "../../services/api";
-import { GoldenSkuQuickSelector } from "../desk/GoldenSkuQuickSelector";
 import { Trash2 } from "lucide-react";
 
 interface CaseHeaderProps {
   caseData: InspectionCase;
   onBack: () => void;
   isProcessing?: boolean;
-  onSelectSku?: (caseId: string) => void;
   onDeleteCase?: () => void;
 }
 
@@ -18,7 +16,6 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
   caseData,
   onBack,
   isProcessing = false,
-  onSelectSku,
   onDeleteCase,
 }) => {
   const { language } = useLanguage();
@@ -76,16 +73,7 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
         </div>
       </div>
 
-      {/* Quick Demo Scenario Switcher (Compact Bar) */}
-      {onSelectSku && (
-        <div className="pt-0.5 pb-1 border-b border-slate-100">
-          <GoldenSkuQuickSelector
-            onSelectSku={onSelectSku}
-            activeSkuId={caseData.sku_demo_id || caseData.id}
-            isCompact={true}
-          />
-        </div>
-      )}
+
 
       {/* Details Row: Commodity, Trader, Registration Date */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
