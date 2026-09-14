@@ -17,7 +17,7 @@ Because all underlying Computer Vision, Multilingual OCR (DBNet++ / PP-OCRv4 / P
 | Component | Recommended Cloud Host | Alternative Host | Local / Offline Host |
 | :--- | :--- | :--- | :--- |
 | **Frontend Workstation** (React 18 + Vite) | **Vercel** (Global Edge CDN) | Netlify / Cloudflare Pages | Nginx / FastAPI static mount |
-| **Backend API & ML Pipeline** (FastAPI) | **Render** (Docker Web Service) | **Railway** / **Hugging Face Spaces** | `python main.py` on `localhost:8000` |
+| **Backend API & ML Pipeline** (FastAPI) | **Render** (Docker Web Service) | **Railway** / **Hugging Face Spaces** | `python backend/main.py` on `localhost:8000` |
 | **Relational Datastore** (Mode A) | **Supabase PostgreSQL 16** | Render Managed PostgreSQL / Neon | `postgres:16-alpine` in Docker |
 | **Evidence Object Storage** (Mode A) | **Supabase Cloud Storage** (`evidence-images`) | AWS S3 / Cloudflare R2 | Local File System (`uploads/`) |
 | **Resilient Datastore** (Mode B) | Embedded SQLite 3.45+ | Embedded SQLite 3.45+ | Embedded `legal_metrology.db` |
@@ -61,7 +61,7 @@ Because all underlying Computer Vision, Multilingual OCR (DBNet++ / PP-OCRv4 / P
 3. Import the GitHub repository: `anonymousgrouphp-collab/sih26034`.
 4. Configure Project Settings:
    - **Framework Preset:** `Vite`
-   - **Root Directory:** Leave as repository root (recommended; root [`vercel.json`](../vercel.json) handles building `ui-combined`), or select `ui-combined`.
+   - **Root Directory:** Leave as repository root (recommended; root [`vercel.json`](../vercel.json) handles building `frontend`), or select `frontend`.
    - **Build Command:** `npm run build`
    - **Output Directory:** `dist`
 5. Set Environment Variables under **Environment Variables**:
@@ -120,13 +120,13 @@ For offline field inspections or laptop demonstrations with zero external depend
 
 ```bash
 # 1. Install dependencies
-pip install -r requirements.txt
+pip install -r backend/requirements.txt
 
 # 2. Build frontend assets (or use pre-built dist/)
-cd ui-combined && npm run build && cd ..
+cd frontend && npm run build && cd ..
 
 # 3. Launch unified server (SQLite storage activates automatically)
-python main.py
+python backend/main.py
 ```
 
 Open browser at:

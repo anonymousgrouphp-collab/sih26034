@@ -23,7 +23,7 @@ You evaluate:
 You are allowed to create and edit files strictly inside:
 - `backend/rule_engine/**`
 
-You may read shared contracts in `contracts/compliance/` and `contracts/extraction/`.
+You may read shared contracts in `backend/contracts/compliance/` and `backend/contracts/extraction/`.
 You must NOT edit other member directories or root specification files.
 
 ---
@@ -36,24 +36,24 @@ You must NOT edit other member directories or root specification files.
 5. `07_API_AND_INTERFACE_CONTRACTS.md` (`RuleEvaluationDTO`, `ComplianceVerdictResult`)
 6. `11_TESTING_AND_VALIDATION_PLAN.md` (`TS-UNIT-04` through `TS-UNIT-13`)
 7. `16_DECISION_LOG.md` (ADL-01: Table-I Row 5 6.0 mm, ADL-07: Temporal Epochs, ADL-12: 4-State Triage)
-8. `CLAIMS_WE_MUST_NOT_MAKE.md` (Section 2: Legal Claims)
+8. `10_SECURITY_AND_AUDIT_SPECIFICATION.md` (Section 2: Legal Compliance & Compounding Boundaries)
 
 ---
 
 ## 4. What inputs do I use?
-- `NormalizedCommodityFacts` from `contracts/extraction/extraction_dto.py`.
-- Physical font height measurements from `contracts/calibration/calibration_dto.py`.
+- `NormalizedCommodityFacts` from `backend/contracts/extraction/extraction_dto.py`.
+- Physical font height measurements from `backend/contracts/calibration/calibration_dto.py`.
 - Standalone rule fixtures in `backend/rule_engine/fixtures/`.
 
 ---
 
 ## 5. What outputs do I produce?
-- `ComplianceVerdictResult` conforming to `contracts/compliance/compliance_dto.py` with granular `RuleEvaluationDTO` list citing exact Gazette GSR notifications.
+- `ComplianceVerdictResult` conforming to `backend/contracts/compliance/compliance_dto.py` with granular `RuleEvaluationDTO` list citing exact Gazette GSR notifications.
 
 ---
 
 ## 6. What contract do I follow?
-- `contracts/compliance/compliance_dto.py` and `contracts/compliance/compliance_schema.json`.
+- `backend/contracts/compliance/compliance_dto.py` and `backend/contracts/compliance/compliance_schema.json`.
 
 ---
 

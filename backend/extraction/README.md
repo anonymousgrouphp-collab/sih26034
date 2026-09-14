@@ -21,7 +21,7 @@ You NEVER use a generative LLM to guess missing statutory declarations.
 You are allowed to create and edit files strictly inside:
 - `backend/extraction/**`
 
-You may read shared contracts in `contracts/extraction/` and `contracts/ocr/`.
+You may read shared contracts in `backend/contracts/extraction/` and `backend/contracts/ocr/`.
 You must NOT edit other member directories or root specification files.
 
 ---
@@ -34,23 +34,23 @@ You must NOT edit other member directories or root specification files.
 5. `11_TESTING_AND_VALIDATION_PLAN.md` (`TS-UNIT-01`, `TS-UNIT-02`, `TS-UNIT-03`, `TS-UNIT-09`)
 6. `16_DECISION_LOG.md` (ADL-04: Hybrid Perception-Verification)
 7. `17_OPEN_QUESTIONS.md` (OQ-02: Minimum Address Parsing Tokens)
-8. `CLAIMS_WE_MUST_NOT_MAKE.md`
+8. `10_SECURITY_AND_AUDIT_SPECIFICATION.md`
 
 ---
 
 ## 4. What inputs do I use?
-- `OCROutput` token payloads conforming to `contracts/ocr/ocr_dto.py`.
+- `OCROutput` token payloads conforming to `backend/contracts/ocr/ocr_dto.py`.
 - Static OCR JSON fixtures in `backend/extraction/fixtures/`.
 
 ---
 
 ## 5. What outputs do I produce?
-- `NormalizedCommodityFacts` conforming to `contracts/extraction/extraction_dto.py`.
+- `NormalizedCommodityFacts` conforming to `backend/contracts/extraction/extraction_dto.py`.
 
 ---
 
 ## 6. What contract do I follow?
-- `contracts/extraction/extraction_dto.py` and `contracts/extraction/extraction_schema.json`.
+- `backend/contracts/extraction/extraction_dto.py` and `backend/contracts/extraction/extraction_schema.json`.
 
 ---
 

@@ -43,7 +43,7 @@ The repository contains 21 authoritative engineering and governance specificatio
 | 06_DATA_AND_MODEL_STRATEGY.md        | DS-SYNTH-001, DS-PILOT-050, ONNX INT8, & model licensing.   |
 | 07_API_AND_INTERFACE_CONTRACTS.md    | RESTful OpenAPI 3.1 endpoints, Pydantic v2 pipeline DTOs.   |
 | 08_DATABASE_SPECIFICATION.md         | Relational DDL, SQLite/PostgreSQL schemas, & index strategy.|
-| 09_UI_UX_BLUEPRINT.md                | Design tokens, mobile HUD, adjudication canvas, & notices.  |
+| docs/design/09_UI_UX_BLUEPRINT.md    | Design tokens, mobile HUD, adjudication canvas, & notices.  |
 | 10_SECURITY_AND_AUDIT_SPECIFICATION.md| RBAC matrix, Section 63 BSA 2023, & Merkle audit ledger.   |
 | 11_TESTING_AND_VALIDATION_PLAN.md    | 4-tier test pyramid, 20 formal test suites, & acceptance QA.|
 | 12_DEMO_PLAN.md                      | 3-tier presentation fallback architecture & pitch script.   |
@@ -54,8 +54,8 @@ The repository contains 21 authoritative engineering and governance specificatio
 | 17_OPEN_QUESTIONS.md                 | Strictly bounded open questions with frozen working defaults|
 | SYSTEM_MODES_AND_CONNECTIVITY.md     | 3 System Operating Modes (Online Web Primary, Optional Local, Future).|
 | CONNECTIVITY_REQUIREMENTS.md         | 4-tier component dependency matrix & network isolation spec.|
-| FINAL_AUTHENTICITY_AND_ACCURACY_AUDIT.md| Master pre-development validation & compliance audit.    |
-| CLAIMS_WE_MUST_NOT_MAKE.md           | Blacklist of unsupported, legally hazardous claims.         |
+| 10_SECURITY_AND_AUDIT_SPECIFICATION.md| Consolidated pre-dev validation, audit & security controls. |
+| COMPLETE_PROJECT_END_TO_END_GUIDE.md | Consolidated master guide, statutory bounds & claims register.|
 +----------------------------------------------------------------------------------------------------+
 ```
 

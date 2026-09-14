@@ -24,7 +24,7 @@ You build:
 You are allowed to create and edit files strictly inside:
 - `backend/evidence/**`
 
-You may read shared contracts in `contracts/evidence/`, `contracts/ui/`, and `08_DATABASE_SPECIFICATION.md`.
+You may read shared contracts in `backend/contracts/evidence/`, `backend/contracts/ui/`, and `08_DATABASE_SPECIFICATION.md`.
 You must NOT edit other member directories or root specification files.
 
 ---
@@ -38,26 +38,26 @@ You must NOT edit other member directories or root specification files.
 6. `10_SECURITY_AND_AUDIT_SPECIFICATION.md` (JWT RBAC, Merkle DAG, Section 63 BSA Certificate)
 7. `11_TESTING_AND_VALIDATION_PLAN.md` (`TS-EVID-01`, `TS-EVID-02`, `TS-WEB-01` to `TS-WEB-03`)
 8. `16_DECISION_LOG.md` (ADL-02, ADL-08, ADL-14, ADL-15, ADL-19)
-9. `CLAIMS_WE_MUST_NOT_MAKE.md` (Section 3 & 4)
+9. `10_SECURITY_AND_AUDIT_SPECIFICATION.md` (Section 3 & 4: Evidentiary Admissibility Bounds)
 
 ---
 
 ## 4. What inputs do I use?
-- Pipeline execution outputs from `contracts/`.
+- Pipeline execution outputs from `backend/contracts/`.
 - Database configurations (PostgreSQL in production, SQLite in local Mode B).
 - Pipeline output fixtures in `backend/evidence/fixtures/`.
 
 ---
 
 ## 5. What outputs do I produce?
-- REST API responses matching `contracts/ui/ui_contract_schema.json`.
-- `BSAEvidenceBundleDTO` and `Section63CertificateDTO` matching `contracts/evidence/evidence_dto.py`.
+- REST API responses matching `backend/contracts/ui/ui_contract_schema.json`.
+- `BSAEvidenceBundleDTO` and `Section63CertificateDTO` matching `backend/contracts/evidence/evidence_dto.py`.
 - Court-ready archival `InspectionNotice_Form1.pdf`.
 
 ---
 
 ## 6. What contract do I follow?
-- `contracts/evidence/evidence_dto.py`, `contracts/ui/ui_contract_schema.json`, and `08_DATABASE_SPECIFICATION.md`.
+- `backend/contracts/evidence/evidence_dto.py`, `backend/contracts/ui/ui_contract_schema.json`, and `08_DATABASE_SPECIFICATION.md`.
 
 ---
 

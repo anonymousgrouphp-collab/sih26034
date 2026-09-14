@@ -754,7 +754,7 @@ class FieldInspectorCLI:
         custom_output_path: Optional[str] = None,
     ) -> Tuple[str, Any]:
         """Generates Form-1 PDF Show Cause Notice and auto-opens viewer."""
-        notices_dir = REPO_ROOT / "storage" / "evidence" / "notices"
+        notices_dir = REPO_ROOT / "backend" / "storage" / "evidence" / "notices"
         notices_dir.mkdir(parents=True, exist_ok=True)
 
         if custom_output_path:

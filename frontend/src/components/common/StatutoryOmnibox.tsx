@@ -210,6 +210,10 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
   const [selectedRule, setSelectedRule] = useState<RuleSnippet | null>(null);
   const navigate = useNavigate();
   const { t, language } = useLanguage();
+  const isHero = variant === "hero";
+  const pillClasses = isHero
+    ? "inline-flex items-center px-2 py-0.5 rounded-md text-[10px] sm:text-[10.5px] font-medium transition-all bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white border border-white/20 hover:border-white/35 shadow-2xs cursor-pointer backdrop-blur-xs active:scale-[0.98] whitespace-nowrap"
+    : "inline-flex items-center px-2 py-0.5 rounded-md text-[10px] sm:text-[10.5px] font-medium transition-all bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 hover:border-slate-300 shadow-2xs cursor-pointer active:scale-[0.98] whitespace-nowrap";
 
   // Lock background scroll and listen for Escape key when statutory modal is open
   useEffect(() => {
@@ -365,17 +369,21 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
         </div>
       </form>
 
-      {/* Statutory Provisions / Quick References Row (Smooth Horizontal Scroll on Mobile) */}
-      <div className="w-full max-w-full min-w-0 flex items-center gap-1.5 sm:gap-2 mt-2 sm:mt-2.5 px-0.5 overflow-x-auto no-scrollbar py-0.5 whitespace-nowrap text-[11px]">
-        <span className="font-bold tracking-wider uppercase text-[10px] text-slate-400 shrink-0 flex items-center gap-1">
-          <Scale size={12} className="text-amber-300" />
+      {/* Statutory Provisions / Quick References Row (Multi-Line Wrapping Pills) */}
+      <div className="w-full max-w-full min-w-0 flex flex-wrap items-center gap-1.5 sm:gap-2 mt-2 sm:mt-2.5 px-0.5">
+        <span
+          className={`inline-flex items-center gap-1 font-bold tracking-wider uppercase text-[9.5px] sm:text-[10px] mr-0.5 shrink-0 ${
+            isHero ? "text-slate-300" : "text-slate-600"
+          }`}
+        >
+          <Scale size={11} className={isHero ? "text-amber-300" : "text-[#1B365D]"} />
           <span>{language === "hi" ? "त्वरित विधिक संदर्भ :" : "STATUTORY REFERENCES :"}</span>
         </span>
 
         <button
           type="button"
           onClick={() => setSelectedRule(STATUTORY_RULES.table1)}
-          className="shrink-0 px-2.5 py-1 rounded-lg text-[10.5px] sm:text-[11px] font-semibold transition-all bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white border border-white/20 shadow-2xs cursor-pointer backdrop-blur-xs"
+          className={pillClasses}
         >
           {t("omnibox.pill_table1", "Table-I Font Schedule (Row 5 = 6.0 mm)")}
         </button>
@@ -383,7 +391,7 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
         <button
           type="button"
           onClick={() => setSelectedRule(STATUTORY_RULES.banned_units)}
-          className="shrink-0 px-2.5 py-1 rounded-lg text-[10.5px] sm:text-[11px] font-semibold transition-all bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white border border-white/20 shadow-2xs cursor-pointer backdrop-blur-xs"
+          className={pillClasses}
         >
           {t("omnibox.pill_banned", "Prohibited Units (gms, ML, gm, ltrs)")}
         </button>
@@ -391,7 +399,7 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
         <button
           type="button"
           onClick={() => setSelectedRule(STATUTORY_RULES.usp)}
-          className="shrink-0 px-2.5 py-1 rounded-lg text-[10.5px] sm:text-[11px] font-semibold transition-all bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white border border-white/20 shadow-2xs cursor-pointer backdrop-blur-xs"
+          className={pillClasses}
         >
           {t("omnibox.pill_usp", "USP Math (|USP×Qty - MRP| ≤ ₹0.02)")}
         </button>
@@ -399,7 +407,7 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
         <button
           type="button"
           onClick={() => setSelectedRule(STATUTORY_RULES.ecommerce)}
-          className="shrink-0 px-2.5 py-1 rounded-lg text-[10.5px] sm:text-[11px] font-semibold transition-all bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white border border-white/20 shadow-2xs cursor-pointer backdrop-blur-xs"
+          className={pillClasses}
         >
           {t("omnibox.pill_ecom", "Rule 6(10) E-Commerce")}
         </button>
@@ -407,7 +415,7 @@ export const StatutoryOmnibox: React.FC<StatutoryOmniboxProps> = ({
         <button
           type="button"
           onClick={() => setSelectedRule(STATUTORY_RULES.sec63)}
-          className="shrink-0 px-2.5 py-1 rounded-lg text-[10.5px] sm:text-[11px] font-semibold transition-all bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white border border-white/20 shadow-2xs cursor-pointer backdrop-blur-xs"
+          className={pillClasses}
         >
           {t("omnibox.pill_sec63", "Section 63 BSA 2023 Merkle Proof")}
         </button>

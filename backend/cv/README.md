@@ -18,7 +18,7 @@ You detect reference calibration markers (ArUco 4x4_50 or ISO 7810 card), comput
 You are allowed to create and edit files strictly inside:
 - `backend/cv/**`
 
-You may read shared contracts in `contracts/quality_gate/` and `contracts/calibration/`.
+You may read shared contracts in `backend/contracts/quality_gate/` and `backend/contracts/calibration/`.
 You must NOT edit other member directories or root specification files.
 
 ---
@@ -32,7 +32,7 @@ You must NOT edit other member directories or root specification files.
 6. `11_TESTING_AND_VALIDATION_PLAN.md` (`TS-CALIB-01`, `TS-CALIB-02`, `TS-OPTIC-01`, `TS-OPTIC-02`)
 7. `16_DECISION_LOG.md` (ADL-03, ADL-17)
 8. `17_OPEN_QUESTIONS.md` (OQ-01, OQ-04)
-9. `CLAIMS_WE_MUST_NOT_MAKE.md` (Section 1: Optical & Measurement Claims)
+9. `10_SECURITY_AND_AUDIT_SPECIFICATION.md` (Section 1: Optical & Measurement Guardrails)
 
 ---
 
@@ -50,8 +50,8 @@ You must NOT edit other member directories or root specification files.
 ---
 
 ## 6. What contract do I follow?
-- `contracts/quality_gate/quality_gate_dto.py`
-- `contracts/calibration/calibration_dto.py`
+- `backend/contracts/quality_gate/quality_gate_dto.py`
+- `backend/contracts/calibration/calibration_dto.py`
 
 ---
 

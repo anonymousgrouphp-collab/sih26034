@@ -278,18 +278,26 @@ flowchart LR
 
 ```text
 .
-├── main.py                             # Monolith production server (FastAPI + SPA mount)
-├── local_runner.py                     # Mode B standalone offline runner (localhost:8000)
-├── inspect_cli.py                      # Headless CLI inspection utility
-├── requirements.txt                    # Root Python dependencies
-│
-├── backend/                            # CV, OCR, extraction, rules, evidence subsystems
-├── contracts/                          # Frozen interfaces and schemas
-├── integration/                        # Cross-subsystem fixtures and tests
-├── frontend/                        # Inspector workstation frontend (React 18 + Vite)
-├── docs/                               # Technical specifications and guides
-├── audit/                              # Validation and ground-truth evidence
-└── Legal Metrology real product images/# 75 Physical packaging test photos & collection notes
+├── assets/                             # Brand identity assets, logos, and validation datasets
+│   ├── brand/                          # High-res SVG/PNG logos, emblems, and visual assets
+│   └── data/                           # Real physical packaging images & validation results
+├── backend/                            # FastAPI server, CV, OCR, rule engine, evidence pipelines
+│   ├── main.py                         # ASGI application entrypoint & SPA static mount
+│   ├── local_runner.py                 # Mode B standalone offline runner (localhost:8000)
+│   ├── inspect_cli.py                  # Headless CLI inspection utility
+│   ├── requirements.txt                # Python dependencies
+│   ├── contracts/                      # Pydantic v2 DTOs and JSON schema definitions
+│   ├── cv/                             # OpenCV quality gate & ArUco/coin fiducial calibration
+│   ├── ocr/                            # DBNet++ detection & PP-OCRv4 recognition engine
+│   ├── extraction/                     # Semantic entity parsing & regex extraction
+│   ├── rule_engine/                    # Deterministic AST statutory evaluators & Jan Vishwas
+│   ├── evidence/                       # Merkle DAG, Section 63 BSA certs, Form-1 notice PDF
+│   ├── integration/                    # Subsystem adapters and test harnesses
+│   └── storage/                        # Central evidence uploads, dossiers, and notices
+├── frontend/                           # Inspector workstation web app (React 18 + Vite + Tailwind)
+├── docs/                               # Technical specifications, design tokens, and user guides
+├── Dockerfile                          # Multi-stage production container build
+└── docker-compose.yml                  # Full-stack container orchestration (Postgres + App)
 ```
 
 ---
@@ -321,10 +329,10 @@ source .venv/bin/activate
 
 # Install dependencies
 pip install --upgrade pip
-pip install -r requirements.txt
+pip install -r backend/requirements.txt
 
 # Start the application server
-python main.py
+python backend/main.py
 ```
 *The backend API will start at `http://localhost:8000`. Interactive OpenAPI documentation is accessible at `http://localhost:8000/docs`.*
 
@@ -346,7 +354,7 @@ npm run dev
 cd frontend
 npm run build
 ```
-*The production build compiles into `frontend/dist`, which is served directly by `main.py` at `http://localhost:8000`.*
+*The production build compiles into `frontend/dist`, which is served directly by `backend/main.py` at `http://localhost:8000`.*
 
 ---
 
@@ -363,13 +371,13 @@ npm run build
 #### Headless CLI Inspection
 Inspect physical packaging directly from the command line:
 ```bash
-python inspect_cli.py --image "Legal Metrology real product images/item 1 facewash/front_01.jpg" --reference card
+python backend/inspect_cli.py --image "assets/data/validation_dataset/item 1 facewash/front_01.jpg" --reference card
 ```
 
 #### Standalone Mode B (Offline Field Runner)
 Execute inspections during field connectivity blackouts:
 ```bash
-python local_runner.py
+python backend/local_runner.py
 ```
 
 ---
@@ -383,7 +391,7 @@ Nirikshak enforces strict automated test verification across frontend, backend, 
 cd frontend && npm test
 
 # 2. Run Evidence & Backend + Integration Tests (95 passing tests)
-python -m pytest backend/evidence/tests/ integration/tests/ -v
+python -m pytest backend/evidence/tests/ backend/integration/tests/ -v
 
 # 3. Run Computer Vision, OCR & Rule Engine Unit Tests (174 passing tests)
 python -m pytest backend/cv/tests/ backend/ocr/tests/ backend/rule_engine/tests/ -v
@@ -406,7 +414,7 @@ python -m pytest backend/extraction/tests/ -v
 3. **Mandatory Text Remarks on Override:** Any modification to an automated finding requires a mandatory written justification remark, preventing undocumented officer tampering.
 4. **Separation of Duties (RBAC):** Field inspectors conduct intake and submit preliminary recommendations; only authorized district Controllers have administrative authority to dispose of cases or sign statutory notices.
 5. **Section 63 BSA 2023 Evidentiary Workflows:** Electronic-evidence metadata and cryptographic hash manifests designed to support Section 63 Bharatiya Sakshya Adhiniyam, 2023 workflows, recording device parameters, software version digests, timestamps, and officer credentials.
-6. **Pristine Evidence Preservation:** Ingested photographs are immutably preserved in storage (`/storage/uploads/`). Bounding polygons and coordinate annotations are maintained as distinct vector layers, ensuring original evidence pixels are never altered.
+6. **Pristine Evidence Preservation:** Ingested photographs are immutably preserved in storage (`backend/storage/uploads/`). Bounding polygons and coordinate annotations are maintained as distinct vector layers, ensuring original evidence pixels are never altered.
 
 ---
 
@@ -429,9 +437,9 @@ For comprehensive technical, legal, and operational specifications, consult the 
 | **Project Engineering Guide** | [docs/COMPLETE_PROJECT_END_TO_END_GUIDE.md](docs/COMPLETE_PROJECT_END_TO_END_GUIDE.md) | 42-section comprehensive technical and domain guide |
 | **Specifications & ADRs** | [docs/specifications/](docs/specifications/) | Frozen specifications (01 through 17), architectural decision records |
 | **Technical Implementation** | [docs/technical/CAMERA_CAPTURE_IMPLEMENTATION.md](docs/technical/CAMERA_CAPTURE_IMPLEMENTATION.md) | Viewfinder HUD, camera stream management, canvas controls |
-| **Research & Legal Dossiers** | [docs/research/](docs/research/) | Statutory research dossiers, GSR Gazette analyses |
+| **Research & Legal Dossiers** | [docs/COMPLETE_PROJECT_END_TO_END_GUIDE.md](docs/COMPLETE_PROJECT_END_TO_END_GUIDE.md#2-the-problem) | Statutory research dossiers, GSR Gazette analyses |
 | **UI/UX & Design System** | [docs/design/](docs/design/) & [docs/ux/](docs/ux/) | Design tokens, wireframes, inspector user journey |
-| **Validation & Audits** | [audit/](audit/) | Ground-truth SKU matrices, provenance registers, defect logs |
+| **Validation & Audits** | [docs/specifications/10_SECURITY_AND_AUDIT_SPECIFICATION.md](docs/specifications/10_SECURITY_AND_AUDIT_SPECIFICATION.md) | Ground-truth SKU matrices, provenance registers, defect logs |
 | **Deployment Guide** | [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md) | Docker Compose, reverse proxy configuration, cloud setup |
 
 ---

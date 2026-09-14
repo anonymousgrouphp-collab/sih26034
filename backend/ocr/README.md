@@ -20,7 +20,7 @@ You ensure zero AGPL-3.0 licenses are used.
 You are allowed to create and edit files strictly inside:
 - `backend/ocr/**`
 
-You may read shared contracts in `contracts/ocr/`.
+You may read shared contracts in `backend/contracts/ocr/`.
 You must NOT edit other member directories or root specification files.
 
 ---
@@ -33,7 +33,7 @@ You must NOT edit other member directories or root specification files.
 5. `07_API_AND_INTERFACE_CONTRACTS.md` (`OCROutput`, `OCRToken`)
 6. `11_TESTING_AND_VALIDATION_PLAN.md` (Text Recognition CER $\le 2.5\%$)
 7. `16_DECISION_LOG.md` (ADL-05, ADL-06, ADL-09)
-8. `CLAIMS_WE_MUST_NOT_MAKE.md` (Section 3: AI & Architecture Claims)
+8. `10_SECURITY_AND_AUDIT_SPECIFICATION.md` (Section 3: AI & Architecture Boundaries)
 
 ---
 
@@ -45,12 +45,12 @@ You must NOT edit other member directories or root specification files.
 ---
 
 ## 5. What outputs do I produce?
-- `OCROutput` conforming to `contracts/ocr/ocr_dto.py` with bounding polygons, recognized text strings, confidence scores, and token lists.
+- `OCROutput` conforming to `backend/contracts/ocr/ocr_dto.py` with bounding polygons, recognized text strings, confidence scores, and token lists.
 
 ---
 
 ## 6. What contract do I follow?
-- `contracts/ocr/ocr_dto.py` and `contracts/ocr/ocr_schema.json`.
+- `backend/contracts/ocr/ocr_dto.py` and `backend/contracts/ocr/ocr_schema.json`.
 
 ---
 
@@ -131,7 +131,7 @@ Member 1 (Rectified Image)
    - Graceful fallback when Tesseract binary is absent.
 
 5. **`engine.py` (`MultilingualOCREngine`)**:
-   - End-to-end orchestrator outputting validated `OCROutput` DTOs conforming to `contracts/ocr/ocr_dto.py` and `contracts/ocr/ocr_schema.json`.
+   - End-to-end orchestrator outputting validated `OCROutput` DTOs conforming to `backend/contracts/ocr/ocr_dto.py` and `backend/contracts/ocr/ocr_schema.json`.
    - **180° Inversion Auto-Detection & Rectification**: Conditional per-crop orientation probe triggered when initial recognition confidence $< 0.92$. Automatically evaluates 180° inverted candidate `crop_180` and replaces tokens if confidence improves by $\Delta_{\text{conf}} > 0.05$. Fully verified on real upside-down physical packaging photograph (`Item 1 - Watch/close_01.jpg`), extracting all 15 tokens upright with 0.98 confidence.
    - Selectable execution provider modes: `FP32` (authoritative AVX2 production default) and `INT8` (PTQ static quantization).
 

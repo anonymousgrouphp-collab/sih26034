@@ -25,7 +25,7 @@ import uuid
 # Force Mode B Offline Environment Configuration
 REPO_ROOT = Path(__file__).resolve().parent.parent
 os.environ.setdefault("NIRIKSHAK_MODE", "MODE_B_OFFLINE")
-os.environ.setdefault("DATABASE_URL", f"sqlite:///{REPO_ROOT / 'storage' / 'legal_metrology_mode_b.db'}")
+os.environ.setdefault("DATABASE_URL", f"sqlite:///{REPO_ROOT / 'backend' / 'storage' / 'legal_metrology_mode_b.db'}")
 os.environ.setdefault("CLOCK_SOURCE", "LOCAL_DEVICE_MONOTONIC")
 
 # Path discovery for all backend modules and integration layers

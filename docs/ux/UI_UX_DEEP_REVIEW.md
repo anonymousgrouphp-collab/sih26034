@@ -5,7 +5,7 @@
 **Audience & Context:** Department of Consumer Affairs (DoCA), Government of India, State Legal Metrology Enforcement Directorates, District Legal Metrology Officers (LMOs), Controllers, and Appellate Authorities.  
 **Legal Framework:** Legal Metrology Act, 2009; Legal Metrology (Packaged Commodities) Rules, 2011 (LMPC Rules, 2011); Bharatiya Sakshya Adhiniyam, 2023 (Section 63); GIGW 3.0 (Guidelines for Indian Government Websites).  
 **Review Version:** 2.0 (Post-Redesign Integrated Workstation Review)  
-**Evaluated Frontend Directory:** `ui-combined/`  
+**Evaluated Frontend Directory:** `frontend/` (formerly `ui-combined/`)  
 
 ---
 

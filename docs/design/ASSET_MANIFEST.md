@@ -9,7 +9,7 @@
 
 ## 1. Executive Summary
 
-This document provides the authoritative, exhaustive registry of all visual and graphic assets deployed across the Nirikshak frontend application (`ui-combined/public/assets/`). Every asset is classified by domain tier, format, resolution/viewBox, byte size, color token alignment, and functional UX purpose.
+This document provides the authoritative, exhaustive registry of all visual and graphic assets deployed across the Nirikshak frontend application (`frontend/public/assets/`). Every asset is classified by domain tier, format, resolution/viewBox, byte size, color token alignment, and functional UX purpose.
 
 All vector assets are authored in strict SVG format with proportional `viewBox` coordinates to guarantee pixel-perfect rendering from mobile viewports (360px) to ultra-high-definition field monitors (4K / 3840px) with zero layout shift (CLS = 0.00).
 
@@ -43,7 +43,7 @@ All vector assets are authored in strict SVG format with proportional `viewBox` 
 ## 3. Directory Layout
 
 ```text
-ui-combined/public/
+frontend/public/
 ├── favicon.svg
 ├── form1.pdf
 └── assets/

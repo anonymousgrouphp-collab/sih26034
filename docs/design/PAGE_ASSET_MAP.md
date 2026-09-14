@@ -9,7 +9,7 @@
 
 ## 1. Overview
 
-This document maps every primary route and major feature component across the Nirikshak frontend (`ui-combined/`) to the specific visual assets embedded within it. Each mapping defines the route path, component name, asset file path, render trigger, layout position, and accessibility metadata.
+This document maps every primary route and major feature component across the Nirikshak frontend (`frontend/`) to the specific visual assets embedded within it. Each mapping defines the route path, component name, asset file path, render trigger, layout position, and accessibility metadata.
 
 ---
 
@@ -49,6 +49,6 @@ This document maps every primary route and major feature component across the Ni
 
 ## 4. Verification Checkpoints
 
-- **Zero Missing Assets:** All 15 referenced assets exist at their exact relative paths under `ui-combined/public/assets/`.
+- **Zero Missing Assets:** All 15 referenced assets exist at their exact relative paths under `frontend/public/assets/`.
 - **Zero Broken Links:** Verified via `tsc -b && vite build` and browser testing on port 5174.
 - **Cross-Resolution Uniformity:** Verified responsive scaling from 390px (mobile) to 1440px (desktop) without any layout distortion.

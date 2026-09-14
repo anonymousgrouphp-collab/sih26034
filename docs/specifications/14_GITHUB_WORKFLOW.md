@@ -48,7 +48,7 @@ sih26034/
 ├── nginx/                      # Nginx reverse proxy configuration & TLS settings
 ├── tests/                      # PyTest regression suites, web API tests, golden fixtures
 ├── docker-compose.yml          # Multi-container orchestration (Nginx + Backend + DB)
-├── local_runner.py             # Standalone runner for Mode B optional local inspection
+├── backend/local_runner.py     # Standalone runner for Mode B optional local inspection
 └── README.md                   # Setup instructions, architecture overview, live demo script
 ```
 
@@ -105,7 +105,7 @@ Because feature branches are developed from `dev`, the Team Lead may also requir
 1. **Rebase Approval Required:** Rebase may be used **only when the Team Lead explicitly approves it**. Standard practice is merging `origin/main`.
 2. **Never Overwrite Uncommitted Work:** Always verify working tree status before branch operations. Destructive commands (`git reset --hard`, `git checkout -f`, `git clean -fd`) that risk losing uncommitted changes are strictly forbidden.
 3. **Never Force-Push:** Never force-push (`git push --force` or `--force-with-lease`) unless the **Team Lead explicitly approves it**. If a push is rejected by the remote, stop and report the issue immediately.
-4. **Cross-Boundary Conflict Escalation:** If merge conflicts involve contracts (`contracts/`), system architecture (`03_FINAL_ARCHITECTURE.md`), legal rules (`02_FINAL_REQUIREMENTS_SPECIFICATION.md`, `16_DECISION_LOG.md`), or another member's code, **STOP immediately and inform the Team Lead**. Do NOT resolve cross-boundary conflicts unilaterally.
+4. **Cross-Boundary Conflict Escalation:** If merge conflicts involve contracts (`backend/contracts/`), system architecture (`03_FINAL_ARCHITECTURE.md`), legal rules (`02_FINAL_REQUIREMENTS_SPECIFICATION.md`, `16_DECISION_LOG.md`), or another member's code, **STOP immediately and inform the Team Lead**. Do NOT resolve cross-boundary conflicts unilaterally.
 5. **No Extra Branches:** Do not create any additional feature branches. Work proceeds strictly on the designated member branches.
 
 ---

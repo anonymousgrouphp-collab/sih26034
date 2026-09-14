@@ -107,6 +107,10 @@ storage/evidence/*
 storage/uploads/*
 !storage/evidence/.gitkeep
 !storage/uploads/.gitkeep
+backend/storage/evidence/*
+backend/storage/uploads/*
+!backend/storage/evidence/.gitkeep
+!backend/storage/uploads/.gitkeep
 
 # Dev-phase AI agent directories
 .agents/

@@ -548,7 +548,7 @@ if TEST_UI_DIR.exists():
 if M1_FIXTURES.exists():
     app.mount("/static/fixtures", StaticFiles(directory=str(M1_FIXTURES)), name="fixtures_static")
 
-STORAGE_DIR = REPO_ROOT / "storage"
+STORAGE_DIR = REPO_ROOT / "backend" / "storage"
 if STORAGE_DIR.exists():
     app.mount("/static/storage", StaticFiles(directory=str(STORAGE_DIR)), name="storage_static")
 

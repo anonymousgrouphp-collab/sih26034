@@ -454,7 +454,7 @@ function copySVGCode() {
 }
 
 function copyReadme() {
-  const code = `<p align="center">\n  <img src="brand/svg/nirikshak-concept-${currentId}-transparent.svg" width="240" alt="NIRIKSHAK Logo" />\n</p>\n<h1 align="center">NIRIKSHAK (निरीक्षक)</h1>\n<p align="center"><strong>AI-Powered Legal Metrology Compliance Verification Platform</strong><br><em>Department of Consumer Affairs (DoCA) · Government of India</em></p>`;
+  const code = `<p align="center">\n  <img src="assets/brand/svg/nirikshak-concept-${currentId}-transparent.svg" width="240" alt="NIRIKSHAK Logo" />\n</p>\n<h1 align="center">NIRIKSHAK (निरीक्षक)</h1>\n<p align="center"><strong>AI-Powered Legal Metrology Compliance Verification Platform</strong><br><em>Department of Consumer Affairs (DoCA) · Government of India</em></p>`;
   navigator.clipboard.writeText(code).then(() => {
     showToast("README markdown code copied!");
   });
