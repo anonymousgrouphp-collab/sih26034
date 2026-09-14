@@ -828,6 +828,21 @@ export class LiveApiService implements IInspectionApiService {
       });
 
       if (!res.ok) {
+        // If edge proxy timed out (502/504), the backend VM continues executing in background.
+        // Poll getInspection to seamlessly retrieve completed results.
+        if (res.status >= 500) {
+          console.warn(`Batch pipeline POST returned HTTP ${res.status}. Polling live case for async completion...`);
+          for (let poll = 0; poll < 12; poll++) {
+            await new Promise((r) => setTimeout(r, 3500));
+            try {
+              const liveCase = await this.getInspection(inspectionId);
+              if (liveCase && liveCase.ai_verdict && liveCase.ai_verdict !== "PENDING") {
+                return liveCase;
+              }
+            } catch {}
+          }
+        }
+
         let errData: any;
         try {
           errData = await res.json();
@@ -856,6 +871,14 @@ export class LiveApiService implements IInspectionApiService {
 
       return await this.getInspection(inspectionId);
     } catch (e: any) {
+      // If network/proxy dropped, try one final check to see if database has the completed inspection
+      try {
+        const fallbackCheck = await this.getInspection(inspectionId);
+        if (fallbackCheck && fallbackCheck.ai_verdict && fallbackCheck.ai_verdict !== "PENDING") {
+          return fallbackCheck;
+        }
+      } catch {}
+
       throw this.normalizeError(e, "Parallel multi-facet AI pipeline execution failed on live server.");
     }
   }

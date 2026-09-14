@@ -357,18 +357,7 @@ export const NewInspection: React.FC = () => {
       try {
         await ApiService.executeBatchPipeline(newCase.id);
       } catch (batchErr) {
-        console.warn("Batch pipeline execution fallback to sequential:", batchErr);
-        if (uploadedImageIds.length > 0) {
-          for (const imgId of uploadedImageIds) {
-            await ApiService.executePipeline(imgId, newCase.id);
-          }
-        } else if (newCase.evidence_assets && newCase.evidence_assets.length > 0) {
-          for (const asset of newCase.evidence_assets) {
-            if (asset.image_id) {
-              await ApiService.executePipeline(asset.image_id, newCase.id);
-            }
-          }
-        }
+        console.warn("Batch pipeline execution deferred or backgrounded:", batchErr);
       }
       
       // Clear draft since submission succeeded
