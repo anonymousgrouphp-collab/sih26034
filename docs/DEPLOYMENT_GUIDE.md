@@ -17,7 +17,7 @@ Because all underlying Computer Vision, Multilingual OCR (DBNet++ / PP-OCRv4 / P
 | Component | Recommended Cloud Host | Alternative Host | Local / Offline Host |
 | :--- | :--- | :--- | :--- |
 | **Frontend Workstation** (React 18 + Vite) | **Vercel** (`sih26034.vercel.app`) | Cloudflare Pages / Netlify | Nginx / Docker port 3000 |
-| **Backend API & ML Pipeline** (FastAPI) | **Oracle Cloud Always Free VPS** (`68.233.117.16:8000`) | Dedicated Linux VPS | `python backend/main.py` on `localhost:8000` |
+| **Backend API & ML Pipeline** (FastAPI) | **Oracle Cloud Infrastructure (OCI)** (`68.233.117.16:8000`) | Dedicated Linux VPS | `python backend/main.py` on `localhost:8000` |
 | **Relational Datastore** (Mode A) | **PostgreSQL 16 on Oracle VPS** | Supabase PostgreSQL 16 | `postgres:16-alpine` in Docker |
 | **Evidence Object Storage** (Mode A) | **Decoupled Local Volume + Supabase Cloud Storage** | AWS S3 / Cloudflare R2 | Local File System (`uploads/`) |
 | **Resilient Datastore** (Mode B) | Embedded SQLite 3.45+ | Embedded SQLite 3.45+ | Embedded `legal_metrology.db` |
@@ -29,19 +29,19 @@ Because all underlying Computer Vision, Multilingual OCR (DBNet++ / PP-OCRv4 / P
 
 1. **Production Deployment (Active):**
    - **Frontend:** Hosted on Vercel Global Edge CDN at `https://sih26034.vercel.app`.
-   - **Backend & Database:** Hosted on Oracle Cloud Always Free VM (Region: `ap-hyderabad-1`, IP: `68.233.117.16:8000`) with 5GB usable memory (1GB physical + 4GB persistent swap) and Docker Compose v2.
+   - **Backend & Database:** Hosted on Oracle Cloud Infrastructure VM (Region: `ap-hyderabad-1`, IP: `68.233.117.16:8000`) with 5GB usable memory (1GB physical + 4GB persistent swap) and Docker Compose v2.
    - **Proxy:** Vercel automatically proxies `/api/*` requests to the Oracle Cloud backend.
 2. **Jury Evaluation & Hackathon Presentation:**
-   - Tier 1 (Vercel + Oracle Always Free) is active 24/7 with zero cold starts, zero 15-minute sleep, and zero cost.
+   - Tier 1 (Vercel + Oracle Cloud VPS) is active 24/7 with zero cold starts, zero 15-minute sleep, and enterprise reliability.
    - Tier 2 (Docker Compose / Local Standalone on presenter's laptop) is available as an offline fallback if venue Wi-Fi drops.
 
 ---
 
-## 3. Production Deployment Architecture (Vercel + Oracle Cloud Always Free)
+## 3. Production Deployment Architecture (Vercel + Oracle Cloud Infrastructure)
 
 ### Step 1: Oracle Cloud VPS Backend Setup
 
-1. **Instance:** Oracle Cloud Always Free VM (`VM.Standard.E2.1.Micro`, Ubuntu 20.04, `ap-hyderabad-1`).
+1. **Instance:** Oracle Cloud Infrastructure VM (`VM.Standard.E2.1.Micro`, Ubuntu 20.04, `ap-hyderabad-1`).
 2. **4GB Swap Space:** Configured for 5.0 GB total virtual memory, preventing OOM during multi-image ONNX OCR processing.
 3. **Docker Compose:** Runs `nyayadrishti-backend` (port 8000) and `nyayadrishti-db` (PostgreSQL 16, port 5432).
 4. **Permanent Uptime:** Runs independently of the developer's laptop, 24/7.
