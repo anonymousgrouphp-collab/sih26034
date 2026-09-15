@@ -517,72 +517,55 @@ export const NewInspection: React.FC = () => {
 
               {/* Upload & Evidence Intake Area */}
               <div className="space-y-4">
-                {/* Primary: Live Field Camera */}
-                <div className="p-4 sm:p-5 rounded-xl bg-[#1B365D] text-white shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-blue-900">
-                  <div className="flex items-start gap-3.5">
-                    <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-amber-300 border border-white/20 shrink-0">
-                      <Camera size={26} />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h4 className="text-sm font-bold tracking-tight">
-                          {language === "hi" ? "सजीव क्षेत्रीय निरीक्षण कैमरा" : "Live Field Inspection Camera"}
-                        </h4>
-                        <span className="text-[10px] uppercase font-black tracking-wider px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 shadow-xs">
-                          {language === "hi" ? "अनुशंसित" : "Recommended"}
-                        </span>
-                      </div>
-                      <p className="text-xs text-blue-100/90 mt-0.5">
-                        {language === "hi"
-                          ? "ArUco 50mm संरेखण जाली एवं तत्काल प्रकाश सहायता के साथ उच्च-रिज़ॉल्यूशन अधिग्रहण।"
-                          : "High-resolution capture with ArUco 50mm alignment reticle and instant lighting assist."}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
+                {/* Split Upload & Evidence Intake Area */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Primary Touch Target: Live Field Camera */}
+                  <div
                     onClick={() => setIsCameraModalOpen(true)}
-                    className="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95 shrink-0 cursor-pointer"
+                    className="flex flex-col items-center justify-center p-8 sm:p-10 rounded-2xl bg-[#1B365D] hover:bg-[#132742] text-white shadow-sm cursor-pointer transition-all active:scale-[0.98] group border border-blue-900 h-full"
                   >
-                    <Camera size={15} />
-                    <span>{language === "hi" ? "कैमरा खोलें" : "Open Camera"}</span>
-                  </button>
-                </div>
+                    <div className="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center text-amber-300 border border-white/20 mb-4 group-hover:scale-110 transition-transform">
+                      <Camera size={32} />
+                    </div>
+                    <h4 className="text-lg font-bold tracking-tight mb-2">
+                      {language === "hi" ? "फोटो लें" : "Take Photo"}
+                    </h4>
+                    <span className="text-[10px] uppercase font-black tracking-wider px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 shadow-xs mb-2">
+                      {language === "hi" ? "अनुशंसित" : "Recommended"}
+                    </span>
+                    <p className="text-xs text-blue-100/80 text-center max-w-[200px]">
+                      {language === "hi"
+                        ? "ArUco 50mm संदर्भ के साथ लाइव कैमरा कैप्चर"
+                        : "Live capture with ArUco 50mm reticle & lighting"}
+                    </p>
+                  </div>
 
-                {/* Secondary: Upload & Dropzone Area */}
-                <div>
+                  {/* Secondary Touch Target: Upload from Gallery */}
                   <div
                     onClick={() => fileInputRef.current?.click()}
-                    className="flex min-h-36 w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50/70 hover:border-[#1B365D] hover:bg-blue-50/30 p-6 text-center cursor-pointer transition-all group"
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                        handleFilesSelected(e.dataTransfer.files);
+                      }
+                    }}
+                    className="flex flex-col items-center justify-center p-8 sm:p-10 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100 hover:border-slate-400 text-slate-900 cursor-pointer transition-all active:scale-[0.98] group h-full"
                   >
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-[#1B365D] shadow-2xs border border-blue-200 group-hover:scale-105 transition-transform">
-                      <UploadCloud size={24} />
+                    <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center text-[#1B365D] border border-slate-200 shadow-sm mb-4 group-hover:scale-110 transition-transform">
+                      <UploadCloud size={32} />
                     </div>
-                    <p className="mt-3 text-xs font-bold text-slate-900">
-                      {language === "hi" ? "अथवा फ़ोटो अपलोड करें / फ़ाइल यहां खींचें" : "Or Upload Existing Photo / Drag & Drop File"}
+                    <h4 className="text-lg font-bold tracking-tight mb-2">
+                      {language === "hi" ? "गैलरी से अपलोड करें" : "Upload from Gallery"}
+                    </h4>
+                    <p className="text-xs text-slate-500 text-center max-w-[200px] mb-3">
+                      {language === "hi" ? "या फ़ाइलें यहाँ खींचें (JPEG, PNG)" : "Or drag & drop files (JPEG, PNG)"}
                     </p>
-                    <p className="text-[11px] text-slate-500 mt-0.5">
-                      {language === "hi"
-                        ? "मोबाइल गैलरी अथवा बाह्य स्कैनर से JPEG, PNG, WEBP समर्थित"
-                        : "Supports JPEG, PNG, WEBP from mobile camera gallery or high-precision external flatbed scanners"}
-                    </p>
-                    <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
-                      <div className="flex items-center gap-1.5 text-[11px] text-emerald-800 font-semibold bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-                        <ShieldCheck size={13} className="text-emerald-600" />
-                        <span>
-                          {language === "hi"
-                            ? "अधिग्रहण पर SHA-256 मर्कल साक्ष्य अखंडता सुरक्षित"
-                            : "SHA-256 Merkle Provenance Captured on Intake"}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5 text-[11px] text-blue-900 font-semibold bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
-                        <Sparkles size={13} className="text-blue-600" />
-                        <span>
-                          {language === "hi"
-                            ? "विश्लेषण हेतु 100% मूल गैर-संपीड़ित छवि • शून्य डेटा हानि"
-                            : "Full-Fidelity Original Intake • Zero Precision Loss"}
-                        </span>
-                      </div>
+                    <div className="flex items-center gap-1.5 text-[10px] text-emerald-800 font-semibold bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                      <ShieldCheck size={12} className="text-emerald-600" />
+                      <span>{language === "hi" ? "SHA-256 सुरक्षित" : "SHA-256 Secured"}</span>
                     </div>
                     <input
                       ref={fileInputRef}
