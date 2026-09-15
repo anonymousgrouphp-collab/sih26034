@@ -1,8 +1,8 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { InspectionSummary } from "../../types/inspection";
 import { VerdictBadge, WorkflowBadge } from "../../components/common/StatusBadge";
-import { GoldenSkuQuickSelector } from "./GoldenSkuQuickSelector";
-import { MapPin, CalendarDays, Plus, Trash2, RefreshCw, AlertTriangle, ArrowUpDown, ArrowDown, ArrowUp, X, Filter } from "lucide-react";
+import { MapPin, CalendarDays, Plus, Trash2, RefreshCw, AlertTriangle, ArrowUpDown, ArrowDown, ArrowUp, X, Filter, Download, Printer, LayoutGrid, List } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext";
 import { ApiService } from "../../services/api";
 import { useDebounce } from "../../hooks/useDebounce";
@@ -18,7 +18,7 @@ export type DeskSortOption =
   | "PRODUCT_ASC"
   | "PRODUCT_DESC";
 
-interface InspectionDeskProps {
+export interface CaseRegistryProps {
   cases: InspectionSummary[];
   activeCircle: string;
   onSelectCase: (caseId: string) => void;
@@ -28,7 +28,7 @@ interface InspectionDeskProps {
   onDeleteCase?: (caseId: string) => Promise<void>;
 }
 
-export const InspectionDesk: React.FC<InspectionDeskProps> = ({
+export const CaseRegistry: React.FC<CaseRegistryProps> = ({
   cases,
   activeCircle,
   onSelectCase,
@@ -38,39 +38,57 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
   onDeleteCase,
 }) => {
   const { language } = useLanguage();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const paramVerdict = searchParams.get("verdict");
+  const paramWorkflow = searchParams.get("workflow");
+  const paramTriage = searchParams.get("triage");
+  const paramQ = searchParams.get("q");
+
   const [caseToDelete, setCaseToDelete] = useState<InspectionSummary | null>(null);
   const [deletingCaseId, setDeletingCaseId] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(paramQ || "");
   const debouncedSearchTerm = useDebounce(searchTerm, 250);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [selectedWorkflow, setSelectedWorkflow] = useState<string>("ALL");
-  const [selectedVerdict, setSelectedVerdict] = useState<string>("ALL");
+  const [viewMode, setViewMode] = useState<"LIST" | "GRID">(() => {
+    return (localStorage.getItem("nirikshak_case_registry_view_mode") as "LIST" | "GRID") || "LIST";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("nirikshak_case_registry_view_mode", viewMode);
+  }, [viewMode]);
+  const [selectedWorkflow, setSelectedWorkflow] = useState<string>(paramWorkflow || "ALL");
+  const [selectedVerdict, setSelectedVerdict] = useState<string>(paramVerdict || "ALL");
   const [sortBy, setSortBy] = useState<DeskSortOption>("DATE_DESC");
-  const [triageFilter, setTriageFilter] = useState<"ALL" | "CONFLICTS" | "EVIDENCE_GAPS">("ALL");
+  const [triageFilter, setTriageFilter] = useState<"ALL" | "CONFLICTS" | "EVIDENCE_GAPS">(
+    paramTriage === "CONFLICTS" || paramTriage === "EVIDENCE_GAPS" ? paramTriage : "ALL"
+  );
+
+  // Sync state if search params change (e.g. user clicks KPI card or browser back/forward)
+  React.useEffect(() => {
+    const v = searchParams.get("verdict");
+    if (v) {
+      setSelectedVerdict(v);
+    }
+    const w = searchParams.get("workflow");
+    if (w) {
+      setSelectedWorkflow(w);
+    }
+    const t = searchParams.get("triage");
+    if (t === "CONFLICTS" || t === "EVIDENCE_GAPS" || t === "ALL") {
+      setTriageFilter(t);
+    }
+    const q = searchParams.get("q");
+    if (q !== null && q !== undefined) {
+      setSearchTerm(q);
+    }
+  }, [searchParams]);
 
   // Reset to page 1 on filter or search changes
   React.useEffect(() => {
     setCurrentPage(1);
   }, [debouncedSearchTerm, selectedWorkflow, selectedVerdict, triageFilter, sortBy, activeCircle]);
-
-  // Summary Metrics calculated directly from the cases
-  const metrics = useMemo(() => {
-    const total = cases.length;
-    const pendingAdjudication = cases.filter(
-      (c) =>
-        c.overall_status === "REVIEW" ||
-        c.overall_status === "UNABLE_TO_VERIFY" ||
-        c.overall_status === "PENDING_REVIEW" ||
-        c.overall_status === "PENDING"
-    ).length;
-    const violations = cases.filter((c) => c.overall_status === "FAIL" || (c.violations_count && c.violations_count > 0)).length;
-    const compliant = cases.filter(
-      (c) => c.overall_status === "PASS" || (c.overall_status === "COMPLETED" && c.ai_verdict !== "FAIL")
-    ).length;
-
-    return { total, pendingAdjudication, violations, compliant };
-  }, [cases]);
 
   // Triage filter counters
   const conflictCount = useMemo(() => {
@@ -159,11 +177,16 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
       if (debouncedSearchTerm.trim()) {
         const query = debouncedSearchTerm.toLowerCase();
         const prodName = getFormattedProductName(c).toLowerCase();
-        const matchProduct = prodName.includes(query);
-        const matchNumber = c.inspection_number.toLowerCase().includes(query);
-        const matchBrand = c.brand_name ? c.brand_name.toLowerCase().includes(query) : false;
-        const matchEst = c.establishment_name ? c.establishment_name.toLowerCase().includes(query) : false;
-        if (!matchProduct && !matchNumber && !matchBrand && !matchEst) {
+        const match = 
+          prodName.includes(query) ||
+          c.inspection_number.toLowerCase().includes(query) ||
+          (c.brand_name && c.brand_name.toLowerCase().includes(query)) ||
+          (c.establishment_name && c.establishment_name.toLowerCase().includes(query)) ||
+          (c.manufacturer_name && c.manufacturer_name.toLowerCase().includes(query)) ||
+          (c.jurisdiction_id && c.jurisdiction_id.toLowerCase().includes(query)) ||
+          (c.location && c.location.toLowerCase().includes(query));
+          
+        if (!match) {
           return false;
         }
       }
@@ -286,6 +309,50 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
 
   const formatDate = formatDateTime;
 
+  const handleExportCSV = () => {
+    const headers = [
+      "Inspection Number",
+      "Commodity Name",
+      "Brand",
+      "Establishment",
+      "Jurisdiction Circle",
+      "Inspection Type",
+      "Compliance Verdict",
+      "Confidence (%)",
+      "Workflow Status",
+      "Created Date",
+    ];
+
+    const rows = filteredCases.map((c) => {
+      const conf = Math.round(getCaseConfidence(c) * 100);
+      return [
+        `"${c.inspection_number || ""}"`,
+        `"${(getFormattedProductName(c) || "").replace(/"/g, '""')}"`,
+        `"${(c.brand_name || "").replace(/"/g, '""')}"`,
+        `"${(c.establishment_name || "").replace(/"/g, '""')}"`,
+        `"${c.jurisdiction_id || activeCircle || ""}"`,
+        `"${c.inspection_type || ""}"`,
+        `"${c.overall_status || ""}"`,
+        conf,
+        `"${c.workflow_status || ""}"`,
+        `"${c.created_at || ""}"`,
+      ].join(",");
+    });
+
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `Case_Registry_${activeCircle}_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
     <div className="space-y-5">
       {/* Desk Title Strip & Action */}
@@ -293,7 +360,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
         <div>
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-bold text-slate-900">
-              {language === "hi" ? "निरीक्षण पटल" : "Inspection Desk"}
+              {language === "hi" ? "केस रजिस्ट्री" : "Case Registry"}
             </h2>
             <span className="text-xs font-mono px-2.5 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-[#1B365D] font-bold">
               {language === "hi" ? `सक्रिय मंडल: ${activeCircle}` : `Active Circle: ${activeCircle}`}
@@ -301,22 +368,40 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
           </div>
           <p className="text-xs text-slate-500 font-medium mt-1">
             {language === "hi"
-              ? "विधिक मापविज्ञान (पैकेज वस्तुएं) नियम, 2011 के अंतर्गत सत्यापित निरीक्षण कार्य कतार।"
-              : "Statutory work queue for verified packaged commodity inspections under LMPC Rules, 2011."}
+              ? "विधिक मापविज्ञान (पैकेज वस्तुएं) नियम, 2011 एवं विधिक माप अधिनियम, 2009 की धारा 15 के अंतर्गत संपूर्ण मामला पंजी।"
+              : "Complete statutory case register under Section 15 of Legal Metrology Act, 2009 and LMPC Rules, 2011."}
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            onClick={handleExportCSV}
+            className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-lg border border-slate-200 shadow-2xs transition-colors cursor-pointer"
+            title={language === "hi" ? "केस रजिस्ट्री सीएसवी डाउनलोड करें" : "Export Case Registry as CSV"}
+          >
+            <Download size={14} className="text-slate-600" />
+            <span className="hidden sm:inline">{language === "hi" ? "सीएसवी निर्यात" : "Export CSV"}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handlePrint}
+            className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-lg border border-slate-200 shadow-2xs transition-colors cursor-pointer"
+            title={language === "hi" ? "पंजी प्रिंट करें" : "Print Registry"}
+          >
+            <Printer size={14} className="text-slate-600" />
+            <span className="hidden sm:inline">{language === "hi" ? "प्रिंट" : "Print"}</span>
+          </button>
+
           {onRefresh && (
             <button
               type="button"
               onClick={onRefresh}
-              className="p-2 text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 text-xs font-medium focus:outline-none transition-colors"
+              className="p-2 text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 text-xs font-medium focus:outline-none transition-colors cursor-pointer"
               title={language === "hi" ? "मामला पंजी रीफ्रेश करें" : "Refresh case register"}
             >
-              <svg className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
+              <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} />
             </button>
           )}
 
@@ -325,59 +410,11 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
             onClick={onNewInspectionClick}
             className="flex items-center gap-1.5 px-4 py-2 bg-[#1B365D] hover:bg-[#0A2540] text-white text-xs font-bold rounded-lg shadow-xs transition-colors focus:ring-2 focus:ring-[#1B365D] focus:outline-none cursor-pointer"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
+            <Plus size={14} />
             <span>{language === "hi" ? "नया मामला" : "New Case"}</span>
           </button>
         </div>
       </div>
-
-      {/* KPI Metric Summary Strip */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
-          <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-            {language === "hi" ? "कुल पंजीकृत मामले" : "Total Registered Cases"}
-          </div>
-          <div className="text-2xl font-black text-slate-900 mt-1 font-mono">{metrics.total}</div>
-          <div className="text-[11px] text-slate-500 mt-0.5 font-medium">
-            {language === "hi" ? "विधिक माप अधिनियम की धारा 15 के तहत" : "Under Section 15 LM Act"}
-          </div>
-        </div>
-
-        <div className="bg-white p-4 rounded-xl border border-amber-200 shadow-xs">
-          <div className="text-xs font-bold text-amber-700 uppercase tracking-wider">
-            {language === "hi" ? "निर्णय लंबित" : "Pending Adjudication"}
-          </div>
-          <div className="text-2xl font-black text-amber-600 mt-1 font-mono">{metrics.pendingAdjudication}</div>
-          <div className="text-[11px] text-slate-500 mt-0.5 font-medium">
-            {language === "hi" ? "अधिकारी हस्ताक्षर अपेक्षित" : "Awaiting LMO Sign-off"}
-          </div>
-        </div>
-
-        <div className="bg-white p-4 rounded-xl border border-rose-200 shadow-xs">
-          <div className="text-xs font-bold text-rose-700 uppercase tracking-wider">
-            {language === "hi" ? "पाए गए विधिक उल्लंघन" : "Violations Detected"}
-          </div>
-          <div className="text-2xl font-black text-rose-600 mt-1 font-mono">{metrics.violations}</div>
-          <div className="text-[11px] text-slate-500 mt-0.5 font-medium">
-            {language === "hi" ? "धारा 36(1) नोटिस योग्य" : "Section 36(1) Notice Ready"}
-          </div>
-        </div>
-
-        <div className="bg-white p-4 rounded-xl border border-emerald-200 shadow-xs">
-          <div className="text-xs font-bold text-emerald-700 uppercase tracking-wider">
-            {language === "hi" ? "विधिक अनुपालक वस्तुएं" : "Compliant Products"}
-          </div>
-          <div className="text-2xl font-black text-emerald-600 mt-1 font-mono">{metrics.compliant}</div>
-          <div className="text-[11px] text-slate-500 mt-0.5 font-medium">
-            {language === "hi" ? "पूर्ण विधिक अनुपालन" : "Table-I & Rule 6 compliant"}
-          </div>
-        </div>
-      </div>
-
-      {/* Golden Demonstration SKU Quick-Selector Bar (1-Click Pipeline Verification) */}
-      <GoldenSkuQuickSelector onSelectSku={onSelectCase} />
 
       {/* Quick Triage Filter Pills */}
       <div className="flex items-center gap-2 flex-wrap bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
@@ -497,16 +534,26 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
               className="text-xs px-2.5 py-1.5 border border-slate-200 rounded-lg bg-white text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#1B365D] cursor-pointer"
             >
               <option value="DATE_DESC">{language === "hi" ? "नवीनतम पहले (Newest)" : "Date: Newest First"}</option>
-              <option value="DATE_ASC">{language === "hi" ? "पुरातन पहले (Oldest)" : "Date: Oldest First"}</option>
+              <option value="DATE_ASC">{language === "hi" ? "पुराने पहले (Oldest)" : "Date: Oldest First"}</option>
               <option value="VERDICT_SEV">{language === "hi" ? "उल्लंघन पहले (Violations First)" : "Violations First"}</option>
               <option value="CONF_ASC">{language === "hi" ? "निम्न विश्वास (Low Confidence)" : "Confidence: Low First"}</option>
               <option value="CONF_DESC">{language === "hi" ? "उच्च विश्वास (High Confidence)" : "Confidence: High First"}</option>
-              <option value="CASE_ASC">{language === "hi" ? "प्रकरण संख्या (A → Z)" : "Case ID: A → Z"}</option>
-              <option value="CASE_DESC">{language === "hi" ? "प्रकरण संख्या (Z → A)" : "Case ID: Z → A"}</option>
-              <option value="PRODUCT_ASC">{language === "hi" ? "वस्तु नाम (A → Z)" : "Commodity: A → Z"}</option>
-              <option value="PRODUCT_DESC">{language === "hi" ? "वस्तु नाम (Z → A)" : "Commodity: Z → A"}</option>
+              <option value="CASE_ASC">{language === "hi" ? "केस आईडी (A → Z)" : "Case ID: A → Z"}</option>
+              <option value="CASE_DESC">{language === "hi" ? "केस आईडी (Z → A)" : "Case ID: Z → A"}</option>
+              <option value="PRODUCT_ASC">{language === "hi" ? "उत्पाद नाम (A → Z)" : "Commodity: A → Z"}</option>
+              <option value="PRODUCT_DESC">{language === "hi" ? "उत्पाद नाम (Z → A)" : "Commodity: Z → A"}</option>
             </select>
           </div>
+
+          {/* View Mode Toggle */}
+          <button
+            type="button"
+            onClick={() => setViewMode(viewMode === "LIST" ? "GRID" : "LIST")}
+            className="p-1.5 rounded-lg border border-slate-300 bg-white text-slate-600 hover:bg-slate-50 hover:text-[#1B365D] hover:border-[#1B365D]/30 transition-all shadow-xs shrink-0 ml-auto md:ml-1 hidden md:flex"
+            title={language === "hi" ? (viewMode === "LIST" ? "ग्रिड दृश्य" : "सूची दृश्य") : (viewMode === "LIST" ? "Switch to Grid View" : "Switch to List View")}
+          >
+            {viewMode === "LIST" ? <LayoutGrid size={16} strokeWidth={2} /> : <List size={16} strokeWidth={2} />}
+          </button>
 
           {(searchTerm || selectedWorkflow !== "ALL" || selectedVerdict !== "ALL" || triageFilter !== "ALL" || sortBy !== "DATE_DESC") && (
             <button
@@ -517,6 +564,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                 setSelectedVerdict("ALL");
                 setTriageFilter("ALL");
                 setSortBy("DATE_DESC");
+                setSearchParams({});
               }}
               className="text-xs text-rose-600 hover:text-rose-700 font-semibold px-2 py-1 underline cursor-pointer"
             >
@@ -580,8 +628,8 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
               </span>
             </div>
 
-            {/* Mobile View: High-Legibility Card Tiles */}
-            <div className="block md:hidden divide-y divide-slate-100">
+            {/* Card / Grid View */}
+            <div className={viewMode === "GRID" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 bg-slate-50/50" : "block md:hidden divide-y divide-slate-100"}>
               {paginatedCases.map((c) => {
                 const conf = getCaseConfidence(c);
                 const confPct = Math.min(100, Math.max(0, Math.round(conf * 100)));
@@ -589,7 +637,9 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
                   <div
                     key={`mobile-${c.id}`}
                     onClick={() => onSelectCase(c.id)}
-                    className="p-3.5 hover:bg-blue-50/50 cursor-pointer space-y-2 transition-colors"
+                    className={`p-3.5 hover:bg-blue-50/50 cursor-pointer space-y-2 transition-colors ${
+                      viewMode === "GRID" ? "bg-white border border-slate-200 rounded-xl shadow-xs" : ""
+                    }`}
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span className="font-mono text-xs font-bold text-[#1B365D] truncate">
@@ -653,7 +703,7 @@ export const InspectionDesk: React.FC<InspectionDeskProps> = ({
             </div>
 
             {/* Desktop View: Full Data Table with Workstation Micro-Interactions */}
-            <div className="hidden md:block overflow-x-auto">
+            <div className={viewMode === "LIST" ? "hidden md:block overflow-x-auto" : "hidden"}>
               <table className="min-w-full divide-y divide-slate-200 text-left">
               <thead className="bg-slate-50 text-[11px] font-bold text-slate-600 uppercase tracking-wider border-b border-slate-200 select-none">
                 <tr>

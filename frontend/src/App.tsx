@@ -13,7 +13,7 @@ import { PageSkeleton } from "./components/common/LoadingSkeleton";
 const Landing = lazy(() => import("./pages/Landing"));
 const Login = lazy(() => import("./pages/Login"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
-const Inspections = lazy(() => import("./pages/Inspections"));
+const CaseRegistryPage = lazy(() => import("./pages/CaseRegistryPage"));
 const NewInspection = lazy(() => import("./pages/NewInspection"));
 const InspectionDetails = lazy(() => import("./pages/InspectionDetails"));
 const EvidenceDossier = lazy(() => import("./pages/EvidenceDossier"));
@@ -23,6 +23,7 @@ const Reports = lazy(() => import("./pages/Reports"));
 const Settings = lazy(() => import("./pages/Settings"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Unauthorized = lazy(() => import("./pages/Unauthorized"));
+const DemoSuite = lazy(() => import("./pages/DemoSuite"));
 const StatutoryDocumentPage = lazy(() => import("./pages/statutory/StatutoryDocumentPage"));
 import { LEGAL_DOCS, docBasePath } from "./pages/statutory/legalDocRegistry";
 
@@ -34,7 +35,9 @@ const ProtectedWorkstation: React.FC<{ children: React.ReactNode }> = ({ childre
   }
   return (
     <AppShell>
-      <AnimatedPage>{children}</AnimatedPage>
+      <Suspense fallback={<PageSkeleton />}>
+        <AnimatedPage>{children}</AnimatedPage>
+      </Suspense>
     </AppShell>
   );
 };
@@ -51,7 +54,7 @@ const AnimatedRoutes: React.FC = () => {
           <Route path="/" element={<AnimatedPage><Landing /></AnimatedPage>} />
           <Route path="/login" element={<AnimatedPage><Login /></AnimatedPage>} />
 
-          {/* GIGW 3.0 Governed Document Pages — Statutory Enactments, Policies & Standards */}
+          {/* GIGW 3.0 Governed Document Pages â€” Statutory Enactments, Policies & Standards */}
           {LEGAL_DOCS.map((doc) => (
             <Route
               key={doc.slug}
@@ -73,7 +76,7 @@ const AnimatedRoutes: React.FC = () => {
             path="/inspections"
             element={
               <ProtectedWorkstation>
-                <Inspections />
+                <CaseRegistryPage />
               </ProtectedWorkstation>
             }
           />
@@ -130,6 +133,14 @@ const AnimatedRoutes: React.FC = () => {
             element={
               <ProtectedWorkstation>
                 <Settings />
+              </ProtectedWorkstation>
+            }
+          />
+          <Route
+            path="/demo"
+            element={
+              <ProtectedWorkstation>
+                <DemoSuite />
               </ProtectedWorkstation>
             }
           />

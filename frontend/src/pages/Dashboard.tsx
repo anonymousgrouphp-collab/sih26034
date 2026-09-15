@@ -30,7 +30,6 @@ import { useCircle } from "../context/CircleContext";
 import { StatutorySurveillanceTicker } from "../components/common/StatutorySurveillanceTicker";
 import { StatutoryOmnibox } from "../components/common/StatutoryOmnibox";
 import { StateEmblem } from "../components/common/StateEmblem";
-import { StatutoryDemoShowcase } from "../features/demo/StatutoryDemoShowcase";
 import { m } from "framer-motion";
 
 export const Dashboard: React.FC = () => {
@@ -485,422 +484,67 @@ export const Dashboard: React.FC = () => {
         </Link>
       </div>
 
-      {/* Main Grid: Recent Inspections Table + Human-in-the-Loop Triage */}
-      <div className="grid gap-6 lg:grid-cols-12">
-        {/* Left 8 Cols: Recent Inspections Activity Table with Interactive Triage Filters */}
-        <div className="lg:col-span-8 bg-white overflow-hidden border border-slate-200 rounded-xl shadow-xs flex flex-col">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 px-4 sm:px-5 py-3.5 bg-slate-50/80 gap-3">
-            <div>
-              <div className="flex items-center gap-2">
-                <p className="font-bold text-slate-900 text-sm">
-                  {language === "hi" ? "हाल के निरीक्षण मामले" : "Recent Inspection Cases"}
-                </p>
-                <span className="hidden sm:inline-flex px-2 py-0.5 text-[10px] font-mono font-bold rounded-full bg-blue-50 text-[#1B365D] border border-blue-200">
-                  {filteredCases.length} {language === "hi" ? "मामले" : "Dossiers"}
-                </span>
-              </div>
-              <p className="text-xs text-slate-500 mt-0.5">
-                {language === "hi"
-                  ? "स्वचालित जांच अथवा अधिकारी न्यायनिर्णयन के अधीन सक्रिय पैकेजिंग डोजियर।"
-                  : "Active packaging dossiers undergoing automated checks or officer adjudication."}
-              </p>
-            </div>
+      {/* Secondary Dashboard Modules: Triage & Compliance Guarantee */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Review Queue Triage Callout */}
+        <div className="p-6 border border-amber-300 bg-amber-50/80 space-y-4 rounded-xl shadow-xs relative overflow-hidden flex flex-col justify-between">
+          <img
+            src="/assets/gov/doca_legal_metrology_seal.svg"
+            alt="Seal"
+            className="absolute -right-6 -bottom-6 w-40 h-40 opacity-10 pointer-events-none select-none"
+            aria-hidden="true"
+          />
 
-            {/* Quick Status Filter Pills with Compact Non-Wrapping Badges */}
-            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs shrink-0 self-start sm:self-auto shadow-inner">
-              {[
-                {
-                  id: "ALL" as const,
-                  label: language === "hi" ? "सभी" : "All",
-                  count: cases.length,
-                  activeClass: "bg-[#1B365D] text-white shadow-2xs font-bold",
-                  inactiveClass: "text-slate-600 hover:text-slate-900 hover:bg-white",
-                },
-                {
-                  id: "PASS" as const,
-                  label: language === "hi" ? "उत्तीर्ण" : "Pass",
-                  count: metrics.passed,
-                  activeClass: "bg-emerald-700 text-white shadow-2xs font-bold",
-                  inactiveClass: "text-emerald-700 hover:bg-emerald-50",
-                },
-                {
-                  id: "FAIL" as const,
-                  label: language === "hi" ? "उल्लंघन" : "Fail",
-                  count: metrics.failed,
-                  activeClass: "bg-rose-700 text-white shadow-2xs font-bold",
-                  inactiveClass: "text-rose-700 hover:bg-rose-50",
-                },
-                {
-                  id: "REVIEW" as const,
-                  label: language === "hi" ? "समीक्षा" : "Review",
-                  count: metrics.pendingTotal,
-                  activeClass: "bg-amber-600 text-white shadow-2xs font-bold",
-                  inactiveClass: "text-amber-800 hover:bg-amber-50",
-                },
-              ].map((tab) => {
-                const isActive = tableFilter === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setTableFilter(tab.id)}
-                    className={`px-2.5 py-1 rounded-md text-[11px] font-bold whitespace-nowrap inline-flex items-center gap-1.5 transition-colors ${
-                      isActive ? tab.activeClass : tab.inactiveClass
-                    }`}
-                  >
-                    <span>{tab.label}</span>
-                    <span
-                      className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-semibold ${
-                        isActive
-                          ? "bg-black/20 text-white"
-                          : "bg-white text-slate-700 border border-slate-200"
-                      }`}
-                    >
-                      {tab.count}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="w-full overflow-x-auto custom-scrollbar relative max-h-[500px] lg:max-h-none lg:flex-1 lg:min-h-0">
-            {/* Desktop / Tablet Table View (sm+) */}
-            <div className="hidden sm:block min-w-[700px]">
-              <table className="w-full table-fixed divide-y divide-slate-200 text-xs border-collapse">
-                <thead className="bg-slate-50 text-[11px] font-bold uppercase tracking-wider text-slate-600 sticky top-0 z-20 backdrop-blur-md">
-                  <tr>
-                    <th className="w-[46%] px-4 py-3 text-left sticky left-0 bg-slate-50 z-10 shadow-[1px_0_0_rgba(226,232,240,1)]">
-                      {language === "hi" ? "मामला / उत्पाद" : "Case / Product"}
-                    </th>
-                    <th className="w-[22%] px-3 py-3 text-left whitespace-nowrap">
-                      {language === "hi" ? "विधिक निर्णय" : "Compliance Verdict"}
-                    </th>
-                    <th className="w-[16%] px-3 py-3 text-left whitespace-nowrap">
-                      {language === "hi" ? "सटीकता" : "Confidence"}
-                    </th>
-                    <th className="w-[16%] px-4 py-3 text-right whitespace-nowrap">
-                      {language === "hi" ? "कार्रवाई" : "Action"}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 bg-white relative">
-                  {isLoading ? (
-                    Array.from({ length: 4 }).map((_, i) => (
-                      <tr key={i} className="animate-pulse">
-                        <td className="px-4 py-4 sticky left-0 bg-white z-10 shadow-[1px_0_0_rgba(226,232,240,1)]">
-                          <div className="h-4 bg-slate-200 rounded skeleton w-2/3 mb-2"></div>
-                          <div className="h-3 bg-slate-200 rounded skeleton w-1/2"></div>
-                        </td>
-                        <td className="px-3 py-4"><div className="h-6 bg-slate-200 rounded-full skeleton w-16"></div></td>
-                        <td className="px-3 py-4"><div className="h-4 bg-slate-200 rounded skeleton w-12"></div></td>
-                        <td className="px-4 py-4 text-right"><div className="h-4 bg-slate-200 rounded skeleton w-12 ml-auto"></div></td>
-                      </tr>
-                    ))
-                  ) : filteredCases.length === 0 ? (
-                    <tr>
-                      <td colSpan={4} className="px-4 py-8 text-center text-slate-500 font-mono text-xs">
-                        {t("table.empty", "No inspection cases match the selected filter.")}
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredCases.slice(0, 10).map((c) => {
-                      const conf = getCaseConfidence(c);
-                      const confPct = Math.round(conf * 100);
-                      return (
-                        <tr
-                          key={c.id}
-                          onClick={() => navigate(`/inspections/${c.id}`)}
-                          className="group hover:bg-blue-50/50 cursor-pointer transition-all duration-200"
-                        >
-                          <td className="px-4 py-3 min-w-0 sticky left-0 bg-white group-hover:bg-blue-50/60 z-10 transition-colors shadow-[1px_0_0_rgba(226,232,240,1)]">
-                            <div className="font-bold text-slate-900 text-xs sm:text-sm truncate transition-colors group-hover:text-[#1B365D]" title={getFormattedProductName(c)}>
-                              {getFormattedProductName(c)}
-                            </div>
-                            <div className="text-[11px] font-mono text-slate-500 flex items-center gap-1.5 mt-0.5 min-w-0 flex-wrap">
-                              <span className="shrink-0 text-[#1B365D] font-bold">{c.inspection_number}</span>
-                              <span className="text-slate-300">•</span>
-                              <span className="truncate max-w-[120px] text-slate-700">{c.establishment_name || c.brand_name || (language === "hi" ? "सामान्य खुदरा" : "General Retail")}</span>
-                              <span className="text-slate-300">•</span>
-                              <span className="inline-block px-1.5 py-0.2 text-[9.5px] font-sans font-medium rounded bg-slate-100 text-slate-700 border border-slate-200 shrink-0">
-                                {formatCategory(c.category)}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-3 py-3 whitespace-nowrap">
-                            <VerdictBadge verdict={c.overall_status} size="sm" />
-                          </td>
-                          <td className="px-3 py-3 whitespace-nowrap">
-                            <div className="flex items-center gap-1.5">
-                              <span
-                                className={`font-mono text-xs font-bold tabular-nums ${
-                                  confPct >= 90
-                                    ? "text-emerald-700"
-                                    : confPct >= 70
-                                    ? "text-amber-700"
-                                    : "text-rose-700"
-                                }`}
-                              >
-                                {confPct}%
-                              </span>
-                              <div className="hidden lg:block w-8 sm:w-10 h-1.5 rounded-full bg-slate-100 overflow-hidden border border-slate-200">
-                                <div
-                                  className={`h-full rounded-full transition-all duration-700 ease-out ${
-                                    confPct >= 90
-                                      ? "bg-emerald-600"
-                                      : confPct >= 70
-                                      ? "bg-amber-500"
-                                      : "bg-rose-500"
-                                  }`}
-                                  style={{ width: `${confPct}%` }}
-                                />
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-4 py-3 text-right whitespace-nowrap">
-                            <span className="inline-flex items-center gap-1 text-xs font-bold text-[#1B365D] group-hover:underline transition-colors">
-                              <span>{language === "hi" ? "निरीक्षण" : "Inspect"}</span>
-                              <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Mobile Touch Card List View (< sm) */}
-            <div className="sm:hidden divide-y divide-slate-100 bg-white">
-              {isLoading ? (
-                <div className="p-6 text-center text-slate-500 text-xs">
-                  {language === "hi" ? "निरीक्षण रिकॉर्ड लोड हो रहे हैं..." : "Loading inspection records..."}
-                </div>
-              ) : filteredCases.length === 0 ? (
-                <div className="p-6 text-center text-slate-500 font-mono text-xs">
-                  {t("table.empty", "No inspection cases match the selected filter.")}
-                </div>
-              ) : (
-                filteredCases.slice(0, 10).map((c) => {
-                  const conf = getCaseConfidence(c);
-                  const confPct = Math.round(conf * 100);
-                  return (
-                    <div
-                      key={c.id}
-                      onClick={() => navigate(`/inspections/${c.id}`)}
-                      className="p-3.5 hover:bg-slate-50 active:bg-slate-100 cursor-pointer transition-colors space-y-1.5"
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="font-bold text-slate-900 text-xs truncate min-w-0 flex-1" title={getFormattedProductName(c)}>
-                          {getFormattedProductName(c)}
-                        </div>
-                        <VerdictBadge verdict={c.overall_status} size="sm" />
-                      </div>
-                      <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 pt-0.5">
-                        <div className="flex items-center gap-1.5 truncate min-w-0">
-                          <span className="shrink-0 text-[#1B365D] font-bold">{c.inspection_number}</span>
-                          <span className="text-slate-300">•</span>
-                          <span className="inline-block px-1.5 py-0.2 text-[9.5px] font-sans font-medium rounded bg-slate-100 text-slate-700 border border-slate-200 shrink-0">
-                            {formatCategory(c.category)}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1.5 shrink-0 text-[#1B365D] font-bold text-[11px]">
-                          <span className="font-mono text-slate-600">{confPct}%</span>
-                          <ArrowRight size={12} className="text-[#1B365D]" />
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          </div>
-
-          {/* Official GovTech Table Footer with Summary & Register Deep-Link */}
-          <div className="border-t border-slate-200 px-4 sm:px-5 py-3 bg-slate-50 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs">
-            <span className="text-slate-600 font-medium">
-              {language === "hi"
-                ? `प्रदर्शित ${Math.min(10, filteredCases.length)} / कुल ${filteredCases.length} सक्रिय प्रकरण (${currentCircle.labelHi})`
-                : `Showing ${Math.min(10, filteredCases.length)} of ${filteredCases.length} active dossiers (${currentCircle.label})`}
-            </span>
-            <Link
-              to="/inspections"
-              className="inline-flex items-center gap-1.5 font-bold text-[#1B365D] hover:underline transition-colors"
-            >
-              <span>
-                {language === "hi"
-                  ? `संपूर्ण निरीक्षण रजिस्टर देखें (${cases.length})`
-                  : `Access Complete Inspection Register (${cases.length})`}
-              </span>
-              <ArrowRight size={13} />
-            </Link>
-          </div>
-        </div>
-
-        {/* Right 4 Cols: Human-in-the-Loop Triage & Golden SKU Quick Demos */}
-        <div className="lg:col-span-4 space-y-4">
-          {/* Review Queue Triage Callout */}
-          <div className="p-5 border border-amber-300 bg-amber-50/80 space-y-3 rounded-xl shadow-xs relative overflow-hidden">
-            {/* Subtle Directorate Seal Background Watermark */}
-            <img
-              src="/assets/gov/doca_legal_metrology_seal.svg"
-              alt="Seal"
-              className="absolute -right-6 -bottom-6 w-32 h-32 opacity-10 pointer-events-none select-none"
-              aria-hidden="true"
-            />
-
-            <div className="flex items-center justify-between relative z-10">
-              <div className="flex items-center gap-2 text-amber-900 font-extrabold text-sm">
-                <Users size={18} className="text-amber-700" />
+          <div>
+            <div className="flex items-center justify-between relative z-10 mb-2">
+              <div className="flex items-center gap-2 text-amber-900 font-extrabold text-base">
+                <Users size={20} className="text-amber-700" />
                 <span>{t("dash.triage_needed", "Officer Triage Needed")}</span>
               </div>
-              <span className="px-2 py-0.5 text-xs font-mono font-black rounded-full bg-amber-200/80 text-amber-900 border border-amber-300">
+              <span className="px-2.5 py-1 text-sm font-mono font-black rounded-full bg-amber-200/80 text-amber-900 border border-amber-300">
                 {metrics.pendingTotal} {t("dash.cases_count", "Cases")}
               </span>
             </div>
-
-            <p className="text-xs text-amber-900/85 leading-relaxed relative z-10">
+            <p className="text-sm text-amber-900/85 leading-relaxed relative z-10 max-w-lg">
               {t(
                 "dash.triage_desc",
                 "Automated rules have identified borderline measurements within sensor uncertainty limits or degraded photographs requiring human officer adjudication."
               )}
             </p>
-
-            <Link
-              to="/review-queue"
-              className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold flex items-center justify-center gap-2 text-xs py-2 rounded-lg shadow-sm transition-colors relative z-10"
-            >
-              <span>{t("dash.open_review_queue", "Open Review Queue")}</span>
-              <ArrowRight size={14} />
-            </Link>
           </div>
 
-          {/* Golden SKU Quick Demonstration Shortcuts */}
-          <div className="bg-white p-5 space-y-3 rounded-xl border border-slate-200 shadow-xs relative overflow-hidden">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <img src="/assets/gov/sovereign_balance_tula.svg" alt="Tula" className="w-5 h-5 object-contain shrink-0" />
-                <p className="font-bold text-slate-900 text-sm">{t("dash.golden_skus", "Pre-loaded Golden SKUs")}</p>
-              </div>
-              <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200">
-                LMPC 2011
-              </span>
+          <Link
+            to="/review-queue"
+            className="w-full sm:w-auto self-start bg-amber-600 hover:bg-amber-700 text-white font-bold flex items-center justify-center gap-2 text-sm px-6 py-2.5 rounded-lg shadow-sm transition-colors relative z-10"
+          >
+            <span>{t("dash.open_review_queue", "Open Review Queue")}</span>
+            <ArrowRight size={16} />
+          </Link>
+        </div>
+
+        {/* Section 63 BSA 2023 Digital Evidence Guarantee */}
+        <div className="p-6 bg-emerald-50/80 border border-emerald-300 rounded-xl shadow-xs relative overflow-hidden flex flex-col sm:flex-row items-start gap-4">
+          <img
+            src="/assets/gov/sec63_bsa_cert_badge.svg"
+            alt="BSA 2023 Tamper Proof Seal"
+            className="w-16 h-16 shrink-0 mt-1"
+          />
+          <div className="min-w-0 flex-1 space-y-3">
+            <div className="flex items-center gap-2 text-emerald-950 font-bold text-base">
+              <span>{t("dash.sec63_title", "Section 63 BSA 2023 Evidentiary Guarantee")}</span>
             </div>
-            <p className="text-xs text-slate-500 leading-relaxed">
+            <p className="text-sm text-emerald-900/90 leading-relaxed">
               {t(
-                "dash.golden_skus_desc",
-                "Test end-to-end statutory adjudication against pre-configured golden demonstration cases:"
+                "dash.sec63_desc",
+                "Electronic evidence certificates adhere strictly to Bharatiya Sakshya Adhiniyam, 2023. Repealed Section 65B Indian Evidence Act 1872 references are strictly forbidden."
               )}
             </p>
-
-            <div className="space-y-2">
-              {[
-                {
-                  id: "SKU-DEMO-01",
-                  name: language === "hi" ? "सनफीस्ट बटर कुकीज़ 200g" : "Sunfeast Butter Cookies 200g",
-                  tag: language === "hi" ? "उल्लंघन — फॉन्ट कमी (1.84mm) + 'gms' इकाई" : "FAIL — Font Deficit (1.84mm) + 'gms' unit",
-                  badge: "FAIL",
-                },
-                {
-                  id: "SKU-DEMO-02",
-                  name: language === "hi" ? "रेडी करी पाउच 300g" : "Ready Curry Retort Pouch 300g",
-                  tag: language === "hi" ? "उल्लंघन — यूएसपी विसंगति (₹0.28 vs ₹0.23/g)" : "FAIL — Rule 6(1)(e) USP Mismatch",
-                  badge: "FAIL",
-                },
-                {
-                  id: "SKU-DEMO-03",
-                  name: language === "hi" ? "खनिज जल बोतल 1L" : "Natural Mineral Water 1L",
-                  tag: language === "hi" ? "उत्तीर्ण — 100% विधिक अनुपालक (बेलनाकार)" : "PASS — 100% Compliant (Cylindrical)",
-                  badge: "PASS",
-                },
-                {
-                  id: "SKU-DEMO-04",
-                  name: language === "hi" ? "हर्बल साबुन 125g" : "Herbal Bathing Soap 125g",
-                  tag: language === "hi" ? "समीक्षा — सीमांत फॉन्ट (2.46mm, k=2 बैंड)" : "REVIEW — Borderline Font (k=2 band)",
-                  badge: "REVIEW",
-                },
-                {
-                  id: "SKU-DEMO-05",
-                  name: language === "hi" ? "आलू चिप्स 75g" : "Crispy Potato Chips 75g",
-                  tag: language === "hi" ? "असमर्थ — चकाचौंध फैलाव (6.4% > 3.0%)" : "UNABLE — Specular Glare (6.4% > 3.0%)",
-                  badge: "UNABLE_TO_VERIFY",
-                },
-                {
-                  id: "SKU-DEMO-06",
-                  name: language === "hi" ? "ई-कॉमर्स ईयरबड्स" : "Wireless Earbuds (E-Commerce)",
-                  tag: language === "hi" ? "उल्लंघन — नियम 6(10) मूल देश अनुपस्थित" : "FAIL — Rule 6(10) Missing Country of Origin",
-                  badge: "FAIL",
-                },
-                {
-                  id: "demo-fortune-sunlite",
-                  name: language === "hi" ? "फॉर्च्यून सनलाइट तेल 1L" : "Fortune Sunlite Oil 1L",
-                  tag: language === "hi" ? "उत्तीर्ण — ArUco अंशांकन एवं धारा 63 प्रमाण" : "PASS — Calibrated ArUco Benchmark",
-                  badge: "PASS",
-                },
-              ].map((sku) => (
-                <button
-                  key={sku.id}
-                  type="button"
-                  onClick={() => navigate(`/inspections/${sku.id}`)}
-                  className="w-full flex items-center justify-between p-2.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-blue-50/60 hover:border-[#1B365D]/40 text-left transition-colors text-xs group cursor-pointer"
-                >
-                  <div className="min-w-0 pr-2">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-mono text-[9px] font-bold px-1.5 py-0.2 rounded bg-white text-[#1B365D] border border-slate-200">
-                        DEMO
-                      </span>
-                      <p className="font-bold text-slate-900 group-hover:text-[#1B365D] transition-colors truncate">
-                        {sku.name}
-                      </p>
-                    </div>
-                    <p className="text-[10.5px] text-slate-500 mt-0.5 truncate">{sku.tag}</p>
-                  </div>
-                  <VerdictBadge verdict={sku.badge as any} size="sm" />
-                </button>
-              ))}
-            </div>
-
-            <div className="pt-2 border-t border-slate-100 text-center">
-              <a
-                href="#demo-showcase"
-                className="inline-flex items-center justify-center gap-1.5 text-xs font-bold text-[#1B365D] hover:underline"
-              >
-                <span>{language === "hi" ? "सभी 7 प्रमाणित सांविधिक परिदृश्य देखें" : "View Full 7 Certified Scenarios Showcase"}</span>
-                <ArrowRight size={13} />
-              </a>
-            </div>
-          </div>
-
-          {/* Section 63 BSA 2023 Digital Evidence Guarantee */}
-          <div className="p-4 bg-emerald-50/80 border border-emerald-300 rounded-xl shadow-xs relative overflow-hidden flex items-start gap-3">
-            <img
-              src="/assets/gov/sec63_bsa_cert_badge.svg"
-              alt="BSA 2023 Tamper Proof Seal"
-              className="w-12 h-12 shrink-0 mt-0.5"
-            />
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2 text-emerald-950 font-bold text-xs">
-                <span>{t("dash.sec63_title", "Section 63 BSA 2023 Evidentiary Guarantee")}</span>
-              </div>
-              <p className="text-[11px] text-emerald-900/90 leading-relaxed mt-1">
-                {t(
-                  "dash.sec63_desc",
-                  "Electronic evidence certificates adhere strictly to Bharatiya Sakshya Adhiniyam, 2023. Repealed Section 65B Indian Evidence Act 1872 references are strictly forbidden."
-                )}
-              </p>
-              <div className="flex items-center gap-2 mt-1.5 text-[10px] font-mono font-bold text-emerald-800">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
-                <span>RFC 3161 NIC-TSA Timestamped • SHA-256 Validated</span>
-              </div>
+            <div className="flex items-center gap-2 mt-2 text-xs font-mono font-bold text-emerald-800 bg-emerald-100/60 p-2 rounded-lg border border-emerald-200/50">
+              <span className="w-2 h-2 rounded-full bg-emerald-600" />
+              <span>RFC 3161 NIC-TSA Timestamped • SHA-256 Validated</span>
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Comprehensive Certified Demonstration Suite (Statutory Golden SKUs) */}
-      <div id="demo-showcase" className="pt-2">
-        <StatutoryDemoShowcase />
       </div>
     </div>
   );

@@ -116,7 +116,7 @@ export const DICTIONARY: Record<string, TranslationEntry> = {
 
   // --- Navigation ---
   "nav.dashboard": { en: "Executive Dashboard", hi: "कार्यकारी डैशबोर्ड" },
-  "nav.register": { en: "Inspection Register", hi: "निरीक्षण पंजी" },
+  "nav.register": { en: "Case Registry", hi: "केस रजिस्ट्री" },
   "nav.new": { en: "New Inspection", hi: "नया निरीक्षण मामला" },
   "nav.review": { en: "Review Queue", hi: "समीक्षा कतार" },
   "nav.rules": { en: "Rules & Schedules", hi: "विधिक नियम एवं अनुसूचियां" },

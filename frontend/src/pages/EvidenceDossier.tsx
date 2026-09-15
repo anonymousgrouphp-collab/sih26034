@@ -15,7 +15,7 @@ import {
   ShieldCheck,
   CheckCircle2,
   Lock,
-  ExternalLink,
+  ArrowRight,
   Printer,
   FileCode,
   Activity,
@@ -394,7 +394,7 @@ export const EvidenceDossier: React.FC = () => {
         <div className="flex flex-wrap items-center gap-2.5">
           <Link to={`/inspections/${caseData.id}`} className="btn-secondary text-xs">
             <span>{language === "hi" ? "अधिनिर्णय कैनवास" : "Adjudication Canvas"}</span>
-            <ExternalLink size={14} />
+            <ArrowRight size={14} />
           </Link>
           <button
             type="button"

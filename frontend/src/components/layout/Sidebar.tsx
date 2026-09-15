@@ -38,7 +38,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const { user, logout } = useAuth();
   const { t, language } = useLanguage();
   const navigate = useNavigate();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    return localStorage.getItem("nirikshak_sidebar_collapsed") === "true";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("nirikshak_sidebar_collapsed", String(isCollapsed));
+  }, [isCollapsed]);
   const location = useLocation();
 
   const isController = user?.officerRole === "CONTROLLER";
@@ -71,21 +77,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
     if (path === "/inspections/new") {
       return current === "/inspections/new";
     }
-    if (path.includes("/evidence")) {
-      return current.includes("/evidence");
-    }
-    if (path === "/inspections/SKU-DEMO-01") {
-      return (
-        current.startsWith("/inspections/SKU-DEMO") ||
-        current === "/inspections/demo-fortune-sunlite"
-      );
+    if (path === "/demo") {
+      return current === "/demo";
     }
     if (path === "/inspections") {
       return (
         current === "/inspections" ||
         (current.startsWith("/inspections/") &&
           current !== "/inspections/new" &&
-          !current.includes("/evidence") &&
           !current.startsWith("/inspections/SKU-DEMO") &&
           current !== "/inspections/demo-fortune-sunlite")
       );
@@ -115,7 +114,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           icon: Home,
         },
         {
-          label: t("nav.register", "Inspection Register"),
+          label: t("nav.register", "Case Registry"),
           path: "/inspections",
           icon: SearchCheck,
         },
@@ -125,11 +124,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           icon: Users,
           badge: pendingCasesCount > 0 ? pendingCasesCount : undefined,
           badgeType: "warning" as const,
-        },
-        {
-          label: t("nav.evidence", "Evidence Dossier"),
-          path: `/inspections/${lastCaseId}/evidence`,
-          icon: FileArchive,
         },
         {
           label: t("nav.reports", "Reports & Notices"),
@@ -148,7 +142,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         },
         {
           label: language === "hi" ? "सांविधिक डेमो परीक्षण" : "Statutory Demo Suite",
-          path: "/inspections/SKU-DEMO-01",
+          path: "/demo",
           icon: Scale,
           badge: "7",
           badgeType: "info" as const,
@@ -169,7 +163,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         initial={false}
         animate={{ width: isCollapsed ? 68 : 256 }}
         transition={{ duration: 0.2, ease: [0.2, 0, 0, 1] }}
-        className="hidden lg:flex h-full shrink-0 flex-col border-r border-slate-200 bg-white text-slate-700 shadow-xs select-none z-30 print:hidden"
+        className="hidden lg:flex h-full shrink-0 flex-col border-r border-slate-200 bg-white text-slate-700 shadow-xs select-none z-30 overflow-hidden print:!hidden"
       >
         {/* Desktop Header / Collapse Bar */}
         <div
@@ -219,7 +213,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               resetScrollToTop();
             }}
             title={isCollapsed ? t("action.new_case", "New Inspection Case") : "New Inspection Case (Alt+N)"}
-            className={`flex items-center transition-all group ${
+            className={`flex items-center transition-colors group ${
               isCollapsed
                 ? "w-10 h-10 justify-center rounded-xl bg-[#1B365D] hover:bg-[#0A2540] text-white shadow-sm hover:shadow border border-[#152a48]"
                 : "w-full gap-2.5 py-2.5 px-3.5 bg-[#1B365D] hover:bg-[#0A2540] text-white text-xs font-bold rounded-xl shadow-sm hover:shadow border border-[#152a48]"
@@ -237,7 +231,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Scrollable Navigation Links */}
-        <div className={`flex-1 min-h-0 overflow-y-auto space-y-4 custom-scrollbar ${isCollapsed ? "px-2 py-2" : "px-3 py-1"}`}>
+        <div className={`flex-1 min-h-0 overflow-y-auto overflow-x-hidden space-y-4 custom-scrollbar ${isCollapsed ? "px-2 py-2" : "px-3 py-1"}`}>
           <nav className="space-y-4">
             {navGroups.map((group, groupIdx) => (
               <div key={groupIdx} className="space-y-1">
@@ -259,7 +253,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       to={item.path}
                       onClick={onCloseMobile}
                       title={isCollapsed ? item.label : undefined}
-                      className={`group relative flex items-center transition-all ${
+                      className={`group relative flex items-center transition-colors ${
                         isCollapsed
                           ? `w-10 h-10 mx-auto justify-center rounded-xl ${
                               active
@@ -364,7 +358,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ duration: 0.25, ease: [0.2, 0, 0, 1] }}
-              className="fixed inset-y-0 left-0 w-72 max-w-[85vw] h-[100dvh] flex flex-col bg-white shadow-2xl z-[71] border-r border-slate-200 select-none print:hidden"
+              className="fixed inset-y-0 left-0 w-72 max-w-[85vw] h-[100dvh] flex flex-col bg-white shadow-2xl z-[71] border-r border-slate-200 select-none print:!hidden"
             >
               {/* Mobile Drawer Header */}
               <div className="flex h-14 items-center justify-between border-b border-slate-200 px-4 bg-slate-50 shrink-0">
@@ -393,7 +387,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     onCloseMobile?.();
                     resetScrollToTop();
                   }}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#1B365D] hover:bg-[#0A2540] text-white text-xs font-bold rounded-xl shadow-sm transition-all border border-[#152a48] px-3.5"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#1B365D] hover:bg-[#0A2540] text-white text-xs font-bold rounded-xl shadow-sm transition-colors border border-[#152a48] px-3.5"
                 >
                   <div className="w-5 h-5 rounded-md bg-[#FF9933] text-slate-950 flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
                     <Plus size={13} className="stroke-[3]" />
@@ -422,7 +416,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             key={item.path}
                             to={item.path}
                             onClick={onCloseMobile}
-                            className={`group relative w-full flex items-center justify-between py-2.5 text-xs font-semibold rounded-xl transition-all px-3 ${
+                            className={`group relative w-full flex items-center justify-between py-2.5 text-xs font-semibold rounded-xl transition-colors px-3 ${
                               active
                                 ? "bg-blue-50/90 text-[#1B365D] font-bold border border-blue-200/80 shadow-2xs"
                                 : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 border border-transparent"

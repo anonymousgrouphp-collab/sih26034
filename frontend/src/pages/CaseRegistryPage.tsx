@@ -2,12 +2,12 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ApiService } from "../services/api";
 import { InspectionSummary, InspectionCase } from "../types/inspection";
-import { InspectionDesk } from "../features/desk/InspectionDesk";
+import { CaseRegistry } from "../features/desk/CaseRegistry";
 import { NewInspectionModal } from "../features/new-inspection/NewInspectionModal";
 import { useCircle } from "../context/CircleContext";
 import { resetScrollToTop } from "../components/common/ScrollToTop";
 
-export const Inspections: React.FC = () => {
+export const CaseRegistryPage: React.FC = () => {
   const [cases, setCases] = useState<InspectionSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { activeCircle } = useCircle();
@@ -60,7 +60,7 @@ export const Inspections: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      <InspectionDesk
+      <CaseRegistry
         cases={cases}
         activeCircle={activeCircle}
         onSelectCase={handleSelectCase}
@@ -80,4 +80,4 @@ export const Inspections: React.FC = () => {
   );
 };
 
-export default Inspections;
+export default CaseRegistryPage;
