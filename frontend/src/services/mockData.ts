@@ -4321,21 +4321,82 @@ export function savePersistedCases(casesMap: Map<string, InspectionCase>): void 
       }
     });
 
-    try {
-      storage.setItem(USER_CASES_STORAGE_KEY, JSON.stringify(toPersist));
-    } catch (quotaErr) {
-      console.warn("Storage quota exceeded, pruning heavy media assets for persistence:", quotaErr);
-      const pruned: Record<string, InspectionCase> = {};
-      Object.entries(toPersist).forEach(([k, c]) => {
-        pruned[k] = {
+    // ---------- Tier 1: Strip all base64/blob data URLs BEFORE first attempt ----------
+    // Base64 data URLs can be 500KB-2MB each and are the #1 cause of QuotaExceededError.
+    // They are ephemeral display previews, NOT statutory evidence — safe to discard on persist.
+    const stripHeavyMedia = (cases: Record<string, InspectionCase>): Record<string, InspectionCase> => {
+      const stripped: Record<string, InspectionCase> = {};
+      Object.entries(cases).forEach(([k, c]) => {
+        stripped[k] = {
           ...c,
           evidence_assets: c.evidence_assets.map((a) => ({
             ...a,
-            preview_url: a.preview_url && a.preview_url.length > 2048 ? "" : a.preview_url,
+            // Drop data: URIs and blob: URIs entirely — they cannot survive a page reload anyway
+            preview_url: a.preview_url && (a.preview_url.startsWith("data:") || a.preview_url.startsWith("blob:"))
+              ? ""
+              : (a.preview_url && a.preview_url.length > 2048 ? "" : a.preview_url),
           })),
         };
       });
-      storage.setItem(USER_CASES_STORAGE_KEY, JSON.stringify(pruned));
+      return stripped;
+    };
+
+    const lean = stripHeavyMedia(toPersist);
+
+    try {
+      storage.setItem(USER_CASES_STORAGE_KEY, JSON.stringify(lean));
+      return; // Success — exit early
+    } catch {
+      // Still too large — proceed to Tier 2
+    }
+
+    // ---------- Tier 2: Also strip audit_trail and ocr_raw_text ----------
+    const deepPruned: Record<string, InspectionCase> = {};
+    Object.entries(lean).forEach(([k, c]) => {
+      deepPruned[k] = {
+        ...c,
+        audit_trail: c.audit_trail ? c.audit_trail.slice(0, 3) : [],
+        evidence_assets: c.evidence_assets.map((a) => ({
+          ...a,
+          preview_url: "",
+          // Strip any large OCR text blobs if present
+          ...(a as any).ocr_raw_text ? { ocr_raw_text: "" } : {},
+        })),
+      };
+    });
+
+    try {
+      storage.setItem(USER_CASES_STORAGE_KEY, JSON.stringify(deepPruned));
+      return;
+    } catch {
+      // Still too large — proceed to Tier 3
+    }
+
+    // ---------- Tier 3: Evict oldest cases until it fits (keep max 15) ----------
+    const entries = Object.entries(deepPruned);
+    entries.sort((a, b) => {
+      const tA = a[1].created_at || "";
+      const tB = b[1].created_at || "";
+      return tB.localeCompare(tA); // newest first
+    });
+
+    const MAX_KEEP = 15;
+    for (let keep = Math.min(entries.length, MAX_KEEP); keep >= 1; keep--) {
+      const sliced: Record<string, InspectionCase> = {};
+      entries.slice(0, keep).forEach(([k, v]) => { sliced[k] = v; });
+      try {
+        storage.setItem(USER_CASES_STORAGE_KEY, JSON.stringify(sliced));
+        return;
+      } catch {
+        // Try keeping fewer
+      }
+    }
+
+    // ---------- Tier 4: Nuclear — clear persisted cases entirely ----------
+    try {
+      storage.removeItem(USER_CASES_STORAGE_KEY);
+    } catch {
+      // Nothing more we can do
     }
   } catch (err) {
     console.warn("Failed to save persisted cases to storage:", err);

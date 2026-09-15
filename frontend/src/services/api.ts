@@ -246,7 +246,7 @@ export class ApiService {
       this.emitSiteWideUpdate();
       return liveCase;
     } catch (err: any) {
-      if (err?.is_network_error || String(err?.message || "").includes("Failed to parse URL")) {
+      if (err?.is_network_error || err?.status >= 500 || String(err?.message || "").includes("Failed to parse URL") || String(err?.message || "").includes("fetch")) {
         console.warn("Live server unreachable for createInspection. Seamlessly activating Mode B local failover:", err);
         const failoverCase = await MockApiService.getInstance().createInspection(payload);
         this.emitSiteWideUpdate();

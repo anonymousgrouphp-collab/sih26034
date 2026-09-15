@@ -348,10 +348,16 @@ export class MockApiService implements IInspectionApiService {
       };
     }
 
+    // Determine a lightweight file_path — never store base64/blob data URLs as file_path
+    const safePath = (metadata.preview_url && !metadata.preview_url.startsWith("data:") && !metadata.preview_url.startsWith("blob:"))
+      ? metadata.preview_url
+      : `storage/uploads/${metadata.original_filename || "field_evidence.jpg"}`;
+    // For preview_url: keep data/blob URLs in-memory for current session display,
+    // but savePersistedCases will strip them before writing to localStorage
     const asset: EvidenceAsset = {
       image_id: imageId,
       inspection_id: metadata.inspection_id,
-      file_path: metadata.preview_url || `storage/uploads/${metadata.original_filename || "field_evidence.jpg"}`,
+      file_path: safePath,
       raw_sha256: rawSha256,
       panel_type: metadata.panel_type || "PDP_FRONT",
       image_width: metadata.image_width || 1920,

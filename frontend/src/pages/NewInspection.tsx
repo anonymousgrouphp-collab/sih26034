@@ -189,7 +189,7 @@ export const NewInspection: React.FC = () => {
         const img = new Image();
         img.onload = () => {
           try {
-            const maxDim = 1024;
+            const maxDim = 480;
             let { width, height } = img;
             if (width > maxDim || height > maxDim) {
               if (width > height) {
@@ -206,7 +206,7 @@ export const NewInspection: React.FC = () => {
             const ctx = canvas.getContext("2d");
             if (ctx) {
               ctx.drawImage(img, 0, 0, width, height);
-              resolve(canvas.toDataURL("image/jpeg", 0.75));
+              resolve(canvas.toDataURL("image/jpeg", 0.6));
               return;
             }
           } catch {
