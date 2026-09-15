@@ -202,7 +202,7 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
 
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200/90 shadow-xs flex flex-col h-full overflow-hidden">
+    <div className="bg-white rounded-xl border border-slate-200/90 shadow-xs flex flex-col overflow-hidden">
       {/* 1. Header Toolbar */}
       <div className="p-3 border-b border-slate-200 flex items-center justify-between gap-2 flex-wrap bg-slate-50">
         <div className="flex items-center gap-2 flex-wrap">

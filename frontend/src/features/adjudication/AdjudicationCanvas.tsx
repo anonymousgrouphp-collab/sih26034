@@ -385,7 +385,7 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
       {/* 2. Flagship Split-View Canvas */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
         {/* Left Column (6 cols): Calibrated Evidence Viewer with SVG Polygon Overlays */}
-        <div className="lg:col-span-6 h-full space-y-3">
+        <div className="lg:col-span-6 space-y-3">
           {/* Multi-Angle Evidence Facet Switcher (Rule 6 Multi-Panel Coverage) */}
           {caseData.evidence_assets && caseData.evidence_assets.length > 1 && (
             <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-xs">

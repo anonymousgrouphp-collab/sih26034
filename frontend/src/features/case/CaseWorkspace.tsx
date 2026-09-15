@@ -700,12 +700,12 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
       {caseData.evidence_assets.length === 0 || isRetakeMode ? (
         /* Evidence Intake Mode */
         <div className="space-y-3">
-          <div className="bg-blue-900/30 border border-blue-800 rounded-lg p-3.5 text-xs text-blue-300 flex items-start gap-2.5">
-            <svg className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-3.5 text-xs text-slate-700 flex items-start gap-2.5 shadow-2xs">
+            <svg className="w-4 h-4 text-[#1B365D] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div>
-              <span className="font-bold">
+              <span className="font-bold text-[#1B365D]">
                 {language === "hi" ? "चरण 1: भौतिक साक्ष्य अंतर्ग्रहण। " : "Stage 1: Physical Evidence Ingestion. "}
               </span>
               {language === "hi"
