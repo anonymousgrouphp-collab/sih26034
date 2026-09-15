@@ -60,6 +60,11 @@ export const Dashboard: React.FC = () => {
 
   const metrics = useMemo(() => {
     const total = cases.length;
+    
+    // Calculate recent cases (last 7 days)
+    const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const recent = cases.filter((c) => new Date(c.created_at).getTime() > sevenDaysAgo).length;
+
     const passed = cases.filter(
       (c) => c.overall_status === "PASS" || (c.overall_status === "COMPLETED" && c.ai_verdict !== "FAIL")
     ).length;
@@ -80,7 +85,7 @@ export const Dashboard: React.FC = () => {
 
     const complianceRate = total > 0 ? Math.round((passed / total) * 100) : 0;
 
-    return { total, passed, failed, review: pendingReview, unable: 0, pendingTotal, complianceRate };
+    return { total, passed, failed, review: pendingReview, unable: 0, pendingTotal, complianceRate, recent };
   }, [cases]);
 
   const filteredCases = useMemo(() => {
@@ -348,8 +353,8 @@ export const Dashboard: React.FC = () => {
           delay={0.1}
           title={t("metric.total", "Total Registered Cases")}
           value={metrics.total}
-          trend={language === "hi" ? "+12% इस सप्ताह" : "+12% this week"}
-          trendPositive={true}
+          trend={language === "hi" ? `+${metrics.recent} इस सप्ताह` : `+${metrics.recent} this week`}
+          trendPositive={metrics.recent > 0}
           subtext={t("metric.total_sub", "Recorded across all circles")}
           statutoryCitation={language === "hi" ? "विधिक माप अधिनियम, 2009 की धारा 15 पंजी" : "Sec. 15 Legal Metrology Act, 2009 Register"}
           icon={<img src="/assets/gov/doca_legal_metrology_seal.svg" alt="Directorate Seal" className="w-6 h-6 object-contain" />}

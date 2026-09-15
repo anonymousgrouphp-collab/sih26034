@@ -33,6 +33,16 @@ export const StatutoryDemoShowcase: React.FC<StatutoryDemoShowcaseProps> = ({
     "ALL" | "FAIL" | "PASS" | "REVIEW" | "UNABLE_TO_VERIFY"
   >("ALL");
 
+  const stats = useMemo(() => {
+    return {
+      ALL: DEMO_SCENARIOS.length,
+      FAIL: DEMO_SCENARIOS.filter(s => s.targetVerdict === "FAIL").length,
+      PASS: DEMO_SCENARIOS.filter(s => s.targetVerdict === "PASS").length,
+      REVIEW: DEMO_SCENARIOS.filter(s => s.targetVerdict === "REVIEW").length,
+      UNABLE_TO_VERIFY: DEMO_SCENARIOS.filter(s => s.targetVerdict === "UNABLE_TO_VERIFY").length
+    };
+  }, []);
+
   const filteredScenarios = useMemo(() => {
     if (activeFilter === "ALL") return DEMO_SCENARIOS;
     return DEMO_SCENARIOS.filter((s) => s.targetVerdict === activeFilter);
@@ -100,8 +110,8 @@ export const StatutoryDemoShowcase: React.FC<StatutoryDemoShowcaseProps> = ({
               </span>
               <span className="text-[11px] text-amber-300 font-mono font-semibold">
                 {language === "hi"
-                  ? "7 पूर्व-प्रमाणित परीक्षण परिदृश्य"
-                  : "7 Pre-Certified Enforcement Scenarios Ready"}
+                  ? `${stats.ALL} पूर्व-प्रमाणित परीक्षण परिदृश्य`
+                  : `${stats.ALL} Pre-Certified Enforcement Scenarios Ready`}
               </span>
             </div>
 
@@ -141,28 +151,28 @@ export const StatutoryDemoShowcase: React.FC<StatutoryDemoShowcaseProps> = ({
           {[
             {
               id: "ALL" as const,
-              label: language === "hi" ? "सभी डेमो (7)" : "All Demo Cases (7)",
-              count: 7,
+              label: language === "hi" ? `सभी डेमो (${stats.ALL})` : `All Demo Cases (${stats.ALL})`,
+              count: stats.ALL,
             },
             {
               id: "FAIL" as const,
-              label: language === "hi" ? "उल्लंघन / अनुत्तीर्ण (3)" : "Violations / FAIL (3)",
-              count: 3,
+              label: language === "hi" ? `उल्लंघन / अनुत्तीर्ण (${stats.FAIL})` : `Violations / FAIL (${stats.FAIL})`,
+              count: stats.FAIL,
             },
             {
               id: "PASS" as const,
-              label: language === "hi" ? "पूर्ण अनुपालक / उत्तीर्ण (2)" : "Compliant / PASS (2)",
-              count: 2,
+              label: language === "hi" ? `पूर्ण अनुपालक / उत्तीर्ण (${stats.PASS})` : `Compliant / PASS (${stats.PASS})`,
+              count: stats.PASS,
             },
             {
               id: "REVIEW" as const,
-              label: language === "hi" ? "मानव समीक्षा / सीमांत (1)" : "Borderline / REVIEW (1)",
-              count: 1,
+              label: language === "hi" ? `मानव समीक्षा / सीमांत (${stats.REVIEW})` : `Borderline / REVIEW (${stats.REVIEW})`,
+              count: stats.REVIEW,
             },
             {
               id: "UNABLE_TO_VERIFY" as const,
-              label: language === "hi" ? "पुनः कैप्चर / चकाचौंध (1)" : "Retake / UNABLE (1)",
-              count: 1,
+              label: language === "hi" ? `पुनः कैप्चर / चकाचौंध (${stats.UNABLE_TO_VERIFY})` : `Retake / UNABLE (${stats.UNABLE_TO_VERIFY})`,
+              count: stats.UNABLE_TO_VERIFY,
             },
           ].map((tab) => {
             const isActive = activeFilter === tab.id;

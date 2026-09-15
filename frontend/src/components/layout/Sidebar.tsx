@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { DEMO_SCENARIOS } from "../../features/demo/demoCatalog";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Home,
@@ -141,10 +142,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
           icon: GitBranch,
         },
         {
-          label: language === "hi" ? "सांविधिक डेमो परीक्षण" : "Statutory Demo Suite",
+          label: language === "hi" ? "सांविधिक डेमो सूट" : "Statutory Demo Suite",
           path: "/demo",
           icon: Scale,
-          badge: "7",
+          badge: DEMO_SCENARIOS.length.toString(),
           badgeType: "info" as const,
         },
         {

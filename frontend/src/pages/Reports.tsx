@@ -714,61 +714,132 @@ export const Reports: React.FC = () => {
                   </div>
                 </div>
 
-                <div className={viewMode === "GRID" ? "grid grid-cols-1 sm:grid-cols-2 gap-3" : "flex flex-col space-y-2.5"}>
-                  {currentNotices.map((c) => {
-                    const isViolation = c.overall_status === "FAIL" || (c.violations_count && c.violations_count > 0);
-                    return (
-                      <div
-                        key={c.id}
-                        className={`rounded-xl border transition-all text-xs ${
-                          viewMode === "GRID" 
-                            ? "p-4 bg-white hover:shadow-md border-slate-200 hover:border-[#1B365D]/30 flex flex-col space-y-3" 
-                            : "p-3.5 bg-slate-50/60 hover:bg-blue-50/40 border-slate-200 hover:border-blue-300 space-y-2"
-                        }`}
-                      >
-                        <div className={`flex justify-between gap-2 ${viewMode === "GRID" ? "items-start" : "items-start"}`}>
-                          <div className="min-w-0 flex-1">
-                            <p className={`font-extrabold text-slate-900 truncate ${viewMode === "GRID" ? "text-sm" : ""}`} title={c.product_name}>
-                              {c.product_name || "Packaged Commodity Sample"}
-                            </p>
-                            <p className="text-[11px] text-slate-500 truncate font-mono mt-0.5">
-                              {c.inspection_number} • {c.establishment_name || c.jurisdiction_id}
-                            </p>
+                {viewMode === "LIST" ? (
+                  <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-xs">
+                    <table className="min-w-full divide-y divide-slate-200 text-left">
+                      <thead className="bg-slate-50 text-[11px] font-bold text-slate-600 uppercase tracking-wider select-none border-b border-slate-200">
+                        <tr>
+                          <th scope="col" className="px-4 py-3">{language === "hi" ? "केस ID / तिथि" : "Case ID / Date"}</th>
+                          <th scope="col" className="px-4 py-3">{language === "hi" ? "उत्पाद / ब्रांड" : "Commodity & Brand"}</th>
+                          <th scope="col" className="px-4 py-3">{language === "hi" ? "संस्थान / स्थान" : "Establishment / Location"}</th>
+                          <th scope="col" className="px-4 py-3">{language === "hi" ? "निर्णय" : "Verdict"}</th>
+                          <th scope="col" className="px-4 py-3 text-right">{language === "hi" ? "कार्रवाई" : "Action"}</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
+                        {currentNotices.map((c) => (
+                          <tr key={c.id} className="hover:bg-blue-50/50 transition-colors group">
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              <div className="font-mono font-bold text-[#1B365D]">
+                                {c.inspection_number}
+                              </div>
+                              <div className="text-[11px] text-slate-500 font-medium mt-0.5 flex items-center gap-1">
+                                <span>{new Date(c.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
+                              </div>
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="font-bold text-slate-900 max-w-xs truncate group-hover:text-[#1B365D] transition-colors" title={c.product_name}>
+                                {c.product_name || "Packaged Commodity Sample"}
+                              </div>
+                              <div className="text-[11px] text-slate-500 font-medium mt-0.5">
+                                {c.brand_name || (language === "hi" ? "अब्रांडेड" : "Unbranded / Generics")}
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 text-slate-600">
+                              <div className="font-medium text-slate-800 truncate max-w-xs">
+                                {c.establishment_name || (language === "hi" ? "रिटेल स्टोर" : "Retail Store / Depot")}
+                              </div>
+                              <div className="text-[11px] text-slate-400 font-mono mt-0.5 truncate">
+                                {c.location || c.jurisdiction_id}
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              <VerdictBadge verdict={c.overall_status} size="sm" />
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap text-right">
+                              <div className="flex items-center justify-end gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedNoticeCase(c)}
+                                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-[#1B365D] text-white hover:bg-[#0A2540] shadow-sm transition-colors cursor-pointer"
+                                >
+                                  <FileCheck size={13} />
+                                  <span>{language === "hi" ? "नोटिस जनरेट करें" : "Generate Notice"}</span>
+                                </button>
+                                <Link
+                                  to={`/inspections/${c.id}`}
+                                  className="p-1.5 rounded text-slate-400 hover:text-[#1B365D] hover:bg-slate-200/60 transition-colors"
+                                  title={language === "hi" ? "केस देखें" : "View Case"}
+                                >
+                                  <Eye size={15} />
+                                </Link>
+                                <Link
+                                  to={`/inspections/${c.id}/evidence`}
+                                  className="p-1.5 rounded text-slate-400 hover:text-[#1B365D] hover:bg-slate-200/60 transition-colors"
+                                  title={language === "hi" ? "साक्ष्य फाइल" : "Evidence Dossier"}
+                                >
+                                  <ExternalLink size={15} />
+                                </Link>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
+                    {currentNotices.map((c) => {
+                      const isViolation = c.overall_status === "FAIL" || (c.violations_count && c.violations_count > 0);
+                      return (
+                        <div
+                          key={c.id}
+                          className="rounded-xl border transition-all text-xs p-4 bg-white hover:shadow-md border-slate-200 hover:border-[#1B365D]/30 flex flex-col space-y-3"
+                        >
+                          <div className="flex justify-between gap-2 items-start">
+                            <div className="min-w-0 flex-1">
+                              <p className="font-extrabold text-slate-900 truncate text-sm" title={c.product_name}>
+                                {c.product_name || "Packaged Commodity Sample"}
+                              </p>
+                              <p className="text-[11px] text-slate-500 truncate font-mono mt-0.5">
+                                {c.inspection_number} • {c.establishment_name || c.jurisdiction_id}
+                              </p>
+                            </div>
+                            <VerdictBadge verdict={c.overall_status} size="sm" />
                           </div>
-                          <VerdictBadge verdict={c.overall_status} size="sm" />
-                        </div>
 
-                        <div className={`flex items-center justify-between pt-2 border-t border-slate-200/80 ${viewMode === "GRID" ? "mt-auto" : ""}`}>
-                          <button
-                            type="button"
-                            onClick={() => setSelectedNoticeCase(c)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-bold bg-[#1B365D] text-white hover:bg-[#0A2540] shadow-2xs transition-colors cursor-pointer"
-                          >
-                            <FileCheck size={13} />
-                            <span>{language === "hi" ? "नोटिस जनरेट करें" : "Generate Notice"}</span>
-                          </button>
+                          <div className="flex items-center justify-between pt-2 border-t border-slate-200/80 mt-auto">
+                            <button
+                              type="button"
+                              onClick={() => setSelectedNoticeCase(c)}
+                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-[#1B365D] text-white hover:bg-[#0A2540] shadow-sm transition-colors cursor-pointer"
+                            >
+                              <FileCheck size={13} />
+                              <span>{language === "hi" ? "नोटिस जनरेट करें" : "Generate Notice"}</span>
+                            </button>
 
-                          <div className="flex items-center gap-1">
-                            <Link
-                              to={`/inspections/${c.id}`}
-                              className="p-1.5 rounded text-slate-600 hover:text-[#1B365D] hover:bg-slate-200/60 transition-colors"
-                              title={language === "hi" ? "केस देखें" : "View Case"}
-                            >
-                              <Eye size={15} />
-                            </Link>
-                            <Link
-                              to={`/inspections/${c.id}/evidence`}
-                              className="p-1.5 rounded text-slate-600 hover:text-[#1B365D] hover:bg-slate-200/60 transition-colors"
-                              title={language === "hi" ? "साक्ष्य संचिका" : "Evidence Dossier"}
-                            >
-                              <ExternalLink size={15} />
-                            </Link>
+                            <div className="flex items-center gap-1">
+                              <Link
+                                to={`/inspections/${c.id}`}
+                                className="p-1.5 rounded text-slate-600 hover:text-[#1B365D] hover:bg-slate-200/60 transition-colors"
+                                title={language === "hi" ? "केस देखें" : "View Case"}
+                              >
+                                <Eye size={15} />
+                              </Link>
+                              <Link
+                                to={`/inspections/${c.id}/evidence`}
+                                className="p-1.5 rounded text-slate-600 hover:text-[#1B365D] hover:bg-slate-200/60 transition-colors"
+                                title={language === "hi" ? "साक्ष्य फाइल" : "Evidence Dossier"}
+                              >
+                                <ExternalLink size={15} />
+                              </Link>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                      );
+                    })}
+                  </div>
+                )}
 
                 {totalPages > 1 && (
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-200 pt-3">

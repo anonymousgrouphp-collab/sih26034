@@ -679,7 +679,7 @@ export const CaseRegistry: React.FC<CaseRegistryProps> = ({
                             e.stopPropagation();
                             setCaseToDelete(c);
                           }}
-                          className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded transition-colors"
+                          className="p-1.5 text-slate-400 hover:text-rose-600 bg-white hover:bg-rose-50 border border-slate-200 hover:border-rose-200 rounded-lg transition-all flex items-center justify-center shrink-0 shadow-2xs"
                           title={language === "hi" ? "मामला हटाएं" : "Delete Case"}
                           aria-label={`Delete case ${c.inspection_number}`}
                         >
@@ -691,7 +691,7 @@ export const CaseRegistry: React.FC<CaseRegistryProps> = ({
                             e.stopPropagation();
                             onSelectCase(c.id);
                           }}
-                          className="text-xs font-bold text-[#1B365D] hover:underline"
+                          className="px-3 py-1.5 text-xs font-bold text-white bg-[#1B365D] hover:bg-[#0A2540] border border-[#152a48] rounded-lg transition-all cursor-pointer shadow-sm"
                         >
                           {language === "hi" ? "जांचें →" : "Inspect →"}
                         </button>
@@ -887,7 +887,7 @@ export const CaseRegistry: React.FC<CaseRegistryProps> = ({
                               e.stopPropagation();
                               onSelectCase(c.id);
                             }}
-                            className="px-2.5 py-1 text-xs font-bold text-[#1B365D] group-hover:text-white group-hover:bg-[#1B365D] border border-blue-200 rounded-lg transition-colors cursor-pointer"
+                            className="px-3 py-1.5 text-xs font-bold text-white bg-[#1B365D] hover:bg-[#0A2540] border border-[#152a48] rounded-lg transition-colors cursor-pointer shadow-sm"
                           >
                             {language === "hi" ? "केस खोलें →" : "Open Case →"}
                           </button>
