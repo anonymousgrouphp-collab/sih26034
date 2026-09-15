@@ -12,6 +12,7 @@ import {
   Layers,
   Sparkles,
   Info,
+  AlertCircle,
 } from "lucide-react";
 
 export interface CanvasBoundingBox {
@@ -83,12 +84,36 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
   const [naturalDimensions, setNaturalDimensions] = useState<{ width: number; height: number } | null>(null);
   const [isImageLoaded, setIsImageLoaded] = useState<boolean>(false);
   const [imageError, setImageError] = useState<boolean>(false);
+  const imgRef = React.useRef<HTMLImageElement>(null);
 
   const activeImage = images.find((img) => img.id === (activeImageId || selectedImageId)) || images[0];
 
+  // Immediately synchronize load state with DOM image status to eliminate infinite buffering
   React.useEffect(() => {
+    const img = imgRef.current;
+    if (img && img.complete && img.naturalWidth > 0) {
+      setNaturalDimensions({ width: img.naturalWidth, height: img.naturalHeight });
+      setIsImageLoaded(true);
+      setImageError(false);
+      return;
+    }
+
     setIsImageLoaded(false);
     setImageError(false);
+
+    // Watchdog timer: ensure buffering spinner never hangs if browser completes loading without dispatching synthetic event
+    const watchdog = setTimeout(() => {
+      const currentImg = imgRef.current;
+      if (currentImg && currentImg.naturalWidth > 0) {
+        setNaturalDimensions({ width: currentImg.naturalWidth, height: currentImg.naturalHeight });
+        setIsImageLoaded(true);
+      } else if (currentImg && currentImg.complete && currentImg.naturalWidth === 0) {
+        setImageError(true);
+        setIsImageLoaded(true);
+      }
+    }, 1000);
+
+    return () => clearTimeout(watchdog);
   }, [activeImage?.url, activeImage?.id]);
 
   const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -229,16 +254,43 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
           {activeImage ? (
             <>
               {!isImageLoaded && !imageError && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 backdrop-blur-xs text-slate-800 z-10 rounded-md">
-                  <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#1B365D] border-t-transparent mb-2" />
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 backdrop-blur-xs text-slate-800 z-10 rounded-md">
+                  <div className="h-7 w-7 animate-spin rounded-full border-2 border-[#1B365D] border-t-transparent mb-2" />
                   <span className="text-[11px] font-medium text-slate-600">
                     {language === "hi" ? "साक्ष्य तस्वीर लोड हो रही है..." : "Loading high-resolution evidence..."}
                   </span>
                 </div>
               )}
+              {imageError && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 text-slate-600 z-10 rounded-md p-4 text-center">
+                  <AlertCircle size={24} className="text-amber-600 mb-1" />
+                  <span className="text-xs font-semibold text-slate-800">
+                    {language === "hi" ? "साक्ष्य छवि लोड करने में असमर्थ" : "Unable to load evidence image"}
+                  </span>
+                  <span className="text-[10px] text-slate-500 mt-1 max-w-xs font-mono truncate">
+                    {activeImage?.filename || activeImage?.id}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setImageError(false);
+                      setIsImageLoaded(false);
+                      if (imgRef.current && activeImage) {
+                        const apiBase = ((import.meta as any)?.env?.VITE_API_BASE_URL as string) || "/api/v1";
+                        imgRef.current.src = `${apiBase}/evidence/image/${activeImage.id}?t=${Date.now()}`;
+                      }
+                    }}
+                    className="mt-2 px-3 py-1 text-[11px] font-semibold bg-[#1B365D] text-white rounded-md hover:bg-blue-900 transition-colors cursor-pointer"
+                  >
+                    {language === "hi" ? "पुनः प्रयास करें" : "Retry Loading"}
+                  </button>
+                </div>
+              )}
               <img
-                src={activeImage.url}
-                alt={activeImage.filename}
+                ref={imgRef}
+                key={activeImage?.id || activeImage?.url}
+                src={activeImage?.url}
+                alt={activeImage?.filename}
                 onLoad={handleImageLoad}
                 onError={(e) => {
                   const apiBase = ((import.meta as any)?.env?.VITE_API_BASE_URL as string) || "/api/v1";
@@ -250,7 +302,7 @@ export const InspectionVisionCanvas: React.FC<InspectionVisionCanvasProps> = ({
                   setImageError(true);
                   setIsImageLoaded(true);
                 }}
-                className={`h-full w-full rounded-md object-contain pointer-events-none transition-opacity duration-300 ${
+                className={`h-full w-full rounded-md object-contain pointer-events-none transition-opacity duration-150 ${
                   isImageLoaded ? "opacity-100" : "opacity-0"
                 }`}
               />
