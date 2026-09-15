@@ -1,4 +1,4 @@
-/** @type {import('tailwindcss').Config} */
+﻿/** @type {import('tailwindcss').Config} */
 export default {
   content: [
     "./index.html",
@@ -6,11 +6,16 @@ export default {
   ],
   theme: {
     extend: {
+      keyframes: {
+        'scan-vertical': {
+          '0%, 100%': { transform: 'translateY(-2px)' },
+          '50%': { transform: 'translateY(2px)' },
+        }
+      },
+      animation: {
+        'scan-vertical': 'scan-vertical 1.5s ease-in-out infinite',
+      },
       colors: {
-        // NOTE: never name a color `base` — it collides with Tailwind's
-        // `text-base` font-size utility (23 usages in src) and hijacks it
-        // into a color utility. The page canvas uses #0b1320 directly
-        // (surfaceBg below now carries the same value).
         surface: "#FFFFFF",
         saffron: "#FF9933",
         cyan: {
@@ -28,9 +33,8 @@ export default {
           950: "#082f49",
         },
         success: "#10b981",
-        // Official Statutory & Institutional Tokens (Government of India Certified Deep Navy)
         govNavy: {
-          DEFAULT: "#1B365D", // Official Indian Sovereign Navy Blue
+          DEFAULT: "#1B365D",
           light: "#244B7E",
           dark: "#0A2540",
           deep: "#071A2F",
@@ -53,28 +57,26 @@ export default {
           green: "#138808",
           gold: "#D97706",
         },
-        // 4-State Epistemic Compliance Tokens
         verdictPass: {
-          DEFAULT: "#059669", // Emerald 600
-          light: "#ECFDF5",   // Emerald 50 tint
+          DEFAULT: "#059669",
+          light: "#ECFDF5",
           dark: "#047857",
         },
         verdictFail: {
-          DEFAULT: "#DC2626", // Rose 600
-          light: "#FEF2F2",   // Rose 50 tint
+          DEFAULT: "#DC2626",
+          light: "#FEF2F2",
           dark: "#B91C1C",
         },
         verdictReview: {
-          DEFAULT: "#D97706", // Amber 600
-          light: "#FFFBEB",   // Amber 50 tint
+          DEFAULT: "#D97706",
+          light: "#FFFBEB",
           dark: "#B45309",
         },
         verdictUnable: {
-          DEFAULT: "#475569", // Slate 600
-          light: "#F1F5F9",   // Slate 100 tint
+          DEFAULT: "#475569",
+          light: "#F1F5F9",
           dark: "#334155",
         },
-        // Surface and Panel Tokens (Crisp Institutional White & Slate)
         surfaceBg: "#F8FAFC",
         panelBg: "#FFFFFF",
         panelBorder: "#E2E8F0",

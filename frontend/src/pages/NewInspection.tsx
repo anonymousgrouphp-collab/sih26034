@@ -4,7 +4,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Camera,
-  CheckCircle2,
+  CheckCircle2, Loader2, Clock,
   FileText,
   Info,
   ScanLine,
@@ -112,6 +112,9 @@ export const NewInspection: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [uploadProgressMessage, setUploadProgressMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorFileIndex, setErrorFileIndex] = useState<number | null>(null);
+  const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
+  const [completedUploads, setCompletedUploads] = useState<Set<number>>(new Set());
   const [showGuidanceModal, setShowGuidanceModal] = useState(false);
   const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -241,6 +244,9 @@ export const NewInspection: React.FC = () => {
 
   const handleStartAnalysis = async () => {
     setErrorMessage(null);
+    setErrorFileIndex(null);
+    setUploadingIndex(null);
+    setCompletedUploads(new Set());
 
     if (files.length === 0) {
       setErrorMessage(
@@ -277,6 +283,7 @@ export const NewInspection: React.FC = () => {
       const uploadedImageIds: string[] = [];
       if (files.length > 0) {
         for (let i = 0; i < files.length; i++) {
+          setUploadingIndex(i);
           const rawFile = files[i];
           setUploadProgressMessage(
             language === "hi"
@@ -322,22 +329,29 @@ export const NewInspection: React.FC = () => {
               : "SIDE_PANEL";
 
           // Transmit untouched original image to uploadEvidence for pristine statutory analysis
-          const uploadResult = await ApiService.uploadEvidence(rawFile, {
-            inspection_id: newCase.id,
-            panel_type: panelType,
-            original_filename: rawFile.name,
-            file_size_bytes: rawFile.size,
-            mime_type: rawFile.type || "image/jpeg",
-            image_width: imgWidth,
-            image_height: imgHeight,
-            preview_url: previewUrl,
-          });
-          if (uploadResult?.image_id) {
-            uploadedImageIds.push(uploadResult.image_id);
+          try {
+            const uploadResult = await ApiService.uploadEvidence(rawFile, {
+              inspection_id: newCase.id,
+              panel_type: panelType,
+              original_filename: rawFile.name,
+              file_size_bytes: rawFile.size,
+              mime_type: rawFile.type || "image/jpeg",
+              image_width: imgWidth,
+              image_height: imgHeight,
+              preview_url: previewUrl,
+            });
+            if (uploadResult?.image_id) {
+              uploadedImageIds.push(uploadResult.image_id);
+            }
+            setCompletedUploads(prev => new Set(prev).add(i));
+          } catch (uploadErr) {
+            setErrorFileIndex(i);
+            throw uploadErr;
           }
         }
       }
 
+      setUploadingIndex(null);
       setUploadProgressMessage(
         language === "hi"
           ? "विधिक AI पाइपलाइन विश्लेषित की जा रही है..."
@@ -358,6 +372,8 @@ export const NewInspection: React.FC = () => {
         await ApiService.executeBatchPipeline(newCase.id);
       } catch (batchErr) {
         console.warn("Batch pipeline execution deferred or backgrounded:", batchErr);
+        setErrorFileIndex(0);
+        throw batchErr;
       }
       
       // Clear draft since submission succeeded
@@ -586,43 +602,97 @@ export const NewInspection: React.FC = () => {
                       {language === "hi" ? `चयनित पैकेज फोटोग्राफ (${files.length}):` : `Selected Package Photographs (${files.length}):`}
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {files.map((file, i) => (
-                        <div
-                          key={`${file.name}-${i}`}
-                          className="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50 text-xs shadow-2xs"
-                        >
-                          <div className="flex items-center gap-3 min-w-0">
-                            {filePreviews[i] ? (
-                              <img
-                                src={filePreviews[i]}
-                                alt="Package thumbnail"
-                                className="w-12 h-12 rounded-lg object-cover border border-slate-200 shrink-0 bg-white"
-                              />
-                            ) : (
-                              <div className="w-12 h-12 rounded-lg bg-slate-200 flex items-center justify-center text-slate-500 shrink-0">
-                                <FileImage size={20} />
-                              </div>
-                            )}
-                            <div className="min-w-0">
-                              <p className="font-bold text-slate-900 truncate">{file.name}</p>
-                              <p className="text-[11px] font-mono text-emerald-700 font-semibold">
-                                {file.size >= 1024 * 1024
-                                  ? `${(file.size / (1024 * 1024)).toFixed(1)} MB`
-                                  : `${(file.size / 1024).toFixed(0)} KB`} • {language === "hi" ? "मूल गैर-संपीड़ित PDP" : "Original Uncompressed PDP"}
-                              </p>
-                            </div>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveFile(i)}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
-                            title={language === "hi" ? "हटाएं" : "Remove file"}
-                            aria-label="Remove image"
+                      {files.map((file, i) => {
+                        const isError = errorFileIndex === i;
+                        const isCompleted = completedUploads.has(i);
+                        const isUploading = uploadingIndex === i;
+
+                        return (
+                          <div
+                            key={`${file.name}-${i}`}
+                            className={`flex items-center justify-between p-3 rounded-xl border text-xs shadow-2xs transition-colors ${
+                              isError
+                                ? "bg-rose-50 border-rose-400 shadow-[0_0_0_1px_rgba(251,113,133,0.4)]"
+                                : isCompleted
+                                ? "bg-emerald-50 border-emerald-300"
+                                : isUploading
+                                ? "bg-blue-50 border-blue-300 shadow-[0_0_0_1px_rgba(147,197,253,0.5)]"
+                                : "border-slate-200 bg-slate-50"
+                            }`}
                           >
-                            <X size={16} />
-                          </button>
-                        </div>
-                      ))}
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="relative shrink-0">
+                                {filePreviews[i] ? (
+                                  <img
+                                    src={filePreviews[i]}
+                                    alt="Package thumbnail"
+                                    className={`w-12 h-12 rounded-lg object-cover border bg-white transition-opacity ${
+                                      isUploading ? "opacity-70 border-blue-400" : "border-slate-200"
+                                    }`}
+                                  />
+                                ) : (
+                                  <div className="w-12 h-12 rounded-lg bg-slate-200 flex items-center justify-center text-slate-500">
+                                    <FileImage size={20} />
+                                  </div>
+                                )}
+                                {isCompleted && (
+                                  <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white rounded-full p-0.5 border-2 border-white shadow-sm">
+                                    <CheckCircle2 size={12} strokeWidth={3} />
+                                  </div>
+                                )}
+                              </div>
+                              <div className="min-w-0">
+                                <p className="font-bold text-slate-900 truncate">{file.name}</p>
+                                <p className={`text-[11px] font-mono font-semibold ${isCompleted ? "text-emerald-700" : "text-slate-500"}`}>
+                                  {file.size >= 1024 * 1024
+                                    ? `${(file.size / (1024 * 1024)).toFixed(1)} MB`
+                                    : `${(file.size / 1024).toFixed(0)} KB`} • {language === "hi" ? "मूल असंपीड़ित PDP" : "Original Uncompressed PDP"}
+                                </p>
+                              </div>
+                            </div>
+                            
+                            {isError ? (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  handleRemoveFile(i);
+                                  setIsCameraModalOpen(true);
+                                  setErrorMessage(null);
+                                  setErrorFileIndex(null);
+                                }}
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold transition-colors shadow-sm shrink-0"
+                              >
+                                <Camera size={14} />
+                                <span>{language === "hi" ? "फिर से फोटो लें" : "Retake Photo"}</span>
+                              </button>
+                            ) : isCompleted ? (
+                              <div className="p-1.5 px-3 rounded-lg text-emerald-700 bg-emerald-100/50 border border-emerald-200 font-bold shrink-0 flex items-center gap-1.5">
+                                <CheckCircle2 size={14} />
+                                <span>{language === "hi" ? "अपलोड हो गया" : "Uploaded"}</span>
+                              </div>
+                            ) : isUploading ? (
+                              <div className="p-1.5 px-3 rounded-lg text-blue-700 bg-blue-50 border border-blue-200 font-bold shrink-0 flex items-center gap-1.5">
+                                <Loader2 size={14} className="animate-spin" />
+                                <span>{language === "hi" ? "अपलोड हो रहा है..." : "Uploading..."}</span>
+                              </div>
+                            ) : isProcessing ? (
+                              <div className="p-1.5 rounded-lg text-slate-300 shrink-0">
+                                <Clock size={16} />
+                              </div>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveFile(i)}
+                                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors shrink-0"
+                                title={language === "hi" ? "फ़ाइल हटाएं" : "Remove file"}
+                                aria-label="Remove image"
+                              >
+                                <X size={16} />
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -860,7 +930,7 @@ export const NewInspection: React.FC = () => {
                 >
                   {uploadProgressMessage ? (
                     <>
-                      <ScanLine size={14} className="text-blue-600 animate-spin shrink-0" />
+                      <ScanLine size={14} className="text-blue-600 animate-scan-vertical shrink-0" />
                       <span className="font-medium">{uploadProgressMessage}</span>
                     </>
                   ) : files.length === 0 ? (
@@ -897,7 +967,7 @@ export const NewInspection: React.FC = () => {
                 >
                   {isProcessing ? (
                     <>
-                      <ScanLine size={18} className="animate-spin text-amber-300" />
+                      <ScanLine size={18} className="animate-scan-vertical text-amber-300" />
                       <span>{uploadProgressMessage || (language === "hi" ? "विधिक पाइपलाइन निष्पादित हो रही है..." : "Running Statutory Pipeline...")}</span>
                     </>
                   ) : (
