@@ -260,7 +260,7 @@ export class ApiService {
   // 3. Single Inspection Case Retrieval
   // ---------------------------------------------------------------------------
 
-  public static isDemoId(id: string): boolean {
+  public static isDemoId(id?: string): boolean {
     if (!id) return false;
     const lower = id.toLowerCase().trim();
     return (
@@ -269,6 +269,7 @@ export class ApiService {
       lower.startsWith("insp_demo_") ||
       lower.startsWith("ins-2026-") ||
       lower.startsWith("real-pkg-") ||
+      /^insp_\d+(_\d+)?$/i.test(lower) ||
       lower === "fortune" ||
       lower === "sunlite"
     );
@@ -433,6 +434,7 @@ export class ApiService {
     if (
       this.operatingMode === "MOCK" ||
       this.operatingMode === "DEMO_FIXTURE" ||
+      this.isDemoId(inspectionId) ||
       inspectionId.startsWith("INS-2026-") ||
       inspectionId.startsWith("SKU-DEMO-") ||
       inspectionId.startsWith("insp_demo_") ||

@@ -362,7 +362,8 @@ export class LiveApiService implements IInspectionApiService {
       }
 
       if (!res.ok) {
-        if (res.status !== 404) {
+        // Only attempt emaap-export recovery for 4xx errors (not 404, not 5xx server failures)
+        if (res.status >= 400 && res.status < 500 && res.status !== 404) {
           try {
             const emaapRes = await this.fetchWithAuth(`${this.baseUrl}/inspections/${id}/emaap-export`);
             if (emaapRes.ok) {
@@ -405,7 +406,7 @@ export class LiveApiService implements IInspectionApiService {
             console.warn("eMaap recovery failed:", emaapErr);
           }
         }
-        throw new Error(`Failed to retrieve inspection: HTTP ${res.status}`);
+        throw { status: res.status, message: `Failed to retrieve inspection: HTTP ${res.status}` };
       }
       const data = await res.json();
       const insp = data.inspection || data;
@@ -822,16 +823,28 @@ export class LiveApiService implements IInspectionApiService {
   public async executeBatchPipeline(
     inspectionId: string
   ): Promise<InspectionCase> {
-    const pollForCompletion = async (maxAttempts = 35, intervalMs = 4000): Promise<InspectionCase | null> => {
+    const pollForCompletion = async (maxAttempts = 12, intervalMs = 5000): Promise<InspectionCase | null> => {
+      let consecutiveServerErrors = 0;
       for (let poll = 0; poll < maxAttempts; poll++) {
         await new Promise((r) => setTimeout(r, intervalMs));
         try {
           const liveCase = await this.getInspection(inspectionId);
+          consecutiveServerErrors = 0; // Reset on any successful fetch
           const verdictStr = String(liveCase?.ai_verdict || "");
           if (liveCase && verdictStr && verdictStr !== "PENDING" && verdictStr !== "PROCESSING") {
             return liveCase;
           }
-        } catch {}
+        } catch (pollErr: any) {
+          const status = pollErr?.status || pollErr?.statusCode;
+          if (status === 500 || status === 502 || status === 503) {
+            consecutiveServerErrors++;
+            console.warn(`Poll ${poll + 1}/${maxAttempts}: server error (${status}), consecutive=${consecutiveServerErrors}`);
+            if (consecutiveServerErrors >= 3) {
+              console.error("Backend consistently returning 500 — aborting poll to prevent request flood.");
+              return null;
+            }
+          }
+        }
       }
       return null;
     };
@@ -842,16 +855,17 @@ export class LiveApiService implements IInspectionApiService {
       });
 
       if (!res.ok) {
-        // If edge proxy timed out (502/504), the backend VM continues executing in background.
+        // If edge proxy timed out (502/504), the backend VM may still be executing.
         // Poll getInspection to seamlessly retrieve completed results.
-        if (res.status >= 500) {
+        if (res.status >= 502 && res.status <= 504) {
           console.warn(`Batch pipeline POST returned HTTP ${res.status}. Polling live case for async completion...`);
-          const completedCase = await pollForCompletion(35, 4000);
+          const completedCase = await pollForCompletion(12, 5000);
           if (completedCase) {
             return completedCase;
           }
         }
 
+        // For a straight 500 (backend error, not a timeout), don't poll — just throw immediately.
         let errData: any;
         try {
           errData = await res.json();
@@ -880,11 +894,13 @@ export class LiveApiService implements IInspectionApiService {
 
       return await this.getInspection(inspectionId);
     } catch (e: any) {
-      // If network/proxy dropped or socket timed out, poll to retrieve completed inspection from live database
-      console.warn("Batch pipeline network disconnected or timed out, polling live DB for async completion...", e);
-      const asyncCase = await pollForCompletion(30, 4000);
-      if (asyncCase) {
-        return asyncCase;
+      // Only poll for network/socket errors (TypeError: Failed to fetch), NOT for known 500 responses
+      if (e instanceof TypeError || e?.name === "AbortError") {
+        console.warn("Batch pipeline network disconnected or timed out, polling live DB for async completion...", e);
+        const asyncCase = await pollForCompletion(8, 5000);
+        if (asyncCase) {
+          return asyncCase;
+        }
       }
 
       throw this.normalizeError(e, "Parallel multi-facet AI pipeline execution failed on live server.");
