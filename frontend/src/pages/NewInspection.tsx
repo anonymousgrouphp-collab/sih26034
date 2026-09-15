@@ -21,6 +21,10 @@ import {
   RefreshCw,
   Building2,
   MapPin,
+  Scale,
+  ChevronDown,
+  ChevronUp,
+  SlidersHorizontal,
 } from "lucide-react";
 import { ApiService } from "../services/api";
 import { GoldenSkuQuickSelector } from "../features/desk/GoldenSkuQuickSelector";
@@ -126,6 +130,7 @@ export const NewInspection: React.FC = () => {
   const [declaredNetQty, setDeclaredNetQty] = useState("");
   const [packageType, setPackageType] = useState<PackagingType>("RECTANGULAR");
   const [inspectionType, setInspectionType] = useState<InspectionType>("ROUTINE_MARKET_SURVEILLANCE");
+  const [showManualFields, setShowManualFields] = useState(false);
 
   // Dashboard "E-Commerce Listing Audit" quick action deep-links here with
   // ?mode=ecommerce — preset the packaging type to the canonical Rule 6(10) value.
@@ -135,7 +140,10 @@ export const NewInspection: React.FC = () => {
     // Load draft on mount
     const draft = StorageService.getDraft();
     if (draft) {
-      if (draft.product_name) setProductName(draft.product_name);
+      if (draft.product_name) {
+        setProductName(draft.product_name);
+        setShowManualFields(true);
+      }
       if (draft.brand_name) setBrandName(draft.brand_name);
       if (draft.category) setCategory(draft.category);
       if (draft.package_type) setPackageType(draft.package_type as PackagingType);
@@ -145,6 +153,7 @@ export const NewInspection: React.FC = () => {
     // Override if e-commerce deep-link
     if (searchParams.get("mode") === "ecommerce") {
       setPackageType("ECOMMERCE_LISTING");
+      setShowManualFields(true);
     }
   }, [searchParams]);
 
@@ -483,13 +492,97 @@ export const NewInspection: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Column: Upload & Packaging Metadata (8 cols) */}
           <div className="lg:col-span-8 space-y-6">
-            {/* Step 1: Field Camera & Photograph Evidence Intake */}
+            {/* Step 1: Statutory Authority & Jurisdiction */}
             <section className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-xs space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-3 border-b border-slate-100">
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-mono text-[#1B365D] bg-blue-50 border border-blue-200 font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm">
-                      {language === "hi" ? "चरण 1 • साक्ष्य अधिग्रहण" : "Step 1 • Evidence Intake"}
+                      {language === "hi" ? "चरण 1 • सांविधिक प्राधिकार" : "Step 1 • Statutory Authority"}
+                    </span>
+                    <span className="text-xs text-slate-400">•</span>
+                    <span className="text-xs text-slate-600 font-medium">
+                      {language === "hi" ? "विधिक मापविज्ञान अधिनियम, 2009 धारा 15" : "Legal Metrology Act, 2009 Sec. 15"}
+                    </span>
+                  </div>
+                  <h3 className="text-base font-bold text-slate-900 mt-1 flex items-center gap-2">
+                    <Scale size={18} className="text-[#1B365D]" />
+                    <span>{language === "hi" ? "प्रवर्तन अधिकार क्षेत्र एवं निरीक्षण अधिदेश" : "Enforcement Jurisdiction & Mandate"}</span>
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {language === "hi"
+                      ? "साक्ष्य संग्रह से पूर्व विधिक क्षेत्र एवं निरीक्षण का प्रकार निर्धारित करें (भारतीय साक्ष्य अधिनियम, 2023 धारा 63 अनुपालन)।"
+                      : "Establish statutory jurisdiction and inspection mandate prior to evidence acquisition (BSA 2023 Sec. 63 compliance)."}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0 self-start bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg text-xs">
+                  <ShieldCheck size={14} className="text-emerald-600" />
+                  <span className="font-mono font-bold text-slate-700">INSP-DL-0842</span>
+                  <span className="text-[10px] uppercase font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                    {language === "hi" ? "सत्यापित अधिकारी" : "Authorized"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                {/* Jurisdiction Enforcement Circle Selector */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-900 mb-1.5 flex items-center gap-1.5">
+                    <Building2 size={15} className="text-[#1B365D]" />
+                    <span>{language === "hi" ? "प्रवर्तन अधिकार क्षेत्र मंडल" : "Enforcement Jurisdiction Circle"}</span>
+                    <span className="text-rose-600 font-bold">*</span>
+                  </label>
+                  <select
+                    value={activeCircle}
+                    onChange={(e) => setActiveCircle(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#1B365D] focus:border-[#1B365D]"
+                  >
+                    {allCircles.map((circle) => (
+                      <option key={circle.id} value={circle.id}>
+                        {language === "hi" ? circle.labelHi : circle.label}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-[11px] text-slate-500 mt-1">
+                    {language === "hi"
+                      ? "विधिक मापविज्ञान अधिनियम, 2009 की धारा 15 के अंतर्गत विधिक अधिकार क्षेत्र।"
+                      : "Official statutory jurisdiction circle under Section 15 of LMA 2009."}
+                  </p>
+                </div>
+
+                {/* Inspection Purpose / Mandate */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-900 mb-1.5 flex items-center gap-1.5">
+                    <FileText size={15} className="text-[#1B365D]" />
+                    <span>{language === "hi" ? "निरीक्षण का उद्देश्य / अधिदेश" : "Inspection Purpose / Mandate"}</span>
+                    <span className="text-rose-600 font-bold">*</span>
+                  </label>
+                  <select
+                    value={inspectionType}
+                    onChange={(e) => setInspectionType(e.target.value as InspectionType)}
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#1B365D] focus:border-[#1B365D]"
+                  >
+                    <option value="ROUTINE_MARKET_SURVEILLANCE">{language === "hi" ? "नियमित बाजार निगरानी" : "Routine Market Surveillance"}</option>
+                    <option value="COMPLAINT_VERIFICATION">{language === "hi" ? "उपभोक्ता शिकायत / निवारण" : "Consumer Grievance / Complaint"}</option>
+                    <option value="MANUFACTURER_PACKER_DEPOT">{language === "hi" ? "निर्माता / पैकर / डिपो ऑडिट" : "Manufacturer / Packer / Depot Audit"}</option>
+                    <option value="SURPRISE_ENFORCEMENT_RAID">{language === "hi" ? "औचक प्रवर्तन छापा" : "Surprise Enforcement Raid"}</option>
+                  </select>
+                  <p className="text-[11px] text-slate-500 mt-1">
+                    {language === "hi"
+                      ? "विधिक कार्यवाही एवं नोटिस प्रारूप का प्रकार।"
+                      : "Determines notice protocol and statutory escalation path."}
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* Step 2: Field Camera & Photograph Evidence Intake */}
+            <section className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-xs space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-3 border-b border-slate-100">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono text-[#1B365D] bg-blue-50 border border-blue-200 font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm">
+                      {language === "hi" ? "चरण 2 • साक्ष्य अधिग्रहण" : "Step 2 • Evidence Intake"}
                     </span>
                     <span className="text-xs text-slate-400">•</span>
                     <span className="text-xs text-slate-600 font-medium">
@@ -679,288 +772,280 @@ export const NewInspection: React.FC = () => {
                     </div>
                   </div>
                 )}
-              </div>
-            </section>
 
-            {/* Step 2: Packaged Commodity Particulars Form (Rule 6 Declarations) */}
-            <section className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-xs space-y-5">
-              <div className="pb-3 border-b border-slate-100">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-mono text-[#1B365D] bg-blue-50 border border-blue-200 font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm">
-                    {language === "hi" ? "चरण 2 • वस्तु पहचान" : "Step 2 • Commodity Identification"}
-                  </span>
-                  <span className="text-xs text-slate-400">•</span>
-                  <span className="text-xs text-slate-600 font-medium">
-                    {language === "hi" ? "पीसीआर 2011 नियम 6 अनिवार्य घोषणाएं" : "PCR 2011 Rule 6 Mandatory Declarations"}
-                  </span>
-                </div>
-                <h3 className="text-base font-bold text-slate-900 mt-1">
-                  {language === "hi" ? "पैकेज्ड वस्तु का विधिक विवरण" : "Packaged Commodity Particulars"}
-                </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  {language === "hi"
-                    ? "नियम 6 सत्यापन हेतु लेबल विवरण दर्ज करें। ओसीआर इंजन द्वारा सभी विवरण स्वचालित रूप से भी निकाले जा सकते हैं।"
-                    : "Enter label details for Rule 6 verification. All fields can also be extracted automatically by the OCR engine."}
-                </p>
-              </div>
-
-              {/* Jurisdiction Enforcement Circle Selector */}
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
-                <label className="block text-xs font-bold text-slate-900 mb-1.5 flex items-center gap-1.5">
-                  <Building2 size={15} className="text-[#1B365D]" />
-                  <span>{language === "hi" ? "प्रवर्तन अधिकार क्षेत्र मंडल" : "Enforcement Jurisdiction Circle"}</span>
-                  <span className="text-rose-600 font-bold">*</span>
-                </label>
-                <select
-                  value={activeCircle}
-                  onChange={(e) => setActiveCircle(e.target.value)}
-                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#1B365D] focus:border-[#1B365D]"
-                >
-                  {allCircles.map((circle) => (
-                    <option key={circle.id} value={circle.id}>
-                      {language === "hi" ? circle.labelHi : circle.label}
-                    </option>
-                  ))}
-                </select>
-                <p className="text-[11px] text-slate-500 mt-1">
-                  {language === "hi"
-                    ? "विधिक मापविज्ञान अधिनियम, 2009 की धारा 15 के अंतर्गत विधिक अधिकार क्षेत्र रिकॉर्ड।"
-                    : "Official statutory jurisdiction circle recording pursuant to Section 15 of Legal Metrology Act, 2009."}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                    {language === "hi" ? "वस्तु / उत्पाद का नाम" : "Commodity / Product Name"}{" "}
-                    <span className="text-rose-600 font-bold">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={productName}
-                    onChange={(e) => setProductName(e.target.value)}
-                    placeholder={language === "hi" ? "उदा., आशीर्वाद सुपीरियर एमपी आटा 500g" : "e.g., Aashirvaad Superior MP Atta 500g"}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-[#1B365D] focus:border-[#1B365D]"
-                  />
-                  <p className="text-[11px] text-slate-500 mt-1">
-                    {language === "hi"
-                      ? "पैकेज्ड वस्तु का सामान्य या व्यापारिक नाम"
-                      : "Generic or common trade name of packaged goods"}
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                    {language === "hi" ? "ब्रांड नाम / ट्रेडमार्क" : "Brand Name / Trade Mark"}
-                  </label>
-                  <input
-                    type="text"
-                    value={brandName}
-                    onChange={(e) => setBrandName(e.target.value)}
-                    placeholder={language === "hi" ? "उदा., आईटीसी लिमिटेड / आशीर्वाद" : "e.g., ITC Limited / Aashirvaad"}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-[#1B365D] focus:border-[#1B365D]"
-                  />
-                  <p className="text-[11px] text-slate-500 mt-1">
-                    {language === "hi"
-                      ? "निर्माता या विपणन संस्था का ब्रांड"
-                      : "Manufacturer or marketing entity brand"}
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                    {language === "hi" ? "वस्तु श्रेणी" : "Commodity Category"}
-                  </label>
-                  <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#1B365D] focus:border-[#1B365D]"
-                  >
-                    <option value="FOOD_SNACKS">{language === "hi" ? "पैकेज्ड खाद्य एवं स्नैक्स" : "Packaged Food & Snacks"}</option>
-                    <option value="EDIBLE_OIL">{language === "hi" ? "खाद्य तेल / वनस्पति / घी" : "Edible Oil / Ghee"}</option>
-                    <option value="BEVERAGES">{language === "hi" ? "पैकेज्ड पेयजल एवं पेय पदार्थ" : "Packaged Drinking Water & Beverages"}</option>
-                    <option value="PERSONAL_CARE">{language === "hi" ? "व्यक्तिगत देखभाल एवं सौंदर्य प्रसाधन" : "Personal Care & Cosmetics"}</option>
-                    <option value="ELECTRONICS">{language === "hi" ? "पैकेज्ड इलेक्ट्रॉनिक उत्पाद" : "Packaged Electronics"}</option>
-                    <option value="HOUSEHOLD_CHEMICALS">{language === "hi" ? "घरेलू डिटर्जेंट एवं स्वच्छता उत्पाद" : "Household Detergents & Cleaners"}</option>
-                  </select>
-                  <p className="text-[11px] text-slate-500 mt-1">
-                    {language === "hi"
-                      ? "लागू तालिका-I फॉन्ट क्षेत्रफल अनुसूची निर्धारित करता है"
-                      : "Defines applicable Table-I font area schedule"}
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                    {language === "hi" ? "घोषित शुद्ध मात्रा" : "Declared Net Quantity"}
-                  </label>
-                  <input
-                    type="text"
-                    value={declaredNetQty}
-                    onChange={(e) => setDeclaredNetQty(e.target.value)}
-                    placeholder={language === "hi" ? "उदा., 500 g, 1 L, 250 ml" : "e.g., 500 g, 1 L, 250 ml"}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-[#1B365D] focus:border-[#1B365D]"
-                  />
-                  <p className="text-[11px] text-slate-500 mt-1">
-                    {language === "hi"
-                      ? "धारा 11 के तहत मानक SI मात्रक आवश्यक हैं"
-                      : "Must use standard SI units under Section 11"}
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                    {language === "hi" ? "पैकेजिंग ज्यामिति / आकार" : "Packaging Geometry"}
-                  </label>
-                  <select
-                    value={packageType}
-                    onChange={(e) => setPackageType(e.target.value as PackagingType)}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#1B365D] focus:border-[#1B365D]"
-                  >
-                    <option value="RECTANGULAR">{language === "hi" ? "आयताकार डिब्बा / पाउच" : "Rectangular Box / Pouch"}</option>
-                    <option value="CYLINDRICAL">{language === "hi" ? "बेलनाकार बोतल / कैन" : "Cylindrical Bottle / Can"}</option>
-                    <option value="FLEXIBLE_POUCH">{language === "hi" ? "लचीला पाउच" : "Flexible Pouch"}</option>
-                    <option value="SPECIAL">{language === "hi" ? "विशेष / अनियमित आकार का पैकेज" : "Special / Irregular Contoured Package"}</option>
-                    <option value="ECOMMERCE_LISTING">{language === "hi" ? "ई-कॉमर्स लिस्टिंग (नियम 6(10))" : "E-Commerce Listing (Rule 6(10))"}</option>
-                  </select>
-                  <p className="text-[11px] text-slate-500 mt-1">
-                    {language === "hi"
-                      ? "PDP सतह क्षेत्रफल गणना का गणितीय मॉडल निर्धारित करता है"
-                      : "Determines mathematical surface formula for PDP area"}
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                    {language === "hi" ? "निरीक्षण का उद्देश्य" : "Inspection Purpose"}
-                  </label>
-                  <select
-                    value={inspectionType}
-                    onChange={(e) => setInspectionType(e.target.value as InspectionType)}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#1B365D] focus:border-[#1B365D]"
-                  >
-                    <option value="ROUTINE_MARKET_SURVEILLANCE">{language === "hi" ? "नियमित बाजार निगरानी" : "Routine Market Surveillance"}</option>
-                    <option value="COMPLAINT_VERIFICATION">{language === "hi" ? "उपभोक्ता शिकायत / निवारण" : "Consumer Grievance / Complaint"}</option>
-                    <option value="MANUFACTURER_PACKER_DEPOT">{language === "hi" ? "निर्माता / पैकर / डिपो ऑडिट" : "Manufacturer / Packer / Depot Audit"}</option>
-                    <option value="SURPRISE_ENFORCEMENT_RAID">{language === "hi" ? "औचक प्रवर्तन छापा" : "Surprise Enforcement Raid"}</option>
-                  </select>
-                  <p className="text-[11px] text-slate-500 mt-1">
-                    {language === "hi"
-                      ? "विधिक कार्यवाही एवं नोटिस प्रारूप का प्रकार"
-                      : "Determines notice protocol and statutory escalation path"}
-                  </p>
-                </div>
-              </div>
-
-              {/* Error Alert Banner */}
-              {errorMessage && (
-                <div className="p-4 rounded-xl bg-rose-50 border border-rose-300 text-rose-900 text-xs flex items-start gap-3 shadow-2xs">
-                  <AlertCircle size={18} className="text-rose-600 shrink-0 mt-0.5" />
-                  <div className="flex-1 space-y-1.5">
-                    <div className="font-bold text-rose-950">
-                      {language === "hi" ? "निरीक्षण विश्लेषण प्रारंभ करने में समस्या" : "Inspection Pipeline Issue"}
-                    </div>
-                    <p className="text-[11.5px] leading-relaxed text-rose-800">{errorMessage}</p>
-                    <div className="flex flex-wrap items-center gap-3 pt-1">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setErrorMessage(null);
-                          handleStartAnalysis();
-                        }}
-                        className="text-[11px] font-bold text-slate-800 bg-white border border-slate-300 px-3 py-1.5 rounded-lg hover:bg-slate-50 flex items-center gap-1.5 shadow-2xs cursor-pointer"
-                      >
-                        <RefreshCw size={12} />
-                        <span>{language === "hi" ? "लाइव पुनः प्रयास करें" : "Retry Live Analysis"}</span>
-                      </button>
-                      {ApiService.getOperatingMode() === "LIVE" && (
+                {/* Error Alert Banner */}
+                {errorMessage && (
+                  <div className="p-4 rounded-xl bg-rose-50 border border-rose-300 text-rose-900 text-xs flex items-start gap-3 shadow-2xs">
+                    <AlertCircle size={18} className="text-rose-600 shrink-0 mt-0.5" />
+                    <div className="flex-1 space-y-1.5">
+                      <div className="font-bold text-rose-950">
+                        {language === "hi" ? "निरीक्षण विश्लेषण प्रारंभ करने में समस्या" : "Inspection Pipeline Issue"}
+                      </div>
+                      <p className="text-[11.5px] leading-relaxed text-rose-800">{errorMessage}</p>
+                      <div className="flex flex-wrap items-center gap-3 pt-1">
                         <button
                           type="button"
                           onClick={() => {
-                            ApiService.setOperatingMode("MOCK", { persist: false });
                             setErrorMessage(null);
                             handleStartAnalysis();
                           }}
-                          className="text-[11px] font-bold text-[#1B365D] hover:underline flex items-center gap-1 cursor-pointer"
+                          className="text-[11px] font-bold text-slate-800 bg-white border border-slate-300 px-3 py-1.5 rounded-lg hover:bg-slate-50 flex items-center gap-1.5 shadow-2xs cursor-pointer"
                         >
-                          <span>{language === "hi" ? "स्थानीय रेजिलिएंट मोड में आज़माएं" : "Try Local Resilient Mode"}</span>
-                          <ArrowRight size={12} />
+                          <RefreshCw size={12} />
+                          <span>{language === "hi" ? "लाइव पुनः प्रयास करें" : "Retry Live Analysis"}</span>
                         </button>
-                      )}
+                        {ApiService.getOperatingMode() === "LIVE" && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              ApiService.setOperatingMode("MOCK", { persist: false });
+                              setErrorMessage(null);
+                              handleStartAnalysis();
+                            }}
+                            className="text-[11px] font-bold text-[#1B365D] hover:underline flex items-center gap-1 cursor-pointer"
+                          >
+                            <span>{language === "hi" ? "स्थानीय रेजिलिएंट मोड में आज़माएं" : "Try Local Resilient Mode"}</span>
+                            <ArrowRight size={12} />
+                          </button>
+                        )}
+                      </div>
                     </div>
+                    <button
+                      type="button"
+                      onClick={() => setErrorMessage(null)}
+                      className="text-rose-500 hover:text-rose-700 p-1 cursor-pointer"
+                      aria-label="Dismiss error"
+                    >
+                      <X size={16} />
+                    </button>
                   </div>
+                )}
+
+                {/* Primary Action Button & Readiness Status */}
+                <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div
+                    className={`text-xs font-semibold px-3 py-1.5 rounded-lg border flex items-center gap-2 ${
+                      uploadProgressMessage
+                        ? "bg-blue-50 border-blue-200 text-blue-900"
+                        : files.length === 0
+                        ? "bg-amber-50 border-amber-200 text-amber-900"
+                        : "bg-emerald-50 border-emerald-200 text-emerald-900"
+                    }`}
+                  >
+                    {uploadProgressMessage ? (
+                      <>
+                        <ScanLine size={14} className="text-blue-600 animate-scan-vertical shrink-0" />
+                        <span className="font-medium">{uploadProgressMessage}</span>
+                      </>
+                    ) : files.length === 0 ? (
+                      <>
+                        <Info size={14} className="text-amber-600 shrink-0" />
+                        <span>
+                          {language === "hi"
+                            ? "विधिक विश्लेषण शुरू करने के लिए कम से कम 1 पैकेजिंग फोटो अपलोड करें।"
+                            : "Upload at least 1 packaging photograph to start statutory analysis."}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle2 size={14} className="text-emerald-600 shrink-0" />
+                        <span>
+                          {language === "hi"
+                            ? `${files.length} तस्वीर(एं) विधिक विश्लेषण हेतु तैयार हैं।`
+                            : `${files.length} photograph(s) ready for statutory analysis.`}
+                        </span>
+                      </>
+                    )}
+                  </div>
+
                   <button
                     type="button"
-                    onClick={() => setErrorMessage(null)}
-                    className="text-rose-500 hover:text-rose-700 p-1 cursor-pointer"
-                    aria-label="Dismiss error"
+                    onClick={handleStartAnalysis}
+                    disabled={isProcessing || files.length === 0}
+                    className={`w-full sm:w-auto py-3 px-7 shadow-sm flex items-center justify-center gap-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${
+                      files.length === 0 || isProcessing
+                        ? "bg-slate-200 text-slate-400 border border-slate-300 cursor-not-allowed"
+                        : "bg-[#1B365D] hover:bg-[#132742] text-white cursor-pointer active:scale-98"
+                    }`}
+                    title={files.length === 0 ? "Upload at least 1 packaging photo to begin" : ""}
                   >
-                    <X size={16} />
+                    {isProcessing ? (
+                      <>
+                        <ScanLine size={18} className="animate-scan-vertical text-amber-300" />
+                        <span>{uploadProgressMessage || (language === "hi" ? "विधिक पाइपलाइन निष्पादित हो रही है..." : "Running Statutory Pipeline...")}</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>{language === "hi" ? "निरीक्षण विश्लेषण प्रारंभ करें" : "Start Statutory Inspection"}</span>
+                        <ArrowRight size={18} />
+                      </>
+                    )}
                   </button>
                 </div>
-              )}
+              </div>
+            </section>
 
-              {/* Action Button & Readiness Status */}
-              <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div
-                  className={`text-xs font-semibold px-3 py-1.5 rounded-lg border flex items-center gap-2 ${
-                    uploadProgressMessage
-                      ? "bg-blue-50 border-blue-200 text-blue-900"
-                      : files.length === 0
-                      ? "bg-amber-50 border-amber-200 text-amber-900"
-                      : "bg-emerald-50 border-emerald-200 text-emerald-900"
-                  }`}
-                >
-                  {uploadProgressMessage ? (
-                    <>
-                      <ScanLine size={14} className="text-blue-600 animate-scan-vertical shrink-0" />
-                      <span className="font-medium">{uploadProgressMessage}</span>
-                    </>
-                  ) : files.length === 0 ? (
-                    <>
-                      <Info size={14} className="text-amber-600 shrink-0" />
-                      <span>
-                        {language === "hi"
-                          ? "विधिक विश्लेषण शुरू करने के लिए कम से कम 1 पैकेजिंग फोटो अपलोड करें।"
-                          : "Upload at least 1 packaging photograph to start statutory analysis."}
+            {/* Optional / Secondary Section: Packaged Commodity Particulars & Packaging Geometry */}
+            <section className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden transition-all">
+              <button
+                type="button"
+                onClick={() => setShowManualFields(!showManualFields)}
+                className="w-full p-4 sm:p-5 flex items-center justify-between text-left hover:bg-slate-50/80 transition-colors cursor-pointer"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-[#1B365D] flex items-center justify-center border border-blue-200 shrink-0 mt-0.5">
+                    <SlidersHorizontal size={16} />
+                  </div>
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-[10px] font-mono text-[#1B365D] bg-blue-50 border border-blue-200 font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm">
+                        {language === "hi" ? "वैकल्पिक • नियम 6 घोषणाएं" : "Optional • Rule 6 Declarations"}
                       </span>
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle2 size={14} className="text-emerald-600 shrink-0" />
-                      <span>
-                        {language === "hi"
-                          ? `${files.length} तस्वीर(एं) विधिक विश्लेषण हेतु तैयार हैं।`
-                          : `${files.length} photograph(s) ready for statutory analysis.`}
+                      <span className="text-[10px] uppercase font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                        {language === "hi" ? "एआई ओसीआर स्वतः निष्कर्षण" : "Auto-extracted by AI OCR"}
                       </span>
-                    </>
-                  )}
+                      {(productName || brandName || declaredNetQty) && (
+                        <span className="text-[10px] uppercase font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                          {language === "hi" ? "मैन्युअल मान सक्रिय" : "Manual values set"}
+                        </span>
+                      )}
+                    </div>
+                    <h4 className="text-sm font-bold text-slate-900 mt-1">
+                      {language === "hi" ? "वस्तु विवरण एवं पैकेजिंग ज्यामिति" : "Commodity Particulars & Packaging Geometry"}
+                    </h4>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      {language === "hi"
+                        ? "ओसीआर इंजन स्वचालित रूप से सभी विवरण निकालेगा। यदि आप पहले से विशिष्ट मान दर्ज करना चाहते हैं तो यहां क्लिक करें।"
+                        : "All fields are automatically extracted from the packaging photo by AI OCR. Click to pre-fill or override manually."}
+                    </p>
+                  </div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={handleStartAnalysis}
-                  disabled={isProcessing || files.length === 0}
-                  className={`w-full sm:w-auto py-3 px-7 shadow-sm flex items-center justify-center gap-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${
-                    files.length === 0 || isProcessing
-                      ? "bg-slate-200 text-slate-400 border border-slate-300 cursor-not-allowed"
-                      : "bg-[#1B365D] hover:bg-[#132742] text-white cursor-pointer active:scale-98"
-                  }`}
-                  title={files.length === 0 ? "Upload at least 1 packaging photo to begin" : ""}
-                >
-                  {isProcessing ? (
-                    <>
-                      <ScanLine size={18} className="animate-scan-vertical text-amber-300" />
-                      <span>{uploadProgressMessage || (language === "hi" ? "विधिक पाइपलाइन निष्पादित हो रही है..." : "Running Statutory Pipeline...")}</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>{language === "hi" ? "निरीक्षण विश्लेषण प्रारंभ करें" : "Start Statutory Inspection"}</span>
-                      <ArrowRight size={18} />
-                    </>
-                  )}
-                </button>
-              </div>
+                <div className="flex items-center gap-2 shrink-0 ml-3">
+                  <span className="text-xs font-semibold text-slate-600 hidden sm:inline">
+                    {showManualFields
+                      ? (language === "hi" ? "छिपाएं" : "Hide")
+                      : (language === "hi" ? "मैन्युअल रूप से भरें" : "Fill Manually")}
+                  </span>
+                  <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600 border border-slate-200">
+                    {showManualFields ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  </div>
+                </div>
+              </button>
+
+              {showManualFields && (
+                <div className="p-5 sm:p-6 border-t border-slate-200 bg-slate-50/50 space-y-4">
+                  <div className="text-xs text-slate-600 bg-blue-50/60 border border-blue-200 p-3 rounded-lg flex items-center gap-2">
+                    <Info size={16} className="text-[#1B365D] shrink-0" />
+                    <span>
+                      {language === "hi"
+                        ? "नोट: ये फ़ील्ड वैकल्पिक हैं। यदि खाली छोड़ दिया जाए, तो NIRIKSHAK फोटो से विवरण स्वचालित रूप से निकाल लेगा।"
+                        : "Note: These fields are optional. When left blank, NIRIKSHAK automatically populates them from the uploaded PDP photograph."}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-800 mb-1.5">
+                        {language === "hi" ? "वस्तु / उत्पाद का नाम" : "Commodity / Product Name"}
+                      </label>
+                      <input
+                        type="text"
+                        value={productName}
+                        onChange={(e) => setProductName(e.target.value)}
+                        placeholder={language === "hi" ? "उदा., आशीर्वाद सुपीरियर एमपी आटा 500g (या रिक्त छोड़ें)" : "e.g., Aashirvaad Superior MP Atta 500g (or leave blank)"}
+                        className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-[#1B365D] focus:border-[#1B365D]"
+                      />
+                      <p className="text-[11px] text-slate-500 mt-1">
+                        {language === "hi"
+                          ? "पैकेज्ड वस्तु का सामान्य या व्यापारिक नाम"
+                          : "Generic or common trade name of packaged goods"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-800 mb-1.5">
+                        {language === "hi" ? "ब्रांड नाम / ट्रेडमार्क" : "Brand Name / Trade Mark"}
+                      </label>
+                      <input
+                        type="text"
+                        value={brandName}
+                        onChange={(e) => setBrandName(e.target.value)}
+                        placeholder={language === "hi" ? "उदा., आईटीसी लिमिटेड / आशीर्वाद" : "e.g., ITC Limited / Aashirvaad"}
+                        className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-[#1B365D] focus:border-[#1B365D]"
+                      />
+                      <p className="text-[11px] text-slate-500 mt-1">
+                        {language === "hi"
+                          ? "निर्माता या विपणन संस्था का ब्रांड"
+                          : "Manufacturer or marketing entity brand"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-800 mb-1.5">
+                        {language === "hi" ? "वस्तु श्रेणी" : "Commodity Category"}
+                      </label>
+                      <select
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
+                        className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#1B365D] focus:border-[#1B365D]"
+                      >
+                        <option value="FOOD_SNACKS">{language === "hi" ? "पैकेज्ड खाद्य एवं स्नैक्स" : "Packaged Food & Snacks"}</option>
+                        <option value="EDIBLE_OIL">{language === "hi" ? "खाद्य तेल / वनस्पति / घी" : "Edible Oil / Ghee"}</option>
+                        <option value="BEVERAGES">{language === "hi" ? "पैकेज्ड पेयजल एवं पेय पदार्थ" : "Packaged Drinking Water & Beverages"}</option>
+                        <option value="PERSONAL_CARE">{language === "hi" ? "व्यक्तिगत देखभाल एवं सौंदर्य प्रसाधन" : "Personal Care & Cosmetics"}</option>
+                        <option value="ELECTRONICS">{language === "hi" ? "पैकेज्ड इलेक्ट्रॉनिक उत्पाद" : "Packaged Electronics"}</option>
+                        <option value="HOUSEHOLD_CHEMICALS">{language === "hi" ? "घरेलू डिटर्जेंट एवं स्वच्छता उत्पाद" : "Household Detergents & Cleaners"}</option>
+                      </select>
+                      <p className="text-[11px] text-slate-500 mt-1">
+                        {language === "hi"
+                          ? "लागू तालिका-I फॉन्ट क्षेत्रफल अनुसूची निर्धारित करता है"
+                          : "Defines applicable Table-I font area schedule"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-800 mb-1.5">
+                        {language === "hi" ? "घोषित शुद्ध मात्रा" : "Declared Net Quantity"}
+                      </label>
+                      <input
+                        type="text"
+                        value={declaredNetQty}
+                        onChange={(e) => setDeclaredNetQty(e.target.value)}
+                        placeholder={language === "hi" ? "उदा., 500 g, 1 L, 250 ml" : "e.g., 500 g, 1 L, 250 ml"}
+                        className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-[#1B365D] focus:border-[#1B365D]"
+                      />
+                      <p className="text-[11px] text-slate-500 mt-1">
+                        {language === "hi"
+                          ? "धारा 11 के तहत मानक SI मात्रक आवश्यक हैं"
+                          : "Must use standard SI units under Section 11"}
+                      </p>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label className="block text-xs font-bold text-slate-800 mb-1.5">
+                        {language === "hi" ? "पैकेजिंग ज्यामिति / आकार" : "Packaging Geometry"}
+                      </label>
+                      <select
+                        value={packageType}
+                        onChange={(e) => setPackageType(e.target.value as PackagingType)}
+                        className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#1B365D] focus:border-[#1B365D]"
+                      >
+                        <option value="RECTANGULAR">{language === "hi" ? "आयताकार डिब्बा / पाउच" : "Rectangular Box / Pouch"}</option>
+                        <option value="CYLINDRICAL">{language === "hi" ? "बेलनाकार बोतल / कैन" : "Cylindrical Bottle / Can"}</option>
+                        <option value="FLEXIBLE_POUCH">{language === "hi" ? "लचीला पाउच" : "Flexible Pouch"}</option>
+                        <option value="SPECIAL">{language === "hi" ? "विशेष / अनियमित आकार का पैकेज" : "Special / Irregular Contoured Package"}</option>
+                        <option value="ECOMMERCE_LISTING">{language === "hi" ? "ई-कॉमर्स लिस्टिंग (नियम 6(10))" : "E-Commerce Listing (Rule 6(10))"}</option>
+                      </select>
+                      <p className="text-[11px] text-slate-500 mt-1">
+                        {language === "hi"
+                          ? "PDP सतह क्षेत्रफल गणना का गणितीय मॉडल निर्धारित करता है"
+                          : "Determines mathematical surface formula for PDP area"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </section>
           </div>
 
@@ -1025,6 +1110,18 @@ export const NewInspection: React.FC = () => {
                     {language === "hi"
                       ? "कैमरा फ्लैश सीधे न मारें और सफेद चमक से बचने के लिए पैकेज को तेज रोशनी से थोड़ा तिरछा रखें।"
                       : "Diffuse direct camera flash and tilt the package slightly away from harsh overhead ceiling lights to prevent white glare bloom."}
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                  <div className="flex items-center gap-2 font-bold text-slate-900">
+                    <Camera size={15} className="text-blue-600" />
+                    <span>{language === "hi" ? "4. लंबवत तल (90°)" : "4. Orthogonal Plane (90°)"}</span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 leading-relaxed">
+                    {language === "hi"
+                      ? "पर्सपेक्टिव विरूपण से बचने के लिए उपकरण को सीधे पैकेज की सतह के समानांतर ऊपर रखें।"
+                      : "Hold device directly parallel above package surface to prevent perspective keystoning distortion."}
                   </p>
                 </div>
               </div>
@@ -1100,10 +1197,15 @@ export const NewInspection: React.FC = () => {
           <div className="w-full max-w-xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
             <div className="flex items-center justify-between p-4 bg-[#1B365D] text-white">
               <div className="flex items-center gap-2">
-                <HelpCircle size={18} className="text-amber-300" />
-                <h3 className="text-sm font-bold">
-                  {language === "hi" ? "विधिक क्षेत्रीय अधिग्रहण एवं फ्रेमिंग प्रोटोकॉल" : "Statutory Field Capture & Framing Protocol"}
-                </h3>
+                <Camera size={18} className="text-amber-300" />
+                <div>
+                  <h3 className="text-sm font-bold">
+                    {language === "hi" ? "क्षेत्रीय फोटोग्राफी नियम एवं फ्रेमिंग प्रोटोकॉल" : "Field Photography Rules & Framing Protocol"}
+                  </h3>
+                  <p className="text-[10.5px] text-blue-100">
+                    {language === "hi" ? "धारा 15 साक्ष्य संग्रह मानक (LMA 2009)" : "Sec. 15 Evidence Collection Standards (LMA 2009)"}
+                  </p>
+                </div>
               </div>
               <button
                 type="button"
@@ -1113,34 +1215,61 @@ export const NewInspection: React.FC = () => {
                 <X size={18} />
               </button>
             </div>
-            <div className="p-5 space-y-4">
-              <div className="rounded-xl overflow-hidden border border-slate-200 bg-slate-50 p-2">
+            <div className="p-5 space-y-4 max-h-[85vh] overflow-y-auto">
+              <div className="rounded-xl overflow-hidden border border-slate-200 bg-white p-2 shadow-2xs">
                 <img
                   src="/assets/guidance/camera_framing_guide.svg"
-                  alt="Framing and ArUco placement instructions"
-                  className="w-full rounded-lg"
+                  alt="Instructional package framing diagram with 50mm ArUco fiducial placement"
+                  className="w-full h-auto block rounded-lg"
                 />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
-                  <span className="font-bold text-slate-900 block mb-1">
-                    {language === "hi" ? "1. लंबवत तल (90°)" : "1. Orthogonal Plane (90°)"}
-                  </span>
-                  <span className="text-[11px] text-slate-600">
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                  <div className="flex items-center gap-2 font-bold text-slate-900">
+                    <Maximize2 size={15} className="text-[#1B365D]" />
+                    <span>{language === "hi" ? "1. संपूर्ण PDP फ्रेम करें" : "1. Frame the Entire PDP"}</span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 leading-relaxed">
                     {language === "hi"
-                      ? "पर्सपेक्टिव विरूपण से बचने के लिए उपकरण को सीधे पैकेज की सतह के ऊपर रखें।"
-                      : "Hold device directly above package surface to prevent perspective keystoning."}
-                  </span>
+                      ? "किनारों को काटे बिना संपूर्ण मुख्य लेबल की तस्वीर लें। तालिका-I अनुसूची हेतु पूर्ण सतह क्षेत्र आवश्यक है।"
+                      : "Capture the whole front label face without cutting off edges. The system needs the full surface area to compute Table-I font schedules."}
+                  </p>
                 </div>
-                <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
-                  <span className="font-bold text-slate-900 block mb-1">
-                    {language === "hi" ? "2. 50mm ArUco संदर्भ" : "2. 50mm ArUco Fiducial"}
-                  </span>
-                  <span className="text-[11px] text-slate-600">
+
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                  <div className="flex items-center gap-2 font-bold text-slate-900">
+                    <Square size={15} className="text-emerald-700" />
+                    <span>{language === "hi" ? "2. ArUco 50mm संदर्भ रखें" : "2. Place ArUco 50mm Reference"}</span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 leading-relaxed">
                     {language === "hi"
-                      ? "अनिवार्य विधिक पाठ को ढके बिना लेबल घोषणाओं के पास सपाट रखें।"
-                      : "Place flat next to label declarations without obscuring mandatory text."}
-                  </span>
+                      ? "ArUco संदर्भ को पैकेज की सतह पर सपाट रखें। विधिक पाठ (MRP, शुद्ध मात्रा, दिनांक) को कभी न ढकें।"
+                      : "Place the ArUco fiducial flat on the package surface next to label declarations. Never cover statutory text (MRP, Net Qty, Dates)."}
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                  <div className="flex items-center gap-2 font-bold text-slate-900">
+                    <Sun size={15} className="text-amber-600" />
+                    <span>{language === "hi" ? "3. अत्यधिक चमक से बचें" : "3. Avoid Specular Glare"}</span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 leading-relaxed">
+                    {language === "hi"
+                      ? "कैमरा फ्लैश सीधे न मारें और सफेद चमक से बचने के लिए पैकेज को तेज रोशनी से थोड़ा तिरछा रखें।"
+                      : "Diffuse direct camera flash and tilt the package slightly away from harsh overhead ceiling lights to prevent white glare bloom."}
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                  <div className="flex items-center gap-2 font-bold text-slate-900">
+                    <Camera size={15} className="text-blue-600" />
+                    <span>{language === "hi" ? "4. लंबवत तल (90°)" : "4. Orthogonal Plane (90°)"}</span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 leading-relaxed">
+                    {language === "hi"
+                      ? "पर्सपेक्टिव विरूपण से बचने के लिए उपकरण को सीधे पैकेज की सतह के समानांतर ऊपर रखें।"
+                      : "Hold device directly parallel above package surface to prevent perspective keystoning distortion."}
+                  </p>
                 </div>
               </div>
               <div className="pt-2 flex justify-end">
