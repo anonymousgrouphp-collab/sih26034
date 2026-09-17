@@ -199,6 +199,7 @@ export const NewInspection: React.FC = () => {
   const [isPipelineComplete, setIsPipelineComplete] = useState(false);
   const [isPipelineFailed, setIsPipelineFailed] = useState(false);
   const [createdCaseId, setCreatedCaseId] = useState<string | null>(null);
+  const createdCaseIdRef = useRef<string | null>(null);
   const [rejectedFiles, setRejectedFiles] = useState<Map<number, string>>(new Map());
 
   // Dashboard "E-Commerce Listing Audit" quick action deep-links here with
@@ -533,6 +534,7 @@ export const NewInspection: React.FC = () => {
         declared_net_quantity: declaredNetQty.trim(),
       });
       setCreatedCaseId(newCase.id);
+      createdCaseIdRef.current = newCase.id;
 
       const uploadedImageIds: string[] = [];
       let lastQgMetrics: any = null;
@@ -753,13 +755,6 @@ export const NewInspection: React.FC = () => {
 
       // Clear draft
       StorageService.clearDraft();
-
-      // Observable pause so the officer can inspect the 6 completed stages;
-      // auto-advance after 7 seconds if not manually clicked
-      setTimeout(() => {
-        resetScrollToTop();
-        navigate(`/inspections/${newCase.id}`);
-      }, 7000);
     } catch (err: any) {
       console.error("Pipeline failed:", err);
       const msg =
@@ -1966,9 +1961,11 @@ export const NewInspection: React.FC = () => {
           setIsPipelineFailed(false);
         }}
         onProceed={() => {
-          if (createdCaseId) {
+          const targetId = createdCaseId || createdCaseIdRef.current;
+          if (targetId) {
+            setIsModalOpen(false);
             resetScrollToTop();
-            navigate(`/inspections/${createdCaseId}`);
+            navigate(`/inspections/${targetId}?view=CANVAS`);
           }
         }}
       />

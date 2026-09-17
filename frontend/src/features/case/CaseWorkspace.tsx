@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext";
 import { useAuth } from "../../context/AuthContext";
 import { InspectionCase, EvidenceAsset, AdjudicationRequest, OfficerRole } from "../../types/inspection";
@@ -70,6 +70,9 @@ interface CaseWorkspaceProps {
   onSelectCase?: (caseId: string) => void;
 }
 
+const VALID_WORKSPACE_VIEWS = ["OVERVIEW", "CANVAS", "HUD", "AUDIT", "OUTCOME", "REPORT"] as const;
+type WorkspaceViewType = (typeof VALID_WORKSPACE_VIEWS)[number];
+
 export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
   caseData,
   onBack,
@@ -79,12 +82,40 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
 }) => {
   const { language } = useLanguage();
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const getInitialView = (): WorkspaceViewType => {
+    const raw = (searchParams.get("view") || searchParams.get("tab"))?.toUpperCase();
+    if (raw && (VALID_WORKSPACE_VIEWS as readonly string[]).includes(raw)) {
+      return raw as WorkspaceViewType;
+    }
+    return "OVERVIEW";
+  };
+
   const [isSubmittingEvidence, setIsSubmittingEvidence] = useState(false);
   const [isAnalyzingPipeline, setIsAnalyzingPipeline] = useState(false);
   const [isRetakeMode, setIsRetakeMode] = useState(false);
-  const [activeWorkspaceView, setActiveWorkspaceView] = useState<
-    "OVERVIEW" | "CANVAS" | "HUD" | "AUDIT" | "OUTCOME" | "REPORT"
-  >("OVERVIEW");
+  const [activeWorkspaceView, setActiveWorkspaceView] = useState<WorkspaceViewType>(getInitialView);
+
+  // Sync state if URL query param changes
+  useEffect(() => {
+    const raw = (searchParams.get("view") || searchParams.get("tab"))?.toUpperCase();
+    if (raw && (VALID_WORKSPACE_VIEWS as readonly string[]).includes(raw) && raw !== activeWorkspaceView) {
+      setActiveWorkspaceView(raw as WorkspaceViewType);
+    }
+  }, [searchParams]);
+
+  const handleSwitchWorkspaceView = (newView: WorkspaceViewType) => {
+    setActiveWorkspaceView(newView);
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.set("view", newView);
+        return next;
+      },
+      { replace: true }
+    );
+  };
   const [actionError, setActionError] = useState<string | null>(null);
   const [quickRemarks, setQuickRemarks] = useState(caseData.notes || "");
   const [quickDecisionSaved, setQuickDecisionSaved] = useState(false);
@@ -184,7 +215,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
 
       const updated = await ApiService.executePipeline(activeAsset.image_id, caseData.id, scenario);
       if (updated.rule_evaluations && updated.rule_evaluations.length > 0) {
-        setActiveWorkspaceView("CANVAS");
+        handleSwitchWorkspaceView("CANVAS");
       }
       onCaseUpdated(updated);
     } catch (err: any) {
@@ -341,13 +372,13 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
         dlLink.click();
         document.body.removeChild(dlLink);
       } else {
-        setActiveWorkspaceView("REPORT");
+        handleSwitchWorkspaceView("REPORT");
       }
 
       setQuickDecisionSaved(true);
       setTimeout(() => setQuickDecisionSaved(false), 5000);
     } catch (err: any) {
-      setActiveWorkspaceView("REPORT");
+      handleSwitchWorkspaceView("REPORT");
       setActionError(err.message || (language === "hi" ? "प्रपत्र-1 नोटिस तैयार करने में विफल।" : "Failed to generate Form-1 notice."));
     } finally {
       setIsGeneratingNotice(false);
@@ -843,13 +874,13 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
       ) : (
         /* Inspection Active Workspace Area */
         <div className="space-y-4">
-          {/* Workspace Mode Switcher (available when case has evaluations) */}
-          {caseData.rule_evaluations && caseData.rule_evaluations.length > 0 && (
+          {/* Workspace Mode Switcher (available when case has evaluations or evidence assets) */}
+          {((caseData.rule_evaluations && caseData.rule_evaluations.length > 0) || (caseData.evidence_assets && caseData.evidence_assets.length > 0)) && (
             <div className="workspace-switcher screen-only no-print flex flex-col sm:flex-row items-stretch sm:items-center justify-between bg-white p-2 rounded-xl border border-slate-200 gap-2 min-w-0 shadow-xs">
               <div className="flex items-center gap-1.5 flex-wrap lg:flex-nowrap overflow-x-auto no-scrollbar min-w-0 flex-1">
                 <button
                   type="button"
-                  onClick={() => setActiveWorkspaceView("OVERVIEW")}
+                  onClick={() => handleSwitchWorkspaceView("OVERVIEW")}
                   className={`px-3.5 py-2 text-sm font-bold rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
                     activeWorkspaceView === "OVERVIEW"
                       ? "bg-[#1B365D] text-white shadow-xs border border-[#1B365D]"
@@ -861,7 +892,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                 </button>
                 <button
                   type="button"
-                  onClick={() => setActiveWorkspaceView("CANVAS")}
+                  onClick={() => handleSwitchWorkspaceView("CANVAS")}
                   className={`px-3.5 py-2 text-sm font-bold rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
                     activeWorkspaceView === "CANVAS"
                       ? "bg-[#1B365D] text-white shadow-xs border border-[#1B365D]"
@@ -875,7 +906,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                 </button>
                 <button
                   type="button"
-                  onClick={() => setActiveWorkspaceView("HUD")}
+                  onClick={() => handleSwitchWorkspaceView("HUD")}
                   className={`px-3.5 py-2 text-sm font-bold rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
                     activeWorkspaceView === "HUD"
                       ? "bg-[#1B365D] text-white shadow-xs border border-[#1B365D]"
@@ -887,7 +918,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                 </button>
                 <button
                   type="button"
-                  onClick={() => setActiveWorkspaceView("OUTCOME")}
+                  onClick={() => handleSwitchWorkspaceView("OUTCOME")}
                   className={`px-3.5 py-2 text-sm font-bold rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
                     activeWorkspaceView === "OUTCOME"
                       ? "bg-[#1B365D] text-white shadow-xs border border-[#1B365D]"
@@ -899,7 +930,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                 </button>
                 <button
                   type="button"
-                  onClick={() => setActiveWorkspaceView("REPORT")}
+                  onClick={() => handleSwitchWorkspaceView("REPORT")}
                   className={`px-3.5 py-2 text-sm font-bold rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
                     activeWorkspaceView === "REPORT"
                       ? "bg-[#1B365D] text-white shadow-xs border border-[#1B365D]"
@@ -911,7 +942,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                 </button>
                 <button
                   type="button"
-                  onClick={() => setActiveWorkspaceView("AUDIT")}
+                  onClick={() => handleSwitchWorkspaceView("AUDIT")}
                   className={`px-3.5 py-2 text-sm font-bold rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
                     activeWorkspaceView === "AUDIT"
                       ? "bg-[#1B365D] text-white shadow-xs border border-[#1B365D]"
@@ -926,7 +957,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
               {/* Dedicated Action Group */}
               <div className="flex items-center gap-2 shrink-0 border-t sm:border-t-0 sm:border-l border-slate-200 pt-1.5 sm:pt-0 sm:pl-2.5">
                 <span className="hidden xl:inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200 text-xs font-mono font-bold text-slate-700 shrink-0">
-                  <span>{caseData.rule_evaluations.length}</span>
+                  <span>{caseData.rule_evaluations?.length || 0}</span>
                   <span>{language === "hi" ? "निष्कर्ष" : "findings"}</span>
                 </span>
                 <Link
@@ -1119,7 +1150,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                   {conflictItems.length > 0 && (
                     <ConflictCard
                       conflicts={conflictItems}
-                      onReview={() => setActiveWorkspaceView("CANVAS")}
+                      onReview={() => handleSwitchWorkspaceView("CANVAS")}
                     />
                   )}
 
@@ -1236,7 +1267,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <button
                           type="button"
-                          onClick={() => setActiveWorkspaceView("CANVAS")}
+                          onClick={() => handleSwitchWorkspaceView("CANVAS")}
                           className="px-3 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 font-semibold text-slate-700 flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                         >
                           <ExternalLink size={13} className="text-slate-500" />
@@ -1244,7 +1275,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                         </button>
                         <button
                           type="button"
-                          onClick={() => setActiveWorkspaceView("AUDIT")}
+                          onClick={() => handleSwitchWorkspaceView("AUDIT")}
                           className="px-3 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 font-semibold text-slate-700 flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                         >
                           <ShieldCheck size={13} className="text-slate-500" />
@@ -1254,7 +1285,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
 
                       <button
                         type="button"
-                        onClick={() => setActiveWorkspaceView("REPORT")}
+                        onClick={() => handleSwitchWorkspaceView("REPORT")}
                         className="w-full py-2 px-3 rounded-lg border border-slate-200 hover:bg-slate-50 font-semibold text-slate-600 hover:text-slate-900 text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                       >
                         <span>
@@ -1282,21 +1313,21 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                 </div>
               </div>
             </div>
-          ) : activeWorkspaceView === "CANVAS" && caseData.rule_evaluations && caseData.rule_evaluations.length > 0 ? (
+          ) : activeWorkspaceView === "CANVAS" ? (
             <AdjudicationCanvas
               caseData={caseData}
               onAdjudicationSubmitted={handleAdjudicationSubmitted}
               onRetakeRequested={() => setIsRetakeMode(true)}
-              onSwitchToDiagnosticHUD={() => setActiveWorkspaceView("HUD")}
+              onSwitchToDiagnosticHUD={() => handleSwitchWorkspaceView("HUD")}
               onFieldEdited={handleFieldEdited}
             />
           ) : activeWorkspaceView === "OUTCOME" ? (
             /* View 4: Inspector Case Outcome Review */
             <InspectionOutcome
               caseData={caseData}
-              onViewReport={() => setActiveWorkspaceView("REPORT")}
-              onOpenCanvas={() => setActiveWorkspaceView("CANVAS")}
-              onOpenAudit={() => setActiveWorkspaceView("AUDIT")}
+              onViewReport={() => handleSwitchWorkspaceView("REPORT")}
+              onOpenCanvas={() => handleSwitchWorkspaceView("CANVAS")}
+              onOpenAudit={() => handleSwitchWorkspaceView("AUDIT")}
               onCloseCase={handleCloseCase}
               officerRole={officerRole}
             />
@@ -1304,8 +1335,8 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
             /* View 5: Read-Only Formal Inspection Report */
             <InspectionReportView
               caseData={caseData}
-              onBackToWorkspace={() => setActiveWorkspaceView("OVERVIEW")}
-              onBackToOutcome={() => setActiveWorkspaceView("OUTCOME")}
+              onBackToWorkspace={() => handleSwitchWorkspaceView("OVERVIEW")}
+              onBackToOutcome={() => handleSwitchWorkspaceView("OUTCOME")}
             />
           ) : activeWorkspaceView === "AUDIT" ? (
             /* View 3: Dedicated Audit, Provenance & Diagnostic Telemetry View */
@@ -1355,7 +1386,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                 <div className="space-y-4">
                   <CaseHandoffState
                     caseData={caseData}
-                    onOpenAdjudication={() => setActiveWorkspaceView("CANVAS")}
+                    onOpenAdjudication={() => handleSwitchWorkspaceView("CANVAS")}
                   />
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
                     <div className="lg:col-span-6">

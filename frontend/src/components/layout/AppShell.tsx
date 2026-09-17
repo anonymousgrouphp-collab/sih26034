@@ -93,6 +93,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
           mobileOpen={mobileSidebarOpen}
           onCloseMobile={() => setMobileSidebarOpen(false)}
           activeCircle={activeCircle}
+          cases={cases}
         />
 
         <main

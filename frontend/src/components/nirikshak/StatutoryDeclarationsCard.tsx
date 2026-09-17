@@ -144,7 +144,7 @@ export const StatutoryDeclarationsCard: React.FC<StatutoryDeclarationsCardProps>
     const currFontSize = editedFontSizes[field.field_id] !== undefined
       ? editedFontSizes[field.field_id]
       : field.measured_font_height_mm;
-    setEditFontSizeInput(currFontSize !== undefined ? String(currFontSize) : "");
+    setEditFontSizeInput(currFontSize != null && !isNaN(Number(currFontSize)) ? String(currFontSize) : "");
   };
 
   const handleSaveEdit = (fieldId: string) => {
@@ -389,9 +389,9 @@ export const StatutoryDeclarationsCard: React.FC<StatutoryDeclarationsCardProps>
                                 {language === "hi" ? "समीक्षा आवश्यक" : "Review Needed"}
                               </span>
                             )}
-                            {currentFontSize !== undefined && (
+                            {currentFontSize != null && !isNaN(Number(currentFontSize)) && Number(currentFontSize) > 0 && (
                               <span className={`ml-2 font-bold ${isFontOverridden ? "text-amber-900 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-300" : "text-[#1B365D]"}`}>
-                                • {language === "hi" ? "फ़ॉन्ट" : "Font"}: {currentFontSize.toFixed(2)}{" "}
+                                • {language === "hi" ? "फ़ॉन्ट" : "Font"}: {Number(currentFontSize).toFixed(2)}{" "}
                                 {language === "hi" ? "मिमी" : "mm"}
                                 {isFontOverridden && (
                                   <span className="ml-1 text-[9px] font-sans font-normal text-amber-800">

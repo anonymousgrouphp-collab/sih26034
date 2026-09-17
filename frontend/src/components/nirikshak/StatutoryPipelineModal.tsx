@@ -52,6 +52,8 @@ export interface StatutoryPipelineModalProps {
   onRemoveAndContinue?: (index: number) => void;
   onRemoveAllBadAndContinue?: () => void;
   onRetry?: () => void;
+  countdownSeconds?: number | null;
+  onPauseCountdown?: () => void;
 }
 
 export const StatutoryPipelineModal: React.FC<StatutoryPipelineModalProps> = ({
@@ -75,6 +77,8 @@ export const StatutoryPipelineModal: React.FC<StatutoryPipelineModalProps> = ({
   onRemoveAndContinue,
   onRemoveAllBadAndContinue,
   onRetry,
+  countdownSeconds = null,
+  onPauseCountdown,
 }) => {
   if (!isOpen) return null;
 
@@ -153,11 +157,11 @@ export const StatutoryPipelineModal: React.FC<StatutoryPipelineModalProps> = ({
             </div>
           </div>
 
-          {failed && onDismissFailure && (
+          {(failed || allCompleted) && onDismissFailure && (
             <button
               type="button"
               onClick={onDismissFailure}
-              className="p-1 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+              className="p-1 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
               title={language === "hi" ? "बंद करें" : "Dismiss"}
             >
               <X size={20} />
@@ -658,14 +662,34 @@ export const StatutoryPipelineModal: React.FC<StatutoryPipelineModalProps> = ({
             )}
 
             {allCompleted && onProceed && (
-              <button
-                type="button"
-                onClick={onProceed}
-                className="w-full sm:w-auto px-5 py-2 text-xs font-bold text-white bg-[#1B365D] hover:bg-[#132742] rounded-lg shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                <span>{language === "hi" ? "अधिनिर्णय कैनवास खोलें" : "Open Adjudication Canvas"}</span>
-                <ArrowRight size={14} />
-              </button>
+              <div className="flex items-center gap-2">
+                {countdownSeconds !== null && countdownSeconds !== undefined && countdownSeconds > 0 && onPauseCountdown && (
+                  <button
+                    type="button"
+                    onClick={onPauseCountdown}
+                    className="px-2.5 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-300/80 rounded-lg transition-colors cursor-pointer"
+                    title={language === "hi" ? "स्वतः-नेविगेशन रोकें" : "Pause auto-navigation"}
+                  >
+                    {language === "hi" ? "रोकें (Pause)" : "Pause Auto-Open"}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={onProceed}
+                  className="w-full sm:w-auto px-5 py-2 text-xs font-bold text-white bg-[#1B365D] hover:bg-[#132742] rounded-lg shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <span>
+                    {language === "hi"
+                      ? (countdownSeconds !== null && countdownSeconds !== undefined && countdownSeconds > 0
+                          ? `अधिनिर्णय कैनवास खोलें (${countdownSeconds}s में स्वतः...)`
+                          : "अधिनिर्णय कैनवास खोलें")
+                      : (countdownSeconds !== null && countdownSeconds !== undefined && countdownSeconds > 0
+                          ? `Open Adjudication Canvas (${countdownSeconds}s...)`
+                          : "Open Adjudication Canvas")}
+                  </span>
+                  <ArrowRight size={14} />
+                </button>
+              </div>
             )}
           </div>
         </div>

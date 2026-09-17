@@ -3,7 +3,7 @@ import { useLanguage } from "../../context/LanguageContext";
 import { InspectionCase } from "../../types/inspection";
 import { VerdictBadge, WorkflowBadge } from "../../components/common/StatusBadge";
 import { ApiService } from "../../services/api";
-import { Trash2 } from "lucide-react";
+import { Trash2, Scale } from "lucide-react";
 
 interface CaseHeaderProps {
   caseData: InspectionCase;
@@ -30,19 +30,24 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
             type="button"
             onClick={onBack}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-[#1B365D] border border-slate-200 transition-colors focus:outline-none focus:ring-1 focus:ring-[#1B365D] cursor-pointer"
+            title={language === "hi" ? "केस पंजी पर वापस जाएं" : "Return to Case Registry"}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            <span>{language === "hi" ? "निरीक्षण डेस्क" : "Inspection Desk"}</span>
+            <span>{language === "hi" ? "केस पंजी पर वापस" : "Back to Registry"}</span>
           </button>
           <div className="h-4 w-px bg-slate-200 hidden sm:block" />
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="text-sm font-mono font-bold text-[#1B365D]">
               {caseData.inspection_number}
             </span>
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-lg bg-blue-50 text-[#1B365D] border border-blue-200 shadow-2xs">
+              <Scale size={13} className="text-[#1B365D]" />
+              <span>{language === "hi" ? "अधिनिर्णय कार्यक्षेत्र" : "Adjudication Workspace"}</span>
+            </span>
             {isMock && (
-              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-blue-50 text-[#1B365D] border border-blue-200 font-bold" title="Running in Standalone Demo / Local Mode">
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 font-bold" title="Running in Standalone Demo / Local Mode">
                 {language === "hi" ? "डेमो / स्थानीय मोड" : "DEMO / LOCAL MODE"}
               </span>
             )}
