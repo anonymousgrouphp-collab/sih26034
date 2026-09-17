@@ -48,7 +48,7 @@ class LegalNoticeDTO(BaseModel):
     bsa_certificate_number: str
     recipient: LegalNoticeRecipientDTO
     statutory_mandate: str = Field(
-        "Section 36(1) of Legal Metrology Act, 2009 read with Section 63 BSA 2023"
+        "Legal Metrology (Packaged Commodities) Rules, 2011 read with Section 36(1) of Legal Metrology Act, 2009 and Section 63 BSA 2023"
     )
     violations_summary: List[str]
     compounding_fee_amount: float = Field(..., ge=0.0, description="Compounding fee under Section 48 LM Act")

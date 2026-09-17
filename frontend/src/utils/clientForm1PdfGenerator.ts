@@ -515,7 +515,7 @@ export function generateClientForm1PdfBlob(
   pushString(`<<
   /Title (${escapePdfText(`Statutory Notice (Form-1) - ${noticeRef}`)})
   /Author (Department of Consumer Affairs - Legal Metrology Division)
-  /Subject (Statutory Inspection Notice & Deficit Memorandum under Section 36\\(1\\) LM Act 2009)
+  /Subject (Statutory Inspection Notice & Deficit Memorandum under LMPC Rules, 2011 & Section 36\\(1\\) LM Act, 2009)
   /Creator (Nirikshak Legal Metrology Enforcement System)
 >>\n`);
   endObject();

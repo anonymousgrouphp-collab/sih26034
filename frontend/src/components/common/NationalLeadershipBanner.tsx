@@ -79,7 +79,7 @@ export const NationalLeadershipBanner: React.FC = () => {
             <p className="text-xs text-slate-600 leading-relaxed">
               {t(
                 "quote.mission_desc",
-                "Ensuring fair measure in trade, statutory clarity in packaged commodities, and tamper-evident electronic evidence under the Legal Metrology Act, 2009."
+                "Ensuring fair measure in trade, statutory clarity in packaged commodities, and tamper-evident electronic evidence under the Legal Metrology (PC) Rules, 2011 & LM Act, 2009."
               )}
             </p>
 

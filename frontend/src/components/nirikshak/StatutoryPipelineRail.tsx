@@ -121,8 +121,8 @@ export const StatutoryPipelineRail: React.FC<StatutoryPipelineRailProps> = ({
             </div>
             <p className="text-[11px] text-slate-600 hidden sm:block">
               {language === "hi"
-                ? "एलएमपीसी नियम 6 एवं तालिका-I स्वचालित परीक्षण अनुक्रम"
-                : "6-stage automated enforcement pipeline under Legal Metrology Act"}
+                ? "एलएमपीसी नियम, 2011 (नियम 6 एवं तालिका-I) स्वचालित परीक्षण अनुक्रम"
+                : "6-stage automated enforcement pipeline under LMPC Rules, 2011 & LM Act, 2009"}
             </p>
           </div>
         </div>

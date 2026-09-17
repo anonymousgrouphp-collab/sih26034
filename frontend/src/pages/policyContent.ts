@@ -42,8 +42,8 @@ export const POLICY_DOCS: LegalDoc[] = [
       {
         labelEn: "Governing Law",
         labelHi: "शासक विधि",
-        valueEn: "Laws of India — IT Act 2000 & Legal Metrology Act 2009",
-        valueHi: "भारत के विधियां — आईटी अधिनियम 2000 एवं विधिक मापविज्ञान अधिनियम 2009",
+        valueEn: "Laws of India — IT Act 2000, Legal Metrology Act 2009 & LMPC Rules 2011",
+        valueHi: "भारत के विधियां — आईटी अधिनियम 2000, विधिक मापविज्ञान अधिनियम 2009 एवं एलएमपीसी नियम 2011",
       },
       {
         labelEn: "Authorised Users",

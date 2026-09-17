@@ -593,8 +593,8 @@ export const Login: React.FC = () => {
                   </h2>
                   <p className="text-xs text-blue-200 mt-0.5">
                     {language === "hi"
-                      ? "विधिक मापविज्ञान अधिनियम, 2009 एवं पैकेज वस्तुएं नियम, 2011 का अधिकृत प्रवर्तन कार्यस्थान"
-                      : "Official Statutory Enforcement Workstation under the Legal Metrology Act, 2009"}
+                      ? "विधिक मापविज्ञान (पैकेज्ड वस्तुएं) नियम, 2011 एवं विधिक मापविज्ञान अधिनियम, 2009 का अधिकृत प्रवर्तन कार्यस्थान"
+                      : "Official Statutory Enforcement Workstation under Legal Metrology (PC) Rules, 2011 & LM Act, 2009"}
                   </p>
                 </div>
               </div>
@@ -626,8 +626,8 @@ export const Login: React.FC = () => {
 
                 <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
                   {language === "hi"
-                    ? "विधिक मापविज्ञान अधिकारियों (LMO) और जिला नियंत्रकों हेतु स्वचालित ऑप्टिकल गुणवत्ता जांच, ArUco मीट्रिक अंशांकन, तालिका-I फॉन्ट अनुसूची सत्यापन एवं धारा 63 भारतीय साक्ष्य अधिनियम, 2023 डिजिटल साक्ष्य प्रमाणपत्र प्रणाली।"
-                    : "Automated optical verification under the Legal Metrology Act, 2009 and LMPC Rules, 2011, backed by Section 63 BSA 2023 tamper-evident cryptographic hash immutability."}
+                    ? "विधिक मापविज्ञान (पैकेज्ड वस्तुएं) नियम, 2011, विधिक मापविज्ञान अधिनियम, 2009 तथा धारा 63 बीएसए 2023 के अंतर्गत अधिकारियों हेतु स्वचालित ऑप्टिकल गुणवत्ता जांच, ArUco मीट्रिक अंशांकन, तालिका-I फॉन्ट अनुसूची सत्यापन एवं डिजिटल साक्ष्य प्रमाणपत्र प्रणाली।"
+                    : "Automated optical verification under Legal Metrology (PC) Rules, 2011 & LM Act, 2009, backed by Section 63 BSA 2023 tamper-evident cryptographic hash immutability."}
                 </p>
               </div>
 
@@ -768,8 +768,8 @@ export const Login: React.FC = () => {
                   </h2>
                   <p className="text-xs text-slate-500 mt-0.5">
                     {language === "hi"
-                      ? "विधिक मापविज्ञान अधिनियम, 2009 के तहत अधिकृत प्रवर्तन लॉगिन"
-                      : "Authorized statutory portal under Legal Metrology Act, 2009"}
+                      ? "विधिक मापविज्ञान (पैकेज्ड वस्तुएं) नियम, 2011 एवं अधिनियम, 2009 के तहत अधिकृत प्रवर्तन लॉगिन"
+                      : "Authorized statutory portal under Legal Metrology (PC) Rules, 2011 & LM Act, 2009"}
                   </p>
                 </div>
                 <div className="shrink-0 hidden sm:block">
@@ -1430,8 +1430,8 @@ export const Login: React.FC = () => {
                   {language === "hi" ? "वैधानिक सुरक्षा सूचना:" : "Statutory Security Notice:"}
                 </strong>{" "}
                 {language === "hi"
-                  ? "यह पोर्टल केवल विधिक मापविज्ञान अधिनियम, 2009 के अंतर्गत अधिकृत राजपत्रित अधिकारियों हेतु सुरक्षित है। अनधिकृत प्रवेश सूचना प्रौद्योगिकी अधिनियम, 2000 की धारा 43 एवं 66 के तहत दंडनीय अपराध है।"
-                  : "Authorized exclusively for Gazetted Legal Metrology Officers and designated enforcement personnel. Unauthorized access is punishable under Sections 43 & 66 of the IT Act, 2000."}
+                  ? "यह पोर्टल केवल विधिक मापविज्ञान अधिनियम, 2009 एवं एलएमपीसी नियम, 2011 के अंतर्गत अधिकृत राजपत्रित अधिकारियों हेतु सुरक्षित है। अनधिकृत प्रवेश सूचना प्रौद्योगिकी अधिनियम, 2000 की धारा 43 एवं 66 के तहत दंडनीय अपराध है।"
+                  : "Authorized exclusively for Gazetted Legal Metrology Officers under LMPC Rules, 2011 & LM Act, 2009. Unauthorized access is punishable under Sections 43 & 66 of the IT Act, 2000."}
               </div>
 
               {/* Return to Public Portal Footer Link */}

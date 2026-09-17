@@ -2319,7 +2319,7 @@ export const GOLDEN_SKU_CASES: Record<string, InspectionCase> = {
       {
         finding_id: "eval_w_02",
         rule_code: "RULE_06_1_F_NET_QTY",
-        statutory_reference: "Rule 6(1)(f) read with Rule 12 and Section 11 LM Act 2009",
+        statutory_reference: "Rule 6(1)(f) read with Rule 12 LMPC Rules, 2011 & Section 11 LM Act, 2009",
         status: "PASS",
         severity: "CRITICAL",
         required_value: "Standard unit declaration (number/countable items: 'NUMBER' or 'N')",
@@ -2755,7 +2755,7 @@ export const GOLDEN_SKU_CASES: Record<string, InspectionCase> = {
       {
         finding_id: "eval_b_02",
         rule_code: "RULE_06_1_F_NET_QTY",
-        statutory_reference: "Rule 6(1)(f) read with Rule 12 and Section 11 LM Act 2009",
+        statutory_reference: "Rule 6(1)(f) read with Rule 12 LMPC Rules, 2011 & Section 11 LM Act, 2009",
         status: "PASS",
         severity: "CRITICAL",
         required_value: "Countable unit declared (Tablets / N)",
@@ -3127,7 +3127,7 @@ export const GOLDEN_SKU_CASES: Record<string, InspectionCase> = {
       {
         finding_id: "eval_d_02",
         rule_code: "RULE_06_1_F_NET_QTY",
-        statutory_reference: "Rule 6(1)(f) read with Rule 12 and Section 11 LM Act 2009",
+        statutory_reference: "Rule 6(1)(f) read with Rule 12 LMPC Rules, 2011 & Section 11 LM Act, 2009",
         status: "PASS",
         severity: "CRITICAL",
         required_value: "Liquid volume in standard SI unit ('ml' or 'l')",
@@ -3470,7 +3470,7 @@ export const GOLDEN_SKU_CASES: Record<string, InspectionCase> = {
       {
         finding_id: "eval_p_02",
         rule_code: "RULE_06_1_F_NET_QTY",
-        statutory_reference: "Rule 6(1)(f) read with Rule 12 and Section 11 LM Act 2009",
+        statutory_reference: "Rule 6(1)(f) read with Rule 12 LMPC Rules, 2011 & Section 11 LM Act, 2009",
         status: "PASS",
         severity: "CRITICAL",
         required_value: "Volume in standard metric SI unit ('ml')",
@@ -3802,7 +3802,7 @@ export const GOLDEN_SKU_CASES: Record<string, InspectionCase> = {
       {
         finding_id: "eval_n_02",
         rule_code: "RULE_06_1_F_NET_QTY",
-        statutory_reference: "Rule 6(1)(f) read with Rule 12 and Section 11 LM Act 2009",
+        statutory_reference: "Rule 6(1)(f) read with Rule 12 LMPC Rules, 2011 & Section 11 LM Act, 2009",
         status: "PASS",
         severity: "CRITICAL",
         required_value: "Solid weight in standard SI symbol ('g')",
@@ -4152,7 +4152,7 @@ export const GOLDEN_SKU_CASES: Record<string, InspectionCase> = {
       {
         finding_id: "eval_c_02",
         rule_code: "RULE_06_1_F_NET_QTY",
-        statutory_reference: "Rule 6(1)(f) read with Rule 12 and Section 11 LM Act 2009",
+        statutory_reference: "Rule 6(1)(f) read with Rule 12 LMPC Rules, 2011 & Section 11 LM Act, 2009",
         status: "PASS",
         severity: "CRITICAL",
         required_value: "Solid weight in standard SI symbol ('g')",

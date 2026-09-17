@@ -38,8 +38,8 @@ export const Unauthorized: React.FC = () => {
               <StateEmblem size={44} tone="white" showMotto={true} />
               <div className="text-[11px] font-bold uppercase tracking-widest text-amber-300">
                 {language === "hi"
-                  ? "विधिक मापविज्ञान अधिनियम, 2009 • सुरक्षा प्रतिबंध"
-                  : "Legal Metrology Act, 2009 • Statutory Access Boundary"}
+                  ? "विधिक मापविज्ञान (पैकेज्ड वस्तुएं) नियम, 2011 एवं अधिनियम, 2009 • सुरक्षा प्रतिबंध"
+                  : "Legal Metrology (PC) Rules, 2011 & LM Act, 2009 • Statutory Access Boundary"}
               </div>
               <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white">
                 {language === "hi" ? "अनाधिकृत अभिगम" : "Access Denied // Restricted Authorization"}

@@ -368,7 +368,7 @@ export const CaseRegistry: React.FC<CaseRegistryProps> = ({
           </div>
           <p className="text-xs text-slate-500 font-medium mt-1">
             {language === "hi"
-              ? "विधिक मापविज्ञान (पैकेज वस्तुएं) नियम, 2011 एवं विधिक माप अधिनियम, 2009 की धारा 15 के अंतर्गत संपूर्ण मामला पंजी।"
+              ? "विधिक मापविज्ञान (पैकेज्ड वस्तुएं) नियम, 2011 एवं विधिक मापविज्ञान अधिनियम, 2009 की धारा 15 के अंतर्गत संपूर्ण मामला पंजी।"
               : "Complete statutory case register under Section 15 of Legal Metrology Act, 2009 and LMPC Rules, 2011."}
           </p>
         </div>

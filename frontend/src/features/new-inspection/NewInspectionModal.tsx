@@ -108,8 +108,8 @@ export const NewInspectionModal: React.FC<NewInspectionModalProps> = ({
       title={language === "hi" ? "नया निरीक्षण मामला दर्ज करें" : "Register New Inspection Case"}
       subtitle={
         language === "hi"
-          ? "विधिक मापविज्ञान अधिनियम, 2009 की धारा 15 के तहत एक सांविधिक केस फ़ाइल प्रारंभ करता है"
-          : "Initializes a statutory case file under Section 15 of Legal Metrology Act, 2009"
+          ? "विधिक मापविज्ञान (पैकेज्ड वस्तुएं) नियम, 2011 एवं अधिनियम, 2009 की धारा 15 के अंतर्गत सांविधिक केस फ़ाइल प्रारंभ करता है"
+          : "Initializes a statutory case file under LMPC Rules, 2011 & Section 15 of Legal Metrology Act, 2009"
       }
       maxWidth="2xl"
     >

@@ -853,8 +853,8 @@ export const NewInspection: React.FC = () => {
               </h1>
               <p className="text-xs text-slate-600 mt-0.5">
                 {language === "hi"
-                  ? "विधिक मापविज्ञान अधिनियम, 2009 एवं पैकेज्ड कमोडिटीज नियम, 2011 के अंतर्गत साक्ष्य ग्रहण एवं सत्यापन"
-                  : "Rule 6 Mandatory Declarations & Table-I Schedule Verification under Legal Metrology Act, 2009"}
+                  ? "विधिक मापविज्ञान (पैकेज्ड वस्तुएं) नियम, 2011 एवं विधिक मापविज्ञान अधिनियम, 2009 के अंतर्गत साक्ष्य ग्रहण एवं सत्यापन"
+                  : "Rule 6 Mandatory Declarations & Table-I Schedule Verification under LMPC Rules, 2011 & LM Act, 2009"}
               </p>
             </div>
           </div>
@@ -952,7 +952,7 @@ export const NewInspection: React.FC = () => {
                     </span>
                     <span className="text-xs text-slate-400">•</span>
                     <span className="text-xs text-slate-600 font-medium">
-                      {language === "hi" ? "विधिक मापविज्ञान अधिनियम, 2009 धारा 15" : "Legal Metrology Act, 2009 Sec. 15"}
+                      {language === "hi" ? "एलएमपीसी नियम, 2011 व धारा 15 एलएम अधिनियम, 2009" : "LMPC Rules, 2011 & LM Act, 2009 Sec. 15"}
                     </span>
                   </div>
                   <h3 className="text-base font-bold text-slate-900 mt-1 flex items-center gap-2">
@@ -995,8 +995,8 @@ export const NewInspection: React.FC = () => {
                   </select>
                   <p className="text-[11px] text-slate-500 mt-1">
                     {language === "hi"
-                      ? "विधिक मापविज्ञान अधिनियम, 2009 की धारा 15 के अंतर्गत विधिक अधिकार क्षेत्र।"
-                      : "Official statutory jurisdiction circle under Section 15 of LMA 2009."}
+                      ? "विधिक मापविज्ञान (पैकेज्ड वस्तुएं) नियम, 2011 एवं अधिनियम, 2009 की धारा 15 के अंतर्गत विधिक अधिकार क्षेत्र।"
+                      : "Official statutory jurisdiction circle under LMPC Rules, 2011 & Section 15 of LM Act, 2009."}
                   </p>
                 </div>
 
@@ -1936,7 +1936,7 @@ export const NewInspection: React.FC = () => {
                     {language === "hi" ? "क्षेत्रीय फोटोग्राफी नियम एवं फ्रेमिंग प्रोटोकॉल" : "Field Photography Rules & Framing Protocol"}
                   </h3>
                   <p className="text-[10.5px] text-blue-100">
-                    {language === "hi" ? "धारा 15 साक्ष्य संग्रह मानक (LMA 2009)" : "Sec. 15 Evidence Collection Standards (LMA 2009)"}
+                    {language === "hi" ? "एलएमपीसी नियम, 2011 व धारा 15 साक्ष्य संग्रह मानक" : "LMPC Rules, 2011 & Sec. 15 Evidence Standards"}
                   </p>
                 </div>
               </div>

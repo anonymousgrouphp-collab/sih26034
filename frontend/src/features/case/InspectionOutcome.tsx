@@ -400,8 +400,8 @@ export const InspectionOutcome: React.FC<InspectionOutcomeProps> = ({
                           ? "आप नियंत्रक साख के साथ लॉग इन हैं। आप प्रपत्र-1 कारण बताओ नोटिस जारी करने तथा शमन शुल्क निर्धारित करने हेतु अधिकृत हैं।"
                           : "You are logged in with Controller credentials. You are authorized to issue Form-1 Show Cause Notices and determine compounding fees.")
                       : (language === "hi"
-                          ? "नियम 6 एवं धारा 36(1) एलएम अधिनियम 2009 के तहत, केवल नियंत्रक ही औपचारिक रूप से प्रपत्र-1 नोटिस जारी कर सकते हैं।"
-                          : "Under Rule 6 and Section 36(1) LM Act 2009, only the Controller may formally issue Form-1 Notices. Inspectors escalate vetted findings.")}
+                          ? "एलएमपीसी नियम, 2011 के नियम 6 एवं विधिक मापविज्ञान अधिनियम, 2009 की धारा 36(1) के तहत, केवल नियंत्रक ही औपचारिक रूप से प्रपत्र-1 नोटिस जारी कर सकते हैं।"
+                          : "Under Rule 6 LMPC Rules, 2011 and Section 36(1) LM Act, 2009, only the Controller may formally issue Form-1 Notices. Inspectors escalate vetted findings.")}
                   </span>
                 </div>
 

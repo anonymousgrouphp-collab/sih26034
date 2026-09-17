@@ -146,7 +146,7 @@ export const StatutoryPipelineInfographic: React.FC = () => {
       titleHi: "अधिकारी न्यायनिर्णयन एवं नोटिस",
       categoryEn: "Human-in-the-Loop",
       categoryHi: "मानव-निर्देशित निर्णय",
-      statute: "Section 15 LM Act 2009",
+      statute: "LMPC Rules, 2011 & Sec 15 LM Act, 2009",
       icon: FileCheck2,
       keySpecsEn: [
         { label: "Role Requirement", value: "Gazetted LMO Required" },

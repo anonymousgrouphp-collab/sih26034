@@ -606,8 +606,8 @@ export const Reports: React.FC = () => {
               <ShieldCheck size={16} className="text-emerald-600 shrink-0" />
               <span>
                 {language === "hi"
-                  ? "विधिक माप अधिनियम, 2009 की धारा 36(1) के अंतर्गत सभी उल्लंघन कंपाउंडिंग हेतु प्रपत्र-1 नोटिस उत्पादन के लिए योग्य हैं।"
-                  : "All contraventions under Section 36(1) Legal Metrology Act, 2009 are eligible for Form-1 Compounding Notices."}
+                  ? "विधिक मापविज्ञान (पैकेज्ड वस्तुएं) नियम, 2011 एवं अधिनियम की धारा 36(1) के अंतर्गत सभी उल्लंघन शमन हेतु प्रपत्र-1 नोटिस उत्पादन के लिए योग्य हैं।"
+                  : "All contraventions under LMPC Rules, 2011 & Section 36(1) Legal Metrology Act, 2009 are eligible for Form-1 Compounding Notices."}
               </span>
             </div>
           </div>
@@ -998,10 +998,10 @@ export const Reports: React.FC = () => {
                   OFFICE OF THE LEGAL METROLOGY OFFICER • {selectedNoticeCase.jurisdiction_id || division}
                 </p>
                 <h2 className="font-black text-slate-900 text-sm pt-1 uppercase">
-                  FORM-1 NOTICE UNDER SECTION 36(1) OF LEGAL METROLOGY ACT, 2009
+                  FORM-1 NOTICE UNDER LMPC RULES, 2011 & SECTION 36(1) LEGAL METROLOGY ACT, 2009
                 </h2>
                 <p className="text-[10px] text-slate-500 font-mono">
-                  Read with Rule 29 of the Legal Metrology (Packaged Commodities) Rules, 2011
+                  Read with Rule 32 of the Legal Metrology (Packaged Commodities) Rules, 2011 & Jan Vishwas Act, 2023
                 </p>
               </div>
 
@@ -1031,7 +1031,7 @@ export const Reports: React.FC = () => {
                   STATUTORY REASON FOR NOTICE / CONTRAVENTIONS ESTABLISHED:
                 </p>
                 <p>
-                  Whereas on the inspection conducted under Section 15 of the Legal Metrology Act, 2009, the aforementioned
+                  Whereas on the inspection conducted under the Legal Metrology (Packaged Commodities) Rules, 2011 and Section 15 of the Legal Metrology Act, 2009, the aforementioned
                   packaged commodity sample was seized and evaluated. The automated optical inspection and Legal Metrology
                   Officer examination established non-compliance with the provisions of:
                 </p>

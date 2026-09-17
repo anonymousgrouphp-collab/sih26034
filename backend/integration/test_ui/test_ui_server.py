@@ -275,7 +275,7 @@ def run_golden_demonstration_sku(
                 "required": "Mandatory Country of Origin declaration",
                 "measured": "MISSING (null)",
                 "deficit": "Missing mandatory Country of Origin declaration on e-commerce product listing",
-                "penalty": "Section 36(1) LM Act 2009 read with Rule 32 LMPC Rules",
+                "penalty": "Section 36(1) LM Act, 2009 read with Rule 32 LMPC Rules, 2011",
             })
 
         # Manufacturing Date Statutory Exemption Note

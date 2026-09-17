@@ -609,7 +609,7 @@ export const Settings: React.FC = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-500">Statute:</span>
-                    <span className="text-slate-800">Legal Metrology Act 2009</span>
+                    <span className="text-slate-800">Legal Metrology (PC) Rules, 2011 & LM Act, 2009</span>
                   </div>
                 </div>
 
@@ -625,8 +625,8 @@ export const Settings: React.FC = () => {
                   {language === "hi" ? "विधिक प्राधिकार सूचना:" : "Statutory Authority Note:"}
                 </span>
                 {language === "hi"
-                  ? "विधिक मापविज्ञान अधिनियम 2009 की धारा 15 एवं नियम 29 के तहत नियुक्त अधिकारी ही विधिक जब्ती एवं शमन आदेश निष्पादित कर सकते हैं।"
-                  : "Officers gazetted under Section 15 of Legal Metrology Act, 2009 are legally empowered to issue compounding notices and seize contraband packaging."}
+                  ? "विधिक मापविज्ञान (पैकेज्ड वस्तुएं) नियम, 2011 के नियम 29 एवं विधिक मापविज्ञान अधिनियम, 2009 की धारा 15 के तहत नियुक्त अधिकारी ही विधिक जब्ती एवं शमन आदेश निष्पादित कर सकते हैं।"
+                  : "Officers gazetted under Section 15 of Legal Metrology Act, 2009 and LMPC Rules, 2011 are legally empowered to issue compounding notices and seize contraband packaging."}
               </div>
             </section>
           </div>

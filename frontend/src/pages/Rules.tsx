@@ -40,8 +40,8 @@ const RULE_CATALOG: RuleCatalogItem[] = [
     statute: "Rule 6(1)(h) read with Table-I of LMPC Rules, 2011",
     description: "The height of any numeral and letter declared on the Principal Display Panel (PDP) shall not be less than the minimum height specified in Table-I for the corresponding area of the panel.",
     descriptionHi: "मुख्य प्रदर्शन फलक (PDP) पर घोषित किसी भी अंक और अक्षर की ऊंचाई पैनल के संबंधित क्षेत्रफल के लिए तालिका-I में निर्दिष्ट न्यूनतम ऊंचाई से कम नहीं होगी।",
-    remedy: "Non-compliance triggers compounding under Section 36(1) of Legal Metrology Act, 2009 (₹5,000 first offense).",
-    remedyHi: "गैर-अनुपालन पर विधिक मापविज्ञान अधिनियम, 2009 की धारा 36(1) के तहत शमन (प्रथम अपराध हेतु ₹5,000)।",
+    remedy: "Non-compliance triggers compounding under Rule 32 LMPC Rules, 2011 & Section 36(1) of Legal Metrology Act, 2009 (₹5,000 first offense under Jan Vishwas Act, 2023).",
+    remedyHi: "गैर-अनुपालन पर एलएमपीसी नियम, 2011 के नियम 32 एवं विधिक मापविज्ञान अधिनियम, 2009 की धारा 36(1) के तहत शमन (जन विश्वास अधिनियम, 2023 के अंतर्गत प्रथम अपराध हेतु ₹5,000)।",
   },
   {
     code: "RULE_6_1_K_USP",
@@ -76,7 +76,7 @@ const RULE_CATALOG: RuleCatalogItem[] = [
     category: "LEGAL_METROLOGY_UNITS",
     categoryHi: "विधिक माप इकाइयां",
     severity: "MAJOR",
-    statute: "Section 11 read with Second Schedule of Legal Metrology Act, 2009",
+    statute: "Rule 12 of LMPC Rules, 2011 & Section 11 / Second Schedule of Legal Metrology Act, 2009",
     description: "Only standard SI units (g, kg, ml, l, m, cm) are permissible. Colloquial abbreviations such as 'gms', 'gm', 'ML', 'ltrs' are strictly prohibited.",
     descriptionHi: "केवल मानक एसआई इकाइयों (g, kg, ml, l, m, cm) की अनुमति है। 'gms', 'gm', 'ML', 'ltrs' जैसे बोलचाल के संक्षिप्ताक्षरों पर सख्त प्रतिबंध है।",
     remedy: "Immediate statutory objection and compounding notice under Section 29.",
@@ -370,8 +370,8 @@ export const Rules: React.FC = () => {
             </div>
             <p className="text-xs text-slate-600 leading-relaxed">
               {language === "hi"
-                ? "विधिक मापविज्ञान अधिनियम, 2009 की दूसरी अनुसूची के तहत, 'gms', 'gm', 'ML', 'ltrs' जैसे बोलचाल के इकाई प्रतीकों का उपयोग प्रतिबंधित है। केवल मानक SI इकाइयों 'g', 'kg', 'ml', 'l' को ही अनुमति है।"
-                : "Under the Second Schedule of the Legal Metrology Act, 2009, colloquial unit symbols such as `gms`, `gm`, `ML`, `ltrs` are prohibited. Standard SI units `g`, `kg`, `ml`, `l` must be enforced."}
+                ? "विधिक मापविज्ञान (पैकेज्ड वस्तुएं) नियम, 2011 के नियम 12 एवं अधिनियम, 2009 की दूसरी अनुसूची के तहत, 'gms', 'gm', 'ML', 'ltrs' जैसे बोलचाल के इकाई प्रतीकों का उपयोग प्रतिबंधित है। केवल मानक SI इकाइयों 'g', 'kg', 'ml', 'l' को ही अनुमति है।"
+                : "Under Rule 12 of LMPC Rules, 2011 and the Second Schedule of the Legal Metrology Act, 2009, colloquial unit symbols such as `gms`, `gm`, `ML`, `ltrs` are prohibited. Standard SI units `g`, `kg`, `ml`, `l` must be enforced."}
             </p>
           </div>
 

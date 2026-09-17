@@ -205,7 +205,7 @@ export const Landing: React.FC = () => {
                 <p className="text-xs sm:text-[13.5px] font-medium text-slate-100 max-w-3xl mx-auto leading-relaxed animate-fade-up px-2 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
                   {t(
                     "hero.description",
-                    "Rule 6 Mandatory Declarations & Table-I Schedule Verification under Legal Metrology Act, 2009 with Section 63 BSA 2023 Tamper-Evident Certificates for Enforcement Officers."
+                    "Rule 6 Mandatory Declarations & Table-I Schedule Verification under Legal Metrology (PC) Rules, 2011 & LM Act, 2009 with Section 63 BSA 2023 Tamper-Evident Certificates for Enforcement Officers."
                   )}
                 </p>
               </div>

@@ -360,7 +360,7 @@ export const Dashboard: React.FC = () => {
           trend={language === "hi" ? `+${metrics.recent} इस सप्ताह` : `+${metrics.recent} this week`}
           trendPositive={metrics.recent > 0}
           subtext={t("metric.total_sub", "Recorded across all circles")}
-          statutoryCitation={language === "hi" ? "विधिक माप अधिनियम, 2009 की धारा 15 पंजी" : "Sec. 15 Legal Metrology Act, 2009 Register"}
+          statutoryCitation={language === "hi" ? "एलएमपीसी नियम, 2011 व धारा 15 पंजी" : "LMPC Rules, 2011 & Sec. 15 Register"}
           icon={<img src="/assets/gov/doca_legal_metrology_seal.svg" alt="Directorate Seal" className="w-6 h-6 object-contain" />}
           tone="normal"
           onClick={() => navigate("/inspections")}

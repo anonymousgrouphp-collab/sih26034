@@ -117,8 +117,8 @@ export const OfficerAdjudicationModal: React.FC<OfficerAdjudicationModalProps> =
           </div>
           <p className="text-[11px] text-slate-600">
             {language === "hi"
-              ? "स्वचालित निष्कर्ष केवल संवर्धित नैदानिक अनुशंसा हैं। विधिक मापविज्ञान अधिनियम, 2009 की धारा 15 के अंतर्गत अंतिम निर्णय का सांविधिक अधिकार केवल जांच अधिकारी के पास सुरक्षित है।"
-              : "Automated findings serve strictly as an augmented diagnostic recommendation. The adjudicating officer holds sole statutory authority under Section 15 of the Legal Metrology Act, 2009."}
+              ? "स्वचालित निष्कर्ष केवल संवर्धित नैदानिक अनुशंसा हैं। विधिक मापविज्ञान (पैकेज्ड वस्तुएं) नियम, 2011 एवं अधिनियम, 2009 की धारा 15 के अंतर्गत अंतिम निर्णय का सांविधिक अधिकार केवल जांच अधिकारी के पास सुरक्षित है।"
+              : "Automated findings serve strictly as an augmented diagnostic recommendation. The adjudicating officer holds sole statutory authority under LMPC Rules, 2011 & Section 15 of the Legal Metrology Act, 2009."}
           </p>
         </div>
 

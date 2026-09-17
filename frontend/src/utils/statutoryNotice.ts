@@ -70,7 +70,7 @@ export function extractStatutoryRecipient(caseData: InspectionCase): StatutoryRe
   if (!address) {
     address =
       caseData.premises_address ||
-      "Premises recorded during statutory inspection under Section 15 Legal Metrology Act, 2009";
+      "Premises recorded during statutory inspection under LMPC Rules, 2011 & Section 15 Legal Metrology Act, 2009";
   }
 
   // Clean formatting

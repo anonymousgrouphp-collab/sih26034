@@ -321,7 +321,7 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
               </span>
               <span className="text-slate-300">•</span>
               <span className="text-[10px] text-slate-500 font-mono">
-                {language === "hi" ? "धारा 15 विधिक मापविज्ञान अधिनियम 2009" : "Sec 15 LM Act 2009"}
+                {language === "hi" ? "एलएमपीसी नियम, 2011 • धारा 15 एलएम अधिनियम, 2009" : "LMPC Rules, 2011 • Sec 15 LM Act, 2009"}
               </span>
             </div>
             <div className="flex items-center gap-2 min-w-0 flex-wrap">

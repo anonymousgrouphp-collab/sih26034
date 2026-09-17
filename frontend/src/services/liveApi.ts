@@ -400,7 +400,7 @@ export class LiveApiService implements IInspectionApiService {
                   required_value: f.prescribed,
                   measured_value: f.observed,
                   discrepancy: f.discrepancy || f.prescribed,
-                  legal_consequence: f.section || "Section 36(1) LM Act 2009",
+                  legal_consequence: f.section || "Section 36(1) LM Act, 2009 & LMPC Rules, 2011",
                 })),
                 audit_trail: [],
                 is_mock_fixture: false,
@@ -554,7 +554,7 @@ export class LiveApiService implements IInspectionApiService {
               required_value: e.expected || e.required_value || "Statutory threshold",
               measured_value: e.actual || e.measured_value || "Observed value",
               discrepancy: e.discrepancy,
-              legal_consequence: e.legal_consequence || "Section 36(1) LM Act 2009",
+              legal_consequence: e.legal_consequence || "Section 36(1) LM Act, 2009 & LMPC Rules, 2011",
             }))
           : (cached?.rule_evaluations || []),
         audit_trail: (data.audit_trail || []).map((a: any, idx: number) => ({

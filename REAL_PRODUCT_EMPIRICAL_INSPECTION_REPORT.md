@@ -1,5 +1,5 @@
 # NIRIKSHAK (निरीक्षक) — Official Physical Product Empirical Verification & Metrology Audit Report
-## विधिक मापविज्ञान (पैक्ड कमोडिटीज़) अधिनियम, 2009 एवं नियम, 2011 के अंतर्गत व्यापक भौतिक उत्पाद निरीक्षण एवं तकनीकी मूल्यांकन प्रतिवेदन
+## विधिक मापविज्ञान अधिनियम, 2009 एवं विधिक मापविज्ञान (पैकेज्ड वस्तुएं) नियम, 2011 के अंतर्गत व्यापक भौतिक उत्पाद निरीक्षण एवं तकनीकी मूल्यांकन प्रतिवेदन
 
 **Statutory Authority:** Department of Consumer Affairs (DoCA), Ministry of Consumer Affairs, Food & Public Distribution, Government of India  
 **Legal Framework:** 

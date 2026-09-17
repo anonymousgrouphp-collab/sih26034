@@ -126,7 +126,7 @@ class Form1NoticePDFGenerator:
             bottomMargin=12 * mm,
             title=f"Statutory Notice (Form-1) - {notice_ref}",
             author="Department of Consumer Affairs - Legal Metrology Division",
-            subject="Statutory Inspection Notice & Deficit Memorandum under Legal Metrology Act, 2009",
+            subject="Statutory Inspection Notice & Deficit Memorandum under LMPC Rules, 2011 & Legal Metrology Act, 2009",
             creator="Nirikshak Legal Metrology Enforcement System (DoCA)",
         )
 

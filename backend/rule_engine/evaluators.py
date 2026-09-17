@@ -286,8 +286,8 @@ class Rule6DeclarationsEvaluator:
             banned_sym = banned_unit_found or unit
             return {
                 "rule_code": "RULE_06_1_F_NET_QUANTITY",
-                "statutory_reference": "Rule 6(1)(f) read with Rule 12 & Section 11 LM Act, 2009",
-                "citation": "Rule 6(1)(f) read with Section 11 LM Act 2009",
+                "statutory_reference": "Rule 6(1)(f) read with Rule 12 LMPC Rules, 2011 & Section 11 LM Act, 2009",
+                "citation": "Rule 6(1)(f) read with Rule 12 LMPC Rules 2011 & Section 11 LM Act 2009",
                 "status": "FAIL",
                 "severity": "CRITICAL",
                 "required_value": "Strict standard SI unit (e.g. 'g', 'kg', 'ml', 'l')",

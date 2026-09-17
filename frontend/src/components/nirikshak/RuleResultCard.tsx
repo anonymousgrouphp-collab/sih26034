@@ -38,8 +38,8 @@ export const RuleResultCard: React.FC<RuleResultCardProps> = ({ rules, className
             </h3>
             <p className="text-[10px] text-slate-500">
               {language === "hi"
-                ? "एलएमपीसी नियम 2011 एवं विधिक मापविज्ञान अधिनियम 2009 के तहत मूल्यांकित"
-                : "Evaluated against LMPC Rules 2011 & Legal Metrology Act 2009"}
+                ? "एलएमपीसी नियम, 2011 एवं विधिक मापविज्ञान अधिनियम, 2009 के तहत मूल्यांकित"
+                : "Evaluated against LMPC Rules, 2011 & Legal Metrology Act, 2009"}
             </p>
           </div>
         </div>

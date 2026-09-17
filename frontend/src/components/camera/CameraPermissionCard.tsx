@@ -134,8 +134,8 @@ export const CameraPermissionCard: React.FC<CameraPermissionCardProps> = ({
             </h3>
             <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
               {language === "hi"
-                ? "विधिक मापविज्ञान अधिनियम, 2009 के तहत सांविधिक अनुपालन सत्यापन हेतु पैकेज्ड वस्तु एवं अरूको मार्कर का फोटो लेने के लिए कैमरा एक्सेस आवश्यक है।"
-                : "Camera access is needed to photograph the packaged commodity and ArUco fiducial marker for statutory compliance verification under the Legal Metrology Act, 2009."}
+                ? "विधिक मापविज्ञान (पैकेज्ड वस्तुएं) नियम, 2011 एवं अधिनियम, 2009 के तहत सांविधिक अनुपालन सत्यापन हेतु पैकेज्ड वस्तु एवं अरूको मार्कर का फोटो लेने के लिए कैमरा एक्सेस आवश्यक है।"
+                : "Camera access is needed to photograph the packaged commodity and ArUco fiducial marker for statutory compliance verification under the Legal Metrology (PC) Rules, 2011 & LM Act, 2009."}
             </p>
           </div>
 

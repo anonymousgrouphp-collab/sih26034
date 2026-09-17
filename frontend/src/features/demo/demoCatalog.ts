@@ -63,13 +63,13 @@ export const DEMO_SCENARIOS: DemoScenarioItem[] = [
     headlineViolationHi: "तालिका-I फॉन्ट कमी 1.84 मिमी बनाम 2.50 मिमी + प्रतिबंधित 'gms' इकाई",
     statutoryRules: [
       "Rule 6(1)(h) read with Table-I, G.S.R. 629(E)",
-      "Section 11 LM Act 2009 read with Rule 12 LMPC Rules 2011",
-      "Section 36(1) Legal Metrology Act 2009 (Misbranded Packaging)",
+      "Section 11 LM Act, 2009 read with Rule 12 LMPC Rules, 2011",
+      "Section 36(1) Legal Metrology Act, 2009 read with LMPC Rules, 2011",
     ],
     statutoryRulesHi: [
       "नियम 6(1)(h) सहपठित तालिका-I, जीएसआर 629(E)",
-      "धारा 11 एलएम अधिनियम 2009 सहपठित नियम 12",
-      "धारा 36(1) विधिक मापविज्ञान अधिनियम 2009 (मिथ्या छाप)",
+      "धारा 11 एलएम अधिनियम, 2009 सहपठित नियम 12 एलएमपीसी नियम, 2011",
+      "धारा 36(1) विधिक मापविज्ञान अधिनियम, 2009 सहपठित एलएमपीसी नियम, 2011",
     ],
     testedCapabilities: [
       "Optical Quality Gate (Sharpness & Exposure Verified)",
@@ -88,9 +88,9 @@ export const DEMO_SCENARIOS: DemoScenarioItem[] = [
       "धारा 63 बीएसए 2023 मर्कल प्रमाण एवं प्रपत्र-1 समझौता नोटिस",
     ],
     detailedRationale:
-      "Principal Display Panel area (144 cm²) falls within 100 < Area <= 500 cm² bracket, mandating minimum 2.50 mm numeral height under Table-I Row 3. Measured height is 1.84 mm (-26.4% deficit). In addition, using 'gms' instead of SI standard 'g' contravenes Section 11 of the LM Act 2009.",
+      "Principal Display Panel area (144 cm²) falls within 100 < Area <= 500 cm² bracket, mandating minimum 2.50 mm numeral height under Table-I Row 3. Measured height is 1.84 mm (-26.4% deficit). In addition, using 'gms' instead of SI standard 'g' contravenes Rule 12 of LMPC Rules, 2011 and Section 11 of the LM Act, 2009.",
     detailedRationaleHi:
-      "मुख्य प्रदर्शन पैनल क्षेत्रफल (144 सेमी²) 100 < क्षेत्रफल <= 500 सेमी² ब्रैकेट में आता है, जिसके अंतर्गत तालिका-I पंक्ति 3 के अनुसार न्यूनतम 2.50 मिमी अंक ऊंचाई अनिवार्य है। मापी गई ऊंचाई 1.84 मिमी (-26.4% कमी) है। साथ ही, मानक 'g' के स्थान पर 'gms' का प्रयोग धारा 11 का स्पष्ट उल्लंघन है।",
+      "मुख्य प्रदर्शन पैनल क्षेत्रफल (144 सेमी²) 100 < क्षेत्रफल <= 500 सेमी² ब्रैकेट में आता है, जिसके अंतर्गत तालिका-I पंक्ति 3 के अनुसार न्यूनतम 2.50 मिमी अंक ऊंचाई अनिवार्य है। मापी गई ऊंचाई 1.84 मिमी (-26.4% कमी) है। साथ ही, मानक 'g' के स्थान पर 'gms' का प्रयोग एलएमपीसी नियम, 2011 के नियम 12 एवं एलएम अधिनियम, 2009 की धारा 11 का स्पष्ट उल्लंघन है।",
     evaluatorGuide:
       "Inspect the calibrated packaging canvas to verify the red bounding box around '200 gms'. Note the 1.84 mm vs 2.50 mm deficit in the rule card, and click 'Generate Form-1 Notice' to view the automated compounding notice.",
     evaluatorGuideHi:
@@ -121,12 +121,12 @@ export const DEMO_SCENARIOS: DemoScenarioItem[] = [
     statutoryRules: [
       "Rule 6(1)(e) read with GSR 779(E) (Unit Sale Price Mandate)",
       "Rule 6(1)(ab) Consumer Care Details Mandate (Missing Email)",
-      "Section 36(1) LM Act 2009",
+      "Section 36(1) LM Act, 2009 & LMPC Rules, 2011",
     ],
     statutoryRulesHi: [
       "नियम 6(1)(e) सहपठित जीएसआर 779(E) (इकाई विक्रय मूल्य)",
       "नियम 6(1)(ab) उपभोक्ता सेवा विवरण (ईमेल अनुपस्थित)",
-      "धारा 36(1) विधिक मापविज्ञान अधिनियम 2009",
+      "धारा 36(1) विधिक मापविज्ञान अधिनियम, 2009 एवं एलएमपीसी नियम, 2011",
     ],
     testedCapabilities: [
       "Unit Sale Price (USP) Mathematical Verification Engine",
@@ -177,13 +177,13 @@ export const DEMO_SCENARIOS: DemoScenarioItem[] = [
       "Rule 6(1) Complete Mandatory Declarations Verified",
       "Rule 6(1)(h) Table-I Row 3 (Observed 3.10 mm >= 2.50 mm)",
       "Rule 6(1)(e) USP Consistent (₹20.00 / L)",
-      "Section 11 LM Act 2009 (Standard SI unit 'L' verified)",
+      "Section 11 LM Act, 2009 & Rule 12 LMPC Rules, 2011 (Standard SI unit 'L' verified)",
     ],
     statutoryRulesHi: [
       "नियम 6(1) संपूर्ण अनिवार्य घोषणाएं सत्यापित",
       "नियम 6(1)(h) तालिका-I पंक्ति 3 (प्रेक्षित 3.10 मिमी >= 2.50 मिमी)",
       "नियम 6(1)(e) यूएसपी सुसंगत (₹20.00 / L)",
-      "धारा 11 एलएम अधिनियम 2009 (मानक एसआई मात्रक 'L' सत्यापित)",
+      "धारा 11 एलएम अधिनियम, 2009 व नियम 12 एलएमपीसी नियम, 2011 (मानक एसआई मात्रक 'L' सत्यापित)",
     ],
     testedCapabilities: [
       "Cylindrical Packaging Surface Area Geometry Calculation",
@@ -336,14 +336,14 @@ export const DEMO_SCENARIOS: DemoScenarioItem[] = [
     headlineViolation: "Rule 6(10) / GSR 594(E) Missing Mandatory Country of Origin Declaration",
     headlineViolationHi: "नियम 6(10) / जीएसआर 594(E) अनिवार्य मूल देश घोषणा अनुपस्थित",
     statutoryRules: [
-      "Rule 6(10) read with Rule 6(1)(p) and G.S.R. 128(E)",
+      "Rule 6(10) read with Rule 6(1)(p) and G.S.R. 128(E) LMPC Rules, 2011",
       "Statutory Exemption for Mfg Date on digital listings (GSR 594(E))",
-      "Section 36(1) read with Section 49 Legal Metrology Act 2009",
+      "Section 36(1) read with Section 49 Legal Metrology Act, 2009 & LMPC Rules, 2011",
     ],
     statutoryRulesHi: [
-      "नियम 6(10) सहपठित नियम 6(1)(p) एवं जीएसआर 128(E)",
+      "नियम 6(10) सहपठित नियम 6(1)(p) एवं जीएसआर 128(E) एलएमपीसी नियम, 2011",
       "डिजिटल लिस्टिंग पर निर्माण तिथि हेतु सांविधिक छूट (जीएसआर 594(E))",
-      "धारा 36(1) सहपठित धारा 49 विधिक मापविज्ञान अधिनियम 2009",
+      "धारा 36(1) सहपठित धारा 49 विधिक मापविज्ञान अधिनियम, 2009 एवं एलएमपीसी नियम, 2011",
     ],
     testedCapabilities: [
       "E-Commerce Listing DOM & Snapshot Parsing Pipeline",

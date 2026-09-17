@@ -139,7 +139,7 @@ export const DICTIONARY: Record<string, TranslationEntry> = {
   },
   "hero.description": {
     en: "Empowering Legal Metrology Officers with automated optical quality gates, ArUco metric calibration, multilingual OCR (English + Hindi), Table-I numeral font schedule checks, and Section 63 BSA 2023 tamper-evident digital certificates.",
-    hi: "विधिक मापविज्ञान (पैकेज वस्तुएं) नियम, 2011, विधिक मापविज्ञान अधिनियम, 2009 तथा भारतीय साक्ष्य अधिनियम, 2023 की धारा 63 के अंतर्गत अधिकृत विधिक मापविज्ञान अधिकारियों (LMO) के लिए स्वचालित ऑप्टिकल गुणवत्ता जांच, ArUco मीट्रिक अंशांकन, बहुभाषी ओसीआर, तालिका-I फॉन्ट अनुसूची एवं डिजिटल साक्ष्य प्रमाणपत्र प्रणाली।",
+    hi: "विधिक मापविज्ञान (पैकेज्ड वस्तुएं) नियम, 2011, विधिक मापविज्ञान अधिनियम, 2009 तथा भारतीय साक्ष्य अधिनियम, 2023 की धारा 63 के अंतर्गत अधिकृत विधिक मापविज्ञान अधिकारियों (LMO) के लिए स्वचालित ऑप्टिकल गुणवत्ता जांच, ArUco मीट्रिक अंशांकन, बहुभाषी ओसीआर, तालिका-I फॉन्ट अनुसूची एवं डिजिटल साक्ष्य प्रमाणपत्र प्रणाली।",
   },
   "hero.cta_workstation": {
     en: "Launch Officer Workstation",
@@ -177,8 +177,8 @@ export const DICTIONARY: Record<string, TranslationEntry> = {
     hi: "उपभोक्ता मामले विभाग • विधिक मापविज्ञान प्रभाग",
   },
   "quote.mission_desc": {
-    en: "Ensuring fair measure in trade, statutory clarity in packaged commodities, and tamper-evident electronic evidence under the Legal Metrology Act, 2009.",
-    hi: "व्यापार में निष्पक्ष माप, पैकेज्ड वस्तुओं में विधिक स्पष्टता तथा विधिक मापविज्ञान अधिनियम, 2009 के तहत छेड़छाड़-मुक्त डिजिटल साक्ष्य सुनिश्चित करना।",
+    en: "Ensuring fair measure in trade, statutory clarity in packaged commodities, and tamper-evident electronic evidence under the Legal Metrology (PC) Rules, 2011 & LM Act, 2009.",
+    hi: "व्यापार में निष्पक्ष माप, पैकेज्ड वस्तुओं में विधिक स्पष्टता तथा विधिक मापविज्ञान (पैकेज्ड वस्तुएं) नियम, 2011 एवं विधिक मापविज्ञान अधिनियम, 2009 के तहत छेड़छाड़-मुक्त डिजिटल साक्ष्य सुनिश्चित करना।",
   },
   "quote.badge_usp": { en: "GSR 779(E) USP Mandate", hi: "GSR 779(E) यूएसपी अधिदेश" },
   "quote.badge_bsa": { en: "Section 63 BSA 2023 Evidence", hi: "धारा 63 बीएसए 2023 साक्ष्य" },
