@@ -158,6 +158,22 @@
   }
 }
 
+@keyframes scanline {
+  0% {
+    top: 0%;
+  }
+  50% {
+    top: 96%;
+  }
+  100% {
+    top: 0%;
+  }
+}
+
+.animate-scanline {
+  animation: scanline 2.2s ease-in-out infinite;
+}
+
 .animate-pulse-glow {
   animation: pulseGlow 4s ease-in-out infinite alternate;
 }

@@ -20,7 +20,8 @@ export type WorkflowStatus =
   | "OPEN"
   | "PROCESSING"
   | "PENDING_REVIEW"
-  | "COMPLETED";
+  | "COMPLETED"
+  | "ADJUDICATED";
 
 export type SeverityLevel = "CRITICAL" | "MAJOR" | "MINOR";
 
@@ -583,6 +584,15 @@ export interface IInspectionApiService {
   getAuditTrail(inspectionId: string): Promise<AuditEvent[]>;
   getCaseReadiness(inspectionId: string): Promise<CaseReadinessChecklist>;
   closeInspection(inspectionId: string, remarks?: string): Promise<InspectionCase>;
+  updateExtractedField?(
+    inspectionId: string,
+    fieldId: string,
+    payload: {
+      raw_ocr_text?: string;
+      measured_font_height_mm?: number;
+      normalized_data?: Record<string, any>;
+    }
+  ): Promise<InspectionCase>;
   getEvidenceDossier?(inspectionId: string): Promise<any>;
   deleteInspection?(inspectionId: string): Promise<{ success: boolean; message: string; deleted_id: string }>;
   generateNotice(payload: GenerateNoticePayload): Promise<LegalNoticeResult>;

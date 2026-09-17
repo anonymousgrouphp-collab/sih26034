@@ -11,7 +11,7 @@ services:
     environment:
       POSTGRES_DB: nyayadrishti
       POSTGRES_USER: nyaya_admin
-      POSTGRES_PASSWORD: StatutoryEnforcement@2026
+      POSTGRES_PASSWORD: StatutoryEnforcement2026
     ports:
       - "5432:5432"
     volumes:
@@ -34,8 +34,10 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    env_file:
+      - .env
     environment:
-      DATABASE_URL: postgresql://nyaya_admin:StatutoryEnforcement@2026@db:5432/nyayadrishti
+      DATABASE_URL: postgresql://nyaya_admin:StatutoryEnforcement2026@db:5432/nyayadrishti
       NIRIKSHAK_SECRET_KEY: Nirikshak-sec63-bsa2023-statutory-secret-key-prod-delhi-01
       PORT: 8000
       HOST: 0.0.0.0

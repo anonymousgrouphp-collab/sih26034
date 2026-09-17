@@ -147,7 +147,8 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({
     }
     if (raw.startsWith("uploads/202") || raw.startsWith("/uploads/202") || raw.startsWith("storage/uploads/202") || raw.startsWith("/storage/uploads/202")) {
       const clean = raw.replace(/^\/?(storage\/)?/, "");
-      return `https://ihqhfusgkullpbjfmjiy.supabase.co/storage/v1/object/public/evidence-images/${clean}`;
+      const supabaseBase = (((import.meta as any)?.env?.VITE_SUPABASE_URL as string) || "https://ihqhfusgkullpbjfmjiy.supabase.co").replace(/\/+$/, "");
+      return `${supabaseBase}/storage/v1/object/public/evidence-images/${clean}`;
     }
     if (raw.startsWith("/")) return raw;
     return raw ? `/storage/${raw}` : "";

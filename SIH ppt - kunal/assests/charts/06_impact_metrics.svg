@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 440" width="1200" height="440">
+  <rect width="1200" height="440" rx="14" fill="#0B192C"/>
+
+  <!-- Left Column: 4 Big Numbers -->
+  <g transform="translate(35, 30)">
+    <!-- Box 1 -->
+    <rect width="260" height="175" rx="10" fill="#1E293B" stroke="#334155"/>
+    <text x="130" y="60" fill="#F59E0B" font-family="Arial, sans-serif" font-size="44" font-weight="bold" text-anchor="middle">~13x</text>
+    <text x="130" y="95" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle">Throughput Gain</text>
+    <text x="130" y="125" fill="#94A3B8" font-family="Arial, sans-serif" font-size="12.5" text-anchor="middle">25 min manual audit</text>
+    <text x="130" y="145" fill="#38BDF8" font-family="Arial, sans-serif" font-size="13" font-weight="bold" text-anchor="middle">→ &lt; 2 min with NIRIKSHAK</text>
+
+    <!-- Box 2 -->
+    <g transform="translate(280, 0)">
+      <rect width="260" height="175" rx="10" fill="#1E293B" stroke="#334155"/>
+      <text x="130" y="60" fill="#38BDF8" font-family="Arial, sans-serif" font-size="44" font-weight="bold" text-anchor="middle">200+</text>
+      <text x="130" y="95" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle">Packages / Day</text>
+      <text x="130" y="125" fill="#94A3B8" font-family="Arial, sans-serif" font-size="12.5" text-anchor="middle">Officer daily capacity</text>
+      <text x="130" y="145" fill="#34D399" font-family="Arial, sans-serif" font-size="13" font-weight="bold" text-anchor="middle">vs 15-20 with calipers</text>
+    </g>
+
+    <!-- Box 3 -->
+    <g transform="translate(0, 195)">
+      <rect width="260" height="175" rx="10" fill="#1E293B" stroke="#334155"/>
+      <text x="130" y="60" fill="#34D399" font-family="Arial, sans-serif" font-size="44" font-weight="bold" text-anchor="middle">₹0</text>
+      <text x="130" y="95" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle">Cloud GPU Cost</text>
+      <text x="130" y="125" fill="#94A3B8" font-family="Arial, sans-serif" font-size="12.5" text-anchor="middle">INT8 ONNX CPU Execution</text>
+      <text x="130" y="145" fill="#FBBF24" font-family="Arial, sans-serif" font-size="13" font-weight="bold" text-anchor="middle">Runs on ₹10k hardware</text>
+    </g>
+
+    <!-- Box 4 -->
+    <g transform="translate(280, 195)">
+      <rect width="260" height="175" rx="10" fill="#1E293B" stroke="#334155"/>
+      <text x="130" y="60" fill="#F472B6" font-family="Arial, sans-serif" font-size="44" font-weight="bold" text-anchor="middle">0.01 mm</text>
+      <text x="130" y="95" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle">Vernier Parity Error</text>
+      <text x="130" y="125" fill="#94A3B8" font-family="Arial, sans-serif" font-size="12.5" text-anchor="middle">Physical caliper 1.47mm</text>
+      <text x="130" y="145" fill="#F87171" font-family="Arial, sans-serif" font-size="13" font-weight="bold" text-anchor="middle">vs NIRIKSHAK 1.46mm</text>
+    </g>
+  </g>
+
+  <!-- Right Column: 4-Stakeholder Value Framework -->
+  <g transform="translate(605, 30)">
+    <rect width="560" height="370" rx="12" fill="#1E293B" stroke="#38BDF8" stroke-width="2"/>
+    <rect width="560" height="48" rx="12" fill="#0F172A"/>
+    <text x="280" y="31" fill="#38BDF8" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle">MULTI-STAKEHOLDER GOVERNANCE VALUE</text>
+
+    <!-- Stakeholder 1 -->
+    <g transform="translate(25, 65)">
+      <rect width="510" height="65" rx="8" fill="#0F172A" stroke="#334155"/>
+      <text x="20" y="26" fill="#F59E0B" font-family="Arial, sans-serif" font-size="14" font-weight="bold">1. Legal Metrology Officers (Field Inspectors):</text>
+      <text x="20" y="48" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="12.5">90% reduction in inspection time; instant retake guidance; zero paper drafting.</text>
+    </g>
+    <!-- Stakeholder 2 -->
+    <g transform="translate(25, 140)">
+      <rect width="510" height="65" rx="8" fill="#0F172A" stroke="#334155"/>
+      <text x="20" y="26" fill="#38BDF8" font-family="Arial, sans-serif" font-size="14" font-weight="bold">2. Indian Consumers:</text>
+      <text x="20" y="48" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="12.5">Eliminates deceptive packaging, hidden taxes, and banned non-standard metric units.</text>
+    </g>
+    <!-- Stakeholder 3 -->
+    <g transform="translate(25, 215)">
+      <rect width="510" height="65" rx="8" fill="#0F172A" stroke="#334155"/>
+      <text x="20" y="26" fill="#34D399" font-family="Arial, sans-serif" font-size="14" font-weight="bold">3. Packaging Manufacturers &amp; MSMEs:</text>
+      <text x="20" y="48" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="12.5">Pre-compliance simulation saves crores in printed stock rejections &amp; recalls.</text>
+    </g>
+    <!-- Stakeholder 4 -->
+    <g transform="translate(25, 290)">
+      <rect width="510" height="65" rx="8" fill="#0F172A" stroke="#334155"/>
+      <text x="20" y="26" fill="#F87171" font-family="Arial, sans-serif" font-size="14" font-weight="bold">4. Judicial Magistrates &amp; Adjudicating Officers:</text>
+      <text x="20" y="48" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="12.5">Tamper-proof Section 63 BSA Merkle DAG evidence prevents courtroom dismissals.</text>
+    </g>
+  </g>
+</svg>

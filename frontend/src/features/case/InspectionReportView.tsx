@@ -8,6 +8,8 @@ import { useLanguage } from "../../context/LanguageContext";
 import { useAuth } from "../../context/AuthContext";
 import { ApiService } from "../../services/api";
 
+import { extractStatutoryRecipient } from "../../utils/statutoryNotice";
+
 interface InspectionReportViewProps {
   caseData: InspectionCase;
   onBackToWorkspace: () => void;
@@ -44,18 +46,20 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
   const handleDownloadPdf = async () => {
     setIsDownloading(true);
     try {
+      const recipient = extractStatutoryRecipient(caseData);
       const res = await ApiService.generateNotice({
         inspection_id: caseData.id,
         recipient: {
-          type: "MANUFACTURER",
-          name: caseData.manufacturer_name || caseData.establishment_name || "Responsible Enterprise / Manufacturer",
-          address: caseData.premises_address || "Premises recorded during statutory inspection",
+          type: recipient.type,
+          name: recipient.name,
+          address: recipient.address,
+          email: recipient.email,
         },
         compounding_fee_amount: 5000,
         reply_window_days: 15,
       });
 
-      if (res && res.pdf_download_url && res.pdf_download_url.startsWith("http") && res.pdf_download_url !== "/form1.pdf") {
+      if (res && res.pdf_download_url && res.pdf_download_url !== "/form1.pdf") {
         const filename = `Form-1-Notice-${caseData.inspection_number || caseData.id}.pdf`;
         const dlLink = document.createElement("a");
         dlLink.href = res.pdf_download_url;
@@ -668,8 +672,10 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
                 <span className="text-slate-500 block font-sans font-medium">
                   {language === "hi" ? "मर्कल लीफ नोड:" : "Merkle Leaf Node:"}
                 </span>
-                <span className="text-slate-900 truncate block font-bold">
-                  0x7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1f
+                <span className="text-slate-900 truncate block font-bold" title={caseData.bsa_certificate?.raw_images_merkle_root || primaryAsset?.raw_sha256}>
+                  {caseData.bsa_certificate?.raw_images_merkle_root
+                    ? caseData.bsa_certificate.raw_images_merkle_root.slice(0, 24) + "..."
+                    : (primaryAsset?.raw_sha256 ? primaryAsset.raw_sha256.slice(0, 24) + "..." : "Authentic DAG sealed")}
                 </span>
               </div>
               <div>

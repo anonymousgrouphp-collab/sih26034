@@ -77,14 +77,16 @@ export const ReviewQueue: React.FC = () => {
     return () => window.removeEventListener("nirikshak_data_updated", loadCases);
   }, []);
 
-  // Filter cases that require human attention (strictly review/pending/unable)
+  // Filter cases that require human attention (strictly unadjudicated review/pending/unable/fail violations)
   const reviewCases = useMemo(() => {
     return cases.filter(
       (c) =>
-        c.overall_status === "REVIEW" ||
-        c.overall_status === "UNABLE_TO_VERIFY" ||
-        c.overall_status === "PENDING_REVIEW" ||
-        c.overall_status === "PENDING"
+        !c.adjudicated &&
+        (c.overall_status === "REVIEW" ||
+          c.overall_status === "UNABLE_TO_VERIFY" ||
+          c.overall_status === "PENDING_REVIEW" ||
+          c.overall_status === "PENDING" ||
+          c.overall_status === "FAIL")
     );
   }, [cases]);
 
@@ -112,7 +114,8 @@ export const ReviewQueue: React.FC = () => {
         (c) =>
           c.overall_status === "REVIEW" ||
           c.overall_status === "PENDING_REVIEW" ||
-          c.overall_status === "PENDING"
+          c.overall_status === "PENDING" ||
+          c.overall_status === "FAIL"
       );
     } else if (triageFilter === "UNABLE") {
       result = result.filter((c) => c.overall_status === "UNABLE_TO_VERIFY");

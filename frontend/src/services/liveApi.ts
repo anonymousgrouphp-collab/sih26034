@@ -33,6 +33,7 @@ import {
 } from "../types/inspection";
 import { StorageService } from "./storage";
 import { computeCaseReadiness, deleteMockCase, getDeletedCaseIds, saveDeletedCaseId } from "./mockData";
+import { getClientTelemetryHeaders } from "../utils/clientDeviceInfo";
 
 export class LiveApiService implements IInspectionApiService {
   private static instance: LiveApiService;
@@ -52,6 +53,7 @@ export class LiveApiService implements IInspectionApiService {
     unified_facts?: any;
     panel_attribution?: any;
     merkle_root?: any;
+    adjudication?: OfficerDecision;
   }>();
 
   public static getInstance(): LiveApiService {
@@ -81,10 +83,14 @@ export class LiveApiService implements IInspectionApiService {
       return authPromise;
     }
 
-    const username = role === "controller" ? "controller_south" : "inspector_rajesh";
+    const env = (import.meta as any)?.env || {};
+    const configuredUser = (env.VITE_DEMO_OFFICER_USERNAME as string | undefined)?.trim();
+    const username =
+      role === "controller"
+        ? (configuredUser && !configuredUser.startsWith("inspector_") ? configuredUser : "controller_south")
+        : (configuredUser && configuredUser.startsWith("inspector_") ? configuredUser : "inspector_rajesh");
     // Demo officer password is environment-provided (.env.local, git-ignored) —
     // falls back to standard seeded demo password 'Officer@2026' when not explicitly overridden.
-    const env = (import.meta as any)?.env || {};
     const demoPassword = (env.VITE_DEMO_OFFICER_PASSWORD as string | undefined) || "Officer@2026";
     const newAuthPromise = (async () => {
       try {
@@ -93,7 +99,7 @@ export class LiveApiService implements IInspectionApiService {
           headers: {
             "Content-Type": "application/json",
             "X-Client-Version": "1.0.0-sih26034",
-            "X-Device-Fingerprint": "WEB-SPA-CLIENT-OFFICER-WORKSTATION",
+            ...getClientTelemetryHeaders(),
           },
           body: JSON.stringify({
             username,
@@ -139,7 +145,7 @@ export class LiveApiService implements IInspectionApiService {
 
     const baseHeaders: Record<string, string> = {
       "X-Client-Version": "1.0.0-sih26034",
-      "X-Device-Fingerprint": "WEB-SPA-CLIENT-OFFICER-WORKSTATION",
+      ...getClientTelemetryHeaders(),
       ...((options.headers as Record<string, string>) || {}),
     };
     if (token) {
@@ -167,7 +173,7 @@ export class LiveApiService implements IInspectionApiService {
   private getHeaders(): Record<string, string> {
     const headers: Record<string, string> = {
       "X-Client-Version": "1.0.0-sih26034",
-      "X-Device-Fingerprint": "WEB-SPA-CLIENT-OFFICER-WORKSTATION",
+      ...getClientTelemetryHeaders(),
     };
     const token = StorageService.getAuthToken();
     if (token) {
@@ -253,13 +259,13 @@ export class LiveApiService implements IInspectionApiService {
           brand_name: r.brand_name,
           category: r.category || "FOOD_SNACKS",
           package_type: r.package_type || "RECTANGULAR",
-          workflow_status: r.workflow_status || (r.adjudication_timestamp ? "COMPLETED" : "PENDING_REVIEW"),
+          workflow_status: (r.adjudication_timestamp || r.workflow_status === "COMPLETED" || r.workflow_status === "ADJUDICATED") ? "COMPLETED" : (r.workflow_status === "DRAFT" ? "DRAFT" : "PENDING_REVIEW"),
           overall_status: r.overall_status || "PENDING_REVIEW",
           ai_verdict: r.ai_verdict || "PENDING",
           jurisdiction_id: r.jurisdiction_id || "CIRCLE_DL_SOUTH_01",
           created_at: r.created_at || r.inspection_timestamp || new Date().toISOString(),
           violations_count: r.violations_count !== undefined ? r.violations_count : (r.overall_status === "FAIL" ? 1 : 0),
-          adjudicated: !!r.adjudication_timestamp,
+          adjudicated: !!r.adjudication_timestamp || r.workflow_status === "COMPLETED" || r.workflow_status === "ADJUDICATED",
           is_mock_fixture: r.is_mock_fixture ?? (r.id?.includes("demo") || r.inspection_number?.includes("demo")),
         }));
 
@@ -434,11 +440,13 @@ export class LiveApiService implements IInspectionApiService {
         product_name: insp.product_name,
         brand_name: insp.brand_name,
         manufacturer_name: insp.manufacturer_name,
+        declared_net_quantity: insp.declared_net_quantity || undefined,
         category: insp.category || "FOOD_SNACKS",
         package_type: insp.package_type || "RECTANGULAR",
         workflow_status:
-          insp.workflow_status ||
-          (insp.overall_status === "PENDING_REVIEW" ? "PENDING_REVIEW" : "COMPLETED"),
+          (insp.adjudication_timestamp || insp.workflow_status === "COMPLETED" || insp.workflow_status === "ADJUDICATED")
+            ? "COMPLETED"
+            : (insp.workflow_status === "DRAFT" ? "DRAFT" : "PENDING_REVIEW"),
         overall_status: insp.overall_status || "PENDING_REVIEW",
         ai_verdict: insp.ai_verdict || "PENDING",
         evidence_assets: (data.evidence_images || []).map((img: any, idx: number) => {
@@ -494,7 +502,8 @@ export class LiveApiService implements IInspectionApiService {
             resolvedPath = `${this.baseUrl}/evidence/image/${img.id}`;
           } else if (rawPath.startsWith("uploads/") || rawPath.startsWith("storage/uploads/") || rawPath.startsWith("/uploads/")) {
             const cleanPath = rawPath.replace(/^\/?(storage\/)?/, "");
-            resolvedPath = `https://ihqhfusgkullpbjfmjiy.supabase.co/storage/v1/object/public/evidence-images/${cleanPath}`;
+            const supabaseBase = (((import.meta as any)?.env?.VITE_SUPABASE_URL as string) || "https://ihqhfusgkullpbjfmjiy.supabase.co").replace(/\/+$/, "");
+            resolvedPath = `${supabaseBase}/storage/v1/object/public/evidence-images/${cleanPath}`;
           } else if (rawPath.startsWith("storage/")) {
             resolvedPath = `/${rawPath}`;
           } else if (rawPath.length > 0) {
@@ -562,6 +571,22 @@ export class LiveApiService implements IInspectionApiService {
           entry_hash: a.event_hash || a.entry_hash,
           metadata: a.payload || {},
         })),
+        adjudication: insp.adjudication_timestamp ? {
+          decision_id: `dec_${insp.id}`,
+          inspection_id: insp.id,
+          officer_id: insp.adjudication_officer_id || insp.officer_id || "INSP-DL-0842",
+          badge_number: insp.adjudication_officer_badge || cached?.adjudication?.badge_number || "DL-LM-0842",
+          officer_name: insp.adjudication_officer_name || cached?.adjudication?.officer_name || "Legal Metrology Officer",
+          verdict: (insp.overall_status === "FAIL" || (!insp.overall_status && insp.ai_verdict === "FAIL"))
+            ? "CONFIRM_VIOLATION"
+            : (insp.overall_status === "REVIEW" ? "REQUEST_RETEST" : "DISMISS_AS_COMPLIANT"),
+          override_applied: Boolean(insp.adjudication_override),
+          remarks: insp.adjudication_remarks || "Statutory adjudication recorded.",
+          timestamp_utc: insp.adjudication_timestamp,
+          action_order: (insp.overall_status === "FAIL" || (!insp.overall_status && insp.ai_verdict === "FAIL"))
+            ? "GENERATE_LEGAL_NOTICE_FORM_1"
+            : "CLOSE_INSPECTION_COMPLIANT",
+        } : (cached?.adjudication || undefined),
         principal_display_panel: cached?.principal_display_panel,
         evidence_graph: cached?.evidence_graph,
         bsa_certificate: cached?.bsa_certificate,
@@ -934,10 +959,10 @@ export class LiveApiService implements IInspectionApiService {
       }
 
       const data = await res.json();
-      return {
+      const decision: OfficerDecision = {
         decision_id: `dec_${inspectionId}`,
         inspection_id: inspectionId,
-        officer_id: "INSP-DL-0842",
+        officer_id: request.officer_id || "INSP-DL-0842",
         badge_number: data.adjudicated_by?.split(" ")[0] || "INSP-DL-0842",
         officer_name: data.adjudicated_by || "Inspecting Officer",
         verdict: request.adjudication_verdict,
@@ -946,6 +971,14 @@ export class LiveApiService implements IInspectionApiService {
         timestamp_utc: data.adjudicated_at || new Date().toISOString(),
         action_order: request.action_order,
       };
+
+      const prevCache = this.pipelineArtifactCache.get(inspectionId) || {};
+      this.pipelineArtifactCache.set(inspectionId, {
+        ...prevCache,
+        adjudication: decision,
+      });
+
+      return decision;
     } catch (e: any) {
       throw this.normalizeError(e, "Officer adjudication submission failed on live server.");
     }
@@ -1024,6 +1057,64 @@ export class LiveApiService implements IInspectionApiService {
     }
   }
 
+  public async updateExtractedField(
+    inspectionId: string,
+    fieldId: string,
+    payload: {
+      raw_ocr_text?: string;
+      measured_font_height_mm?: number;
+      normalized_data?: Record<string, any>;
+    }
+  ): Promise<InspectionCase> {
+    try {
+      const res = await this.fetchWithAuth(
+        `${this.baseUrl}/inspections/${encodeURIComponent(inspectionId)}/fields/${encodeURIComponent(fieldId)}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+      if (!res.ok) {
+        throw await res.json().catch(() => new Error(`HTTP ${res.status}`));
+      }
+
+      // Update in-memory artifact cache if populated
+      for (const [, cached] of this.pipelineArtifactCache.entries()) {
+        if (cached.extracted_fields) {
+          const target = cached.extracted_fields.find((f: any) => f.field_id === fieldId || f.id === fieldId);
+          if (target) {
+            if (payload.raw_ocr_text !== undefined) target.raw_ocr_text = payload.raw_ocr_text;
+            if (payload.measured_font_height_mm !== undefined) {
+              target.measured_font_height_mm = payload.measured_font_height_mm;
+              if (cached.rule_evaluations) {
+                const fontEvalIdx = cached.rule_evaluations.findIndex((e: any) =>
+                  e.rule_code === "RULE_06_1_H_NET_QTY_FONT" || e.rule_code?.includes("FONT")
+                );
+                if (fontEvalIdx >= 0) {
+                  const reqMatch = cached.rule_evaluations[fontEvalIdx].required_value?.match(/(\d+(?:\.\d+)?)\s*mm/);
+                  const reqH = reqMatch ? parseFloat(reqMatch[1]) : 4.0;
+                  const passed = payload.measured_font_height_mm >= reqH;
+                  cached.rule_evaluations[fontEvalIdx].measured_value = `${payload.measured_font_height_mm.toFixed(2)} mm`;
+                  cached.rule_evaluations[fontEvalIdx].status = passed ? "PASS" : "FAIL";
+                  cached.rule_evaluations[fontEvalIdx].discrepancy = passed
+                    ? undefined
+                    : `${(payload.measured_font_height_mm - reqH).toFixed(2)} mm`;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      return await this.getInspection(inspectionId);
+    } catch (e: any) {
+      throw this.normalizeError(e, `Failed to update extracted field '${fieldId}' on live server.`);
+    }
+  }
+
   public async generateNotice(payload: GenerateNoticePayload): Promise<LegalNoticeResult> {
     try {
       const res = await this.fetchWithAuth(
@@ -1035,7 +1126,7 @@ export class LiveApiService implements IInspectionApiService {
           },
           body: JSON.stringify(payload),
         },
-        "controller"
+        "inspector"
       );
 
       if (!res.ok) {
@@ -1056,15 +1147,8 @@ export class LiveApiService implements IInspectionApiService {
         pdf_download_url: pdfUrl,
       };
     } catch (e: any) {
-      console.warn("Live notice generation failed; returning statutory Form-1 resilient metadata:", e);
-      return {
-        notice_id: `not_${payload.inspection_id}_${Date.now()}`,
-        notice_reference_number: `LMO/DL/SOUTH/${new Date().toISOString().slice(0, 10).replace(/-/g, "")}/${Math.floor(1000 + Math.random() * 9000)}`,
-        bsa_certificate_number: `CERT-BSA2023-${Date.now()}`,
-        statutory_mandate: "Section 36(1) of Legal Metrology Act, 2009 read with Section 63 BSA 2023",
-        pdf_download_url: "",
-        merkle_entry_hash: "caa168e70f316cff972580d4575d2136ffd2b0800805672863f5c4175754d51c",
-      };
+      console.warn("Live notice generation failed on server:", e);
+      throw this.normalizeError(e, e?.detail || e?.message || "Form-1 statutory notice generation failed on live server.");
     }
   }
 

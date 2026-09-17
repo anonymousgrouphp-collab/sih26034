@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+  body { background: transparent; display: flex; justify-content: center; align-items: center; padding: 12px; }
+  .table-container {
+    width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+  .header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px;
+  }
+  .header-pill-left {
+    background: #FEE2E2;
+    color: #991B1B;
+    font-weight: 800;
+    font-size: 12px;
+    padding: 4px 14px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid #FCA5A5;
+  }
+  .header-vs {
+    font-weight: 900;
+    font-size: 13px;
+    color: #475569;
+  }
+  .header-pill-right {
+    background: #D1FAE5;
+    color: #065F46;
+    font-weight: 800;
+    font-size: 12px;
+    padding: 4px 14px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid #6EE7B7;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-left {
+    flex: 1;
+    background: #FFF5F5;
+    border: 1.5px solid #FECACA;
+    border-radius: 9px;
+    padding: 9px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-icon-bad {
+    color: #DC2626;
+    font-size: 16px;
+  }
+  .card-text {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #1E293B;
+    line-height: 1.25;
+  }
+  .arrow-connector {
+    color: #2563EB;
+    font-weight: 900;
+    font-size: 16px;
+    min-width: 20px;
+    text-align: center;
+  }
+  .card-right {
+    flex: 1.15;
+    background: #F0FDF4;
+    border: 1.5px solid #A7F3D0;
+    border-radius: 9px;
+    padding: 9px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-icon-good {
+    color: #16A34A;
+    font-size: 16px;
+  }
+  .card-text-good {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #064E3B;
+    line-height: 1.25;
+  }
+</style>
+</head>
+<body>
+<div class="table-container">
+  <div class="header-row">
+    <div class="header-pill-left">⚠️ Manual Field Risk</div>
+    <div class="header-vs">VS</div>
+    <div class="header-pill-right">✅ Nirikshak Solution</div>
+  </div>
+
+  <div class="row">
+    <div class="card-left">
+      <span class="card-icon-bad">⏱️</span>
+      <div class="card-text"><b>Endless Manual Delay:</b> 8–10 min per pack with magnifying lens</div>
+    </div>
+    <div class="arrow-connector">⇄</div>
+    <div class="card-right">
+      <span class="card-icon-good">⚡</span>
+      <div class="card-text-good"><b>30-Second Calibrated Audit:</b> Instant camera-to-docket processing</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="card-left">
+      <span class="card-icon-bad">🤖</span>
+      <div class="card-text"><b>AI Hallucinations:</b> Generic LLMs guess numbers & misread law</div>
+    </div>
+    <div class="arrow-connector">⇄</div>
+    <div class="card-right">
+      <span class="card-icon-good">⚖️</span>
+      <div class="card-text-good"><b>100% Deterministic AST:</b> Exact Gazette Table-I mathematical checks</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="card-left">
+      <span class="card-icon-bad">❌</span>
+      <div class="card-text"><b>Courtroom Dismissals:</b> Broken photo evidence chains in District Courts</div>
+    </div>
+    <div class="arrow-connector">⇄</div>
+    <div class="card-right">
+      <span class="card-icon-good">🔒</span>
+      <div class="card-text-good"><b>Sec. 63 BSA 2023 Proof:</b> Tamper-proof SHA-256 Merkle root in PDF</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="card-left">
+      <span class="card-icon-bad">📵</span>
+      <div class="card-text"><b>Rural Mandi Outages:</b> Remote inspection halts without internet</div>
+    </div>
+    <div class="arrow-connector">⇄</div>
+    <div class="card-right">
+      <span class="card-icon-good">📴</span>
+      <div class="card-text-good"><b>Mode B Edge CPU ONNX:</b> Air-gapped local SQLite with zero API cost</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

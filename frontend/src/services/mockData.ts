@@ -15,6 +15,7 @@ import {
   HandoffReadinessState,
   CaseReadinessChecklist,
 } from "../types/inspection";
+import { getDeviceModel, getDeviceOS } from "../utils/clientDeviceInfo";
 
 export const GOLDEN_SKU_CASES: Record<string, InspectionCase> = {
   "SKU-DEMO-01": {
@@ -242,8 +243,8 @@ export const GOLDEN_SKU_CASES: Record<string, InspectionCase> = {
       certificate_number: "CERT-BSA2023-20260910-B144",
       inspection_id: "insp_demo_01_biscuit",
       statutory_law_ref: "Section 63 of Bharatiya Sakshya Adhiniyam, 2023",
-      device_model: "Samsung Galaxy Tab Active4 Pro / Field Workstation",
-      operating_system: "Android 14 / Linux 6.1",
+      device_model: getDeviceModel(),
+      operating_system: getDeviceOS(),
       clock_source: "LOCAL_DEVICE_MONOTONIC",
       raw_images_merkle_root: "a3f5e1b2c4d6879012345678abcdef0123456789abcdef0123456789abcdef01",
       evidence_bundle_sha256: "9e7c5b2a10df840291abc09845ef1234908123456789abcdef0123456789abcd",

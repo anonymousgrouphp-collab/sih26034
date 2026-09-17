@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" width="1200" height="420">
+  <rect width="1200" height="420" rx="14" fill="#0F172A"/>
+
+  <!-- Root: NIRIKSHAK Statutory Rule Evaluation -->
+  <g transform="translate(380, 25)">
+    <rect width="440" height="65" rx="10" fill="#1E293B" stroke="#38BDF8" stroke-width="2"/>
+    <text x="220" y="28" fill="#38BDF8" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle">NIRIKSHAK DETERMINISTIC AST VERDICT</text>
+    <text x="220" y="50" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="13" text-anchor="middle">Evaluation Under Legal Metrology Act, 2009 &amp; PCR 2011</text>
+  </g>
+
+  <!-- Fork Lines -->
+  <path d="M 600,90 L 600,125 L 300,125 L 300,155" fill="none" stroke="#10B981" stroke-width="3"/>
+  <path d="M 600,90 L 600,125 L 900,125 L 900,155" fill="none" stroke="#EF4444" stroke-width="3"/>
+
+  <!-- Left Branch: Minor Technical Deficit -->
+  <g transform="translate(60, 155)">
+    <rect width="480" height="235" rx="12" fill="#1E293B" stroke="#10B981" stroke-width="2"/>
+    <rect width="480" height="45" rx="12" fill="#064E3B"/>
+    <text x="240" y="28" fill="#A7F3D0" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle">MINOR PROCEDURAL DEFICIT</text>
+    
+    <text x="30" y="75" fill="#E2E8F0" font-family="Arial, sans-serif" font-size="13.5" font-weight="bold">• Example Finding:</text>
+    <text x="45" y="98" fill="#94A3B8" font-family="Arial, sans-serif" font-size="13">Font height 1.46 mm vs 2.0 mm required (Himalaya Brahmi)</text>
+    
+    <rect x="25" y="115" width="430" height="65" rx="8" fill="#0F172A" stroke="#10B981" stroke-width="1.2"/>
+    <text x="240" y="140" fill="#34D399" font-family="Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle">15-Day Statutory Improvement Notice</text>
+    <text x="240" y="163" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle">₹0 Compounding Fee (Decriminalized)</text>
+    
+    <text x="240" y="205" fill="#A7F3D0" font-family="Arial, sans-serif" font-size="12" font-style="italic" text-anchor="middle">Sec. 36(1) proviso (Jan Vishwas Act 2023) — Protects Ease of Doing Business</text>
+  </g>
+
+  <!-- Right Branch: Substantive Violation -->
+  <g transform="translate(660, 155)">
+    <rect width="480" height="235" rx="12" fill="#1E293B" stroke="#EF4444" stroke-width="2"/>
+    <rect width="480" height="45" rx="12" fill="#7F1D1D"/>
+    <text x="240" y="28" fill="#FECACA" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle">SUBSTANTIVE FRAUD / OMISSION</text>
+    
+    <text x="30" y="75" fill="#E2E8F0" font-family="Arial, sans-serif" font-size="13.5" font-weight="bold">• Example Findings:</text>
+    <text x="45" y="98" fill="#94A3B8" font-family="Arial, sans-serif" font-size="13">Banned units (&apos;100ml.&apos;), missing tax clause, missing email</text>
+    
+    <rect x="25" y="115" width="430" height="65" rx="8" fill="#0F172A" stroke="#EF4444" stroke-width="1.2"/>
+    <text x="240" y="140" fill="#F87171" font-family="Arial, sans-serif" font-size="15" font-weight="bold" text-anchor="middle">Section 48 Civil Compounding Notice</text>
+    <text x="240" y="163" fill="#EF4444" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle">₹25,000 INR Penalty Imposed</text>
+    
+    <text x="240" y="205" fill="#FCA5A5" font-family="Arial, sans-serif" font-size="12" font-style="italic" text-anchor="middle">Sec. 48 LM Act 2009 — Immediate deterrence against deceptive packaging</text>
+  </g>
+</svg>

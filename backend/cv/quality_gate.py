@@ -19,7 +19,7 @@ import cv2
 import numpy as np
 
 # Dynamically locate repository root to import canonical contracts if available
-REPO_ROOT = Path(__file__).resolve().parent.parent.parent.parent
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
@@ -44,6 +44,8 @@ class QualityGateOutput:
     glare_percentage: float
     skew_angle_deg: float
     advice: Optional[str] = None
+    mean_luminance: Optional[float] = None
+    contrast_std: Optional[float] = None
 
     # QualityCheckDTO compatibility properties
     @property
@@ -78,23 +80,33 @@ class QualityGateOutput:
 
     def to_dict(self) -> Dict[str, Any]:
         """Serializes output to standard dictionary matching QualityGateResult."""
-        return {
+        res = {
             "passed": self.passed,
             "blur_variance": round(self.blur_variance, 2),
             "glare_percentage": round(self.glare_percentage, 2),
             "skew_angle_deg": round(self.skew_angle_deg, 2),
             "advice": self.advice,
         }
+        if self.mean_luminance is not None:
+            res["mean_luminance"] = round(self.mean_luminance, 2)
+        if self.contrast_std is not None:
+            res["contrast_std"] = round(self.contrast_std, 2)
+        return res
 
     def to_pipeline_dict(self) -> Dict[str, Any]:
         """Serializes output to dictionary matching QualityCheckDTO for pipeline adapters."""
-        return {
+        res = {
             "is_valid": self.passed,
             "laplacian_blur": round(self.blur_variance, 2),
             "glare_percentage": round(self.glare_percentage, 2),
             "tilt_angle_deg": round(self.skew_angle_deg, 2),
             "rejection_reason": self.advice,
         }
+        if self.mean_luminance is not None:
+            res["mean_luminance"] = round(self.mean_luminance, 2)
+        if self.contrast_std is not None:
+            res["contrast_std"] = round(self.contrast_std, 2)
+        return res
 
     def to_quality_gate_result(self) -> Any:
         """Returns canonical QualityGateResult Pydantic model instance."""
@@ -128,13 +140,21 @@ class QualityGateEvaluator:
     BLUR_THRESHOLD: float = 150.0
     GLARE_MAX_PERCENTAGE: float = 3.0
     TILT_MAX_DEG: float = 15.0
+    MIN_LUMINANCE: float = 38.0
+    MAX_LUMINANCE: float = 242.0
+    MIN_CONTRAST_STD: float = 16.0
 
     # Normalization target resolution for focus evaluation
     NORMALIZATION_MAX_DIM: int = 1920
 
     @classmethod
     def evaluate_metrics(
-        cls, blur_variance: float, glare_percentage: float, skew_angle_deg: float = 0.0
+        cls,
+        blur_variance: float,
+        glare_percentage: float,
+        skew_angle_deg: float = 0.0,
+        luminance_mean: Optional[float] = None,
+        contrast_std: Optional[float] = None,
     ) -> Tuple[bool, Optional[str]]:
         """Evaluates pre-computed optical metrics against statutory thresholds.
 
@@ -145,15 +165,28 @@ class QualityGateEvaluator:
         reasons = []
         if blur_variance < cls.BLUR_THRESHOLD:
             reasons.append(
-                f"IMAGE_BLURRED: Laplacian variance {blur_variance:.2f} is below threshold {cls.BLUR_THRESHOLD:.1f}. Hold steady and refocus."
+                f"IMAGE_BLURRED: Laplacian blur variance ({blur_variance:.1f}) is below threshold ({cls.BLUR_THRESHOLD:.1f}). Hold steady and refocus."
             )
         if glare_percentage > cls.GLARE_MAX_PERCENTAGE:
             reasons.append(
-                f"SPECULAR_GLARE: Glare coverage {glare_percentage:.2f}% exceeds maximum {cls.GLARE_MAX_PERCENTAGE:.1f}%. Adjust lighting or angle."
+                f"SPECULAR_GLARE: Specular glare coverage ({glare_percentage:.1f}%) exceeds maximum ({cls.GLARE_MAX_PERCENTAGE:.1f}%). Adjust lighting or camera angle."
             )
         if skew_angle_deg > cls.TILT_MAX_DEG:
             reasons.append(
-                f"EXCESSIVE_TILT: Skew angle {skew_angle_deg:.1f} deg exceeds maximum {cls.TILT_MAX_DEG:.1f} deg. Align camera perpendicular to label."
+                f"EXCESSIVE_TILT: Skew angle ({skew_angle_deg:.1f} deg) exceeds maximum ({cls.TILT_MAX_DEG:.1f} deg). Align camera perpendicular to label."
+            )
+        if luminance_mean is not None:
+            if luminance_mean < cls.MIN_LUMINANCE:
+                reasons.append(
+                    f"INSUFFICIENT_ILLUMINATION: Mean luminance ({luminance_mean:.1f}/255) is below threshold ({cls.MIN_LUMINANCE:.1f}). Image is underexposed / captured in low light. Please increase illumination."
+                )
+            elif luminance_mean > cls.MAX_LUMINANCE:
+                reasons.append(
+                    f"OVEREXPOSED: Mean luminance ({luminance_mean:.1f}/255) is washed out. Reduce intense direct light."
+                )
+        if contrast_std is not None and contrast_std < cls.MIN_CONTRAST_STD:
+            reasons.append(
+                f"LOW_CONTRAST: Image contrast standard deviation ({contrast_std:.1f}) is below threshold ({cls.MIN_CONTRAST_STD:.1f}). Label text cannot be reliably segmented."
             )
 
         if reasons:
@@ -391,7 +424,16 @@ class QualityGateEvaluator:
             except Exception:
                 pass
 
-        is_valid, advice = cls.evaluate_metrics(blur_variance, glare_percentage, effective_tilt)
+        luminance_mean = float(np.mean(norm_gray))
+        contrast_std = float(np.std(norm_gray))
+
+        is_valid, advice = cls.evaluate_metrics(
+            blur_variance,
+            glare_percentage,
+            effective_tilt,
+            luminance_mean=luminance_mean,
+            contrast_std=contrast_std,
+        )
 
         return QualityGateOutput(
             passed=is_valid,
@@ -399,4 +441,6 @@ class QualityGateEvaluator:
             glare_percentage=glare_percentage,
             skew_angle_deg=effective_tilt,
             advice=advice,
+            mean_luminance=luminance_mean,
+            contrast_std=contrast_std,
         )

@@ -22,6 +22,7 @@ import {
   findFindingsForToken,
 } from "./AdjudicationTraceability";
 import { ConflictResolutionCard, EvidenceConflict } from "./ConflictResolutionCard";
+import { extractStatutoryRecipient } from "../../utils/statutoryNotice";
 import { StateEmblem } from "../../components/common/StateEmblem";
 import { GovStampSeal } from "../../components/common/GovStampSeal";
 import { m } from "framer-motion";
@@ -33,6 +34,7 @@ interface AdjudicationCanvasProps {
   onRetakeRequested?: () => void;
   onSwitchToDiagnosticHUD?: () => void;
   conflicts?: EvidenceConflict[];
+  onFieldEdited?: (fieldId: string, newValue: string, newFontSizeMm?: number) => void;
 }
 
 export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
@@ -41,6 +43,7 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
   onRetakeRequested,
   onSwitchToDiagnosticHUD,
   conflicts: propsConflicts,
+  onFieldEdited,
 }) => {
   const { language } = useLanguage();
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
@@ -79,19 +82,15 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
   // Quick Form-1 Notice PDF Generation handler
   const handleQuickGenerateNotice = async () => {
     setIsGeneratingNotice(true);
-    setNoticeResultMsg(null);
     try {
+      const statutoryRecipient = extractStatutoryRecipient(caseData);
       const res = await ApiService.generateNotice({
         inspection_id: caseData.id,
-        recipient: {
-          type: "MANUFACTURER",
-          name: caseData.manufacturer_name || caseData.establishment_name || "Responsible Enterprise / Manufacturer",
-          address: caseData.premises_address || "Premises recorded during statutory inspection",
-        },
+        recipient: statutoryRecipient,
         compounding_fee_amount: 5000,
         reply_window_days: 15,
       });
-      if (res && res.pdf_download_url && res.pdf_download_url.startsWith("http") && res.pdf_download_url !== "/form1.pdf") {
+      if (res && res.pdf_download_url && res.pdf_download_url !== "/form1.pdf") {
         const filename = `Form-1-Notice-${caseData.inspection_number || caseData.id}.pdf`;
         const dlLink = document.createElement("a");
         dlLink.href = res.pdf_download_url;
@@ -572,6 +571,7 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
               onSelectToken={handleSelectToken}
               caseAdjudication={caseData.adjudication}
               findingAdjudication={selectedFinding ? caseData.finding_decisions?.[selectedFinding.finding_id] : undefined}
+              onFieldEdited={onFieldEdited}
             />
           )}
 

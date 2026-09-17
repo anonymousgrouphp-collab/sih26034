@@ -21,8 +21,10 @@ try:
     ONNX_AVAILABLE = True
 except ImportError:
     ONNX_AVAILABLE = False
-
-from polygon_normalizer import PolygonNormalizer
+try:
+    from backend.ocr.polygon_normalizer import PolygonNormalizer
+except ImportError:
+    from polygon_normalizer import PolygonNormalizer
 
 logger = logging.getLogger(__name__)
 

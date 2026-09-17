@@ -38,6 +38,7 @@ import { GovTopBar } from "../components/layout/GovTopBar";
 import { GovFooter } from "../components/layout/GovFooter";
 import { useLanguage } from "../context/LanguageContext";
 import { resetScrollToTop } from "../components/common/ScrollToTop";
+import { getClientTelemetryHeaders } from "../utils/clientDeviceInfo";
 
 type AuthMethod = "gov_id" | "meripehchaan" | "dsc";
 
@@ -46,10 +47,29 @@ export const Login: React.FC = () => {
   const navigate = useNavigate();
   const { language, t } = useLanguage();
 
+  const configuredUser = ((import.meta as any)?.env?.VITE_DEMO_OFFICER_USERNAME as string | undefined)?.trim();
+  const configuredPass = ((import.meta as any)?.env?.VITE_DEMO_OFFICER_PASSWORD as string | undefined)?.trim();
+  const initialRole: UserRole =
+    configuredUser === "controller_south"
+      ? "controller"
+      : configuredUser === "admin_central"
+      ? "administrator"
+      : configuredUser === "viewer_analyst"
+      ? "auditor"
+      : "inspector";
+  const initialEmail =
+    initialRole === "controller"
+      ? "controller.clm@nic.in"
+      : initialRole === "administrator"
+      ? "admin.metrology@nic.in"
+      : initialRole === "auditor"
+      ? "auditor.doca@nic.in"
+      : "inspector.lmo@nic.in";
+
   const [authMethod, setAuthMethod] = useState<AuthMethod>("gov_id");
-  const [selectedRole, setSelectedRole] = useState<UserRole>("inspector");
-  const [email, setEmail] = useState("inspector.lmo@nic.in");
-  const [password, setPassword] = useState("Demo@123");
+  const [selectedRole, setSelectedRole] = useState<UserRole>(initialRole);
+  const [email, setEmail] = useState(initialEmail);
+  const [password, setPassword] = useState(configuredPass || "Officer@2026");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberDevice, setRememberDevice] = useState(true);
   const [shiftDuration, setShiftDuration] = useState<"8h" | "incident">("8h");
@@ -69,7 +89,7 @@ export const Login: React.FC = () => {
     administrator: "+91 98710 33455",
     auditor: "+91 99551 22440",
   };
-  const [mobileOrVid, setMobileOrVid] = useState(cadrePhoneMap.inspector);
+  const [mobileOrVid, setMobileOrVid] = useState(cadrePhoneMap[initialRole] || cadrePhoneMap.inspector);
   const [otpSent, setOtpSent] = useState(false);
   const [otpDigits, setOtpDigits] = useState<string[]>(["", "", "", "", "", ""]);
   const [otpCountdown, setOtpCountdown] = useState(30);
@@ -269,8 +289,10 @@ export const Login: React.FC = () => {
       auditor: "viewer_analyst",
     };
     const username = usernameMap[role] || "inspector_rajesh";
+    const envPass = ((import.meta as any)?.env?.VITE_DEMO_OFFICER_PASSWORD as string | undefined)?.trim();
+    const defaultOfficerPass = envPass || "Officer@2026";
     const backendPassword =
-      !customPassword || customPassword === "Demo@123" ? "Officer@2026" : customPassword;
+      !customPassword || customPassword === "Demo@123" ? defaultOfficerPass : customPassword;
 
     const baseUrl = ((import.meta as any)?.env?.VITE_API_BASE_URL as string) || "/api/v1";
 
@@ -280,7 +302,7 @@ export const Login: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
           "X-Client-Version": "1.0.0-sih26034",
-          "X-Device-Fingerprint": "WEB-SPA-CLIENT-OFFICER-WORKSTATION",
+          ...getClientTelemetryHeaders(),
         },
         body: JSON.stringify({ username, password: backendPassword }),
       });

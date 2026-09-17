@@ -626,10 +626,19 @@ class FieldInspectorCLI:
             consumer_care_dict = facts.consumer_care.model_dump() if facts.consumer_care else None
             country_of_origin = facts.country_of_origin if facts.country_of_origin else None
             ocr_tokens_list = [{"field": rf.field_type, "value": rf.normalized_value or rf.raw_ocr_text, "confidence": rf.detection_confidence, "lang": "en"} for rf in facts.raw_fields]
+            # Prioritize Net Quantity declaration numeral height for Table-I schedule
+            nq_font = None
+            mrp_font = None
+            fallback_font = None
             for rf in facts.raw_fields:
                 if rf.measured_font_height_mm and rf.measured_font_height_mm > 0:
-                    font_mm = rf.measured_font_height_mm
-                    break
+                    if rf.field_type == "NET_QUANTITY":
+                        nq_font = rf.measured_font_height_mm
+                    elif rf.field_type == "MRP" and mrp_font is None:
+                        mrp_font = rf.measured_font_height_mm
+                    elif fallback_font is None:
+                        fallback_font = rf.measured_font_height_mm
+            font_mm = nq_font or mrp_font or fallback_font or font_mm
 
         # Stage 4: Rule Engine
         rule_results = LegalMetrologyRuleEngine.evaluate_inspection(

@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { RuleFinding, ExtractedField, OCRToken, OfficerDecision, FindingAdjudication } from "../../types/inspection";
 import { VerdictBadge } from "../../components/common/StatusBadge";
 import { useLanguage } from "../../context/LanguageContext";
+import { Edit3, Check, X } from "lucide-react";
 
 const DEVANAGARI_DIGITS_MAP: Record<string, string> = {
   "०": "0", "१": "1", "२": "2", "३": "3", "४": "4",
@@ -45,6 +46,7 @@ interface FieldDetailPanelProps {
   onSelectToken?: (tokenId: string) => void;
   findingAdjudication?: FindingAdjudication;
   caseAdjudication?: OfficerDecision;
+  onFieldEdited?: (fieldId: string, newValue: string, newFontSizeMm?: number) => void;
 }
 
 export const FieldDetailPanel: React.FC<FieldDetailPanelProps> = ({
@@ -54,8 +56,35 @@ export const FieldDetailPanel: React.FC<FieldDetailPanelProps> = ({
   onSelectToken,
   findingAdjudication,
   caseAdjudication,
+  onFieldEdited,
 }) => {
   const { language } = useLanguage();
+  const [isEditingField, setIsEditingField] = useState(false);
+  const [editText, setEditText] = useState("");
+  const [editFontSize, setEditFontSize] = useState("");
+
+  useEffect(() => {
+    setIsEditingField(false);
+    if (field) {
+      setEditText(field.raw_ocr_text);
+      setEditFontSize(field.measured_font_height_mm !== undefined ? String(field.measured_font_height_mm) : "");
+    }
+  }, [field?.field_id, field?.raw_ocr_text, field?.measured_font_height_mm]);
+
+  const handleStartEdit = () => {
+    if (!field) return;
+    setEditText(field.raw_ocr_text);
+    setEditFontSize(field.measured_font_height_mm !== undefined ? String(field.measured_font_height_mm) : "");
+    setIsEditingField(true);
+  };
+
+  const handleSaveEdit = () => {
+    if (!field || !onFieldEdited) return;
+    const parsedH = editFontSize.trim() ? parseFloat(editFontSize) : undefined;
+    const validH = (parsedH !== undefined && !isNaN(parsedH) && parsedH > 0) ? Number(parsedH.toFixed(2)) : undefined;
+    onFieldEdited(field.field_id, editText, validH);
+    setIsEditingField(false);
+  };
 
   if (!finding && !field && tokens.length === 0) {
     return (
@@ -374,18 +403,101 @@ export const FieldDetailPanel: React.FC<FieldDetailPanelProps> = ({
       {/* 4. Extracted Field Details (Rule 6 LMPC Declarations) */}
       {field && (
         <div className="space-y-2 text-xs">
-          <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-            {language === "hi" ? "अर्थगत निष्कर्षण अभिलेख" : "Semantic Extraction Record"}
-          </h4>
-          <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-2.5">
-            <div>
-              <span className="text-[10px] text-slate-500 font-bold block font-mono uppercase">
-                {language === "hi" ? "मूल ओसीआर पाठ (Raw Text)" : "Raw OCR Observed Text"}
-              </span>
-              <div className="p-2 bg-white rounded border border-slate-200 font-sans text-xs text-slate-900 font-medium shadow-2xs">
-                {field.raw_ocr_text}
+          <div className="flex items-center justify-between">
+            <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+              {language === "hi" ? "अर्थगत निष्कर्षण अभिलेख" : "Semantic Extraction Record"}
+            </h4>
+            {onFieldEdited && !isEditingField && (
+              <button
+                type="button"
+                onClick={handleStartEdit}
+                className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#1B365D] hover:underline px-2 py-0.5 rounded hover:bg-slate-100 transition-colors"
+              >
+                <Edit3 size={11} />
+                <span>{language === "hi" ? "पाठ व फ़ॉन्ट संशोधित करें" : "Edit Text & Font"}</span>
+              </button>
+            )}
+          </div>
+
+          {isEditingField ? (
+            <div className="bg-white p-3.5 rounded-lg border-2 border-[#1B365D]/20 shadow-xs space-y-3">
+              <div>
+                <label className="block text-[10px] font-bold text-slate-700 mb-1">
+                  {language === "hi" ? "घोषणा पाठ (संशोधन):" : "Declaration Text (Override):"}
+                </label>
+                {editText.length > 50 ? (
+                  <textarea
+                    rows={3}
+                    value={editText}
+                    onChange={(e) => setEditText(e.target.value)}
+                    className="w-full text-xs font-mono p-2 border border-slate-300 rounded focus:ring-2 focus:ring-[#1B365D] focus:border-transparent resize-y"
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    value={editText}
+                    onChange={(e) => setEditText(e.target.value)}
+                    className="w-full text-xs font-mono p-2 border border-slate-300 rounded focus:ring-2 focus:ring-[#1B365D] focus:border-transparent"
+                  />
+                )}
+              </div>
+
+              <div className="bg-slate-50 p-2.5 rounded border border-slate-200 flex items-center gap-3">
+                <div className="w-36">
+                  <label className="block text-[10px] font-bold text-slate-700 mb-1">
+                    {language === "hi" ? "फ़ॉन्ट ऊंचाई (मिमी):" : "Font Height (mm):"}
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0.1"
+                      max="100"
+                      value={editFontSize}
+                      onChange={(e) => setEditFontSize(e.target.value)}
+                      className="w-full text-xs font-mono p-1.5 pr-8 border border-slate-300 rounded bg-white"
+                      placeholder="e.g. 2.50"
+                    />
+                    <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 font-mono font-bold">
+                      mm
+                    </span>
+                  </div>
+                </div>
+                <div className="text-[10px] text-slate-500 leading-tight flex-1">
+                  {language === "hi"
+                    ? "तालिका-I अनुसूची अनुसार फ़ॉन्ट ऊंचाई संशोधित करें।"
+                    : "Override measured font height per Table-I schedule."}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-1 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsEditingField(false)}
+                  className="px-2.5 py-1 text-xs text-slate-500 hover:bg-slate-100 rounded"
+                >
+                  {language === "hi" ? "रद्द करें" : "Cancel"}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveEdit}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#1B365D] hover:bg-[#0A2540] text-white text-xs font-bold rounded shadow-xs"
+                >
+                  <Check size={12} />
+                  <span>{language === "hi" ? "सहेजें" : "Save Changes"}</span>
+                </button>
               </div>
             </div>
+          ) : (
+            <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-2.5">
+              <div>
+                <span className="text-[10px] text-slate-500 font-bold block font-mono uppercase">
+                  {language === "hi" ? "मूल ओसीआर पाठ (Raw Text)" : "Raw OCR Observed Text"}
+                </span>
+                <div className="p-2 bg-white rounded border border-slate-200 font-sans text-xs text-slate-900 font-medium shadow-2xs">
+                  {field.raw_ocr_text}
+                </div>
+              </div>
 
             {/* Devanagari Numeral Normalization Inspection */}
             {hasDevanagariNumerals(field.raw_ocr_text) && (
@@ -457,6 +569,7 @@ export const FieldDetailPanel: React.FC<FieldDetailPanelProps> = ({
               )}
             </div>
           </div>
+          )}
         </div>
       )}
 

@@ -6,6 +6,7 @@ import { VerdictBadge } from "../components/common/StatusBadge";
 import { useLanguage } from "../context/LanguageContext";
 import { useAuth } from "../context/AuthContext";
 import { getJurisdictionCircle } from "../context/CircleContext";
+import { extractStatutoryRecipient } from "../utils/statutoryNotice";
 import {
   ArrowLeft,
   Download,
@@ -174,16 +175,12 @@ export const EvidenceDossier: React.FC = () => {
       }
       const res = await ApiService.generateNotice({
         inspection_id: caseData.id,
-        recipient: {
-          type: "MANUFACTURER",
-          name: caseData.manufacturer_name || caseData.brand_name || "Responsible Enterprise",
-          address: caseData.premises_address || "Inspection location",
-        },
+        recipient: extractStatutoryRecipient(caseData),
         compounding_fee_amount: 5000,
         reply_window_days: 15,
       });
 
-      if (res && res.pdf_download_url && res.pdf_download_url.startsWith("http") && res.pdf_download_url !== "/form1.pdf") {
+      if (res && res.pdf_download_url && res.pdf_download_url !== "/form1.pdf") {
         const filename = `Form-1-Notice-${caseData.inspection_number || caseData.id}.pdf`;
         const dlLink = document.createElement("a");
         dlLink.href = res.pdf_download_url;

@@ -252,3 +252,197 @@ class PolygonNormalizer:
             crop = cv2.resize(crop, (scaled_width, target_height), interpolation=cv2.INTER_CUBIC)
 
         return crop
+
+    @classmethod
+    def compute_oriented_height(cls, polygon: List[List[Union[int, float]]]) -> float:
+        """Computes true perpendicular oriented character/line height of 4-point polygon.
+
+        Eliminates rotation/tilt inflation that occurs with axis-aligned bounding boxes.
+        Properly handles both horizontal and vertically-oriented packaging text lines.
+        Returns perpendicular height in pixels.
+        """
+        if len(polygon) != 4:
+            raise ValueError(f"Expected 4 points, got {len(polygon)}")
+
+        canonical_pts = cls.canonicalize_polygon(polygon)
+        src = np.array(canonical_pts, dtype=np.float32)
+
+        # Vector along top edge: TL -> TR
+        v_top = src[1] - src[0]
+        top_len = float(np.linalg.norm(v_top))
+
+        # Vector along bottom edge: BL -> BR
+        v_bot = src[2] - src[3]
+        bot_len = float(np.linalg.norm(v_bot))
+
+        # Left edge: TL -> BL
+        v_left = src[3] - src[0]
+        left_len = float(np.linalg.norm(v_left))
+
+        # Right edge: TR -> BR
+        v_right = src[2] - src[1]
+        right_len = float(np.linalg.norm(v_right))
+
+        ref_w = max(top_len, bot_len)
+        ref_h = max(left_len, right_len)
+
+        if ref_w < 1e-3 and ref_h < 1e-3:
+            return 1.0
+
+        # Normal to top edge (pointing down)
+        u_top = v_top / max(top_len, 1e-6)
+        n_top = np.array([-u_top[1], u_top[0]], dtype=np.float32)
+
+        h_left = float(abs(np.dot(v_left, n_top)))
+        h_right = float(abs(np.dot(v_right, n_top)))
+        perp_height = max(1.0, (h_left + h_right) / 2.0)
+
+        # Normal to left edge (pointing right)
+        u_left = v_left / max(left_len, 1e-6)
+        n_left = np.array([u_left[1], -u_left[0]], dtype=np.float32)
+        w_top = float(abs(np.dot(v_top, n_left)))
+        w_bot = float(abs(np.dot(v_bot, n_left)))
+        perp_width = max(1.0, (w_top + w_bot) / 2.0)
+
+        # If text line is oriented vertically (e.g. running down packaging height),
+        # character stroke height runs across the narrow dimension:
+        if perp_height > perp_width * 1.3:
+            oriented_height = perp_width
+        else:
+            oriented_height = perp_height
+
+        return float(round(oriented_height, 2))
+
+    @classmethod
+    def estimate_numeral_height_px(
+        cls,
+        text: str,
+        poly_height_px: float,
+        image_crop: Optional[np.ndarray] = None
+    ) -> float:
+        """Calculates true printed numeral/character glyph height in pixels from 1st principles.
+
+        Accounts for:
+        1. DBNet++ polygon expansion padding (Vatti unclip ratio 1.5 adds ~15-20% margin)
+        2. Typographic ascenders ('t', 'd', 'k', 'l') and descenders ('g', 'p', 'y', 'q', 'j')
+        3. Direct connected-component character glyph profiling on rectified image crop if provided
+        """
+        if poly_height_px <= 0:
+            return 1.0
+
+        # Method A: Direct connected-component character glyph profiling on image crop
+        if image_crop is not None and image_crop.size > 0 and image_crop.ndim >= 2:
+            try:
+                gray = cv2.cvtColor(image_crop, cv2.COLOR_BGR2GRAY) if image_crop.ndim == 3 else image_crop
+                crop_h, crop_w = gray.shape[:2]
+                if crop_h >= 12 and crop_w >= 16:
+                    # Detect ink polarity by comparing border luminance to interior luminance
+                    border_pixels = np.concatenate([gray[0, :], gray[-1, :], gray[:, 0], gray[:, -1]])
+                    bg_lum = float(np.median(border_pixels))
+                    center_lum = float(np.median(gray[crop_h // 4 : 3 * crop_h // 4, crop_w // 4 : 3 * crop_w // 4]))
+
+                    # Invert if light text on dark background
+                    if bg_lum < 120 and center_lum > bg_lum:
+                        proc_gray = cv2.bitwise_not(gray)
+                    else:
+                        proc_gray = gray
+
+                    # Otsu thresholding for stroke segmentation
+                    _, binary = cv2.threshold(proc_gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+
+                    # Extract connected components representing glyphs
+                    num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(binary, connectivity=8)
+                    char_heights = []
+
+                    for idx in range(1, num_labels):
+                        x, y, w, h, area = stats[idx]
+                        # Exclude borders, noise, diacritics, or connected line artifacts
+                        if area < 6 or w < 2 or h < 4:
+                            continue
+                        if h > 0.96 * crop_h and w > 0.85 * crop_w:
+                            continue
+                        # Valid character glyph criteria
+                        aspect = float(w) / float(max(1, h))
+                        if 0.10 <= aspect <= 2.5 and (0.25 * crop_h <= h <= 0.92 * crop_h):
+                            char_heights.append(float(h))
+
+                    if len(char_heights) >= 2:
+                        char_heights.sort()
+                        # Numeral / Cap height sits at the 75th percentile (above lowercase without ascenders)
+                        p75_idx = int(round(0.75 * (len(char_heights) - 1)))
+                        glyph_h_in_crop = char_heights[p75_idx]
+                        # Map back to original unscaled polygon height
+                        scale_factor = poly_height_px / float(crop_h)
+                        measured_numeral_px = glyph_h_in_crop * scale_factor
+                        # Bound within physically plausible range [0.45 * poly_h, 0.90 * poly_h]
+                        return float(round(max(0.45 * poly_height_px, min(0.90 * poly_height_px, measured_numeral_px)), 2))
+            except Exception:
+                pass
+
+        # Method B: Typographic First-Principles Ratio
+        # Derived from packaging typography standards (DIN 1451, Helvetica, Arial, Akzidenz-Grotesk):
+        clean_text = (text or "").strip()
+        if not clean_text:
+            return float(round(max(1.0, poly_height_px * 0.72), 2))
+
+        has_descender = any(c in clean_text for c in "gpyqj,;ç")
+        has_ascender = any(c in clean_text for c in "bdfhkltABCDEFGHIJKLMNÑOPQRSTUVWXYZ0123456789₹$€£")
+        is_pure_numeral = clean_text.replace(".", "").replace(",", "").replace("-", "").isdigit()
+        is_upper_or_num = bool(clean_text) and (clean_text.isupper() or all(c.isupper() or c.isdigit() or c.isspace() or c in "/.-₹" for c in clean_text))
+
+        if has_descender:
+            # Box contains cap height + descenders (0.25) + DBNet unclip expansion (0.30)
+            # True numeral height = box * (1.0 / 1.55) = box * 0.645
+            ratio = 0.65
+        elif is_pure_numeral:
+            # Pure numbers have no ascenders/descenders, only DBNet boundary margin
+            # True numeral height = box * 0.80
+            ratio = 0.80
+        elif is_upper_or_num:
+            # Capital letters and numerals with SI unit abbreviations (e.g. "NET WT 500 G", "100 ML")
+            # True numeral height = box * 0.76
+            ratio = 0.76
+        elif has_ascender:
+            # Mixed case with ascenders (e.g. "Net Wt", "Pack of")
+            # True numeral height = box * 0.70
+            ratio = 0.70
+        else:
+            # Default packaging line
+            ratio = 0.72
+
+        estimated_px = poly_height_px * ratio
+        return float(round(max(1.0, estimated_px), 2))
+
+    @classmethod
+    def compute_numeral_height_mm(
+        cls,
+        polygon: List[List[Union[int, float]]],
+        px_to_mm: float,
+        text: str = "",
+        image_crop: Optional[np.ndarray] = None
+    ) -> Tuple[Optional[float], Optional[float]]:
+        """Computes true physical numeral height in millimeters and measurement confidence.
+
+        Args:
+            polygon: 4-point bounding polygon in image coordinates.
+            px_to_mm: Metric calibration scale (pixels per millimeter).
+            text: Transcribed OCR text line (e.g. "Net Qty: 100 g").
+            image_crop: Optional perspective-rectified image patch for direct stroke profiling.
+
+        Returns:
+            Tuple[measured_height_mm, measurement_confidence]
+        """
+        if px_to_mm is None or px_to_mm <= 0:
+            return None, None
+
+        poly_height_px = cls.compute_oriented_height(polygon)
+        numeral_px = cls.estimate_numeral_height_px(text, poly_height_px, image_crop=image_crop)
+        height_mm = numeral_px / px_to_mm
+
+        # Confidence is higher for direct image crop analysis or high resolution
+        conf = 0.95 if image_crop is not None else 0.90
+        if poly_height_px < 8:
+            conf *= 0.80
+
+        return round(float(height_mm), 2), round(float(conf), 2)
+

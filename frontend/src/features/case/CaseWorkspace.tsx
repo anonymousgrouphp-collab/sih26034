@@ -14,6 +14,7 @@ import { InspectionReportView } from "./InspectionReportView";
 import { ApiService } from "../../services/api";
 import { DemoCaseTourBanner } from "../demo/DemoCaseTourBanner";
 import { resetScrollToTop } from "../../components/common/ScrollToTop";
+import { extractStatutoryRecipient } from "../../utils/statutoryNotice";
 import {
   CalibrationCard,
   MeasurementCard,
@@ -215,22 +216,106 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
     }
   };
 
+  // Handle manual officer override of extracted field text / font height
+  const handleFieldEdited = async (fieldId: string, newValue: string, newFontSizeMm?: number) => {
+    setActionError(null);
+    try {
+      const updated = await ApiService.updateExtractedField(caseData.id, fieldId, {
+        raw_ocr_text: newValue,
+        measured_font_height_mm: newFontSizeMm,
+      });
+      let finalUpdated = updated;
+      if (newFontSizeMm !== undefined && finalUpdated?.rule_evaluations) {
+        const netQtyEvalIdx = finalUpdated.rule_evaluations.findIndex(
+          (e) => e.rule_code === "RULE_06_1_H_NET_QTY_FONT" || e.rule_code.includes("FONT")
+        );
+        if (netQtyEvalIdx >= 0) {
+          const reqMatch = finalUpdated.rule_evaluations[netQtyEvalIdx].required_value?.match(/(\d+(?:\.\d+)?)\s*mm/);
+          const requiredH = reqMatch ? parseFloat(reqMatch[1]) : 4.0;
+          const passed = newFontSizeMm >= requiredH;
+          const evals = [...finalUpdated.rule_evaluations];
+          evals[netQtyEvalIdx] = {
+            ...evals[netQtyEvalIdx],
+            measured_value: `${newFontSizeMm.toFixed(2)} mm`,
+            status: passed ? "PASS" : "FAIL",
+            discrepancy: passed ? undefined : `${(newFontSizeMm - requiredH).toFixed(2)} mm`,
+          };
+          const hasFails = evals.some((e) => e.status === "FAIL");
+          finalUpdated = {
+            ...finalUpdated,
+            rule_evaluations: evals,
+            overall_status: hasFails ? "FAIL" : "PASS",
+            ai_verdict: hasFails ? "FAIL" : "PASS",
+          };
+        }
+      }
+      onCaseUpdated(finalUpdated);
+    } catch (err: any) {
+      console.warn("Failed to update extracted field via API, falling back to local update:", err);
+      // Optimistic local update
+      const updatedFields = (caseData.extracted_fields || []).map((f) => {
+        if (f.field_id === fieldId || (f as any).id === fieldId) {
+          return {
+            ...f,
+            raw_ocr_text: newValue,
+            measured_font_height_mm: newFontSizeMm !== undefined ? newFontSizeMm : f.measured_font_height_mm,
+          };
+        }
+        return f;
+      });
+
+      let evaluations = [...(caseData.rule_evaluations || [])];
+      const targetField = updatedFields.find((f) => f.field_id === fieldId || (f as any).id === fieldId);
+      if (
+        targetField &&
+        targetField.field_type === "NET_QUANTITY" &&
+        newFontSizeMm !== undefined
+      ) {
+        const netQtyEvalIdx = evaluations.findIndex((e) => e.rule_code === "RULE_06_1_H_NET_QTY_FONT");
+        if (netQtyEvalIdx >= 0) {
+          const requiredH = 4.0;
+          const passed = newFontSizeMm >= requiredH;
+          evaluations[netQtyEvalIdx] = {
+            ...evaluations[netQtyEvalIdx],
+            measured_value: `${newFontSizeMm.toFixed(2)} mm`,
+            status: passed ? "PASS" : "FAIL",
+            discrepancy: passed
+              ? undefined
+              : `${(newFontSizeMm - requiredH).toFixed(2)} mm (${((newFontSizeMm - requiredH) / requiredH * 100).toFixed(1)}%)`,
+          };
+        }
+      }
+
+      const hasFails = evaluations.some((e) => e.status === "FAIL");
+      const overallStatus = hasFails ? "FAIL" : "PASS";
+
+      onCaseUpdated({
+        ...caseData,
+        extracted_fields: updatedFields,
+        rule_evaluations: evaluations,
+        overall_status: overallStatus,
+        ai_verdict: overallStatus,
+      });
+    }
+  };
+
   // Quick Form-1 notice generation
   const handleQuickGenerateNotice = async () => {
     setIsGeneratingNotice(true);
-    setActionError(null);
     try {
+      const recipient = extractStatutoryRecipient(caseData);
       const res = await ApiService.generateNotice({
         inspection_id: caseData.id,
         recipient: {
-          type: "MANUFACTURER",
-          name: caseData.manufacturer_name || caseData.establishment_name || "Responsible Enterprise / Manufacturer",
-          address: caseData.premises_address || "Premises recorded during statutory inspection",
+          type: recipient.type,
+          name: recipient.name,
+          address: recipient.address,
+          email: recipient.email,
         },
         compounding_fee_amount: 5000,
         reply_window_days: 15,
       });
-      if (res && res.pdf_download_url && res.pdf_download_url.startsWith("http") && res.pdf_download_url !== "/form1.pdf") {
+      if (res && res.pdf_download_url && res.pdf_download_url !== "/form1.pdf") {
         const filename = `Form-1-Notice-${caseData.inspection_number || caseData.id}.pdf`;
         const dlLink = document.createElement("a");
         dlLink.href = res.pdf_download_url;
@@ -325,9 +410,10 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
 
   const pipelineSteps: PipelineStepItem[] = useMemo(() => {
     const hasEvidence = caseData.evidence_assets.length > 0;
+    const qualityEvaluated = hasEvidence && activeAsset?.quality_gate !== undefined;
     const qualityPassed = hasEvidence && activeAsset?.quality_gate?.passed !== false;
-    const hasOcr = Boolean(activeAsset?.ocr?.tokens?.length) || Boolean(caseData.rule_evaluations?.length);
     const hasCalibration = Boolean(calibrationData.available);
+    const hasOcr = Boolean(activeAsset?.ocr?.tokens?.length) || Boolean(caseData.extracted_fields?.length);
     const hasRules = Boolean(caseData.rule_evaluations && caseData.rule_evaluations.length > 0);
     const isAdjudicated =
       Boolean(caseData.adjudication) || caseData.workflow_status === "COMPLETED";
@@ -336,15 +422,23 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
       {
         id: "s1",
         label: language === "hi" ? "साक्ष्य अधिग्रहण" : "Evidence Capture",
-        description: qualityPassed
-          ? (language === "hi" ? "लाप्लासियन धुंधलापन व चमक जांच सफल" : "Laplacian blur & glare passed")
-          : hasEvidence
-          ? (language === "hi" ? "गुणवत्ता जांच में कमी" : "Quality check deficit")
+        description: hasEvidence
+          ? (language === "hi" ? `${caseData.evidence_assets.length} मूल साक्ष्य सुरक्षित` : `${caseData.evidence_assets.length} original assets sealed`)
           : (language === "hi" ? "पीडीपी फोटोग्राफ आवश्यक" : "PDP photograph required"),
-        status: qualityPassed ? "completed" : hasEvidence ? "failed" : "pending",
+        status: hasEvidence ? "completed" : "pending",
       },
       {
         id: "s2",
+        label: language === "hi" ? "गुणवत्ता द्वार" : "Quality Gate",
+        description: qualityPassed
+          ? (language === "hi" ? "धुंधलापन व चमक मानक सत्यापित" : "Laplacian blur & glare passed")
+          : qualityEvaluated
+          ? (language === "hi" ? "गुणवत्ता जांच में कमी (अस्वीकृत)" : "Optical quality gate rejected")
+          : (language === "hi" ? "गुणवत्ता परीक्षण प्रतीक्षारत" : "Optical audit pending"),
+        status: qualityPassed ? "completed" : qualityEvaluated ? "failed" : "pending",
+      },
+      {
+        id: "s3",
         label: language === "hi" ? "ऑप्टिकल अंशांकन" : "Optical Calibration",
         description: hasCalibration
           ? (language === "hi" ? "मीट्रिक पैमाना ट्रेसबिलिटी स्थापित" : "Metric scale traceability verified")
@@ -352,23 +446,23 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
         status: hasCalibration ? "completed" : "pending",
       },
       {
-        id: "s3",
+        id: "s4",
         label: language === "hi" ? "बहुभाषी ओसीआर" : "Multilingual OCR",
         description: hasOcr
-          ? (language === "hi" ? "पाठ निष्कर्षण पूर्ण" : "Statutory declarations detected")
+          ? (language === "hi" ? "सांविधिक घोषणाएं निष्कर्षित" : "Statutory declarations detected")
           : (language === "hi" ? "पाठ पहचान लंबित" : "Text detection pending"),
         status: hasOcr ? "completed" : "pending",
       },
       {
-        id: "s4",
+        id: "s5",
         label: language === "hi" ? "विधिक नियम सत्यापन" : "Statutory Rules",
         description: hasRules
-          ? (language === "hi" ? "एलएमपीसी नियम 2011 मूल्यांकन पूर्ण" : "LMPC Rules 2011 evaluated")
+          ? (language === "hi" ? "तालिका-I एवं एलएमपीसी 2011 सत्यापित" : "Table-I font schedule evaluated")
           : (language === "hi" ? "नियम जांच लंबित" : "Rule check pending"),
         status: hasRules ? "completed" : "pending",
       },
       {
-        id: "s5",
+        id: "s6",
         label: language === "hi" ? "अधिकारी न्यायनिर्णयन" : "Officer Adjudication",
         description: isAdjudicated
           ? (language === "hi" ? "विधिक आदेश जारी" : "Statutory action signed")
@@ -389,7 +483,8 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
       if (u.startsWith("uploads/") || u.startsWith("/uploads/")) {
         const clean = u.replace(/^\/?(storage\/)?/, "");
         if (clean.startsWith("uploads/202")) {
-          return imgId ? `${apiBase}/evidence/image/${imgId}` : `https://ihqhfusgkullpbjfmjiy.supabase.co/storage/v1/object/public/evidence-images/${clean}`;
+          const supabaseBase = (((import.meta as any)?.env?.VITE_SUPABASE_URL as string) || "https://ihqhfusgkullpbjfmjiy.supabase.co").replace(/\/+$/, "");
+          return imgId ? `${apiBase}/evidence/image/${imgId}` : `${supabaseBase}/storage/v1/object/public/evidence-images/${clean}`;
         }
         return `/storage/${clean}`;
       }
@@ -1019,6 +1114,9 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                     onFieldConfirmed={(fieldId) => {
                       console.log("Statutory field confirmed by officer:", fieldId);
                     }}
+                    onFieldEdited={(fieldId, newValue, newFontSizeMm) => {
+                      handleFieldEdited(fieldId, newValue, newFontSizeMm);
+                    }}
                   />
 
                   {/* Photogrammetric Calibrated Measurements */}
@@ -1175,6 +1273,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
               onAdjudicationSubmitted={handleAdjudicationSubmitted}
               onRetakeRequested={() => setIsRetakeMode(true)}
               onSwitchToDiagnosticHUD={() => setActiveWorkspaceView("HUD")}
+              onFieldEdited={handleFieldEdited}
             />
           ) : activeWorkspaceView === "OUTCOME" ? (
             /* View 4: Inspector Case Outcome Review */

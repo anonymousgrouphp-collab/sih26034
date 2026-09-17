@@ -11,13 +11,27 @@ import sys
 REPO_ROOT = Path(__file__).resolve().parent.parent
 BACKEND_DIR = REPO_ROOT / "backend"
 
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
 # Add each backend subdirectory (cv, ocr, extraction, rule_engine, evidence) to sys.path
 for subdir in BACKEND_DIR.iterdir():
     if subdir.is_dir() and str(subdir) not in sys.path:
         sys.path.insert(0, str(subdir))
 
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
+try:
+    from dotenv import load_dotenv
+    if (REPO_ROOT / ".env").exists():
+        load_dotenv(REPO_ROOT / ".env")
+    if (REPO_ROOT / ".env.local").exists():
+        load_dotenv(REPO_ROOT / ".env.local", override=True)
+    if (BACKEND_DIR / ".env").exists():
+        load_dotenv(BACKEND_DIR / ".env", override=True)
+    if (BACKEND_DIR / ".env.local").exists():
+        load_dotenv(BACKEND_DIR / ".env.local", override=True)
+    load_dotenv()
+except Exception:
+    pass
 
 # 2. Import FastAPI application from backend/evidence/server.py
 from server import app

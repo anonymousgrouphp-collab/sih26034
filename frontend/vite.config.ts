@@ -1,11 +1,29 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import basicSsl from '@vitejs/plugin-basic-ssl';
 import path from 'path';
 
-export default defineConfig(() => {
-  const isHttps = process.env.HTTPS === 'true' || process.argv.includes('--https');
-  const cdnUrl = process.env.CDN_URL || '/';
+export default defineConfig(({ mode }) => {
+  // Load environment variables from both frontend and project root directories
+  const env = {
+    ...process.env,
+    ...loadEnv(mode, path.resolve(__dirname, '..'), ''),
+    ...loadEnv(mode, path.resolve(__dirname), ''),
+  };
+
+  const isHttps = env.HTTPS === 'true' || process.argv.includes('--https');
+  const cdnUrl = env.CDN_URL || '/';
+
+  // In LIVE operating mode, default dev proxy routes to live Oracle Cloud VPS backend
+  // In LOCAL or MOCK modes, routes to local Python FastAPI server on 127.0.0.1:8000
+  const oracleHost = env.ORACLE_VM_HOST || '68.233.117.16';
+  const liveTarget = `http://${oracleHost}:8000`;
+  const defaultTarget = env.VITE_OPERATING_MODE === 'LIVE' ? liveTarget : 'http://127.0.0.1:8000';
+  const proxyTarget =
+    env.VITE_PROXY_TARGET ||
+    env.BACKEND_PROXY_TARGET ||
+    env.VITE_BACKEND_URL ||
+    defaultTarget;
 
   return {
     root: path.resolve(__dirname),
@@ -19,7 +37,7 @@ export default defineConfig(() => {
       host: true,
       proxy: {
         '/api': {
-          target: 'http://127.0.0.1:8000',
+          target: proxyTarget,
           changeOrigin: true,
         },
       },

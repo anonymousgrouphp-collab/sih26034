@@ -73,10 +73,12 @@ export const Dashboard: React.FC = () => {
     ).length;
     const pendingReview = cases.filter(
       (c) =>
-        c.overall_status === "REVIEW" ||
-        c.overall_status === "UNABLE_TO_VERIFY" ||
-        c.overall_status === "PENDING_REVIEW" ||
-        c.overall_status === "PENDING"
+        !c.adjudicated &&
+        (c.overall_status === "REVIEW" ||
+          c.overall_status === "UNABLE_TO_VERIFY" ||
+          c.overall_status === "PENDING_REVIEW" ||
+          c.overall_status === "PENDING" ||
+          c.overall_status === "FAIL")
     ).length;
 
     // Remaining edge cases if any
@@ -103,10 +105,12 @@ export const Dashboard: React.FC = () => {
     if (tableFilter === "REVIEW") {
       return cases.filter(
         (c) =>
-          c.overall_status === "REVIEW" ||
-          c.overall_status === "UNABLE_TO_VERIFY" ||
-          c.overall_status === "PENDING_REVIEW" ||
-          c.overall_status === "PENDING"
+          !c.adjudicated &&
+          (c.overall_status === "REVIEW" ||
+            c.overall_status === "UNABLE_TO_VERIFY" ||
+            c.overall_status === "PENDING_REVIEW" ||
+            c.overall_status === "PENDING" ||
+            c.overall_status === "FAIL")
       );
     }
     return cases;

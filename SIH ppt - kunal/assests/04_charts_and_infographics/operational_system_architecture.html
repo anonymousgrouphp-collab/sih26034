@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Operational System Architecture</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-900 text-white p-4 flex items-center justify-center min-h-screen">
+  <div class="w-[580px] bg-slate-800/90 border border-slate-700 rounded-2xl p-5 shadow-2xl flex flex-col gap-3">
+    
+    <!-- Header -->
+    <div class="flex items-center justify-between pb-2 border-b border-slate-700">
+      <div class="flex items-center gap-2">
+        <span class="text-xl">⚙️</span>
+        <div>
+          <h2 class="text-base font-bold text-sky-400 tracking-wide">OPERATIONAL SYSTEM ARCHITECTURE</h2>
+          <p class="text-xs text-slate-400">End-to-End Metrology & Deterministic Enforcement</p>
+        </div>
+      </div>
+      <span class="px-2.5 py-1 bg-sky-500/20 text-sky-300 border border-sky-500/40 rounded-full text-[10px] font-mono font-bold">100% DETERMINISTIC</span>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="bg-slate-800 border border-slate-600 rounded-xl p-3 flex items-start gap-3 relative">
+      <div class="w-8 h-8 rounded-lg bg-blue-500/20 border border-blue-400 flex items-center justify-center font-bold text-blue-400 text-sm shrink-0">1</div>
+      <div class="flex-1">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-bold text-white">Forensic Ingestion & Byte Lock</h3>
+          <span class="text-[10px] text-blue-300 font-mono bg-blue-900/60 px-2 py-0.5 rounded">SHA-256</span>
+        </div>
+        <p class="text-xs text-slate-300 mt-0.5">Captures 12MP+ raw frame, locks SHA-256 byte digest, records monotonic UTC clock & device telemetry.</p>
+      </div>
+    </div>
+
+    <!-- Connector -->
+    <div class="flex justify-center -my-1 text-sky-400 text-sm font-bold">↓</div>
+
+    <!-- Step 2 -->
+    <div class="bg-slate-800 border border-slate-600 rounded-xl p-3 flex items-start gap-3 relative">
+      <div class="w-8 h-8 rounded-lg bg-cyan-500/20 border border-cyan-400 flex items-center justify-center font-bold text-cyan-400 text-sm shrink-0">2</div>
+      <div class="flex-1">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-bold text-white">Quality Gate & Planar Calibration</h3>
+          <span class="text-[10px] text-cyan-300 font-mono bg-cyan-900/60 px-2 py-0.5 rounded">3×3 Homography H</span>
+        </div>
+        <p class="text-xs text-slate-300 mt-0.5">Laplacian blur screening (σ² ≥ 150). ArUco/ISO-7810 fiducial un-tilts surface up to 35°, resolving metric scale factor (px/mm).</p>
+      </div>
+    </div>
+
+    <!-- Connector -->
+    <div class="flex justify-center -my-1 text-sky-400 text-sm font-bold">↓</div>
+
+    <!-- Step 3 -->
+    <div class="bg-slate-800 border border-slate-600 rounded-xl p-3 flex items-start gap-3 relative">
+      <div class="w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-400 flex items-center justify-center font-bold text-indigo-400 text-sm shrink-0">3</div>
+      <div class="flex-1">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-bold text-white">Multilingual Neural Perception</h3>
+          <span class="text-[10px] text-indigo-300 font-mono bg-indigo-900/60 px-2 py-0.5 rounded">DBNet++ · PP-OCRv4</span>
+        </div>
+        <p class="text-xs text-slate-300 mt-0.5">DBNet++ detects oriented text bounding polygons. INT8 quantized PP-OCRv4 reads English & Devanagari Hindi (180ms CPU).</p>
+      </div>
+    </div>
+
+    <!-- Connector -->
+    <div class="flex justify-center -my-1 text-sky-400 text-sm font-bold">↓</div>
+
+    <!-- Step 4 -->
+    <div class="bg-slate-800 border border-slate-600 rounded-xl p-3 flex items-start gap-3 relative">
+      <div class="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-400 flex items-center justify-center font-bold text-amber-400 text-sm shrink-0">4</div>
+      <div class="flex-1">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-bold text-white">Metrological CCA & Statutory AST</h3>
+          <span class="text-[10px] text-amber-300 font-mono bg-amber-900/60 px-2 py-0.5 rounded">Table-I Gazette AST</span>
+        </div>
+        <p class="text-xs text-slate-300 mt-0.5">Connected Components Analysis measures numeral height (±0.08mm). AST engine evaluates Table-I font schedules & USP math.</p>
+      </div>
+    </div>
+
+    <!-- Connector -->
+    <div class="flex justify-center -my-1 text-sky-400 text-sm font-bold">↓</div>
+
+    <!-- Step 5 -->
+    <div class="bg-slate-800 border border-emerald-500/80 rounded-xl p-3 flex items-start gap-3 bg-emerald-950/20">
+      <div class="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-400 flex items-center justify-center font-bold text-emerald-400 text-sm shrink-0">5</div>
+      <div class="flex-1">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-bold text-emerald-300">Human Loupe Signoff & Form-1 Notice</h3>
+          <span class="text-[10px] text-emerald-300 font-mono bg-emerald-900/60 px-2 py-0.5 rounded">Sec 63 BSA 2023</span>
+        </div>
+        <p class="text-xs text-slate-300 mt-0.5">Officer reviews borderline findings on interactive split-canvas. 1-click generates court-admissible Form-1 notice with Merkle DAG root.</p>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

@@ -7,3 +7,4 @@ export * from "./InspectionVisionCanvas";
 export * from "./InspectionTable";
 export * from "./StatutoryDeclarationsCard";
 export * from "./StatutoryPipelineRail";
+export * from "./StatutoryPipelineModal";

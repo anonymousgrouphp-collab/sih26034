@@ -130,6 +130,101 @@ class CommodityFactExtractor:
 
         return None, None
 
+    @staticmethod
+    def compute_font_height(
+        bbox: List[int],
+        px_to_mm: Optional[float] = None,
+        tokens: Optional[List[Dict[str, Any]]] = None,
+        text: Optional[str] = None,
+        polygon: Optional[List[List[Union[int, float]]]] = None,
+        line_count: Optional[int] = None,
+        calib_confidence: Optional[float] = None,
+    ) -> Tuple[Optional[float], Optional[float]]:
+        """Compute measured font height in mm if px_to_mm is available.
+
+        Normalizes multi-line text blocks by line_count so entire paragraphs (e.g. addresses)
+        are not inflated into whole-block single-character font height.
+        """
+        if px_to_mm and px_to_mm > 0:
+            try:
+                from backend.ocr.polygon_normalizer import PolygonNormalizer
+            except ImportError:
+                try:
+                    from polygon_normalizer import PolygonNormalizer
+                except ImportError:
+                    PolygonNormalizer = None
+
+            # Determine effective line count for multi-line block normalization
+            n_lines = line_count if (line_count is not None and line_count > 0) else 1
+            if n_lines <= 1 and text:
+                split_lines = [l for l in text.splitlines() if l.strip()]
+                if len(split_lines) > 1:
+                    n_lines = len(split_lines)
+
+            # 1. Determine base oriented perpendicular pixel height
+            target_poly = polygon
+            numeral_token = None
+            if tokens:
+                for t in tokens:
+                    if isinstance(t, dict) and any(c.isdigit() for c in t.get("text", "")):
+                        numeral_token = t
+                        break
+
+            if numeral_token and numeral_token.get("polygon") and len(numeral_token["polygon"]) == 4:
+                target_poly = numeral_token["polygon"]
+            elif not target_poly and tokens:
+                for t in tokens:
+                    if isinstance(t, dict) and t.get("polygon") and len(t["polygon"]) == 4:
+                        target_poly = t["polygon"]
+                        break
+
+            if target_poly and len(target_poly) == 4 and PolygonNormalizer:
+                try:
+                    h_px = PolygonNormalizer.compute_oriented_height(target_poly)
+                except Exception:
+                    h_px = max(1.0, float(bbox[2] - bbox[0]))
+            elif numeral_token and numeral_token.get("bounding_box"):
+                nb = numeral_token["bounding_box"]
+                h_px = max(1.0, float(nb[2] - nb[0]))
+            elif tokens and len(tokens) > 0:
+                valid_token_heights = [
+                    float(t["bounding_box"][2] - t["bounding_box"][0])
+                    for t in tokens
+                    if isinstance(t, dict) and t.get("bounding_box") and len(t["bounding_box"]) == 4 and (t["bounding_box"][2] - t["bounding_box"][0]) > 0
+                ]
+                if valid_token_heights:
+                    h_px = float(sum(valid_token_heights) / len(valid_token_heights))
+                else:
+                    h_px = max(1.0, float(bbox[2] - bbox[0]))
+            else:
+                h_px = max(1.0, float(bbox[2] - bbox[0]))
+
+            # Normalize per line count where lines > 1 so an entire multi-line block's height
+            # is not computed as a single character font size
+            if n_lines > 1:
+                raw_block_h = float(bbox[2] - bbox[0])
+                if h_px >= raw_block_h * 0.7:
+                    h_px = max(1.0, h_px / n_lines)
+
+            # 2. Extract representative text (prefer numeral token text if available)
+            if numeral_token and numeral_token.get("text"):
+                cand_text = numeral_token.get("text")
+            else:
+                cand_text = text or ""
+                if not cand_text and tokens:
+                    cand_text = " ".join(t.get("text", "") for t in tokens if isinstance(t, dict))
+
+            # 3. Apply first-principles typographic numeral height adjustment
+            if PolygonNormalizer:
+                numeral_px = PolygonNormalizer.estimate_numeral_height_px(cand_text, h_px)
+            else:
+                numeral_px = h_px * 0.72
+
+            numeral_mm = numeral_px / px_to_mm
+            conf = calib_confidence if calib_confidence is not None else 0.95
+            return round(float(numeral_mm), 2), round(float(conf), 2)
+        return None, None
+
     def _normalize_tokens(self, ocr_data: Union[Dict[str, Any], Any]) -> Tuple[str, List[Dict[str, Any]], str]:
         """Extracts image_id, tokens list, and full_text from dict, DTO, string, or HTML DOM snapshot."""
         if isinstance(ocr_data, str):
@@ -210,6 +305,7 @@ class CommodityFactExtractor:
                 "text": t_text,
                 "confidence": conf,
                 "bounding_box": clean_bbox,
+                "polygon": t.get("polygon"),
             })
 
         # Fallback if dict has text/html content or arbitrary attributes but no pre-tokenized bounding boxes
@@ -555,6 +651,9 @@ class CommodityFactExtractor:
                 all_bboxes = [bl["bounding_box"] for bl in block_lines]
                 union_bbox = _compute_union_bbox(all_bboxes)
                 mean_conf = sum(bl["confidence"] for bl in block_lines) / len(block_lines)
+                all_tokens = []
+                for bl in block_lines:
+                    all_tokens.extend(bl.get("source_tokens", []))
 
                 blocks.append({
                     "role": role,
@@ -562,6 +661,8 @@ class CommodityFactExtractor:
                     "confidence": mean_conf,
                     "bounding_box": union_bbox,
                     "lines": block_lines,
+                    "tokens": all_tokens,
+                    "line_count": len(block_lines),
                 })
 
         return blocks
@@ -619,22 +720,23 @@ class CommodityFactExtractor:
         # If card tokens found, synthesize or expand the exclusion zone (seed tokens take precedence)
         card_exclusion_box = None
         if len(seed_card_tokens) >= 1:
-            s_ymin = min(t["bounding_box"][0] for t in seed_card_tokens)
-            s_xmin = min(t["bounding_box"][1] for t in seed_card_tokens)
-            s_ymax = max(t["bounding_box"][2] for t in seed_card_tokens)
-            s_xmax = max(t["bounding_box"][3] for t in seed_card_tokens)
-            pad_y = int((s_ymax - s_ymin) * 0.30)
-            pad_x = int((s_xmax - s_xmin) * 0.30)
-            card_exclusion_box = [s_ymin - pad_y, s_xmin - pad_x, s_ymax + pad_y, s_xmax + pad_x]
-        elif ref_card_box and len(ref_card_box) == 4:
-            pad_y = int((ref_card_box[2] - ref_card_box[0]) * 0.15)
-            pad_x = int((ref_card_box[3] - ref_card_box[1]) * 0.15)
-            card_exclusion_box = [
-                ref_card_box[0] - pad_y,
-                ref_card_box[1] - pad_x,
-                ref_card_box[2] + pad_y,
-                ref_card_box[3] + pad_x,
-            ]
+            if ref_card_box and len(ref_card_box) == 4:
+                pad_y = int((ref_card_box[2] - ref_card_box[0]) * 0.15)
+                pad_x = int((ref_card_box[3] - ref_card_box[1]) * 0.15)
+                card_exclusion_box = [
+                    ref_card_box[0] - pad_y,
+                    ref_card_box[1] - pad_x,
+                    ref_card_box[2] + pad_y,
+                    ref_card_box[3] + pad_x,
+                ]
+            else:
+                s_ymin = min(t["bounding_box"][0] for t in seed_card_tokens)
+                s_xmin = min(t["bounding_box"][1] for t in seed_card_tokens)
+                s_ymax = max(t["bounding_box"][2] for t in seed_card_tokens)
+                s_xmax = max(t["bounding_box"][3] for t in seed_card_tokens)
+                pad_y = int((s_ymax - s_ymin) * 0.30)
+                pad_x = int((s_xmax - s_xmin) * 0.30)
+                card_exclusion_box = [s_ymin - pad_y, s_xmin - pad_x, s_ymax + pad_y, s_xmax + pad_x]
 
         def is_card_noise_token(t_dict: Dict[str, Any]) -> bool:
             txt = str(t_dict.get("text", "")).lower()
@@ -694,15 +796,22 @@ class CommodityFactExtractor:
         raw_fields: List[ExtractedFieldDTO] = []
 
         # Helper to compute measured font height in mm if px_to_mm is available
-        def compute_font_height(bbox: List[int], tokens: Optional[List[Dict[str, Any]]] = None) -> Tuple[Optional[float], Optional[float]]:
-            if px_to_mm and px_to_mm > 0:
-                if tokens and len(tokens) > 0:
-                    h_px = sum(max(1, t["bounding_box"][2] - t["bounding_box"][0]) for t in tokens) / len(tokens)
-                else:
-                    h_px = max(1, bbox[2] - bbox[0])
-                conf = calib_confidence if calib_confidence is not None else 0.95
-                return round(h_px / px_to_mm, 2), round(conf, 2)
-            return None, None
+        def compute_font_height(
+            bbox: List[int],
+            tokens: Optional[List[Dict[str, Any]]] = None,
+            text: Optional[str] = None,
+            polygon: Optional[List[List[Union[int, float]]]] = None,
+            line_count: Optional[int] = None,
+        ) -> Tuple[Optional[float], Optional[float]]:
+            return CommodityFactExtractor.compute_font_height(
+                bbox=bbox,
+                px_to_mm=px_to_mm,
+                tokens=tokens,
+                text=text,
+                polygon=polygon,
+                line_count=line_count,
+                calib_confidence=calib_confidence,
+            )
 
         # 1. NET QUANTITY & BANNED UNITS
         qty_cand_explicit: Optional[Tuple[Dict[str, Any], Dict[str, Any]]] = None
@@ -728,7 +837,12 @@ class CommodityFactExtractor:
         if chosen_qty:
             parsed_qty, unit = chosen_qty
             extracted_net_qty = NetQuantityValue(**parsed_qty)
-            font_mm, font_conf = compute_font_height(unit["bounding_box"])
+            font_mm, font_conf = compute_font_height(
+                unit["bounding_box"],
+                unit.get("source_tokens") or unit.get("tokens"),
+                text=unit.get("text"),
+                polygon=unit.get("polygon")
+            )
             raw_fields.append(
                 ExtractedFieldDTO(
                     field_type="NET_QUANTITY",
@@ -774,7 +888,12 @@ class CommodityFactExtractor:
                     parsed_mrp["tax_inclusive"] = True
 
             extracted_mrp = MRPValue(**parsed_mrp)
-            font_mm, font_conf = compute_font_height(unit["bounding_box"])
+            font_mm, font_conf = compute_font_height(
+                unit["bounding_box"],
+                unit.get("source_tokens") or unit.get("tokens"),
+                text=unit.get("text"),
+                polygon=unit.get("polygon"),
+            )
             raw_fields.append(
                 ExtractedFieldDTO(
                     field_type="MRP",
@@ -794,7 +913,12 @@ class CommodityFactExtractor:
             parsed_usp = self.parser.parse_usp(text)
             if parsed_usp and extracted_usp is None:
                 extracted_usp = USPValue(**parsed_usp)
-                font_mm, font_conf = compute_font_height(unit["bounding_box"])
+                font_mm, font_conf = compute_font_height(
+                    unit["bounding_box"],
+                    unit.get("source_tokens") or unit.get("tokens"),
+                    text=unit.get("text"),
+                    polygon=unit.get("polygon"),
+                )
                 raw_fields.append(
                     ExtractedFieldDTO(
                         field_type="UNIT_SALE_PRICE",
@@ -831,7 +955,12 @@ class CommodityFactExtractor:
         for unit in text_units + composite_lines:
             text = unit["text"]
             parsed_dates = self.parser.parse_mfg_and_expiry_dates(text)
-            font_mm, font_conf = compute_font_height(unit["bounding_box"])
+            font_mm, font_conf = compute_font_height(
+                unit["bounding_box"],
+                unit.get("source_tokens") or unit.get("tokens"),
+                text=unit.get("text"),
+                polygon=unit.get("polygon"),
+            )
             has_mfg = bool(parsed_dates.get("mfg_month") or parsed_dates.get("mfg_year"))
             is_prefixed = bool(parsed_dates.get("has_mfg_prefix", False))
 
@@ -907,7 +1036,12 @@ class CommodityFactExtractor:
             origin = self.parser.parse_country_of_origin(text)
             if origin and extracted_origin is None:
                 extracted_origin = origin
-                font_mm, font_conf = compute_font_height(unit["bounding_box"])
+                font_mm, font_conf = compute_font_height(
+                    unit["bounding_box"],
+                    unit.get("source_tokens") or unit.get("tokens"),
+                    text=unit.get("text"),
+                    polygon=unit.get("polygon"),
+                )
                 raw_fields.append(
                     ExtractedFieldDTO(
                         field_type="COUNTRY_OF_ORIGIN",
@@ -948,8 +1082,13 @@ class CommodityFactExtractor:
             parsed_addr = self.parser.parse_address(block["text"])
             if parsed_addr:
                 addr_val = AddressValue(**parsed_addr)
-                role = block["role"]
-                font_mm, font_conf = compute_font_height(block["bounding_box"], block.get("tokens"))
+                role = block.get("role", "MANUFACTURER")
+                font_mm, font_conf = compute_font_height(
+                    block["bounding_box"],
+                    block.get("tokens"),
+                    text=block.get("text"),
+                    line_count=block.get("line_count", len(block.get("lines", []))),
+                )
 
                 if role == "MANUFACTURER_AND_PACKER":
                     if extracted_mfg is None or extracted_mfg == extracted_marketer:
@@ -1216,7 +1355,12 @@ class CommodityFactExtractor:
 
             care_bbox = _compute_union_bbox(care_bboxes) if care_bboxes else [0, 0, 0, 0]
             fake_tokens = [{"bounding_box": b} for b in care_bboxes]
-            font_mm, font_conf = compute_font_height(care_bbox, fake_tokens)
+            font_mm, font_conf = compute_font_height(
+                care_bbox,
+                fake_tokens,
+                text=full_text,
+                line_count=len(care_bboxes) if care_bboxes else 1,
+            )
 
             extracted_consumer_care = ConsumerCareValue(
                 contact_name=contact_name,
@@ -1351,6 +1495,10 @@ def main():
         print(f"  * Total Raw Fields Extracted: {len(facts.raw_fields)}")
 
     print(f"\n=== Verification Complete: All fixtures parsed into NormalizedCommodityFacts ===")
+
+
+# Module-level export for unit testing and backward compatibility
+compute_font_height = CommodityFactExtractor.compute_font_height
 
 
 if __name__ == "__main__":

@@ -22,7 +22,7 @@ import {
 interface StatutoryDeclarationsCardProps {
   fields: ExtractedField[];
   onFieldConfirmed?: (fieldId: string) => void;
-  onFieldEdited?: (fieldId: string, newValue: string) => void;
+  onFieldEdited?: (fieldId: string, newValue: string, newFontSizeMm?: number) => void;
   className?: string;
 }
 
@@ -123,7 +123,9 @@ export const StatutoryDeclarationsCard: React.FC<StatutoryDeclarationsCardProps>
   const [confirmedFields, setConfirmedFields] = useState<Record<string, boolean>>({});
   const [editingFieldId, setEditingFieldId] = useState<string | null>(null);
   const [editedValues, setEditedValues] = useState<Record<string, string>>({});
+  const [editedFontSizes, setEditedFontSizes] = useState<Record<string, number>>({});
   const [editInputValue, setEditInputValue] = useState("");
+  const [editFontSizeInput, setEditFontSizeInput] = useState("");
 
   const handleToggleConfirm = (fieldId: string) => {
     setConfirmedFields((prev) => ({
@@ -137,17 +139,33 @@ export const StatutoryDeclarationsCard: React.FC<StatutoryDeclarationsCardProps>
 
   const handleStartEdit = (field: ExtractedField) => {
     setEditingFieldId(field.field_id);
-    setEditInputValue(editedValues[field.field_id] || field.raw_ocr_text);
+    const currText = editedValues[field.field_id] !== undefined ? editedValues[field.field_id] : field.raw_ocr_text;
+    setEditInputValue(currText);
+    const currFontSize = editedFontSizes[field.field_id] !== undefined
+      ? editedFontSizes[field.field_id]
+      : field.measured_font_height_mm;
+    setEditFontSizeInput(currFontSize !== undefined ? String(currFontSize) : "");
   };
 
   const handleSaveEdit = (fieldId: string) => {
+    const parsedFontSize = editFontSizeInput.trim() ? parseFloat(editFontSizeInput) : undefined;
+    const validFontSize = (parsedFontSize !== undefined && !isNaN(parsedFontSize) && parsedFontSize > 0)
+      ? Number(parsedFontSize.toFixed(2))
+      : undefined;
+
     setEditedValues((prev) => ({
       ...prev,
       [fieldId]: editInputValue,
     }));
+    if (validFontSize !== undefined) {
+      setEditedFontSizes((prev) => ({
+        ...prev,
+        [fieldId]: validFontSize,
+      }));
+    }
     setEditingFieldId(null);
     if (onFieldEdited) {
-      onFieldEdited(fieldId, editInputValue);
+      onFieldEdited(fieldId, editInputValue, validFontSize);
     }
   };
 
@@ -209,7 +227,12 @@ export const StatutoryDeclarationsCard: React.FC<StatutoryDeclarationsCardProps>
 
             const isConfirmed = confirmedFields[field.field_id];
             const isEditing = editingFieldId === field.field_id;
-            const displayValue = editedValues[field.field_id] || field.raw_ocr_text;
+            const isTextOverridden = editedValues[field.field_id] !== undefined;
+            const isFontOverridden = editedFontSizes[field.field_id] !== undefined;
+            const displayValue = isTextOverridden ? editedValues[field.field_id] : field.raw_ocr_text;
+            const currentFontSize = isFontOverridden
+              ? editedFontSizes[field.field_id]
+              : field.measured_font_height_mm;
 
             // Simple heuristic to detect potential issues for the officer
             const hasPotentialIssue =
@@ -222,6 +245,8 @@ export const StatutoryDeclarationsCard: React.FC<StatutoryDeclarationsCardProps>
                 className={`p-3.5 rounded-xl border transition-all ${
                   isConfirmed
                     ? "border-emerald-200 bg-emerald-50/50"
+                    : (isTextOverridden || isFontOverridden)
+                    ? "border-amber-300 bg-amber-50/40"
                     : hasPotentialIssue
                     ? "border-rose-200 bg-rose-50/50"
                     : "border-slate-200 bg-slate-50/60 hover:bg-slate-50"
@@ -246,6 +271,11 @@ export const StatutoryDeclarationsCard: React.FC<StatutoryDeclarationsCardProps>
                         <CheckCircle2 size={11} className="text-emerald-600" />
                         <span>{language === "hi" ? "अधिकारी द्वारा पुष्ट" : "Officer Confirmed"}</span>
                       </span>
+                    ) : (isTextOverridden || isFontOverridden) ? (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
+                        <Edit3 size={10} className="text-amber-700" />
+                        <span>{language === "hi" ? "अधिकारी संशोधित" : "Officer Overridden"}</span>
+                      </span>
                     ) : hasPotentialIssue ? (
                       <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-300">
                         <AlertTriangle size={11} className="text-rose-600" />
@@ -261,16 +291,63 @@ export const StatutoryDeclarationsCard: React.FC<StatutoryDeclarationsCardProps>
 
                 {/* Declaration Content Area */}
                 {isEditing ? (
-                  <div className="space-y-2 mt-2">
-                    <input
-                      type="text"
-                      value={editInputValue}
-                      onChange={(e) => setEditInputValue(e.target.value)}
-                      className="input text-xs w-full font-mono bg-white border-slate-300 text-slate-900"
-                      placeholder={language === "hi" ? "निष्कर्षित मान संशोधित करें..." : "Correct extracted value..."}
-                      autoFocus
-                    />
-                    <div className="flex items-center justify-end gap-2">
+                  <div className="space-y-2.5 mt-2 p-3 bg-white rounded-lg border-2 border-[#1B365D]/20 shadow-2xs">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-700 mb-1">
+                        {language === "hi" ? "घोषणा पाठ / विवरण:" : "Declaration Text / Value:"}
+                      </label>
+                      {editInputValue.length > 50 ? (
+                        <textarea
+                          rows={3}
+                          value={editInputValue}
+                          onChange={(e) => setEditInputValue(e.target.value)}
+                          className="input text-xs w-full font-mono bg-white border-slate-300 text-slate-900 rounded-md p-2 focus:ring-2 focus:ring-[#1B365D] resize-y"
+                          placeholder={language === "hi" ? "निष्कर्षित मान संशोधित करें..." : "Correct extracted value..."}
+                          autoFocus
+                        />
+                      ) : (
+                        <input
+                          type="text"
+                          value={editInputValue}
+                          onChange={(e) => setEditInputValue(e.target.value)}
+                          className="input text-xs w-full font-mono bg-white border-slate-300 text-slate-900 rounded-md p-2 focus:ring-2 focus:ring-[#1B365D]"
+                          placeholder={language === "hi" ? "निष्कर्षित मान संशोधित करें..." : "Correct extracted value..."}
+                          autoFocus
+                        />
+                      )}
+                    </div>
+
+                    <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div className="w-full sm:w-44">
+                          <label className="block text-[10px] font-bold text-slate-700 mb-1">
+                            {language === "hi" ? "मापी गई फ़ॉन्ट ऊंचाई (मिमी):" : "Measured Font Height (mm):"}
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="number"
+                              step="0.01"
+                              min="0.1"
+                              max="100"
+                              value={editFontSizeInput}
+                              onChange={(e) => setEditFontSizeInput(e.target.value)}
+                              className="input text-xs w-full font-mono bg-white border-slate-300 text-slate-900 rounded-md py-1.5 pl-2.5 pr-8 focus:ring-2 focus:ring-[#1B365D]"
+                              placeholder="e.g. 2.50"
+                            />
+                            <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 font-mono font-bold pointer-events-none">
+                              mm
+                            </span>
+                          </div>
+                        </div>
+                        <div className="text-[10px] text-slate-500 leading-tight flex-1">
+                          {language === "hi"
+                            ? "तालिका-I अनुसूची अनुसार फ़ॉन्ट ऊंचाई मैन्युअल रूप से संशोधित करें। नियम अनुपालन का स्वतः पुनर्मूल्यांकन होगा।"
+                            : "Manually override font height in mm (e.g. physical caliper check). Rule compliance will auto-recalculate."}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-end gap-2 pt-1 border-t border-slate-100">
                       <button
                         type="button"
                         onClick={handleCancelEdit}
@@ -281,7 +358,7 @@ export const StatutoryDeclarationsCard: React.FC<StatutoryDeclarationsCardProps>
                       <button
                         type="button"
                         onClick={() => handleSaveEdit(field.field_id)}
-                        className="btn-primary py-1 px-3 text-xs"
+                        className="btn-primary py-1 px-3 text-xs inline-flex items-center gap-1.5 bg-[#1B365D] hover:bg-[#12243f] text-white rounded font-bold shadow-xs"
                       >
                         <Check size={13} />
                         <span>{language === "hi" ? "संशोधन सहेजें" : "Save Correction"}</span>
@@ -312,10 +389,15 @@ export const StatutoryDeclarationsCard: React.FC<StatutoryDeclarationsCardProps>
                                 {language === "hi" ? "समीक्षा आवश्यक" : "Review Needed"}
                               </span>
                             )}
-                            {field.measured_font_height_mm && (
-                              <span className="ml-2 font-bold text-[#1B365D]">
-                                • {language === "hi" ? "फ़ॉन्ट" : "Font"}: {field.measured_font_height_mm.toFixed(2)}{" "}
+                            {currentFontSize !== undefined && (
+                              <span className={`ml-2 font-bold ${isFontOverridden ? "text-amber-900 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-300" : "text-[#1B365D]"}`}>
+                                • {language === "hi" ? "फ़ॉन्ट" : "Font"}: {currentFontSize.toFixed(2)}{" "}
                                 {language === "hi" ? "मिमी" : "mm"}
+                                {isFontOverridden && (
+                                  <span className="ml-1 text-[9px] font-sans font-normal text-amber-800">
+                                    ({language === "hi" ? "संशोधित" : "manual"})
+                                  </span>
+                                )}
                               </span>
                             )}
                             {((field as any).panel_type || (field as any).source_panel) && (
@@ -333,7 +415,7 @@ export const StatutoryDeclarationsCard: React.FC<StatutoryDeclarationsCardProps>
                           type="button"
                           onClick={() => handleStartEdit(field)}
                           className="p-1 rounded text-slate-400 hover:text-[#1B365D] hover:bg-slate-100 transition-colors"
-                          title={language === "hi" ? "निष्कर्षित पाठ संशोधित करें" : "Correct extracted text"}
+                          title={language === "hi" ? "निष्कर्षित पाठ व फ़ॉन्ट संशोधित करें" : "Correct extracted text & font size"}
                         >
                           <Edit3 size={13} />
                         </button>

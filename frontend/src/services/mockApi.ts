@@ -46,6 +46,7 @@ import {
   deleteMockCase,
   getDeletedCaseIds,
 } from "./mockData";
+import { evaluateImageQuality } from "../utils/qualityGate";
 
 export function getActiveSessionOfficer(): {
   name: string;
@@ -324,7 +325,7 @@ export class MockApiService implements IInspectionApiService {
         blur_variance: 310.0,
         glare_percentage: 6.4,
         skew_angle_deg: 2.5,
-        advice: "REDUCE_GLARE",
+        advice: "SPECULAR_GLARE",
         rejection_reason:
           "SPECULAR_GLARE: Glare coverage 6.40% exceeds acceptable maximum 3.00%. Tilt camera slightly to avoid direct light reflection.",
       };
@@ -345,6 +346,19 @@ export class MockApiService implements IInspectionApiService {
         glare_percentage: 0.6,
         skew_angle_deg: 0.8,
         advice: "FRAME_OPTIMAL",
+      };
+    } else {
+      // First-principles optical quality evaluation on actual image pixels
+      qualityGate = await evaluateImageQuality(file, metadata.original_filename);
+    }
+
+    if (!qualityGate.passed) {
+      throw {
+        error_code: "IMAGE_QUALITY_GATE_FAILED",
+        status: 422,
+        message: `Image rejected by Optical Quality Gate: ${qualityGate.rejection_reason || qualityGate.advice || "Degraded image quality"}`,
+        rejection_reason: qualityGate.rejection_reason || qualityGate.advice,
+        quality_gate: qualityGate,
       };
     }
 
@@ -1093,6 +1107,78 @@ export class MockApiService implements IInspectionApiService {
       entity_id: inspectionId,
       decision: "CASE_CLOSED",
       remarks: closureRemarks,
+    });
+
+    return await this.getInspection(inspectionId);
+  }
+
+  public async updateExtractedField(
+    inspectionId: string,
+    fieldId: string,
+    payload: {
+      raw_ocr_text?: string;
+      measured_font_height_mm?: number;
+      normalized_data?: Record<string, any>;
+    }
+  ): Promise<InspectionCase> {
+    const caseData = await this.getInspection(inspectionId);
+    const fields = [...(caseData.extracted_fields || [])];
+    const fieldIndex = fields.findIndex((f) => f.field_id === fieldId || (f as any).id === fieldId);
+
+    if (fieldIndex >= 0) {
+      const target = { ...fields[fieldIndex] };
+      if (payload.raw_ocr_text !== undefined) {
+        target.raw_ocr_text = payload.raw_ocr_text;
+      }
+      if (payload.measured_font_height_mm !== undefined) {
+        target.measured_font_height_mm = payload.measured_font_height_mm;
+      }
+      if (payload.normalized_data !== undefined) {
+        target.normalized_value = payload.normalized_data;
+      }
+      fields[fieldIndex] = target;
+    }
+
+    // Re-evaluate net quantity font rule if net qty font height was modified
+    let evaluations = [...(caseData.rule_evaluations || [])];
+    const modifiedField = fieldIndex >= 0 ? fields[fieldIndex] : null;
+    if (modifiedField && modifiedField.field_type === "NET_QUANTITY") {
+      const netQtyEvalIdx = evaluations.findIndex((e) => e.rule_code === "RULE_06_1_H_NET_QTY_FONT");
+      if (netQtyEvalIdx >= 0 && payload.measured_font_height_mm !== undefined) {
+        const requiredH = 4.0;
+        const measuredH = payload.measured_font_height_mm;
+        const passed = measuredH >= requiredH;
+        evaluations[netQtyEvalIdx] = {
+          ...evaluations[netQtyEvalIdx],
+          measured_value: `${measuredH.toFixed(2)} mm`,
+          status: passed ? "PASS" : "FAIL",
+          discrepancy: passed ? undefined : `${(measuredH - requiredH).toFixed(2)} mm (${((measuredH - requiredH) / requiredH * 100).toFixed(1)}%)`,
+        };
+      }
+    }
+
+    const hasFails = evaluations.some((e) => e.status === "FAIL");
+    const overallStatus = hasFails ? "FAIL" : "PASS";
+
+    updateMockCase(inspectionId, {
+      extracted_fields: fields,
+      rule_evaluations: evaluations,
+      overall_status: overallStatus,
+      ai_verdict: overallStatus,
+    });
+
+    const officer = getActiveSessionOfficer();
+    appendAuditEvent(inspectionId, {
+      event_type: "FIELD_OVERRIDE_APPLIED",
+      event_label: `Field Overridden: ${modifiedField?.field_type || fieldId}`,
+      actor_type: "OFFICER",
+      actor_id: officer.badgeNumber,
+      actor_name: officer.name,
+      entity_type: "FINDING",
+      entity_id: fieldId,
+      decision: "FIELD_UPDATED",
+      remarks: `Officer updated field text / font height (${payload.measured_font_height_mm ? payload.measured_font_height_mm + ' mm' : 'text'})`,
+      metadata: payload,
     });
 
     return await this.getInspection(inspectionId);

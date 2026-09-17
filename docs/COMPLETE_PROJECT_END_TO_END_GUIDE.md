@@ -39,6 +39,7 @@ State **Legal Metrology Officers (LMOs)** inspecting shops, **Adjudicating Contr
 ### What Are We Building?
 
 We are building Nirikshak, an **Online-First Web Application** built for the Department of Consumer Affairs (DoCA) to inspect packaged commodities under the Legal Metrology (Packaged Commodities) Rules, 2011. It operates across three distinct operational modes:
+
 - **Mode A: Online Web Mode (Primary Production):** Centralized web application accessed via standard browsers (Chrome, Edge, Firefox). Features multi-user authentication (RBAC), centralized PostgreSQL 16+ datastore, server-side CPU INT8 ONNX inference, and national/state enforcement dashboards.
 - **Mode B: Optional Local Inspection Mode (Secondary Field Resiliency):** Lightweight standalone execution capability running on field laptops (localhost:8000) for officers operating in network-deprived circles. Uses embedded ONNX Runtime CPU inference and local encrypted SQLite (SQLCipher), queueing signed sync bundles for upload when connectivity is restored.
 - **Mode C: External Integrations (Future Roadmap):** Future national registry webhooks for eMaap, MCA21, and GSTN verification.
@@ -1161,6 +1162,7 @@ $$
 ### 13 Golden Test Packages for Demonstration:
 
 #### Tier 3A: Statutory Edge Cases & Rule Diagnostic Demonstrators
+
 1. `DEMO-01` (Sunfeast Butter Cookies 200g): Font height violation ($1.84\text{ mm}$ vs $2.50\text{ mm}$) + Banned unit symbol `gms` (`FAIL`).
 2. `DEMO-02` (Everest Garam Masala 100g): USP math mismatch ($\text{Rs } 0.45/\text{g}$ vs $\text{Rs } 0.52/\text{g}$) + Missing customer care email (`FAIL`).
 3. `DEMO-03` (Himalayan Mineral Water 1L): Fully compliant baseline packaging (Clean `PASS` across all clauses).
@@ -1170,13 +1172,13 @@ $$
 7. `DEMO-07` (Fortune Sunlite Oil 1L): Indic Hindi Devanagari Net Qty numeral font deficit ($2.9\text{ mm} < 4.0\text{ mm}$) (`FAIL`).
 
 #### Tier 3B: Certified Real Physical Packaging Cases
+
 8. `REAL-PKG-WATCH` (Fastrack Wristwatch): Single unit count declaration (`01 NUMBER` $\rightarrow$ `1 N`) statutory exempt from USP under Rule 6(1)(da) Second Proviso; upside-down label auto-rectified via 180° inversion probe (`PASS`).
 9. `REAL-PKG-BRAHMI` (Himalaya Brahmi 60 Tablets): Tri-panel packaging fusion (Front PDP + Side LM panel with rate `Rs. 4.33/TAB.` + Back panel factory PIN `560058`) (`PASS`).
 10. `REAL-PKG-FACEWASH` (Dot & Key Face Wash 100ml): Dual corporate entity decoupling (Manufacturer in Solan HP vs Marketer in Kolkata WB) with volume rate `₹2.49/ml` (`PASS`).
 11. `REAL-PKG-PERFUME` (Bella Vita Perfume 20ml): Bottom carton base stamp batch fusion with volume rate `₹19.95/ml` (`PASS`).
 12. `REAL-PKG-NAMKEEN` (Haldiram's Namkeen 400g): Strict SI metric symbol verification (`400 g` with zero false `gms` flags) and mass rate `Rs. 0.25/g` (`PASS`).
 13. `REAL-PKG-CHIA` (True Elements Chia 250g): Nutritional panel isolation, rate `₹1.40/g`, and verified Pune customer care (`PASS`).
-
 
 ---
 

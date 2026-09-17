@@ -137,6 +137,21 @@ class CrossFacetSemanticFusionEngine:
                 raw_f = f.get("raw_fields")
                 if not raw_f and isinstance(facts_data, dict):
                     raw_f = facts_data.get("raw_fields", [])
+                
+                # Extract generic_name if available on facet or in raw_fields
+                if isinstance(facts_data, dict) and not facts_data.get("generic_name"):
+                    gen_name_cand = f.get("generic_name")
+                    if not gen_name_cand and raw_f:
+                        for rf in raw_f:
+                            rf_dict = rf if isinstance(rf, dict) else (rf.model_dump() if hasattr(rf, "model_dump") else rf.dict())
+                            if rf_dict.get("field_type") == "GENERIC_NAME":
+                                val = rf_dict.get("normalized_value")
+                                gen_name_cand = val.get("generic_name") if isinstance(val, dict) else str(val or "")
+                                if gen_name_cand:
+                                    break
+                    if gen_name_cand:
+                        facts_data["generic_name"] = str(gen_name_cand).strip()
+
                 normalized_facets.append({
                     "image_id": str(f.get("image_id", "unknown_img")),
                     "panel_type": p_type,
@@ -167,6 +182,7 @@ class CrossFacetSemanticFusionEngine:
 
         best_pdp_area_cm2: Optional[float] = None
         best_font_height_mm: Optional[float] = None
+        fallback_font_height_mm: Optional[float] = None
 
         # 1. Traverse all facets and pool candidates
         for facet in normalized_facets:
@@ -191,11 +207,11 @@ class CrossFacetSemanticFusionEngine:
                 rf_dict["panel_type"] = p_type
                 all_raw_fields.append(rf_dict)
 
-                # Check for font measurements on raw fields
+                # Check for font measurements on raw fields as fallback
                 f_mm = rf_dict.get("measured_font_height_mm")
                 if f_mm and f_mm > 0:
-                    if best_font_height_mm is None or f_mm > best_font_height_mm:
-                        best_font_height_mm = float(f_mm)
+                    if fallback_font_height_mm is None or f_mm > fallback_font_height_mm:
+                        fallback_font_height_mm = float(f_mm)
 
             # A. Net Quantity Candidate
             nq = facts.get("net_quantity")
@@ -216,12 +232,15 @@ class CrossFacetSemanticFusionEngine:
                 if nq.get("has_prefix"):
                     score += 15
 
-                # Find associated raw text for this candidate
+                # Find associated raw text and specific font height for this net quantity declaration
                 raw_txt = ""
+                nq_font_val = None
                 for rf in fields_list:
                     rf_dict = rf if isinstance(rf, dict) else (rf.dict() if hasattr(rf, "dict") else {})
                     if rf_dict.get("field_type") == "NET_QUANTITY":
                         raw_txt = str(rf_dict.get("raw_ocr_text", ""))
+                        if rf_dict.get("measured_font_height_mm"):
+                            nq_font_val = float(rf_dict["measured_font_height_mm"])
                         break
 
                 if re.search(r"\b(?:net\s*(?:quantity|qty\.?|weight|wt\.?|volume|vol\.?|content|contents)|शुद्ध|निवल)\b", raw_txt, re.IGNORECASE):
@@ -231,7 +250,7 @@ class CrossFacetSemanticFusionEngine:
                 if re.search(r"\b(?:composition|ingredients?|contains?|each\s*(?:100|10|tablet|capsule))\b", raw_txt, re.IGNORECASE):
                     score -= 30
 
-                font_val = facet.get("primary_font_height_mm")
+                font_val = nq_font_val or facet.get("primary_font_height_mm")
                 candidate_net_quantities.append((score, nq, img_id, font_val, raw_txt))
 
             # B. MRP Candidate
@@ -394,6 +413,9 @@ class CrossFacetSemanticFusionEngine:
                 "source_image_id": candidate_generic_names[0][2],
                 "name": resolved_generic_name,
             }
+
+        if best_font_height_mm is None:
+            best_font_height_mm = fallback_font_height_mm
 
         # 3. Build unified facts dictionary conforming to NormalizedCommodityFacts
         composite_image_id = f"fused_{inspection_id}" if inspection_id else (

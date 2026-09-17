@@ -7,7 +7,8 @@ from datetime import datetime, timezone
 import hashlib
 import hmac
 import os
-from typing import Any, Dict, List, Literal, Optional
+import platform
+from typing import Any, Dict, List, Literal, Optional, Tuple
 
 # Import shared frozen contracts
 try:
@@ -59,6 +60,20 @@ class Section63CertificateGenerator:
         message = f"{officer_id}:{merkle_root}".encode("utf-8")
         return hmac.new(key, message, hashlib.sha256).hexdigest()
 
+    @staticmethod
+    def resolve_device_telemetry(
+        device_model: Optional[str] = None,
+        operating_system: Optional[str] = None,
+    ) -> Tuple[str, str]:
+        """Resolves device model and OS dynamically without hardcoding."""
+        if not device_model or not device_model.strip():
+            proc = platform.processor() or platform.machine()
+            sys_name = platform.system()
+            device_model = f"{sys_name} Workstation ({proc})" if proc else f"{sys_name} Workstation"
+        if not operating_system or not operating_system.strip():
+            operating_system = platform.platform() or f"{platform.system()} {platform.release()}"
+        return device_model, operating_system
+
     @classmethod
     def create_certificate(
         cls,
@@ -67,26 +82,30 @@ class Section63CertificateGenerator:
         evidence_bundle_sha256: str,
         issuing_officer_id: str,
         issuing_officer_name: str,
-        device_model: str = "Samsung Galaxy Tab Active4 Pro",
-        operating_system: str = "Android 14 (Kernel 5.15)",
+        device_model: Optional[str] = None,
+        operating_system: Optional[str] = None,
         clock_source: Literal["LOCAL_DEVICE_MONOTONIC", "NTP_SYNCHRONIZED", "MANUAL_DECLARED"] = "LOCAL_DEVICE_MONOTONIC",
         timestamp_utc: Optional[datetime] = None,
         signing_key: Optional[str] = None,
     ) -> Section63CertificateDTO:
-        """Constructs and returns validated Section63CertificateDTO."""
+        """Constructs and returns validated Section63CertificateDTO with dynamic device telemetry."""
         if timestamp_utc is None:
             timestamp_utc = datetime.now(timezone.utc)
 
+        resolved_model, resolved_os = cls.resolve_device_telemetry(device_model, operating_system)
         cert_number = cls.generate_certificate_number(inspection_id, timestamp_utc)
         sig_token = cls.compute_officer_signature_token(issuing_officer_id, merkle_root, signing_key)
+
+        valid_clock_sources = {"LOCAL_DEVICE_MONOTONIC", "NTP_SYNCHRONIZED", "MANUAL_DECLARED"}
+        clean_clock_source = clock_source if clock_source in valid_clock_sources else "LOCAL_DEVICE_MONOTONIC"
 
         return Section63CertificateDTO(
             certificate_number=cert_number,
             inspection_id=inspection_id,
             statutory_law_ref=cls.DEFAULT_STATUTORY_REF,
-            device_model=device_model,
-            operating_system=operating_system,
-            clock_source=clock_source,
+            device_model=resolved_model,
+            operating_system=resolved_os,
+            clock_source=clean_clock_source,
             raw_images_merkle_root=merkle_root,
             evidence_bundle_sha256=evidence_bundle_sha256,
             issuing_officer_id=issuing_officer_id,
@@ -103,8 +122,8 @@ class Section63CertificateGenerator:
         dag: PipelineEvidenceDAG,
         issuing_officer_id: str,
         issuing_officer_name: str,
-        device_model: str = "Samsung Galaxy Tab Active4 Pro",
-        operating_system: str = "Android 14 (Kernel 5.15)",
+        device_model: Optional[str] = None,
+        operating_system: Optional[str] = None,
         clock_source: Literal["LOCAL_DEVICE_MONOTONIC", "NTP_SYNCHRONIZED", "MANUAL_DECLARED"] = "LOCAL_DEVICE_MONOTONIC",
     ) -> BSAEvidenceBundleDTO:
         """Compiles an unbroken BSAEvidenceBundleDTO linking raw image, Merkle DAG, and certificate."""

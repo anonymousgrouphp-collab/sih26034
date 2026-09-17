@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NIRIKSHAK (निरीक्षक) — SIH 2026 Interactive Presentation Deck</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy-950: #070B14;
+      --navy-900: #0F172A;
+      --navy-800: #1E293B;
+      --navy-700: #334155;
+      --blue-500: #0284C7;
+      --blue-400: #38BDF8;
+      --gold-500: #D97706;
+      --gold-400: #F59E0B;
+      --emerald-500: #059669;
+      --emerald-400: #10B981;
+      --red-500: #DC2626;
+      --red-400: #EF4444;
+      --bg-canvas: #0B1120;
+      --card-bg: rgba(15, 23, 42, 0.85);
+      --card-border: rgba(56, 189, 248, 0.2);
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Top Bar Header */
+    header.top-bar {
+      height: 54px;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 50;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .team-badge {
+      background: linear-gradient(135deg, #0F172A, #1E293B);
+      border: 1.5px solid var(--gold-500);
+      padding: 3px 12px;
+      border-radius: 9999px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1.1;
+    }
+
+    .team-badge span:first-child {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #FFF;
+    }
+
+    .team-badge span:last-child {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--gold-400);
+      letter-spacing: 0.8px;
+    }
+
+    .project-meta {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .project-meta h1 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #FFF;
+      letter-spacing: 0.3px;
+    }
+
+    .project-meta span {
+      font-size: 11px;
+      color: var(--blue-400);
+      font-weight: 500;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-action {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #E2E8F0;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      text-decoration: none;
+    }
+
+    .btn-action:hover {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: var(--blue-400);
+      color: #FFF;
+      transform: translateY(-1px);
+    }
+
+    .btn-action.active {
+      background: var(--blue-500);
+      border-color: var(--blue-400);
+      color: #FFF;
+    }
+
+    .btn-action.primary {
+      background: linear-gradient(135deg, #0284C7, #0369A1);
+      border-color: #38BDF8;
+      color: #FFF;
+    }
+
+    .btn-action.primary:hover {
+      background: linear-gradient(135deg, #0369A1, #0284C7);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+    }
+
+    /* Main Presentation Viewport */
+    main.viewport {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 14px 20px;
+      overflow: hidden;
+    }
+
+    .slide-stage-container {
+      width: 100%;
+      max-width: 1380px;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .slide-frame {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    /* Navigation Overlay Controls (Hover Arrows) */
+    .nav-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #FFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+      transition: all 0.2s ease;
+      opacity: 0.3;
+      z-index: 20;
+    }
+
+    .nav-arrow:hover {
+      opacity: 1;
+      background: var(--blue-500);
+      border-color: var(--blue-400);
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .nav-arrow.prev { left: 16px; }
+    .nav-arrow.next { right: 16px; }
+
+    /* Bottom Dock Bar */
+    footer.bottom-dock {
+      height: 70px;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 50;
+    }
+
+    .slide-stepper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .slide-counter {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gold-400);
+      background: rgba(217, 119, 6, 0.12);
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(217, 119, 6, 0.3);
+    }
+
+    .thumbnails-strip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .thumb-item {
+      height: 44px;
+      aspect-ratio: 16 / 9;
+      border-radius: 4px;
+      border: 1.5px solid rgba(255, 255, 255, 0.15);
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.15s ease;
+      opacity: 0.6;
+    }
+
+    .thumb-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .thumb-item:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+      border-color: var(--blue-400);
+    }
+
+    .thumb-item.active {
+      opacity: 1;
+      border-color: var(--gold-400);
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .thumb-number {
+      position: absolute;
+      bottom: 2px;
+      right: 3px;
+      background: rgba(0, 0, 0, 0.8);
+      color: #FFF;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+
+    .shortcut-hints {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .key-badge {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: #FFF;
+    }
+
+    /* Modal / Drawer Drawers */
+    .drawer-overlay {
+      position: fixed;
+      top: 54px;
+      bottom: 70px;
+      right: -520px;
+      width: 500px;
+      background: rgba(15, 23, 42, 0.98);
+      backdrop-filter: blur(16px);
+      border-left: 1px solid rgba(56, 189, 248, 0.25);
+      box-shadow: -10px 0 30px rgba(0, 0, 0, 0.6);
+      transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 45;
+      display: flex;
+      flex-direction: column;
+      user-select: text;
+    }
+
+    .drawer-overlay.open {
+      right: 0;
+    }
+
+    .drawer-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .drawer-header h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #FFF;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .drawer-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .drawer-close:hover {
+      color: #FFF;
+    }
+
+    .drawer-body {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #CBD5E1;
+    }
+
+    .drawer-body h4 {
+      color: var(--blue-400);
+      margin: 16px 0 6px 0;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .drawer-body h4:first-child {
+      margin-top: 0;
+    }
+
+    .speech-box {
+      background: rgba(2, 132, 199, 0.1);
+      border-left: 3px solid var(--blue-500);
+      padding: 12px 14px;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 14px;
+      font-size: 13px;
+      color: #F1F5F9;
+      font-style: italic;
+    }
+
+    .pill-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10.5px;
+      font-weight: 700;
+      margin-right: 6px;
+      margin-bottom: 6px;
+    }
+
+    .pill-tag.amber { background: rgba(217, 119, 6, 0.2); color: #FBBF24; border: 1px solid rgba(217, 119, 6, 0.4); }
+    .pill-tag.emerald { background: rgba(5, 150, 105, 0.2); color: #34D399; border: 1px solid rgba(5, 150, 105, 0.4); }
+    .pill-tag.red { background: rgba(220, 38, 38, 0.2); color: #F87171; border: 1px solid rgba(220, 38, 38, 0.4); }
+
+    /* Interactive Loupe Simulator Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(7, 11, 20, 0.88);
+      backdrop-filter: blur(12px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .loupe-modal {
+      width: 900px;
+      max-width: 95vw;
+      background: var(--navy-900);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 12px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .loupe-modal-header {
+      padding: 14px 20px;
+      background: rgba(30, 41, 59, 0.8);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .loupe-modal-body {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 20px;
+    }
+
+    .loupe-stage-wrap {
+      position: relative;
+      background: #000;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      cursor: crosshair;
+      height: 420px;
+    }
+
+    .loupe-stage-wrap img.target-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
+    /* Magnifier Lens Element */
+    .magnifier-lens {
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      border: 2.5px solid var(--gold-400);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(217, 119, 6, 0.3);
+      pointer-events: none;
+      display: none;
+      background-repeat: no-repeat;
+      z-index: 10;
+    }
+
+    /* Reticle overlay inside magnifier */
+    .magnifier-lens::before, .magnifier-lens::after {
+      content: '';
+      position: absolute;
+      background: rgba(56, 189, 248, 0.6);
+    }
+    .magnifier-lens::before {
+      top: 50%; left: 10%; right: 10%; height: 1px; transform: translateY(-50%);
+    }
+    .magnifier-lens::after {
+      left: 50%; top: 10%; bottom: 10%; width: 1px; transform: translateX(-50%);
+    }
+
+    .loupe-hud-panel {
+      background: rgba(30, 41, 59, 0.6);
+      border-radius: 8px;
+      padding: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      font-size: 12px;
+    }
+
+    .hud-metric-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .hud-metric-label {
+      color: var(--text-muted);
+    }
+
+    .hud-metric-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: #FFF;
+    }
+
+    .hud-metric-val.alert {
+      color: #F87171;
+    }
+
+    .hud-metric-val.success {
+      color: #34D399;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="top-bar">
+    <div class="brand-group">
+      <div class="team-badge">
+        <span>TEAM 92770</span>
+        <span>NIRIKSHAK</span>
+      </div>
+      <div class="project-meta">
+        <h1>SIH26034 • Legal Metrology Verification System</h1>
+        <span>Department of Consumer Affairs (DoCA) | Smart India Hackathon 2026</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn-action" id="btn-loupe-demo">
+        <span>🔍</span> 2.5x Loupe Reticle
+      </button>
+      <button class="btn-action" id="btn-statutory-drawer">
+        <span>⚖️</span> Statutory Code
+      </button>
+      <button class="btn-action" id="btn-notes-drawer">
+        <span>🎤</span> Speaker Notes <span class="key-badge">N</span>
+      </button>
+      <button class="btn-action" id="btn-fullscreen">
+        <span>⛶</span> Fullscreen <span class="key-badge">F</span>
+      </button>
+      <a href="https://sih26034.vercel.app" target="_blank" class="btn-action primary">
+        <span>▶</span> Live Workstation ↗
+      </a>
+    </div>
+  </header>
+
+  <!-- Presentation Stage Viewport -->
+  <main class="viewport">
+    <div class="slide-stage-container" id="stage-container">
+      <img id="slide-img" class="slide-frame" src="assests/rendered_slides_v2/slide_1.png" alt="Slide 1" />
+      
+      <!-- Nav Arrows -->
+      <button class="nav-arrow prev" id="btn-prev" title="Previous Slide (Left Arrow)">❮</button>
+      <button class="nav-arrow next" id="btn-next" title="Next Slide (Right Arrow or Space)">❯</button>
+    </div>
+
+    <!-- Speaker Notes Side Drawer -->
+    <aside class="drawer-overlay" id="speaker-drawer">
+      <div class="drawer-header">
+        <h3 id="drawer-title">🎤 Speaker Notes: Slide 1</h3>
+        <button class="drawer-close" id="btn-close-notes">✕</button>
+      </div>
+      <div class="drawer-body" id="drawer-content">
+        <!-- Injected dynamically via JS -->
+      </div>
+    </aside>
+
+    <!-- Statutory Code Reference Drawer -->
+    <aside class="drawer-overlay" id="statutory-drawer">
+      <div class="drawer-header">
+        <h3>⚖️ Statutory Gazette References</h3>
+        <button class="drawer-close" id="btn-close-statutory">✕</button>
+      </div>
+      <div class="drawer-body">
+        <h4>Legal Metrology (Packaged Commodities) Rules, 2011</h4>
+        <p><strong>Rule 6(1)(h):</strong> Mandatory declaration of retail sale price inclusive of all taxes with Unit Sale Price (USP) as per G.S.R. 629(E).</p>
+        <p><strong>Table-I Schedule:</strong> Mandatory minimum numeral heights based on packaging principal display panel (PDP) area (e.g., 2.0mm for net qty up to 200g).</p>
+        
+        <h4>Jan Vishwas (Amendment) Act, 2023</h4>
+        <p><strong>Act No. 18 of 2023 (Sec 36(1) Proviso):</strong> Complete decriminalization of first-time procedural label defects. Mandates an immediate <strong>15-Day Statutory Improvement Notice at ₹0 compounding fee</strong> before any civil compounding penalty.</p>
+        
+        <h4>Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)</h4>
+        <p><strong>Section 63 (Repealed Sec 65B):</strong> Admissibility of electronic records requires cryptographic hash integrity, tamper-evident device custody, and monotonic timestamp verification.</p>
+
+        <h4>Metrological Traceability</h4>
+        <p><strong>ISO/IEC 17025 & JCGM 100:2008 (GUM):</strong> Sub-millimeter planar homography calibration with 95% expanded coverage factor ($k=2, \pm 0.08\text{ mm}$).</p>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Bottom Dock Controls -->
+  <footer class="bottom-dock">
+    <div class="slide-stepper">
+      <span class="slide-counter" id="slide-num-badge">SLIDE 1 / 6</span>
+      <div class="thumbnails-strip" id="thumb-strip">
+        <div class="thumb-item active" data-slide="1"><img src="assests/rendered_slides_v2/slide_1.png" alt="1"><span class="thumb-number">1</span></div>
+        <div class="thumb-item" data-slide="2"><img src="assests/rendered_slides_v2/slide_2.png" alt="2"><span class="thumb-number">2</span></div>
+        <div class="thumb-item" data-slide="3"><img src="assests/rendered_slides_v2/slide_3.png" alt="3"><span class="thumb-number">3</span></div>
+        <div class="thumb-item" data-slide="4"><img src="assests/rendered_slides_v2/slide_4.png" alt="4"><span class="thumb-number">4</span></div>
+        <div class="thumb-item" data-slide="5"><img src="assests/rendered_slides_v2/slide_5.png" alt="5"><span class="thumb-number">5</span></div>
+        <div class="thumb-item" data-slide="6"><img src="assests/rendered_slides_v2/slide_6.png" alt="6"><span class="thumb-number">6</span></div>
+      </div>
+    </div>
+
+    <div class="shortcut-hints">
+      <span>Navigate: <span class="key-badge">←</span> <span class="key-badge">→</span> / <span class="key-badge">Space</span></span>
+      <span>Notes: <span class="key-badge">N</span></span>
+      <span>Fullscreen: <span class="key-badge">F</span></span>
+      <span>Loupe: <span class="key-badge">L</span></span>
+    </div>
+
+    <div>
+      <a href="SIH26034-KUNAL-PPTv2.pptx" download class="btn-action">
+        <span>📥</span> Download PPTX
+      </a>
+      <a href="presentation_v2.pdf" target="_blank" class="btn-action">
+        <span>📄</span> PDF
+      </a>
+    </div>
+  </footer>
+
+  <!-- Interactive 2.5x Loupe Simulator Modal -->
+  <div class="modal-backdrop" id="loupe-modal">
+    <div class="loupe-modal">
+      <div class="loupe-modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 18px;">🔍</span>
+          <h3 style="font-size: 14px; font-weight: 700; color: #FFF;">NIRIKSHAK Sub-mm Optical Loupe & Caliper Simulator</h3>
+          <span class="pill-tag amber">ISO 17025 Traceable</span>
+        </div>
+        <button class="drawer-close" id="btn-close-loupe">✕</button>
+      </div>
+      <div class="loupe-modal-body">
+        <div class="loupe-stage-wrap" id="loupe-stage">
+          <img class="target-img" id="loupe-target-img" src="assests/05_product_inspection_evidence/himalaya_brahmi_back.jpg" alt="Packaging Sample" />
+          <div class="magnifier-lens" id="magnifier"></div>
+        </div>
+        <div class="loupe-hud-panel">
+          <h4 style="color: var(--blue-400); font-size: 12px; font-weight: 700; text-transform: uppercase;">Real-time Telemetry</h4>
+          
+          <div class="hud-metric-row">
+            <span class="hud-metric-label">Sample Target</span>
+            <span class="hud-metric-val">Himalaya Brahmi (Back PDP)</span>
+          </div>
+          <div class="hud-metric-row">
+            <span class="hud-metric-label">Reference Standard</span>
+            <span class="hud-metric-val">ISO 7810 Card (85.60mm)</span>
+          </div>
+          <div class="hud-metric-row">
+            <span class="hud-metric-label">Homography Matrix H</span>
+            <span class="hud-metric-val" style="color: var(--blue-400);">3x3 Planar Calibrated</span>
+          </div>
+          <div class="hud-metric-row">
+            <span class="hud-metric-label">Physical Caliper Truth</span>
+            <span class="hud-metric-val">1.47 mm (Mitutoyo)</span>
+          </div>
+          <div class="hud-metric-row">
+            <span class="hud-metric-label">NIRIKSHAK Optical Height</span>
+            <span class="hud-metric-val success">1.46 mm (Δ 0.01mm)</span>
+          </div>
+          <div class="hud-metric-row">
+            <span class="hud-metric-label">PCR Table-I Requirement</span>
+            <span class="hud-metric-val">≥ 2.00 mm</span>
+          </div>
+          <div class="hud-metric-row">
+            <span class="hud-metric-label">Statutory Variance</span>
+            <span class="hud-metric-val alert">-0.54 mm (Deficit)</span>
+          </div>
+          <div class="hud-metric-row">
+            <span class="hud-metric-label">Jan Vishwas Disposition</span>
+            <span class="hud-metric-val" style="color: #FBBF24;">15-Day ₹0 Cure Notice</span>
+          </div>
+          <p style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">
+            Hover cursor over the packaging label to inspect high-resolution font contours under 2.5x optical magnification.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Slide Data & Speaker Delivery Notes
+    const SLIDES_COUNT = 6;
+    let currentSlide = 1;
+
+    const speakerNotesData = {
+      1: {
+        title: "Slide 1: Title & Statutory Identity",
+        time: "0:30 (Target: 30s)",
+        speech: `"Respected Judges, good morning. We are Team NIRIKSHAK, Team ID 92770, presenting our solution for Problem Statement SIH26034 under the Ministry of Consumer Affairs, Food & Public Distribution. Our mission is to transform Legal Metrology enforcement from a slow 25-minute manual caliper ordeal into a sub-millimeter, court-admissible 2-minute digital inspection."`,
+        keyPoints: [
+          "Confirm Team ID 92770 and Statutory Authority: Ministry of Consumer Affairs (DoCA).",
+          "Highlight multidisciplinary engineering roles: CV & Metrology, Neural OCR, Statutory Rules, Crypto/BSA 2023, and Web UX.",
+          "Emphasize: Built and tested across 38 real physical packaging SKUs with certified calipers."
+        ]
+      },
+      2: {
+        title: "Slide 2: Problem Statement & Proposed Solution",
+        time: "1:30 (Cumulative: 2:00)",
+        speech: `"Across India, 1.2 Crore retail establishments and packaging godowns are monitored by fewer than 3,000 officers. Manual calipers take 25 minutes per package, creating subjective parallax errors. Unverified phone photos fail Section 63 BSA 2023, causing widespread courtroom dismissals. NIRIKSHAK replaces guesswork with three pillars: Sub-mm Planar Homography, Deterministic Statutory AST, and Section 63 BSA 2023 Merkle Chain."`,
+        keyPoints: [
+          "Contrast the 1.2 Cr vs 3,000 officer disparity (less than 0.1% audit coverage).",
+          "Explain the 4-tier Innovation Pyramid (Core Innovation, Quality Gate, AST schedules, BSA Vault).",
+          "Showcase physical proof: 1.46mm optical vs 1.47mm Mitutoyo caliper truth (0.01mm error).",
+          "Point to live system at sih26034.vercel.app."
+        ]
+      },
+      3: {
+        title: "Slide 3: Technical Approach & Architecture",
+        time: "1:45 (Cumulative: 3:45)",
+        speech: `"Our 6-stage pipeline is 100% deterministic with zero generative hallucination. In Stage 1, ingestion is locked with SHA-256. Stage 2 evaluates Laplacian blur and specularity glare in under 15ms. Stage 3 computes planar homography matrix H. Stage 4 runs DBNet++ and SVTR quantized to INT8 ONNX in 180ms on CPU. Stage 5 evaluates codified Table-I and USP math. Stage 6 produces a Section 63 BSA Merkle notice."`,
+        keyPoints: [
+          "Walk through the circular methodology cycle on the left.",
+          "Highlight clean Apache-2.0 FOSS stack (DBNet++, PP-OCRv4); zero AGPL viral copyleft risk.",
+          "Emphasize Mode B: Resilient 0-Byte offline field engine using SQLite SQLCipher."
+        ]
+      },
+      4: {
+        title: "Slide 4: Feasibility, Viability & Statutory Fairness",
+        time: "1:15 (Cumulative: 5:00)",
+        speech: `"NIRIKSHAK is hardware-agnostic and runs on a standard ₹10k laptop with 0 bytes network requirement. Crucially, we codify Parliament's Jan Vishwas Act, 2023: minor procedural font deficits trigger a 15-day ₹0 statutory cure notice, protecting MSMEs and Ease of Doing Business. Only substantive deceptive fraud incurs Section 48 compounding penalties."`,
+        keyPoints: [
+          "Explain the 3 pillar cards: Feasibility, Viability, and Business Potential.",
+          "Explain the bottom decision tree: Minor Procedural Deficit (15-day ₹0 cure) vs Substantive Fraud (₹25k penalty).",
+          "Highlight Quasi-Judicial Human Sovereignty: AI never issues autonomous fines."
+        ]
+      },
+      5: {
+        title: "Slide 5: Impact, Benefits & Empirical Proof",
+        time: "1:30 (Cumulative: 6:30)",
+        speech: `"The impact is dramatic: inspection time drops from 25 minutes to 1.8 minutes—a 93% reduction. Daily officer capacity scales 11x from 18 to over 200 packages. Most importantly, court admissibility surges from 35% under vulnerable phone photos to 98% under Section 63 BSA 2023 Merkle chains, recovering over ₹150 Crore in evaded compounding revenue."`,
+        keyPoints: [
+          "Present the dual-ring radial diagram on the left.",
+          "Explain the comparative horizontal bar chart: Time, Output, and Admissibility.",
+          "Review the Before/After comparison box with key-value highlights."
+        ]
+      },
+      6: {
+        title: "Slide 6: Research, References & Live Workstation",
+        time: "0:45 (Cumulative: 7:15)",
+        speech: `"Our entire system is grounded in statutory gazettes from the Legal Metrology Act 2009 to Section 63 BSA 2023. We invite the judges to inspect our three live workstation modules: the GIGW 3.0 Inspection Control Centre, the Adjudication Desk with ArUco unwarping, and the Section 63 BSA Merkle Dossier."`,
+        keyPoints: [
+          "Point out the 7-stage statutory and scientific research timeline ribbon.",
+          "Showcase the three live production workstation screenshots.",
+          "Invite judges to test the live web app at sih26034.vercel.app."
+        ]
+      }
+    };
+
+    // Elements
+    const slideImg = document.getElementById("slide-img");
+    const slideNumBadge = document.getElementById("slide-num-badge");
+    const thumbItems = document.querySelectorAll(".thumb-item");
+    const btnPrev = document.getElementById("btn-prev");
+    const btnNext = document.getElementById("btn-next");
+
+    // Drawer elements
+    const btnNotesDrawer = document.getElementById("btn-notes-drawer");
+    const speakerDrawer = document.getElementById("speaker-drawer");
+    const btnCloseNotes = document.getElementById("btn-close-notes");
+    const drawerTitle = document.getElementById("drawer-title");
+    const drawerContent = document.getElementById("drawer-content");
+
+    const btnStatutoryDrawer = document.getElementById("btn-statutory-drawer");
+    const statutoryDrawer = document.getElementById("statutory-drawer");
+    const btnCloseStatutory = document.getElementById("btn-close-statutory");
+
+    // Loupe modal elements
+    const btnLoupeDemo = document.getElementById("btn-loupe-demo");
+    const loupeModal = document.getElementById("loupe-modal");
+    const btnCloseLoupe = document.getElementById("btn-close-loupe");
+    const loupeStage = document.getElementById("loupe-stage");
+    const magnifier = document.getElementById("magnifier");
+    const loupeTargetImg = document.getElementById("loupe-target-img");
+
+    // Fullscreen button
+    const btnFullscreen = document.getElementById("btn-fullscreen");
+
+    function updateSlide(newSlide) {
+      if (newSlide < 1 || newSlide > SLIDES_COUNT) return;
+      currentSlide = newSlide;
+
+      // Update main slide image with fade
+      slideImg.style.opacity = "0.7";
+      slideImg.src = `assests/rendered_slides_v2/slide_${currentSlide}.png`;
+      slideImg.onload = () => {
+        slideImg.style.opacity = "1";
+      };
+
+      // Update badge
+      slideNumBadge.textContent = `SLIDE ${currentSlide} / ${SLIDES_COUNT}`;
+
+      // Update thumbnails
+      thumbItems.forEach((t, idx) => {
+        if (idx + 1 === currentSlide) {
+          t.classList.add("active");
+          t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        } else {
+          t.classList.remove("active");
+        }
+      });
+
+      // Update Speaker Notes if open
+      updateSpeakerNotes();
+    }
+
+    function updateSpeakerNotes() {
+      const data = speakerNotesData[currentSlide];
+      if (!data) return;
+
+      drawerTitle.textContent = `🎤 ${data.title}`;
+      let html = `
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+          <span class="pill-tag amber">⏱️ ${data.time}</span>
+          <span class="pill-tag emerald">Speaker Lead</span>
+        </div>
+        <h4>Verbal Delivery Script (What to Say)</h4>
+        <div class="speech-box">${data.speech}</div>
+        <h4>Key Judge Takeaways & Cues</h4>
+        <ul style="padding-left: 18px; margin-bottom: 16px;">
+      `;
+      data.keyPoints.forEach(kp => {
+        html += `<li style="margin-bottom: 6px;">${kp}</li>`;
+      });
+      html += `</ul>`;
+      drawerContent.innerHTML = html;
+    }
+
+    // Nav Event Listeners
+    btnPrev.addEventListener("click", () => updateSlide(currentSlide - 1));
+    btnNext.addEventListener("click", () => updateSlide(currentSlide + 1));
+
+    thumbItems.forEach(t => {
+      t.addEventListener("click", () => {
+        const s = parseInt(t.getAttribute("data-slide"));
+        updateSlide(s);
+      });
+    });
+
+    // Keyboard Shortcuts
+    window.addEventListener("keydown", (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") {
+        e.preventDefault();
+        updateSlide(currentSlide + 1);
+      } else if (e.key === "ArrowLeft" || e.key === "PageUp" || e.key === "Backspace") {
+        e.preventDefault();
+        updateSlide(currentSlide - 1);
+      } else if (e.key >= '1' && e.key <= '6') {
+        updateSlide(parseInt(e.key));
+      } else if (e.key.toLowerCase() === 'f') {
+        toggleFullscreen();
+      } else if (e.key.toLowerCase() === 'n') {
+        toggleNotesDrawer();
+      } else if (e.key.toLowerCase() === 'l') {
+        toggleLoupeModal();
+      } else if (e.key === 'Escape') {
+        closeAllModals();
+      }
+    });
+
+    // Fullscreen Toggle
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => console.log(err));
+        btnFullscreen.classList.add("active");
+      } else {
+        document.exitFullscreen().catch(err => console.log(err));
+        btnFullscreen.classList.remove("active");
+      }
+    }
+    btnFullscreen.addEventListener("click", toggleFullscreen);
+
+    // Notes Drawer
+    function toggleNotesDrawer() {
+      statutoryDrawer.classList.remove("open");
+      btnStatutoryDrawer.classList.remove("active");
+
+      const isOpen = speakerDrawer.classList.toggle("open");
+      btnNotesDrawer.classList.toggle("active", isOpen);
+      if (isOpen) updateSpeakerNotes();
+    }
+    btnNotesDrawer.addEventListener("click", toggleNotesDrawer);
+    btnCloseNotes.addEventListener("click", () => {
+      speakerDrawer.classList.remove("open");
+      btnNotesDrawer.classList.remove("active");
+    });
+
+    // Statutory Drawer
+    function toggleStatutoryDrawer() {
+      speakerDrawer.classList.remove("open");
+      btnNotesDrawer.classList.remove("active");
+
+      const isOpen = statutoryDrawer.classList.toggle("open");
+      btnStatutoryDrawer.classList.toggle("active", isOpen);
+    }
+    btnStatutoryDrawer.addEventListener("click", toggleStatutoryDrawer);
+    btnCloseStatutory.addEventListener("click", () => {
+      statutoryDrawer.classList.remove("open");
+      btnStatutoryDrawer.classList.remove("active");
+    });
+
+    // Loupe Simulator Modal
+    function toggleLoupeModal() {
+      loupeModal.classList.toggle("open");
+    }
+    btnLoupeDemo.addEventListener("click", toggleLoupeModal);
+    btnCloseLoupe.addEventListener("click", () => loupeModal.classList.remove("open"));
+
+    function closeAllModals() {
+      speakerDrawer.classList.remove("open");
+      btnNotesDrawer.classList.remove("active");
+      statutoryDrawer.classList.remove("open");
+      btnStatutoryDrawer.classList.remove("active");
+      loupeModal.classList.remove("open");
+    }
+
+    // Loupe Reticle Hover Logic
+    const zoomFactor = 2.5;
+    loupeStage.addEventListener("mousemove", (e) => {
+      const rect = loupeStage.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      if (x < 0 || y < 0 || x > rect.width || y > rect.height) {
+        magnifier.style.display = "none";
+        return;
+      }
+
+      magnifier.style.display = "block";
+      const lensWidth = magnifier.offsetWidth;
+      const lensHeight = magnifier.offsetHeight;
+
+      magnifier.style.left = (x - lensWidth / 2) + "px";
+      magnifier.style.top = (y - lensHeight / 2) + "px";
+
+      magnifier.style.backgroundImage = `url('${loupeTargetImg.src}')`;
+      magnifier.style.backgroundSize = `${rect.width * zoomFactor}px ${rect.height * zoomFactor}px`;
+      magnifier.style.backgroundPosition = `-${x * zoomFactor - lensWidth / 2}px -${y * zoomFactor - lensHeight / 2}px`;
+    });
+
+    loupeStage.addEventListener("mouseleave", () => {
+      magnifier.style.display = "none";
+    });
+
+    // Initialize
+    updateSlide(1);
+  </script>
+</body>
+</html>

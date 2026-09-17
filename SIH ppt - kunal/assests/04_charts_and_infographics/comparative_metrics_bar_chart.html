@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+  body { background: transparent; display: flex; justify-content: center; align-items: center; padding: 12px; }
+  .chart-box {
+    width: 620px;
+    background: #0F172A;
+    border-radius: 12px;
+    padding: 16px 20px;
+    border: 1.5px solid #334155;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    color: white;
+  }
+  .chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #1E293B;
+  }
+  .chart-title {
+    font-size: 13px;
+    font-weight: 800;
+    color: #38BDF8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .legend {
+    display: flex;
+    gap: 12px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .leg-item { display: flex; align-items: center; gap: 6px; }
+  .leg-box-manual { width: 10px; height: 10px; background: #EF4444; border-radius: 2px; }
+  .leg-box-nirik { width: 10px; height: 10px; background: #10B981; border-radius: 2px; }
+  
+  .bar-rows { display: flex; flex-direction: column; gap: 12px; }
+  .bar-group { display: flex; flex-direction: column; gap: 4px; }
+  .bar-label-row { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: #E2E8F0; }
+  .bars-container { display: flex; flex-direction: column; gap: 4px; }
+  .bar-track { background: #1E293B; border-radius: 4px; height: 16px; width: 100%; position: relative; overflow: hidden; display: flex; align-items: center; }
+  .bar-fill-manual { height: 100%; background: #EF4444; border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 10px; font-weight: 800; color: white; min-width: 80px; }
+  .bar-fill-nirik { height: 100%; background: #10B981; border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 10px; font-weight: 800; color: white; min-width: 80px; }
+</style>
+</head>
+<body>
+<div class="chart-box">
+  <div class="chart-header">
+    <div class="chart-title">📊 National Enforcement Benchmark Metrics</div>
+    <div class="legend">
+      <div class="leg-item"><div class="leg-box-manual"></div> Manual Inspection</div>
+      <div class="leg-item"><div class="leg-box-nirik"></div> With NIRIKSHAK</div>
+    </div>
+  </div>
+
+  <div class="bar-rows">
+    <div class="bar-group">
+      <div class="bar-label-row">
+        <span>Inspection Time per Package</span>
+        <span style="color:#10B981">94% Faster</span>
+      </div>
+      <div class="bars-container">
+        <div class="bar-track"><div class="bar-fill-manual" style="width: 90%;">8.5 Mins</div></div>
+        <div class="bar-track"><div class="bar-fill-nirik" style="width: 15%;">0.5 Min (&lt;30s)</div></div>
+      </div>
+    </div>
+
+    <div class="bar-group">
+      <div class="bar-label-row">
+        <span>Daily Inspection Capacity per Officer</span>
+        <span style="color:#10B981">13x Surge</span>
+      </div>
+      <div class="bars-container">
+        <div class="bar-track"><div class="bar-fill-manual" style="width: 14%;">15 SKUs</div></div>
+        <div class="bar-track"><div class="bar-fill-nirik" style="width: 100%;">200+ SKUs/Day</div></div>
+      </div>
+    </div>
+
+    <div class="bar-group">
+      <div class="bar-label-row">
+        <span>Measurement Tolerance Error</span>
+        <span style="color:#10B981">84% Error Reduction</span>
+      </div>
+      <div class="bars-container">
+        <div class="bar-track"><div class="bar-fill-manual" style="width: 65%;">&plusmn;0.50 mm (Human Vernier)</div></div>
+        <div class="bar-track"><div class="bar-fill-nirik" style="width: 32%;">&plusmn;0.08 mm (Calibrated)</div></div>
+      </div>
+    </div>
+
+    <div class="bar-group">
+      <div class="bar-label-row">
+        <span>Courtroom Evidence Admissibility (BSA 2023)</span>
+        <span style="color:#10B981">Zero Court Dismissals</span>
+      </div>
+      <div class="bars-container">
+        <div class="bar-track"><div class="bar-fill-manual" style="width: 35%;">35% (Unsigned Photos)</div></div>
+        <div class="bar-track"><div class="bar-fill-nirik" style="width: 100%;">100% (Sec. 63 Merkle Root)</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

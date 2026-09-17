@@ -38,6 +38,7 @@ import { LiveApiService } from "./liveApi";
 import { MockApiService } from "./mockApi";
 import { DemoFixtureService } from "./demoFixtures";
 import { getDeletedCaseIds, saveDeletedCaseId, deleteMockCase } from "./mockData";
+import { evaluateImageQuality } from "../utils/qualityGate";
 import { ApiCache } from "./apiCache";
 
 export { LiveApiService } from "./liveApi";
@@ -368,6 +369,20 @@ export class ApiService {
     quality_gate: QualityGateResult;
     asset: EvidenceAsset;
   }> {
+    // Client-side optical pre-screening on actual image pixels
+    if (metadata.demo_scenario !== "PASS" && metadata.demo_scenario !== "REVIEW") {
+      const clientQg = await evaluateImageQuality(file, metadata.original_filename);
+      if (!clientQg.passed) {
+        throw {
+          error_code: "IMAGE_QUALITY_GATE_FAILED",
+          status: 422,
+          message: `Image rejected by Optical Quality Gate: ${clientQg.rejection_reason || clientQg.advice || "Degraded image quality"}`,
+          rejection_reason: clientQg.rejection_reason || clientQg.advice,
+          quality_gate: clientQg,
+        };
+      }
+    }
+
     if (this.operatingMode === "MOCK" || this.isDemoId(metadata.inspection_id)) {
       return await MockApiService.getInstance().uploadEvidence(file, metadata);
     }
@@ -375,6 +390,17 @@ export class ApiService {
     try {
       return await LiveApiService.getInstance().uploadEvidence(file, metadata);
     } catch (err: any) {
+      if (
+        err?.error_code === "IMAGE_QUALITY_GATE_FAILED" ||
+        err?.status === 422 ||
+        err?.quality_gate?.passed === false ||
+        String(err?.message || "").toLowerCase().includes("quality gate") ||
+        String(err?.message || "").toLowerCase().includes("blur") ||
+        String(err?.message || "").toLowerCase().includes("illumination") ||
+        String(err?.message || "").toLowerCase().includes("glare")
+      ) {
+        throw err;
+      }
       console.warn("Live server uploadEvidence failed. Engaging Mode B Local Resilient failover:", err);
       return await MockApiService.getInstance().uploadEvidence(file, metadata);
     }
@@ -411,12 +437,7 @@ export class ApiService {
     if (this.operatingMode === "MOCK" || this.isDemoId(inspectionId)) {
       res = await MockApiService.getInstance().executeBatchPipeline(inspectionId);
     } else {
-      try {
-        res = await LiveApiService.getInstance().executeBatchPipeline(inspectionId);
-      } catch (err: any) {
-        console.warn("Live server executeBatchPipeline failed. Engaging Mode B Local Resilient failover:", err);
-        res = await MockApiService.getInstance().executeBatchPipeline(inspectionId);
-      }
+      res = await LiveApiService.getInstance().executeBatchPipeline(inspectionId);
     }
     this.emitSiteWideUpdate();
     return res;
@@ -570,6 +591,37 @@ export class ApiService {
     return res;
   }
 
+  public static async updateExtractedField(
+    inspectionId: string,
+    fieldId: string,
+    payload: {
+      raw_ocr_text?: string;
+      measured_font_height_mm?: number;
+      normalized_data?: Record<string, any>;
+    }
+  ): Promise<InspectionCase> {
+    let res: InspectionCase;
+    if (
+      this.operatingMode === "MOCK" ||
+      this.operatingMode === "DEMO_FIXTURE" ||
+      inspectionId.startsWith("INS-2026-") ||
+      inspectionId.startsWith("SKU-DEMO-") ||
+      inspectionId.startsWith("insp_demo_") ||
+      inspectionId.startsWith("demo-")
+    ) {
+      res = await MockApiService.getInstance().updateExtractedField(inspectionId, fieldId, payload);
+    } else {
+      try {
+        res = await LiveApiService.getInstance().updateExtractedField(inspectionId, fieldId, payload);
+      } catch (err: any) {
+        console.warn("Live server updateExtractedField failed. Engaging Mode B Local Resilient failover:", err);
+        res = await MockApiService.getInstance().updateExtractedField(inspectionId, fieldId, payload);
+      }
+    }
+    this.emitSiteWideUpdate();
+    return res;
+  }
+
   public static async getEvidenceDossier(inspectionId: string): Promise<any> {
     if (
       this.operatingMode === "MOCK" ||
@@ -659,17 +711,8 @@ export class ApiService {
       };
     }
 
-    try {
-      const res = await LiveApiService.getInstance().generateNotice(payload);
-      return res;
-    } catch (err: any) {
-      console.warn("Live server generate notice failed. Engaging Mode B Local Resilient failover:", err);
-      const res = await MockApiService.getInstance().generateNotice(payload);
-      return {
-        ...res,
-        pdf_download_url: "/form1.pdf",
-      };
-    }
+    // In LIVE mode, call the live backend directly so authentic statutory responses or refusals are respected
+    return await LiveApiService.getInstance().generateNotice(payload);
   }
 
   public static getNoticePdfUrl(noticeId: string): string {

@@ -15,6 +15,22 @@ import uuid
 
 logger = logging.getLogger("Nirikshak.database")
 
+try:
+    from dotenv import load_dotenv
+    _db_dir = Path(__file__).resolve().parent
+    _repo_root = _db_dir.parent.parent
+    if (_repo_root / ".env").exists():
+        load_dotenv(_repo_root / ".env")
+    if (_repo_root / ".env.local").exists():
+        load_dotenv(_repo_root / ".env.local", override=True)
+    if (_db_dir.parent / ".env").exists():
+        load_dotenv(_db_dir.parent / ".env", override=True)
+    if (_db_dir.parent / ".env.local").exists():
+        load_dotenv(_db_dir.parent / ".env.local", override=True)
+    load_dotenv()
+except Exception:
+    pass
+
 from sqlalchemy import (
     BigInteger,
     Boolean,
@@ -103,6 +119,7 @@ class Inspection(Base):
     manufacturer_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     category: Mapped[str] = mapped_column(String(100), nullable=False)
     package_type: Mapped[str] = mapped_column(String(50), nullable=False)  # 'RECTANGULAR', 'CYLINDRICAL', 'FLEXIBLE_POUCH'
+    declared_net_quantity: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     ecommerce_url: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     overall_status: Mapped[str] = mapped_column(String(20), nullable=False)  # 'PASS', 'FAIL', 'WARNING', 'PENDING_REVIEW'
     ai_verdict: Mapped[str] = mapped_column(String(20), nullable=False)  # 'PASS', 'FAIL', 'WARNING'
@@ -458,10 +475,14 @@ def migrate_database_schema(engine_or_conn):
             dialect_name = getattr(conn.dialect, "name", "").lower()
             if "postgres" in dialect_name or "psycopg" in dialect_name:
                 conn.exec_driver_sql("ALTER TABLE evidence_images ADD COLUMN IF NOT EXISTS calibration_reference_box TEXT;")
+                conn.exec_driver_sql("ALTER TABLE inspections ADD COLUMN IF NOT EXISTS declared_net_quantity VARCHAR(100);")
             else:
                 cols = [row[1] for row in conn.exec_driver_sql("PRAGMA table_info(evidence_images)").fetchall()]
                 if cols and "calibration_reference_box" not in cols:
                     conn.exec_driver_sql("ALTER TABLE evidence_images ADD COLUMN calibration_reference_box TEXT;")
+                insp_cols = [row[1] for row in conn.exec_driver_sql("PRAGMA table_info(inspections)").fetchall()]
+                if insp_cols and "declared_net_quantity" not in insp_cols:
+                    conn.exec_driver_sql("ALTER TABLE inspections ADD COLUMN declared_net_quantity VARCHAR(100);")
             for idx_stmt in index_statements:
                 try:
                     conn.exec_driver_sql(idx_stmt)
@@ -473,10 +494,14 @@ def migrate_database_schema(engine_or_conn):
                 dialect_name = getattr(engine_or_conn.dialect, "name", "").lower()
                 if "postgres" in dialect_name or "psycopg" in dialect_name:
                     conn.exec_driver_sql("ALTER TABLE evidence_images ADD COLUMN IF NOT EXISTS calibration_reference_box TEXT;")
+                    conn.exec_driver_sql("ALTER TABLE inspections ADD COLUMN IF NOT EXISTS declared_net_quantity VARCHAR(100);")
                 else:
                     cols = [row[1] for row in conn.exec_driver_sql("PRAGMA table_info(evidence_images)").fetchall()]
                     if cols and "calibration_reference_box" not in cols:
                         conn.exec_driver_sql("ALTER TABLE evidence_images ADD COLUMN calibration_reference_box TEXT;")
+                    insp_cols = [row[1] for row in conn.exec_driver_sql("PRAGMA table_info(inspections)").fetchall()]
+                    if insp_cols and "declared_net_quantity" not in insp_cols:
+                        conn.exec_driver_sql("ALTER TABLE inspections ADD COLUMN declared_net_quantity VARCHAR(100);")
                 for idx_stmt in index_statements:
                     try:
                         conn.exec_driver_sql(idx_stmt)
