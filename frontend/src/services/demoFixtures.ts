@@ -319,7 +319,7 @@ export class DemoFixtureService implements IInspectionApiService {
       notice_id: `not_demo_${Date.now()}`,
       notice_reference_number: "LMO/DL/SOUTH/2026/0842",
       bsa_certificate_number: "CERT-BSA2023-20260910-0842",
-      statutory_mandate: "Section 36(1) of Legal Metrology Act, 2009 read with Section 63 BSA 2023",
+      statutory_mandate: "Legal Metrology (Packaged Commodities) Rules, 2011 (as amended) read with Section 36(1) proviso Legal Metrology Act, 2009 & Section 63 BSA 2023",
       pdf_download_url: "/form1.pdf",
       merkle_entry_hash: "8c42b9101adfa9280194bc0281efca891048bca120938a1ef908123bcdef0123",
     };

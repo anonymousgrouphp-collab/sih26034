@@ -24,6 +24,7 @@ import {
 import { Link } from "react-router-dom";
 import { ApiService } from "../services/api";
 import { InspectionSummary } from "../types/inspection";
+import { generateClientForm1PdfBlobUrl } from "../utils/clientForm1PdfGenerator";
 import { resetScrollToTop } from "../components/common/ScrollToTop";
 import { VerdictBadge } from "../components/common/StatusBadge";
 import { StateEmblem } from "../components/common/StateEmblem";
@@ -274,7 +275,13 @@ export const Reports: React.FC = () => {
         compounding_fee_amount: 5000,
         reply_window_days: 15,
       });
-      const downloadUrl = res.pdf_download_url;
+      let downloadUrl = res?.pdf_download_url;
+      if (!downloadUrl || downloadUrl === "/form1.pdf") {
+        try {
+          const fullCase = await ApiService.getInspection(caseItem.id || caseItem.inspection_number);
+          downloadUrl = generateClientForm1PdfBlobUrl(fullCase);
+        } catch {}
+      }
       if (downloadUrl && downloadUrl !== "/form1.pdf") {
         const link = document.createElement("a");
         link.href = downloadUrl;
@@ -288,8 +295,6 @@ export const Reports: React.FC = () => {
             ? `धारा 36(1) नोटिस तैयार एवं डाउनलोड किया गया: ${caseItem.inspection_number}`
             : `Section 36(1) Notice issued & downloaded: ${caseItem.inspection_number}`
         );
-      } else if (ApiService.getOperatingMode() === "DEMO_FIXTURE" || ApiService.isDemoOrFixtureCase(caseItem)) {
-        handleDownload(`Form1_Notice_${caseItem.inspection_number}.pdf`);
       } else {
         setDownloadSuccess(
           language === "hi"

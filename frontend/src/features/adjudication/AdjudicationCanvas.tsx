@@ -23,10 +23,12 @@ import {
 } from "./AdjudicationTraceability";
 import { ConflictResolutionCard, EvidenceConflict } from "./ConflictResolutionCard";
 import { extractStatutoryRecipient } from "../../utils/statutoryNotice";
+import { generateClientForm1PdfBlobUrl } from "../../utils/clientForm1PdfGenerator";
 import { StateEmblem } from "../../components/common/StateEmblem";
 import { GovStampSeal } from "../../components/common/GovStampSeal";
 import { m } from "framer-motion";
 import { useLanguage } from "../../context/LanguageContext";
+import { useAuth } from "../../context/AuthContext";
 
 interface AdjudicationCanvasProps {
   caseData: InspectionCase;
@@ -46,6 +48,7 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
   onFieldEdited,
 }) => {
   const { language } = useLanguage();
+  const { user } = useAuth();
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
 
   const activeAsset: EvidenceAsset | undefined = useMemo(() => {
@@ -90,10 +93,23 @@ export const AdjudicationCanvas: React.FC<AdjudicationCanvasProps> = ({
         compounding_fee_amount: 5000,
         reply_window_days: 15,
       });
-      if (res && res.pdf_download_url && res.pdf_download_url !== "/form1.pdf") {
+      let downloadUrl = res?.pdf_download_url;
+      const effectiveOfficerName = caseData.adjudication?.officer_name || user?.name || "Rajesh Sharma";
+      const effectiveBadgeNumber = caseData.adjudication?.badge_number || user?.badgeNumber || "INSP-DL-0842";
+      if (!downloadUrl || downloadUrl === "/form1.pdf") {
+        downloadUrl = generateClientForm1PdfBlobUrl(
+          caseData,
+          statutoryRecipient,
+          5000,
+          15,
+          effectiveOfficerName,
+          effectiveBadgeNumber
+        );
+      }
+      if (downloadUrl) {
         const filename = `Form-1-Notice-${caseData.inspection_number || caseData.id}.pdf`;
         const dlLink = document.createElement("a");
-        dlLink.href = res.pdf_download_url;
+        dlLink.href = downloadUrl;
         dlLink.download = filename;
         dlLink.target = "_blank";
         document.body.appendChild(dlLink);

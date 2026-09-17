@@ -107,6 +107,10 @@ class Form1NoticePDFGenerator:
         declared_mrp: Optional[str] = None,
         package_type: Optional[str] = None,
         pdp_area_cm2: Optional[float] = None,
+        declared_usp: Optional[str] = None,
+        mfg_date: Optional[str] = None,
+        country_of_origin: Optional[str] = None,
+        consumer_care: Optional[str] = None,
     ) -> Tuple[bytes, LegalNoticeDTO]:
         """Generates archival Form-1 notice PDF bytes and corresponding LegalNoticeDTO."""
         start_time = time.perf_counter()
@@ -116,10 +120,14 @@ class Form1NoticePDFGenerator:
         doc = SimpleDocTemplate(
             target,
             pagesize=A4,
-            rightMargin=18 * mm,
-            leftMargin=18 * mm,
-            topMargin=18 * mm,
-            bottomMargin=18 * mm,
+            rightMargin=14 * mm,
+            leftMargin=14 * mm,
+            topMargin=12 * mm,
+            bottomMargin=12 * mm,
+            title=f"Statutory Notice (Form-1) - {notice_ref}",
+            author="Department of Consumer Affairs - Legal Metrology Division",
+            subject="Statutory Inspection Notice & Deficit Memorandum under Legal Metrology Act, 2009",
+            creator="Nirikshak Legal Metrology Enforcement System (DoCA)",
         )
 
         styles = getSampleStyleSheet()
@@ -129,8 +137,8 @@ class Form1NoticePDFGenerator:
             "GovTitle",
             parent=normal,
             fontName="Helvetica-Bold",
-            fontSize=12,
-            leading=15,
+            fontSize=11,
+            leading=14,
             textColor=NAVY_PRIMARY,
             alignment=1,  # Center
         )
@@ -178,18 +186,19 @@ class Form1NoticePDFGenerator:
         # 1. Official Header
         story.append(Paragraph("GOVERNMENT OF INDIA", style_title))
         story.append(Paragraph("MINISTRY OF CONSUMER AFFAIRS, FOOD & PUBLIC DISTRIBUTION", style_subtitle))
-        story.append(Paragraph("DEPARTMENT OF CONSUMER AFFAIRS — LEGAL METROLOGY DIVISION", style_subtitle))
-        story.append(Spacer(1, 3 * mm))
-        story.append(HRFlowable(width="100%", thickness=1.5, color=NAVY_PRIMARY, spaceAfter=4 * mm))
+        story.append(Paragraph("DEPARTMENT OF CONSUMER AFFAIRS - LEGAL METROLOGY DIVISION", style_subtitle))
+        story.append(Spacer(1, 2 * mm))
+        story.append(HRFlowable(width="100%", thickness=1.2, color=NAVY_PRIMARY, spaceAfter=2.5 * mm))
 
         # 2. Form Title & Mandate
         story.append(Paragraph("<b>STATUTORY INSPECTION NOTICE & DEFICIT MEMORANDUM (FORM-1)</b>", style_title))
         story.append(Paragraph(
-            "<i>Issued under Section 36(1) read with Section 48 of the Legal Metrology Act, 2009<br/>"
-            "and Certified under Section 63 of Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)</i>",
+            "<i>Issued under Section 36(1) read with Section 48 of the Legal Metrology Act, 2009 (as amended by Jan Vishwas Act, 2023)<br/>"
+            "and the Legal Metrology (Packaged Commodities) Rules, 2011 (as amended up to 2024)<br/>"
+            "Certified under Section 63 of Bharatiya Sakshya Adhiniyam, 2023 (BSA 2023)</i>",
             style_subtitle
         ))
-        story.append(Spacer(1, 4 * mm))
+        story.append(Spacer(1, 2.5 * mm))
 
         # 3. Notice Reference & Metadata Table + QR Code
         qr_data = (
@@ -197,7 +206,7 @@ class Form1NoticePDFGenerator:
             f"notice={notice_ref}&cert={bsa_cert.certificate_number}&merkle={bsa_cert.raw_images_merkle_root}"
         )
         qr_buf = cls._create_qr_image(qr_data)
-        qr_flowable = Image(qr_buf, width=28 * mm, height=28 * mm)
+        qr_flowable = Image(qr_buf, width=26 * mm, height=26 * mm)
 
         meta_table_data = [
             [
@@ -209,83 +218,133 @@ class Form1NoticePDFGenerator:
                 qr_flowable
             ]
         ]
-        meta_table = Table(meta_table_data, colWidths=[130 * mm, 35 * mm])
+        meta_table = Table(meta_table_data, colWidths=[146 * mm, 36 * mm])
         meta_table.setStyle(TableStyle([
             ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
             ("BACKGROUND", (0, 0), (-1, -1), GRAY_BG),
-            ("BOX", (0, 0), (-1, -1), 1, GRAY_BORDER),
-            ("TOPPADDING", (0, 0), (-1, -1), 6),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
-            ("LEFTPADDING", (0, 0), (-1, -1), 8),
-            ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+            ("BOX", (0, 0), (-1, -1), 0.5, GRAY_BORDER),
+            ("TOPPADDING", (0, 0), (-1, -1), 3),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+            ("LEFTPADDING", (0, 0), (-1, -1), 6),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 6),
         ]))
         story.append(meta_table)
-        story.append(Spacer(1, 4 * mm))
+        story.append(Spacer(1, 2.5 * mm))
 
         # 4. Addressee Details
         story.append(Paragraph("<b>TO (ALLEGED OFFENDER / RESPONSIBLE PARTY):</b>", style_heading))
+        recip_name = str(recipient.name or "Responsible Commercial Entity").strip()
+        if len(recip_name) > 70:
+            recip_name = recip_name[:67] + "..."
+        recip_addr = str(recipient.registered_address or "Premises recorded during statutory inspection").strip()
+        if len(recip_addr) > 105:
+            recip_addr = recip_addr[:102] + "..."
+
         addressee_text = (
-            f"<b>{recipient.name}</b> ({recipient.recipient_type})<br/>"
-            f"{recipient.registered_address}<br/>"
-            f"Email: {recipient.email or 'N/A'}"
+            f"<b>{recip_name}</b> ({recipient.recipient_type})<br/>"
+            f"{recip_addr}<br/>"
+            f"Email: {recipient.email or 'Declared on package'}"
         )
         story.append(Paragraph(addressee_text, style_body))
-        story.append(Spacer(1, 4 * mm))
+        story.append(Spacer(1, 2.5 * mm))
 
         # 5. Allegation Narrative
         narrative_text = (
             f"TAKE NOTICE that on physical inspection of packaged commodity under your distribution, the "
             f"undersigned authorized Legal Metrology Officer has recorded non-compliance with statutory provisions of the "
-            f"<b>Legal Metrology (Packaged Commodities) Rules, 2011</b>. You are hereby called upon to show cause "
-            f"within <b>{reply_window_days} days</b> of receipt of this notice as to why penal proceedings under "
-            f"<b>Section 36(1) of the Legal Metrology Act, 2009</b> should not be instituted, or submit application "
-            f"for statutory compounding under Section 48 upon payment of the compounding sum indicated below."
+            f"<b>Legal Metrology (Packaged Commodities) Rules, 2011 (as amended up to 2024)</b>. You are hereby served "
+            f"this Statutory Improvement Notice under the <b>proviso to Section 36(1) of the Legal Metrology Act, 2009 "
+            f"(as amended by the Jan Vishwas (Amendment of Provisions) Act, 2023)</b> and called upon to show cause "
+            f"within <b>{reply_window_days} days</b> of receipt of this notice or submit application for statutory "
+            f"compounding under Section 48 upon payment of the compounding sum indicated below."
         )
         story.append(Paragraph(narrative_text, style_body))
-        story.append(Spacer(1, 3 * mm))
+        story.append(Spacer(1, 2.5 * mm))
 
-        def _clean_pdf_text(val: Any) -> str:
+        def _clean_pdf_text(val: Any, max_chars: int = 0) -> str:
             if val is None:
                 return ""
-            text = str(val).replace("₹", "Rs. ")
+            text = str(val).replace("₹", "Rs. ").replace("—", "-").replace("–", "-")
+            text = text.replace("\u2018", "'").replace("\u2019", "'").replace("\u201c", '"').replace("\u201d", '"')
             while "Rs.  " in text:
                 text = text.replace("Rs.  ", "Rs. ")
+            text = " ".join(text.split())
+            if max_chars > 0 and len(text) > max_chars:
+                text = text[:max_chars - 3] + "..."
             return text
+
+        RULE_CODE_MAP = {
+            "RULE_06_1_A_NAME_ADDRESS": "Rule 6(1)(a)",
+            "RULE_06_1_B_GENERIC_NAME": "Rule 6(1)(b)",
+            "RULE_06_1_C_NET_QTY": "Rule 6(1)(c)",
+            "RULE_06_1_D_MRP": "Rule 6(1)(d)",
+            "RULE_06_1_E_MFG_DATE": "Rule 6(1)(e)",
+            "RULE_06_1_F_NET_QUANTITY": "Rule 6(1)(f)",
+            "RULE_06_1_H_NET_QTY_FONT": "Rule 6(1)(h)",
+            "RULE_06_1_K_USP_COMPUTATION": "Rule 6(1)(k)",
+            "RULE_06_2_CONSUMER_CARE": "Rule 6(2)",
+            "RULE_07_TABLE_1": "Rule 7(1) Table-I",
+            "RULE_06_COUNTRY_ORIGIN": "Rule 6(10)",
+            "RULE_06_10_COUNTRY_ORIGIN": "Rule 6(10)",
+            "RULE_04_PREPACKAGED_COMMODITY": "Rule 4",
+            "RULE_18_WHOLESALE_PACKAGE": "Rule 18",
+            "RULE_27_REGISTRATION": "Rule 27",
+        }
+
+        # Clean individual commodity particulars to avoid multiline blowup
+        clean_commodity = _clean_pdf_text(commodity_name, 45) or "Packaged Commodity"
+        clean_brand = _clean_pdf_text(brand_name, 35) or "N/A"
+        clean_net_qty = _clean_pdf_text(declared_net_qty, 25) or "N/A"
+        clean_mrp = _clean_pdf_text(declared_mrp, 50) or "N/A"
+        clean_usp = _clean_pdf_text(declared_usp, 35) or "N/A"
+        clean_mfg = _clean_pdf_text(mfg_date, 28) or "N/A"
+        clean_origin = _clean_pdf_text(country_of_origin, 25) or "India"
+        clean_batch = _clean_pdf_text(batch_number, 22) or "N/A"
+        clean_pkg = _clean_pdf_text(package_type, 26) or "Standard Box / Pack"
+        clean_care = _clean_pdf_text(consumer_care, 55) or "Declared on pack"
 
         # 5.5 Schedule A: Particulars of Inspected Commodity
         story.append(Paragraph("<b>SCHEDULE A: PARTICULARS OF INSPECTED PACKAGED COMMODITY:</b>", style_heading))
         sched_a_data = [
             [
-                Paragraph(f"<b>Commodity / Product:</b> {_clean_pdf_text(commodity_name) or 'Packaged Commodity'}", style_body),
-                Paragraph(f"<b>Brand Name:</b> {_clean_pdf_text(brand_name) or 'N/A'}", style_body),
+                Paragraph(f"<b>Commodity / Product:</b> {clean_commodity}", style_body),
+                Paragraph(f"<b>Brand Name:</b> {clean_brand}", style_body),
             ],
             [
-                Paragraph(f"<b>Declared Net Qty:</b> {_clean_pdf_text(declared_net_qty) or 'N/A'}", style_body),
-                Paragraph(f"<b>Retail Price (MRP):</b> {_clean_pdf_text(declared_mrp) or 'N/A'}", style_body),
+                Paragraph(f"<b>Declared Net Qty:</b> {clean_net_qty}", style_body),
+                Paragraph(f"<b>Retail Price (MRP):</b> {clean_mrp}", style_body),
             ],
             [
-                Paragraph(f"<b>Batch / Lot No.:</b> {_clean_pdf_text(batch_number) or 'N/A'}", style_body),
-                Paragraph(f"<b>Packaging Geometry:</b> {_clean_pdf_text(package_type) or 'Standard Box / Pack'}", style_body),
+                Paragraph(f"<b>Unit Sale Price (USP):</b> {clean_usp}", style_body),
+                Paragraph(f"<b>Month & Year of Mfg/Pkd:</b> {clean_mfg}", style_body),
+            ],
+            [
+                Paragraph(f"<b>Country of Origin:</b> {clean_origin}", style_body),
+                Paragraph(f"<b>Batch / Lot No.:</b> {clean_batch}", style_body),
+            ],
+            [
+                Paragraph(f"<b>Packaging Geometry:</b> {clean_pkg}", style_body),
+                Paragraph(f"<b>Consumer Care:</b> {clean_care}", style_body),
             ],
         ]
         if pdp_area_cm2:
             sched_a_data.append([
-                Paragraph(f"<b>Measured PDP Area:</b> {pdp_area_cm2:.1f} cm²", style_body),
-                Paragraph(f"<b>Inspection Dossier ID:</b> {_clean_pdf_text(inspection_id)}", style_body),
+                Paragraph(f"<b>Measured PDP Area:</b> {pdp_area_cm2:.1f} cm<sup>2</sup>", style_body),
+                Paragraph(f"<b>Inspection Dossier ID:</b> {_clean_pdf_text(inspection_id, 35)}", style_body),
             ])
-        sched_a_table = Table(sched_a_data, colWidths=[85 * mm, 80 * mm])
+        sched_a_table = Table(sched_a_data, colWidths=[91 * mm, 91 * mm])
         sched_a_table.setStyle(TableStyle([
             ("BACKGROUND", (0, 0), (-1, -1), GRAY_BG),
             ("BOX", (0, 0), (-1, -1), 0.5, GRAY_BORDER),
             ("GRID", (0, 0), (-1, -1), 0.5, HexColor("#E2E8F0")),
             ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-            ("TOPPADDING", (0, 0), (-1, -1), 2.5),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 2.5),
-            ("LEFTPADDING", (0, 0), (-1, -1), 6),
-            ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+            ("TOPPADDING", (0, 0), (-1, -1), 2),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
+            ("LEFTPADDING", (0, 0), (-1, -1), 5),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 5),
         ]))
         story.append(sched_a_table)
-        story.append(Spacer(1, 3 * mm))
+        story.append(Spacer(1, 2.5 * mm))
 
         # 6. Violations Table (Schedule B)
         story.append(Paragraph("<b>SCHEDULE B: STATUTORY DEFICITS & NON-COMPLIANCE FINDINGS:</b>", style_heading))
@@ -300,11 +359,12 @@ class Form1NoticePDFGenerator:
         violation_strings = []
 
         for v in violations:
-            v_code = _clean_pdf_text(v.get("rule_code", "RULE_UNKNOWN"))
-            v_ref = _clean_pdf_text(v.get("statutory_reference", "LM (PC) Rules 2011"))
-            v_req = _clean_pdf_text(v.get("required_value", "N/A"))
-            v_meas = _clean_pdf_text(v.get("measured_value", "N/A"))
-            v_disc = _clean_pdf_text(v.get("discrepancy", "Deficit detected"))
+            raw_code = str(v.get("rule_code") or v.get("rule_id") or "RULE_UNKNOWN")
+            v_code = RULE_CODE_MAP.get(raw_code, raw_code.replace("RULE_", "").replace("_", " "))
+            v_ref = _clean_pdf_text(v.get("statutory_reference", "LM (PC) Rules 2011"), 45)
+            v_req = _clean_pdf_text(v.get("required_value", "N/A"), 28)
+            v_meas = _clean_pdf_text(v.get("measured_value", "N/A"), 24)
+            v_disc = _clean_pdf_text(v.get("discrepancy", "Deficit detected"), 36)
             violation_strings.append(f"{v_code}: {v_disc} ({v_ref})")
 
             v_rows.append([
@@ -315,42 +375,56 @@ class Form1NoticePDFGenerator:
                 Paragraph(f"<font color='#DC2626'>{v_disc}</font>", style_body),
             ])
 
-        v_table = Table(v_rows, colWidths=[38 * mm, 45 * mm, 28 * mm, 24 * mm, 30 * mm])
+        if not violations:
+            v_rows.append([
+                Paragraph("<font color='#059669'><b>COMPLIANT</b></font>", style_body),
+                Paragraph("LMPC Rules, 2011 (as amended)", style_body),
+                Paragraph("Statutory Declarations", style_body),
+                Paragraph("Compliant", style_body),
+                Paragraph("<font color='#059669'>Nil - No Deficits Established</font>", style_body),
+            ])
+
+        v_table = Table(v_rows, colWidths=[34 * mm, 50 * mm, 32 * mm, 28 * mm, 38 * mm])
         v_table.setStyle(TableStyle([
             ("BACKGROUND", (0, 0), (-1, 0), HexColor("#E2E8F0")),
             ("TEXTCOLOR", (0, 0), (-1, 0), NAVY_DARK),
             ("GRID", (0, 0), (-1, -1), 0.5, GRAY_BORDER),
             ("VALIGN", (0, 0), (-1, -1), "TOP"),
-            ("TOPPADDING", (0, 0), (-1, -1), 4),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+            ("TOPPADDING", (0, 0), (-1, -1), 3),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
             ("LEFTPADDING", (0, 0), (-1, -1), 4),
             ("RIGHTPADDING", (0, 0), (-1, -1), 4),
         ]))
         story.append(v_table)
-        story.append(Spacer(1, 4 * mm))
+        story.append(Spacer(1, 2.5 * mm))
 
-        # 7. Compounding Fee Box
+        # 7. Compounding / Improvement Notice Box
         fee_data = [
             [
-                Paragraph(f"<b>Statutory Compounding Fee (Section 48 LM Act):</b>", style_body_bold),
+                Paragraph(f"<b>Statutory Improvement Notice / Compounding Fee (Sec 36(1) Proviso & Sec 48 LM Act):</b>", style_body_bold),
                 Paragraph(f"<font color='#1B365D' size='11'><b>Rs. {compounding_fee:,.2f}</b></font>", style_body_bold),
-                Paragraph(f"<b>Reply Window:</b> {reply_window_days} Days", style_body),
+                Paragraph(f"<b>Statutory Cure Window:</b> {reply_window_days} Days", style_body),
             ]
         ]
-        fee_table = Table(fee_data, colWidths=[80 * mm, 45 * mm, 40 * mm])
+        fee_table = Table(fee_data, colWidths=[92 * mm, 45 * mm, 45 * mm])
         fee_table.setStyle(TableStyle([
             ("BACKGROUND", (0, 0), (-1, -1), HexColor("#FEF3C7")),
             ("BOX", (0, 0), (-1, -1), 1, HexColor("#F59E0B")),
             ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-            ("TOPPADDING", (0, 0), (-1, -1), 5),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
-            ("LEFTPADDING", (0, 0), (-1, -1), 8),
+            ("TOPPADDING", (0, 0), (-1, -1), 4),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+            ("LEFTPADDING", (0, 0), (-1, -1), 6),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 6),
         ]))
         story.append(fee_table)
-        story.append(Spacer(1, 4 * mm))
+        story.append(Spacer(1, 2 * mm))
 
-        # 8. Section 63 BSA 2023 Certificate Box
-        story.append(Paragraph("<b>SECTION 63 BHARATIYA SAKSHYA ADHINIYAM, 2023 — EVIDENCE CERTIFICATE</b>", style_heading))
+        # Separate Form-1 Notice & Schedules from Section 63 BSA Certificate
+        story.append(PageBreak())
+
+        # 8. Part II: Section 63 BSA 2023 Evidence Certificate & Officer Attestation
+        story.append(Paragraph("<b>PART II: SECTION 63 BHARATIYA SAKSHYA ADHINIYAM, 2023 - EVIDENCE CERTIFICATE</b>", style_heading))
+        story.append(HRFlowable(width="100%", thickness=1.0, color=NAVY_PRIMARY, spaceAfter=3 * mm))
         cert_text = (
             f"<b>Statutory Certification:</b> This document certifies that the electronic records, photographic measurements, and rule findings "
             f"referenced herein have been produced by an automated diagnostic compliance system operating in lawful custody under Section 63 of "
@@ -361,17 +435,17 @@ class Form1NoticePDFGenerator:
             f"<b>Issuing Officer:</b> {bsa_cert.issuing_officer_name} ({bsa_cert.issuing_officer_id}) | "
             f"<b>Signature Token:</b> <font face='Courier'>{bsa_cert.officer_signature_token[:32]}...</font>"
         )
-        cert_box = Table([[Paragraph(cert_text, style_body)]], colWidths=[165 * mm])
+        cert_box = Table([[Paragraph(cert_text, style_body)]], colWidths=[182 * mm])
         cert_box.setStyle(TableStyle([
             ("BACKGROUND", (0, 0), (-1, -1), HexColor("#F1F5F9")),
             ("BOX", (0, 0), (-1, -1), 1, NAVY_PRIMARY),
-            ("TOPPADDING", (0, 0), (-1, -1), 6),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
-            ("LEFTPADDING", (0, 0), (-1, -1), 8),
-            ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+            ("TOPPADDING", (0, 0), (-1, -1), 5),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+            ("LEFTPADDING", (0, 0), (-1, -1), 6),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 6),
         ]))
         story.append(cert_box)
-        story.append(Spacer(1, 5 * mm))
+        story.append(Spacer(1, 4 * mm))
 
         # 9. Officer Sign-off Block
         sig_data = [
@@ -385,11 +459,11 @@ class Form1NoticePDFGenerator:
                           "<i>[Authenticated under Section 63 BSA 2023]</i>", style_body),
             ]
         ]
-        sig_table = Table(sig_data, colWidths=[80 * mm, 85 * mm])
+        sig_table = Table(sig_data, colWidths=[91 * mm, 91 * mm])
         sig_table.setStyle(TableStyle([
             ("VALIGN", (0, 0), (-1, -1), "TOP"),
             ("LINEABOVE", (0, 0), (-1, -1), 0.5, GRAY_BORDER),
-            ("TOPPADDING", (0, 0), (-1, -1), 6),
+            ("TOPPADDING", (0, 0), (-1, -1), 5),
         ]))
         story.append(sig_table)
 
@@ -410,7 +484,11 @@ class Form1NoticePDFGenerator:
             inspection_id=inspection_id,
             bsa_certificate_number=bsa_cert.certificate_number,
             recipient=recipient,
-            statutory_mandate="Section 36(1) of Legal Metrology Act, 2009 read with Section 63 BSA 2023",
+            statutory_mandate=(
+                "Legal Metrology (Packaged Commodities) Rules, 2011 (as amended up to 2024) read with "
+                "Section 36(1) proviso & Section 48 of Legal Metrology Act, 2009 (as amended by Jan Vishwas Act, 2023) "
+                "and Section 63 BSA 2023"
+            ),
             violations_summary=violation_strings,
             compounding_fee_amount=compounding_fee,
             reply_window_days=reply_window_days,

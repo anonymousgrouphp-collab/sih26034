@@ -60,7 +60,7 @@ class MultilingualOCREngine:
             num_threads=det_num_threads,
             execution_mode=self.execution_mode,
             allow_classical_fallback=allow_classical_fallback,
-            max_side_len=1280
+            max_side_len=int(os.environ.get("DBNET_MAX_SIDE_LEN", "1920"))
         )
         self.recognizer = recognizer if recognizer is not None else PPOCRv4Recognizer(
             num_threads=rec_num_threads,
@@ -127,7 +127,14 @@ class MultilingualOCREngine:
 
         return np.ascontiguousarray(img)
 
-    def _extract_tokens_from_mat(self, mat: np.ndarray, img_w: int, img_h: int) -> List[Dict[str, Any]]:
+    def _extract_tokens_from_mat(
+        self,
+        mat: np.ndarray,
+        img_w: int,
+        img_h: int,
+        crop_source: Optional[np.ndarray] = None,
+        crop_scale: float = 1.0,
+    ) -> List[Dict[str, Any]]:
         """Internal helper to detect and recognize text tokens on an oriented image buffer."""
         detections = self.detector.detect(mat)
         extracted: List[Dict[str, Any]] = []
@@ -138,22 +145,47 @@ class MultilingualOCREngine:
             if not is_valid:
                 continue
 
-            # Extract perspective-rectified crop
+            # Extract perspective-rectified crop from full-resolution crop_source if available
             try:
-                crop = PolygonNormalizer.extract_crop(mat, det.polygon, target_height=48)
+                if crop_source is not None and abs(crop_scale - 1.0) > 1e-4:
+                    poly_scaled = [[pt[0] * crop_scale, pt[1] * crop_scale] for pt in det.polygon]
+                    crop = PolygonNormalizer.extract_crop(crop_source, poly_scaled, target_height=48)
+                else:
+                    crop = PolygonNormalizer.extract_crop(mat, det.polygon, target_height=48)
             except Exception:
-                continue
+                try:
+                    crop = PolygonNormalizer.extract_crop(mat, det.polygon, target_height=48)
+                except Exception:
+                    continue
 
             # Multilingual recognition (PP-OCRv4)
             p_text, p_conf, p_lang = self.recognizer.recognize(crop)
 
-            # Inversion probe: if initial confidence is broken/inverted (< 0.40), test 180-degree flipped crop
-            if crop is not None and crop.size > 0 and p_conf < 0.40:
+            # Inversion probe: if initial confidence is low or inverted (< 0.75), test 180-degree flipped crop
+            if crop is not None and crop.size > 0 and p_conf < 0.75:
                 try:
                     crop_180 = cv2.rotate(crop, cv2.ROTATE_180)
                     p_text_180, p_conf_180, p_lang_180 = self.recognizer.recognize(crop_180)
-                    if p_conf_180 > p_conf + 0.05 or (p_conf < 0.60 and p_conf_180 > p_conf):
+                    if p_conf_180 > p_conf + 0.05 or (p_conf < 0.50 and p_conf_180 > p_conf):
                         p_text, p_conf, p_lang = p_text_180, p_conf_180, p_lang_180
+                except Exception:
+                    pass
+
+            # Packaging contrast enhancement probe for low/medium confidence crops (< 0.85)
+            # Physical factors like cylindrical curvature, glossy specular glare, and colored plastic backgrounds
+            # can degrade CTC confidence on fine print statutory labels
+            if crop is not None and crop.size > 0 and p_conf < 0.85:
+                try:
+                    lab = cv2.cvtColor(crop, cv2.COLOR_BGR2LAB)
+                    l, a, b = cv2.split(lab)
+                    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(4, 4))
+                    cl = clahe.apply(l)
+                    enh_bgr = cv2.cvtColor(cv2.merge((cl, a, b)), cv2.COLOR_LAB2BGR)
+                    gaussian = cv2.GaussianBlur(enh_bgr, (0, 0), 2.0)
+                    unsharp = cv2.addWeighted(enh_bgr, 1.5, gaussian, -0.5, 0)
+                    p_text_enh, p_conf_enh, p_lang_enh = self.recognizer.recognize(unsharp)
+                    if p_conf_enh > p_conf + 0.03 or (not p_text.strip() and p_text_enh.strip()):
+                        p_text, p_conf, p_lang = p_text_enh, p_conf_enh, p_lang_enh
                 except Exception:
                     pass
 
@@ -220,19 +252,22 @@ class MultilingualOCREngine:
 
         orig_h, orig_w = image.shape[:2]
 
-        # Memory-safe downsample: cap max dimension to 1280
+        # Memory-safe downsample: cap max dimension to 1920 to preserve fine print statutory text
+        max_dim = int(os.environ.get("OCR_MAX_IMAGE_DIM", "1920"))
         scale = 1.0
         proc_image = image
-        if max(orig_h, orig_w) > 1280:
-            scale = 1280.0 / max(orig_h, orig_w)
+        if max(orig_h, orig_w) > max_dim:
+            scale = float(max_dim) / max(orig_h, orig_w)
             proc_w = max(int(round(orig_w * scale)), 16)
             proc_h = max(int(round(orig_h * scale)), 16)
             proc_image = cv2.resize(image, (proc_w, proc_h), interpolation=cv2.INTER_AREA)
 
         curr_h, curr_w = proc_image.shape[:2]
+        inv_scale = 1.0 / scale if abs(scale - 1.0) > 1e-4 else 1.0
 
-        # 1. Primary pass at 0 degrees
-        tokens_0 = self._extract_tokens_from_mat(proc_image, curr_w, curr_h)
+        # 1. Primary pass at 0 degrees (extracting crops from full-res image if downsampled)
+        crop_src_0 = image if abs(scale - 1.0) > 1e-4 else None
+        tokens_0 = self._extract_tokens_from_mat(proc_image, curr_w, curr_h, crop_source=crop_src_0, crop_scale=inv_scale)
 
         STATUTORY_KEYWORDS = (
             "mrp", "₹", "rs.", "net", "qty", "content", "mfg", "pkd", "usp", "exp", "batch",
@@ -257,8 +292,9 @@ class MultilingualOCREngine:
         )
         if needs_rot:
             img_90 = cv2.rotate(proc_image, cv2.ROTATE_90_CLOCKWISE)
+            crop_src_90 = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE) if abs(scale - 1.0) > 1e-4 else None
             # In img_90: width is curr_h, height is curr_w
-            tokens_90 = self._extract_tokens_from_mat(img_90, curr_h, curr_w)
+            tokens_90 = self._extract_tokens_from_mat(img_90, curr_h, curr_w, crop_source=crop_src_90, crop_scale=inv_scale)
             stat_90 = sum(1 for t in tokens_90 if any(k in t["text"].lower() for k in STATUTORY_KEYWORDS))
 
             if stat_90 > 0 or len(tokens_90) > len(tokens_0):
@@ -288,8 +324,14 @@ class MultilingualOCREngine:
         # 3. Inverse scale mapping back to original image dimensions
         inv_scale = 1.0 / scale if abs(scale - 1.0) > 1e-4 else 1.0
         final_tokens: List[OCRToken] = []
+        token_idx = 1
 
-        for i, item in enumerate(raw_candidates):
+        for item in raw_candidates:
+            token_text = item["text"].strip()
+            # Discard empty strings or noise-only artifacts that artificially depress mean confidence
+            if not token_text or item["confidence"] < 0.10:
+                continue
+
             poly = item["polygon"]
             scaled_poly = [
                 [int(round(pt[0] * inv_scale)), int(round(pt[1] * inv_scale))]
@@ -301,7 +343,7 @@ class MultilingualOCREngine:
             int_bbox = [int(round(b)) for b in bbox]
 
             token = OCRToken(
-                token_id=f"tok_{i + 1:02d}",
+                token_id=f"tok_{token_idx:02d}",
                 text=item["text"],
                 confidence=round(item["confidence"], 4),
                 polygon=int_scaled,
@@ -309,6 +351,7 @@ class MultilingualOCREngine:
                 language=item["language"]
             )
             final_tokens.append(token)
+            token_idx += 1
 
         # Compute aggregate metrics
         total_tokens = len(final_tokens)

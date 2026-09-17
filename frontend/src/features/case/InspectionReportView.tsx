@@ -9,6 +9,7 @@ import { useAuth } from "../../context/AuthContext";
 import { ApiService } from "../../services/api";
 
 import { extractStatutoryRecipient } from "../../utils/statutoryNotice";
+import { generateClientForm1PdfBlobUrl } from "../../utils/clientForm1PdfGenerator";
 
 interface InspectionReportViewProps {
   caseData: InspectionCase;
@@ -45,8 +46,8 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
 
   const handleDownloadPdf = async () => {
     setIsDownloading(true);
+    const recipient = extractStatutoryRecipient(caseData);
     try {
-      const recipient = extractStatutoryRecipient(caseData);
       const res = await ApiService.generateNotice({
         inspection_id: caseData.id,
         recipient: {
@@ -59,10 +60,22 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
         reply_window_days: 15,
       });
 
-      if (res && res.pdf_download_url && res.pdf_download_url !== "/form1.pdf") {
+      let downloadUrl = res?.pdf_download_url;
+      if (!downloadUrl || downloadUrl === "/form1.pdf") {
+        downloadUrl = generateClientForm1PdfBlobUrl(
+          caseData,
+          recipient,
+          5000,
+          15,
+          effectiveOfficerName,
+          effectiveBadgeNumber
+        );
+      }
+
+      if (downloadUrl) {
         const filename = `Form-1-Notice-${caseData.inspection_number || caseData.id}.pdf`;
         const dlLink = document.createElement("a");
-        dlLink.href = res.pdf_download_url;
+        dlLink.href = downloadUrl;
         dlLink.download = filename;
         dlLink.target = "_blank";
         document.body.appendChild(dlLink);
@@ -71,7 +84,28 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
         return;
       }
     } catch (err) {
-      console.warn("Backend notice download unavailable, engaging high-fidelity Gazette Print/PDF view:", err);
+      console.warn("Notice download fallback to dynamic client generator:", err);
+      try {
+        const fallbackUrl = generateClientForm1PdfBlobUrl(
+          caseData,
+          recipient,
+          5000,
+          15,
+          effectiveOfficerName,
+          effectiveBadgeNumber
+        );
+        const filename = `Form-1-Notice-${caseData.inspection_number || caseData.id}.pdf`;
+        const dlLink = document.createElement("a");
+        dlLink.href = fallbackUrl;
+        dlLink.download = filename;
+        dlLink.target = "_blank";
+        document.body.appendChild(dlLink);
+        dlLink.click();
+        document.body.removeChild(dlLink);
+        return;
+      } catch (clientErr) {
+        console.warn("Client PDF fallback error:", clientErr);
+      }
     } finally {
       setIsDownloading(false);
     }
@@ -172,8 +206,8 @@ export const InspectionReportView: React.FC<InspectionReportViewProps> = ({
               </h1>
               <div className="text-xs text-slate-600 font-medium mt-0.5">
                 {language === "hi"
-                  ? "विधिक मापविज्ञान अधिनियम, 2009 की धारा 15 सपठित एलएमपीसी नियम, 2011 के नियम 6 व तालिका-I के अंतर्गत सांविधिक नोटिस"
-                  : "Statutory Notice under Section 15 of Legal Metrology Act, 2009 read with Rule 6 & Table-I of LMPC Rules, 2011"}
+                  ? "विधिक मापविज्ञान अधिनियम, 2009 (यथा संशोधित जन विश्वास अधिनियम, 2023) की धारा 36(1) सपठित धारा 48 एवं विधिक मापविज्ञान (पैकेज्ड कमोडिटीज) नियम, 2011 (2024 तक यथा संशोधित) के अंतर्गत सांविधिक नोटिस"
+                  : "Statutory Notice under Section 36(1) read with Section 48 of Legal Metrology Act, 2009 (as amended by Jan Vishwas Act, 2023) and Legal Metrology (Packaged Commodities) Rules, 2011 (as amended up to 2024)"}
               </div>
             </div>
           </div>

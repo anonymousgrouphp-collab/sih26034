@@ -1,7 +1,7 @@
 import { InspectionCase, ExtractedField } from "../types/inspection";
 
 export interface StatutoryRecipient {
-  type: "MANUFACTURER" | "PACKER" | "IMPORTER";
+  type: "MANUFACTURER" | "PACKER" | "IMPORTER" | "ECOMMERCE_PLATFORM" | "SELLER";
   name: string;
   address: string;
   email?: string;

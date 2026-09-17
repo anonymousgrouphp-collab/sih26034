@@ -1214,7 +1214,7 @@ export class MockApiService implements IInspectionApiService {
       notice_id: `not_mock_${Date.now()}`,
       notice_reference_number: `LMO/DL/SOUTH/${new Date().getFullYear()}/${shortBadge}`,
       bsa_certificate_number: `CERT-BSA2023-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-${shortBadge}`,
-      statutory_mandate: "Section 36(1) of Legal Metrology Act, 2009 read with Section 63 BSA 2023",
+      statutory_mandate: "Legal Metrology (Packaged Commodities) Rules, 2011 (as amended) read with Section 36(1) proviso Legal Metrology Act, 2009 & Section 63 BSA 2023",
       pdf_download_url: "/form1.pdf",
       merkle_entry_hash: "8c42b9101adfa9280194bc0281efca891048bca120938a1ef908123bcdef0123",
     };

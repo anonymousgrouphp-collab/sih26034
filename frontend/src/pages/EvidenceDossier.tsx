@@ -7,6 +7,7 @@ import { useLanguage } from "../context/LanguageContext";
 import { useAuth } from "../context/AuthContext";
 import { getJurisdictionCircle } from "../context/CircleContext";
 import { extractStatutoryRecipient } from "../utils/statutoryNotice";
+import { generateClientForm1PdfBlobUrl } from "../utils/clientForm1PdfGenerator";
 import {
   ArrowLeft,
   Download,
@@ -180,10 +181,14 @@ export const EvidenceDossier: React.FC = () => {
         reply_window_days: 15,
       });
 
-      if (res && res.pdf_download_url && res.pdf_download_url !== "/form1.pdf") {
+      let downloadUrl = res?.pdf_download_url;
+      if (!downloadUrl || downloadUrl === "/form1.pdf") {
+        downloadUrl = generateClientForm1PdfBlobUrl(caseData, extractStatutoryRecipient(caseData), 5000, 15);
+      }
+      if (downloadUrl) {
         const filename = `Form-1-Notice-${caseData.inspection_number || caseData.id}.pdf`;
         const dlLink = document.createElement("a");
-        dlLink.href = res.pdf_download_url;
+        dlLink.href = downloadUrl;
         dlLink.download = filename;
         dlLink.target = "_blank";
         document.body.appendChild(dlLink);

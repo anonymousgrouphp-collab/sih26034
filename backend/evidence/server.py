@@ -3120,7 +3120,7 @@ def generate_legal_notice(
             "notice_id": existing_notice.id,
             "notice_reference_number": existing_notice.notice_reference_number,
             "bsa_certificate_number": existing_cert.certificate_number if existing_cert else f"SEC63-BSA-2026-{insp.id[:8].upper()}",
-            "statutory_mandate": "Section 36(1) of Legal Metrology Act, 2009 read with Section 63 BSA 2023",
+            "statutory_mandate": "Legal Metrology (Packaged Commodities) Rules, 2011 (as amended up to 2024) read with Section 36(1) proviso & Section 48 of Legal Metrology Act, 2009 (as amended by Jan Vishwas Act, 2023) and Section 63 BSA 2023",
             "pdf_download_url": f"/api/v1/notices/{existing_notice.id}/pdf",
             "merkle_entry_hash": (existing_cert.raw_images_merkle_root if existing_cert else "VALID"),
             "dispatch_status": existing_notice.notice_dispatch_status,
@@ -3234,23 +3234,98 @@ def generate_legal_notice(
     is_generic_name = not recipient_name or any(g in recipient_name.lower() for g in ["responsible enterprise", "unlabeled", "unknown", "sample"])
     is_generic_address = not recipient_address or any(g in recipient_address.lower() for g in ["premises recorded", "unknown", "sample"])
 
-    if is_generic_name or is_generic_address or not recipient_email:
-        # Check BoundingBox records for extracted entity addresses
-        image_ids = [img.id for img in images]
-        boxes = []
-        if image_ids:
-            boxes = db.execute(
-                select(BoundingBox).where(
-                    (BoundingBox.image_id.in_(image_ids)) &
-                    (BoundingBox.field_type.in_([
-                        "MANUFACTURER_ADDRESS", "MANUFACTURER",
-                        "PACKER_ADDRESS", "PACKER",
-                        "IMPORTER_ADDRESS", "IMPORTER",
-                        "CONSUMER_CARE_CONTACT", "CONSUMER_CARE"
-                    ]))
-                )
-            ).scalars().all()
+    # Query all bounding boxes across inspection evidence images for product particulars and recipient info
+    image_ids = [img.id for img in images]
+    boxes = []
+    if image_ids:
+        boxes = db.execute(
+            select(BoundingBox).where(BoundingBox.image_id.in_(image_ids))
+        ).scalars().all()
 
+    # Extract additional product particulars from bounding boxes unconditionally
+    import re
+    declared_usp = None
+    mfg_date = None
+    country_of_origin = None
+    care_contacts = []
+    if recipient_email:
+        care_contacts.append(f"Email: {recipient_email}")
+
+    for b in boxes:
+        norm = {}
+        if b.normalized_text:
+            try:
+                norm = json.loads(b.normalized_text) if isinstance(b.normalized_text, str) else b.normalized_text
+            except Exception:
+                norm = {}
+
+        if not declared_usp and b.field_type in ("UNIT_SALE_PRICE", "USP"):
+            if isinstance(norm, dict) and norm.get("usp_value"):
+                declared_usp = f"Rs. {norm['usp_value']} per unit"
+            else:
+                raw_usp = (b.raw_ocr_text or "").strip()
+                if raw_usp:
+                    m_usp = re.search(r'(?:Rs\.?|₹|USP\s*:?)\s*([\d,]+(?:\.\d{2})?\s*(?:per|/)\s*[A-Za-z]+)', raw_usp, re.I)
+                    declared_usp = m_usp.group(0) if m_usp else raw_usp[:30]
+
+        elif not mfg_date and b.field_type in ("MANUFACTURING_DATE", "MFG_DATE", "PACKING_DATE", "DATE_OF_MANUFACTURE"):
+            if isinstance(norm, dict) and norm.get("mfg_month") and norm.get("mfg_year"):
+                declared_mfg = f"{int(norm['mfg_month']):02d}/{norm['mfg_year']}"
+            else:
+                m_date = re.search(r'(\d{1,2}\s*[/-]\s*\d{2,4}|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s*\d{4})', b.raw_ocr_text or "", re.I)
+                declared_mfg = m_date.group(1).strip() if m_date else None
+            mfg_date = declared_mfg or (b.raw_ocr_text or "").replace("MFG", "").replace("PKD", "").replace(":", "").strip()[:25]
+
+        elif not country_of_origin and b.field_type in ("COUNTRY_OF_ORIGIN", "ORIGIN"):
+            if isinstance(norm, dict) and norm.get("country"):
+                country_of_origin = norm.get("country").strip()
+            else:
+                m_co = re.search(r'\b(India|China|Vietnam|Germany|Japan|USA|United States|Taiwan|Thailand|South Korea|United Kingdom|Bangladesh|Malaysia)\b', b.raw_ocr_text or "", re.I)
+                country_of_origin = m_co.group(1).title() if m_co else "India"
+
+        elif not declared_mrp and b.field_type in ("MAXIMUM_RETAIL_PRICE", "MRP"):
+            if isinstance(norm, dict) and norm.get("amount"):
+                declared_mrp = f"Rs. {float(norm['amount']):,.2f} (Inclusive of all taxes)"
+            else:
+                m_mrp = re.search(r'(?:Rs\.?|₹|MRP\s*:?)\s*([\d,]+(?:\.\d{2})?)', b.raw_ocr_text or "")
+                declared_mrp = f"Rs. {m_mrp.group(1)} (Inclusive of all taxes)" if m_mrp else (b.raw_ocr_text or "").strip()[:35]
+
+        elif not declared_net_qty and b.field_type in ("NET_QUANTITY", "NET_WEIGHT", "NET_VOLUME"):
+            if isinstance(norm, dict) and norm.get("quantity") and norm.get("unit"):
+                declared_net_qty = f"{norm['quantity']} {norm['unit']}"
+            else:
+                m_qty = re.search(r'(\d+(?:\.\d+)?\s*(?:g|kg|ml|l|unit|units|u|n|piece|pieces))\b', b.raw_ocr_text or "", re.I)
+                declared_net_qty = m_qty.group(1).strip() if m_qty else (b.raw_ocr_text or "").replace("Net Quantity", "").replace(":", "").strip()[:25]
+
+        elif commodity_name in ("Packaged Commodity", None, "") and b.field_type in ("COMMODITY_NAME", "GENERIC_NAME", "PRODUCT_NAME"):
+            if isinstance(norm, dict) and norm.get("generic_name"):
+                commodity_name = norm["generic_name"].strip()[:40]
+            else:
+                commodity_name = (b.raw_ocr_text or "").strip()[:40]
+
+        elif not brand_name and b.field_type in ("BRAND_NAME", "BRAND"):
+            brand_name = (b.raw_ocr_text or "").strip()[:35]
+
+        elif not batch_number and b.field_type in ("BATCH_NUMBER", "BATCH_LOT_NUMBER", "LOT_NUMBER"):
+            batch_number = (b.raw_ocr_text or "").strip()[:22]
+
+        elif b.field_type in ("CONSUMER_CARE_CONTACT", "CONSUMER_CARE"):
+            if isinstance(norm, dict):
+                if norm.get("email") and norm["email"] not in care_contacts:
+                    care_contacts.append(f"Email: {norm['email']}")
+                if norm.get("phone") and norm["phone"] not in care_contacts:
+                    care_contacts.append(f"Tel: {norm['phone']}")
+            if not care_contacts and b.raw_ocr_text:
+                m_em = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', b.raw_ocr_text)
+                if m_em and m_em.group(0) not in care_contacts:
+                    care_contacts.append(f"Email: {m_em.group(0)}")
+                m_ph = re.search(r'(?:\+91[\s-]?)?\d{10}|1800[\s-]?\d{3}[\s-]?\d{3,4}', b.raw_ocr_text)
+                if m_ph and m_ph.group(0) not in care_contacts:
+                    care_contacts.append(f"Tel: {m_ph.group(0)}")
+
+    consumer_care_str = " | ".join(care_contacts) if care_contacts else (recipient_email or "Declared on package")
+
+    if is_generic_name or is_generic_address or not recipient_email:
         for b in boxes:
             norm = {}
             if b.normalized_text:
@@ -3262,9 +3337,18 @@ def generate_legal_notice(
             if b.field_type in ("MANUFACTURER_ADDRESS", "MANUFACTURER", "PACKER_ADDRESS", "IMPORTER_ADDRESS"):
                 if is_generic_name:
                     extracted_n = norm.get("name") if isinstance(norm, dict) else None
+                    if not extracted_n and b.raw_ocr_text:
+                        m_mfg = re.search(r'(?:Manufactured|Marketed|Packed)\s*(?:&|\band\b)?\s*(?:Marketed|Packed|Manufactured)?\s*By\s*:\s*([^,\n\r]+)', b.raw_ocr_text, re.I)
+                        if m_mfg:
+                            extracted_n = m_mfg.group(1).strip()
                     extracted_n = extracted_n or getattr(insp, "manufacturer_name", None)
                     if extracted_n:
-                        recipient_name = extracted_n
+                        # Clean if address was prepended
+                        if "Manufactured & Marketed By:" in extracted_n:
+                            extracted_n = extracted_n.split("Manufactured & Marketed By:")[-1].strip()
+                        elif "Manufactured By:" in extracted_n:
+                            extracted_n = extracted_n.split("Manufactured By:")[-1].strip()
+                        recipient_name = extracted_n[:60]
                         is_generic_name = False
                         if "PACKER" in b.field_type:
                             recipient_type = "PACKER"
@@ -3274,7 +3358,9 @@ def generate_legal_notice(
                     extracted_a = (norm.get("address_line") or norm.get("raw_text")) if isinstance(norm, dict) else None
                     extracted_a = extracted_a or b.raw_ocr_text
                     if extracted_a:
-                        recipient_address = extracted_a
+                        cleaned_a = re.sub(r'Manufactured\s*&?\s*Marketed\s*By\s*:[^,]+', '', extracted_a, flags=re.I).strip()
+                        cleaned_a = " ".join(cleaned_a.split())
+                        recipient_address = (cleaned_a or extracted_a)[:95]
                         is_generic_address = False
 
             if not recipient_email and b.field_type in ("CONSUMER_CARE_CONTACT", "CONSUMER_CARE"):
@@ -3283,10 +3369,13 @@ def generate_legal_notice(
                     recipient_email = extracted_e
 
     if not recipient_name or is_generic_name:
-        if getattr(insp, "manufacturer_name", None):
-            recipient_name = getattr(insp, "manufacturer_name")
-        elif getattr(insp, "brand_name", None):
+        if getattr(insp, "brand_name", None):
             recipient_name = f"{getattr(insp, 'brand_name')} (Packer / Manufacturer)"
+        elif getattr(insp, "manufacturer_name", None):
+            m_clean = getattr(insp, "manufacturer_name")
+            if "Manufactured & Marketed By:" in m_clean:
+                m_clean = m_clean.split("Manufactured & Marketed By:")[-1].strip()
+            recipient_name = m_clean[:60]
         elif getattr(insp, "product_name", None) and getattr(insp, "product_name") != "Unlabeled Sample":
             recipient_name = f"{getattr(insp, 'product_name')} (Commercial Entity)"
 
@@ -3316,6 +3405,10 @@ def generate_legal_notice(
         declared_mrp=declared_mrp,
         package_type=package_type,
         pdp_area_cm2=pdp_area,
+        declared_usp=declared_usp,
+        mfg_date=mfg_date,
+        country_of_origin=country_of_origin,
+        consumer_care=consumer_care_str,
     )
 
     # Save to decoupled storage (ADL-19)
@@ -3333,7 +3426,7 @@ def generate_legal_notice(
         recipient_name=recipient_dto.name,
         recipient_registered_address=recipient_dto.registered_address,
         recipient_email=recipient_dto.email,
-        statutory_section="Section 36(1) of Legal Metrology Act, 2009",
+        statutory_section="Section 36(1) Legal Metrology Act, 2009 read with LMPC Rules, 2011 (as amended)",
         violations_summary="; ".join(f"{v['rule_code']}: {v['discrepancy']}" for v in violation_dicts),
         compounding_fee_amount=payload.compounding_fee_amount,
         reply_window_days=payload.reply_window_days,
@@ -3356,7 +3449,7 @@ def generate_legal_notice(
         "notice_id": legal_notice.id,
         "notice_reference_number": notice_ref,
         "bsa_certificate_number": cert_dto.certificate_number,
-        "statutory_mandate": "Section 36(1) of Legal Metrology Act, 2009 read with Section 63 BSA 2023",
+        "statutory_mandate": "Legal Metrology (Packaged Commodities) Rules, 2011 (as amended up to 2024) read with Section 36(1) proviso & Section 48 of Legal Metrology Act, 2009 (as amended by Jan Vishwas Act, 2023) and Section 63 BSA 2023",
         "pdf_download_url": f"/api/v1/notices/{legal_notice.id}/pdf",
         "merkle_entry_hash": merkle_root,
     }

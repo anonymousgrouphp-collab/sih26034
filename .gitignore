@@ -134,3 +134,5 @@ backend/storage/uploads/*
 # Backups & scratch images
 *.bak
 page_*_img_*.png
+*.mp4
+form 1/

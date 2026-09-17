@@ -246,6 +246,12 @@ class PolygonNormalizer:
             crop = cv2.rotate(crop, cv2.ROTATE_90_CLOCKWISE)
             max_width, max_height = max_height, max_width
 
+        # Add horizontal context padding to prevent CTC blank token boundary character truncation
+        # on fine print packaging declarations
+        pad_x = max(int(round(max_height * 0.08)), 3)
+        crop = cv2.copyMakeBorder(crop, 0, 0, pad_x, pad_x, cv2.BORDER_REPLICATE)
+        max_width += 2 * pad_x
+
         if target_height is not None and target_height > 0:
             aspect_ratio = max_width / max_height
             scaled_width = max(min(int(round(target_height * aspect_ratio)), 4096), 16)

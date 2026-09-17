@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext";
+import { useAuth } from "../../context/AuthContext";
 import { InspectionCase, EvidenceAsset, AdjudicationRequest, OfficerRole } from "../../types/inspection";
 import { CaseHeader } from "./CaseHeader";
 import { EvidenceIntake } from "./EvidenceIntake";
@@ -15,6 +16,7 @@ import { ApiService } from "../../services/api";
 import { DemoCaseTourBanner } from "../demo/DemoCaseTourBanner";
 import { resetScrollToTop } from "../../components/common/ScrollToTop";
 import { extractStatutoryRecipient } from "../../utils/statutoryNotice";
+import { generateClientForm1PdfBlobUrl } from "../../utils/clientForm1PdfGenerator";
 import {
   CalibrationCard,
   MeasurementCard,
@@ -76,6 +78,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
   onSelectCase,
 }) => {
   const { language } = useLanguage();
+  const { user } = useAuth();
   const [isSubmittingEvidence, setIsSubmittingEvidence] = useState(false);
   const [isAnalyzingPipeline, setIsAnalyzingPipeline] = useState(false);
   const [isRetakeMode, setIsRetakeMode] = useState(false);
@@ -315,17 +318,29 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
         compounding_fee_amount: 5000,
         reply_window_days: 15,
       });
-      if (res && res.pdf_download_url && res.pdf_download_url !== "/form1.pdf") {
+      let downloadUrl = res?.pdf_download_url;
+      const effectiveOfficerName = caseData.adjudication?.officer_name || user?.name || "Rajesh Sharma";
+      const effectiveBadgeNumber = caseData.adjudication?.badge_number || user?.badgeNumber || "INSP-DL-0842";
+      if (!downloadUrl || downloadUrl === "/form1.pdf") {
+        downloadUrl = generateClientForm1PdfBlobUrl(
+          caseData,
+          recipient,
+          5000,
+          15,
+          effectiveOfficerName,
+          effectiveBadgeNumber
+        );
+      }
+      if (downloadUrl) {
         const filename = `Form-1-Notice-${caseData.inspection_number || caseData.id}.pdf`;
         const dlLink = document.createElement("a");
-        dlLink.href = res.pdf_download_url;
+        dlLink.href = downloadUrl;
         dlLink.download = filename;
         dlLink.target = "_blank";
         document.body.appendChild(dlLink);
         dlLink.click();
         document.body.removeChild(dlLink);
       } else {
-        // Direct officer to authentic on-screen Form-1 Report View
         setActiveWorkspaceView("REPORT");
       }
 
