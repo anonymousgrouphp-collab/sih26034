@@ -60,6 +60,9 @@ import {
   Lock,
   Trash2,
   Activity,
+  Info,
+  Camera,
+  AlertCircle,
 } from "lucide-react";
 
 interface CaseWorkspaceProps {
@@ -838,8 +841,8 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
       )}
 
       {/* 2. Main Stage Area */}
-      {caseData.evidence_assets.length === 0 || isRetakeMode ? (
-        /* Evidence Intake Mode */
+      {isRetakeMode ? (
+        /* Evidence Intake Mode (Explicit Officer Retake) */
         <div className="space-y-3">
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-3.5 text-xs text-slate-700 flex items-start gap-2.5 shadow-2xs">
             <svg className="w-4 h-4 text-[#1B365D] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -847,7 +850,7 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
             </svg>
             <div>
               <span className="font-bold text-[#1B365D]">
-                {language === "hi" ? "चरण 1: भौतिक साक्ष्य अंतर्ग्रहण। " : "Stage 1: Physical Evidence Ingestion. "}
+                {language === "hi" ? "चरण 1: भौतिक साक्ष्य अंतर्ग्रहण / पुनः अधिग्रहण। " : "Stage 1: Physical Evidence Ingestion / Retake. "}
               </span>
               {language === "hi"
                 ? "समान तल पर रखे अरूको 4x4 (50 मिमी) संदर्भ मार्कर के साथ मुख्य सम्मुख पैनल (पीडीपी) तस्वीर चुनें या कैप्चर करें।"
@@ -862,24 +865,21 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
             existingAsset={activeAsset}
             onClearExisting={() => setIsRetakeMode(false)}
             retakeReason={
-              isRetakeMode
-                ? (language === "hi"
-                    ? "भौतिक पुनः कैप्चर का अनुरोध: सुनिश्चित करें कि पैकेजिंग स्थिर, अच्छी तरह से प्रकाशित हो और 50 मिमी अरूको मार्कर समतलीय हो।"
-                    : "Physical Retake Requested: Ensure packaging is steady, well-lit, and the 50mm ArUco fiducial marker is planar.")
-                : undefined
+              language === "hi"
+                ? "भौतिक पुनः कैप्चर का अनुरोध: सुनिश्चित करें कि पैकेजिंग स्थिर, अच्छी तरह से प्रकाशित हो और 50 मिमी अरूको मार्कर समतलीय हो।"
+                : "Physical Retake Requested: Ensure packaging is steady, well-lit, and the 50mm ArUco fiducial marker is planar."
             }
-            autoOpenCamera={isRetakeMode}
+            autoOpenCamera={true}
           />
         </div>
       ) : (
         /* Inspection Active Workspace Area */
         <div className="space-y-4">
-          {/* Workspace Mode Switcher (available when case has evaluations or evidence assets) */}
-          {((caseData.rule_evaluations && caseData.rule_evaluations.length > 0) || (caseData.evidence_assets && caseData.evidence_assets.length > 0)) && (
-            <div className="workspace-switcher screen-only no-print flex flex-col sm:flex-row items-stretch sm:items-center justify-between bg-white p-2 rounded-xl border border-slate-200 gap-2 min-w-0 shadow-xs">
-              <div className="flex items-center gap-1.5 flex-wrap lg:flex-nowrap overflow-x-auto no-scrollbar min-w-0 flex-1">
-                <button
-                  type="button"
+          {/* Workspace Mode Switcher (Always accessible for seamless navigation) */}
+          <div className="workspace-switcher screen-only no-print flex flex-col sm:flex-row items-stretch sm:items-center justify-between bg-white p-2 rounded-xl border border-slate-200 gap-2 min-w-0 shadow-xs">
+            <div className="flex items-center gap-1.5 flex-wrap lg:flex-nowrap overflow-x-auto no-scrollbar min-w-0 flex-1">
+              <button
+                type="button"
                   onClick={() => handleSwitchWorkspaceView("OVERVIEW")}
                   className={`px-3.5 py-2 text-sm font-bold rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
                     activeWorkspaceView === "OVERVIEW"
@@ -970,13 +970,36 @@ export const CaseWorkspace: React.FC<CaseWorkspaceProps> = ({
                 </Link>
               </div>
             </div>
-          )}
 
           {/* View 0: Inspection Overview (Nirikshak Vision Synthesis) */}
           {activeWorkspaceView === "OVERVIEW" ? (
             <div className="space-y-4">
               {/* 1. 5-Stage Statutory Pipeline Progress */}
               <PipelineStepper steps={pipelineSteps} />
+
+              {/* Informational banner when evidence assets are 0 */}
+              {caseData.evidence_assets.length === 0 && (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 text-xs text-amber-900 flex items-center justify-between shadow-2xs">
+                  <div className="flex items-center gap-2.5">
+                    <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                    <div>
+                      <span className="font-bold">
+                        {language === "hi" ? "भौतिक पैकेजिंग साक्ष्य लंबित: " : "Physical Packaging Evidence Pending: "}
+                      </span>
+                      {language === "hi"
+                        ? "इस निरीक्षण में अभी कोई पैकेजिंग छवि संलग्न नहीं है। आप अतिरिक्त साक्ष्य कभी भी संलग्न कर सकते हैं।"
+                        : "No packaging images are currently attached to this inspection record."}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsRetakeMode(true)}
+                    className="px-3 py-1.5 bg-[#1B365D] hover:bg-blue-900 text-white font-bold rounded-lg text-xs transition-colors shrink-0 cursor-pointer"
+                  >
+                    {language === "hi" ? "साक्ष्य फोटो संलग्न करें" : "Attach / Capture Photo"}
+                  </button>
+                </div>
+              )}
 
               {/* 2. Executive Inspection Summary Ribbon (Statutory Ticker) */}
               <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-xs">

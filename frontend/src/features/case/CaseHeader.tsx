@@ -56,12 +56,12 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
 
         <div className="flex items-center gap-2 flex-wrap">
           <WorkflowBadge status={isProcessing ? "PROCESSING" : (caseData.workflow_status || "OPEN")} />
-          {caseData.workflow_status === "DRAFT" || caseData.evidence_assets.length === 0 ? (
+          {caseData.evidence_assets.length === 0 && !caseData.overall_status && !caseData.ai_verdict ? (
             <span className="text-xs font-mono text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded border border-slate-200 font-medium">
-              {language === "hi" ? "[कोई साक्ष्य प्रस्तुत नहीं]" : "[NO EVIDENCE SUBMITTED]"}
+              {language === "hi" ? "[साक्ष्य अपेक्षित]" : "[AWAITING EVIDENCE]"}
             </span>
           ) : (
-            <VerdictBadge verdict={caseData.overall_status} />
+            <VerdictBadge verdict={caseData.overall_status || caseData.ai_verdict || "PENDING"} />
           )}
           {onDeleteCase && (
             <button

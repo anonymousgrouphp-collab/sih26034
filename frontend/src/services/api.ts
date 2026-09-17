@@ -231,7 +231,7 @@ export class ApiService {
 
   public static async createInspection(payload: CreateInspectionPayload): Promise<InspectionCase> {
     if (this.operatingMode === "DEMO_FIXTURE") {
-      this.setOperatingMode("MOCK", { persist: false });
+      this.setOperatingMode("LIVE");
     }
 
     if (this.operatingMode === "MOCK") {
@@ -250,6 +250,7 @@ export class ApiService {
     } catch (err: any) {
       if (err?.is_network_error || err?.status >= 500 || String(err?.message || "").includes("Failed to parse URL") || String(err?.message || "").includes("fetch")) {
         console.warn("Live server unreachable for createInspection. Seamlessly activating Mode B local failover:", err);
+        this.setOperatingMode("MOCK");
         const failoverCase = await MockApiService.getInstance().createInspection(payload);
         this.emitSiteWideUpdate();
         return failoverCase;
@@ -271,7 +272,6 @@ export class ApiService {
       lower.startsWith("insp_demo_") ||
       lower.startsWith("ins-2026-") ||
       lower.startsWith("real-pkg-") ||
-      /^insp_\d+(_\d+)?$/i.test(lower) ||
       lower === "fortune" ||
       lower === "sunlite"
     );
@@ -324,7 +324,18 @@ export class ApiService {
     }
 
     try {
-      return await LiveApiService.getInstance().getInspection(id);
+      const liveCase = await LiveApiService.getInstance().getInspection(id);
+      // Guard against split-brain: if live returned 0 evidence assets but local datastore has evidence assets
+      if (liveCase && (!liveCase.evidence_assets || liveCase.evidence_assets.length === 0)) {
+        try {
+          const localCase = await MockApiService.getInstance().getInspection(id);
+          if (localCase && localCase.evidence_assets && localCase.evidence_assets.length > 0) {
+            console.info(`Live case has 0 evidence assets, but local MockApiService has ${localCase.evidence_assets.length} assets. Using local case to preserve evidence.`);
+            return localCase;
+          }
+        } catch {}
+      }
+      return liveCase;
     } catch (liveErr: any) {
       if (this.isDemoId(id)) {
         try {
@@ -389,7 +400,11 @@ export class ApiService {
     }
 
     try {
-      return await LiveApiService.getInstance().uploadEvidence(file, metadata);
+      const res = await LiveApiService.getInstance().uploadEvidence(file, metadata);
+      try {
+        MockApiService.getInstance().addEvidenceAsset(metadata.inspection_id, res.asset);
+      } catch {}
+      return res;
     } catch (err: any) {
       if (
         err?.error_code === "IMAGE_QUALITY_GATE_FAILED" ||
@@ -438,7 +453,15 @@ export class ApiService {
     if (this.operatingMode === "MOCK" || this.isDemoId(inspectionId)) {
       res = await MockApiService.getInstance().executeBatchPipeline(inspectionId);
     } else {
-      res = await LiveApiService.getInstance().executeBatchPipeline(inspectionId);
+      try {
+        res = await LiveApiService.getInstance().executeBatchPipeline(inspectionId);
+        try {
+          MockApiService.getInstance().updateLocalCase(inspectionId, res);
+        } catch {}
+      } catch (err: any) {
+        console.warn("Live server executeBatchPipeline failed. Engaging Mode B Local Resilient failover:", err);
+        res = await MockApiService.getInstance().executeBatchPipeline(inspectionId);
+      }
     }
     this.emitSiteWideUpdate();
     return res;

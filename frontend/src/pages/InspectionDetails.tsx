@@ -57,9 +57,9 @@ export const InspectionDetails: React.FC = () => {
   }, [id, language]);
 
   // If the statutory AI pipeline is running asynchronously on the live cloud server,
-  // poll getInspection until the verdict and evaluations are written to PostgreSQL.
+  // poll getInspection until the verdict, evidence assets, and evaluations are written.
   useEffect(() => {
-    if (!caseData || (caseData.ai_verdict !== "PENDING" && (caseData.rule_evaluations?.length || 0) > 0)) {
+    if (!caseData || (caseData.ai_verdict !== "PENDING" && (caseData.rule_evaluations?.length || 0) > 0 && (caseData.evidence_assets?.length || 0) > 0)) {
       return;
     }
 
@@ -67,20 +67,28 @@ export const InspectionDetails: React.FC = () => {
     const pollInterval = setInterval(async () => {
       try {
         const fresh = await ApiService.getInspection(caseData.id);
-        if (!isCancelled && fresh && fresh.ai_verdict && fresh.ai_verdict !== "PENDING") {
-          setCaseData(fresh);
-          clearInterval(pollInterval);
+        if (!isCancelled && fresh) {
+          const evidenceCountChanged = (fresh.evidence_assets?.length || 0) > (caseData.evidence_assets?.length || 0);
+          const rulesCountChanged = (fresh.rule_evaluations?.length || 0) > (caseData.rule_evaluations?.length || 0);
+          const verdictReady = fresh.ai_verdict && fresh.ai_verdict !== "PENDING";
+
+          if (evidenceCountChanged || rulesCountChanged || verdictReady) {
+            setCaseData(fresh);
+            if (verdictReady && (fresh.rule_evaluations?.length || 0) > 0) {
+              clearInterval(pollInterval);
+            }
+          }
         }
       } catch {
         // Silently retry on transient network drops
       }
-    }, 3500);
+    }, 2500);
 
     return () => {
       isCancelled = true;
       clearInterval(pollInterval);
     };
-  }, [caseData?.id, caseData?.ai_verdict, caseData?.rule_evaluations?.length]);
+  }, [caseData?.id, caseData?.ai_verdict, caseData?.rule_evaluations?.length, caseData?.evidence_assets?.length]);
 
   if (isLoading) {
     return (

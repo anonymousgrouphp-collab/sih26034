@@ -203,6 +203,44 @@ export class MockApiService implements IInspectionApiService {
     addMockCase(c);
   }
 
+  public addEvidenceAsset(inspectionId: string, asset: EvidenceAsset): void {
+    const mockCases = getMockCases();
+    let existing = mockCases[inspectionId];
+    if (!existing) {
+      for (const c of Object.values(mockCases)) {
+        if (c.id === inspectionId || c.inspection_number === inspectionId || c.sku_demo_id === inspectionId) {
+          existing = c;
+          break;
+        }
+      }
+    }
+    if (!existing) {
+      const persisted = loadPersistedCases();
+      existing = persisted[inspectionId];
+      if (!existing) {
+        for (const c of Object.values(persisted)) {
+          if (c.id === inspectionId || c.inspection_number === inspectionId || c.sku_demo_id === inspectionId) {
+            existing = c;
+            break;
+          }
+        }
+      }
+    }
+    if (existing) {
+      const alreadyHas = existing.evidence_assets.some((a) => a.image_id === asset.image_id);
+      if (!alreadyHas) {
+        updateMockCase(existing.id, {
+          evidence_assets: [...existing.evidence_assets, asset],
+          workflow_status: "OPEN",
+        });
+      }
+    }
+  }
+
+  public updateLocalCase(inspectionId: string, updates: Partial<InspectionCase>): void {
+    updateMockCase(inspectionId, updates);
+  }
+
   public async getInspection(id: string): Promise<InspectionCase> {
     const deletedIds = getDeletedCaseIds();
     if (deletedIds.has(id)) {
@@ -232,52 +270,18 @@ export class MockApiService implements IInspectionApiService {
       }
     }
 
+    if (!found && (id === "demo-fortune-sunlite" || id === "demo-sunlite")) {
+      found = GOLDEN_SKU_CASES["demo-fortune-sunlite"];
+      if (found) {
+        addMockCase(found);
+      }
+    }
+
     if (found) {
       return {
         ...found,
         pipeline_source: "BACKEND_SIMULATION",
       };
-    }
-
-    // RESILIENT RECOVERY: If id is a timestamped or Mode B reference ID (e.g. insp_1789405692116_3042),
-    // synthesize a resilient statutory inspection case file so direct URL navigation, cross-device link sharing,
-    // or reloads never fail with a 404 dead screen.
-    if (id && (/^insp_\d+(_\d+)?$/i.test(id) || id.startsWith("insp_"))) {
-      const parts = id.split("_");
-      const suffix = parts.length > 2 ? parts[parts.length - 1] : parts[1] || "3042";
-      const timestampMs = parseInt(parts[1], 10);
-      const caseDate = !isNaN(timestampMs) ? new Date(timestampMs) : new Date();
-      const dateStr = caseDate.toISOString().slice(0, 10).replace(/-/g, "");
-
-      const resilientCase: InspectionCase = {
-        id,
-        inspection_number: `INSP-${dateStr}-${suffix.slice(-4).toUpperCase()}`,
-        created_at: caseDate.toISOString(),
-        officer_id: "INSP-DL-0842",
-        jurisdiction_id: "CIRCLE_DL_SOUTH_01",
-        capture_source: "PHYSICAL_FIELD",
-        product_name: "Fortune Sunlite Refined Sunflower Oil 1L",
-        brand_name: "Fortune Sunlite",
-        manufacturer_name: "Adani Wilmar Limited",
-        category: "FOOD_SNACKS",
-        package_type: "FLEXIBLE_POUCH",
-        workflow_status: "PENDING_REVIEW",
-        overall_status: "PENDING_REVIEW",
-        ai_verdict: "PENDING",
-        establishment_name: "Aggarwal Supermart, Kalkaji",
-        premises_address: "B-42, Main Market, Kalkaji, New Delhi 110019",
-        inspection_type: "ROUTINE_MARKET_SURVEILLANCE",
-        declared_net_quantity: "1 L / 910 g",
-        notes: "Mode B local resilient statutory inspection case.",
-        is_mock_fixture: true,
-        pipeline_source: "BACKEND_SIMULATION",
-        evidence_assets: [],
-        extracted_fields: [],
-        rule_evaluations: [],
-      };
-
-      addMockCase(resilientCase);
-      return resilientCase;
     }
 
     throw {
@@ -385,9 +389,18 @@ export class MockApiService implements IInspectionApiService {
       is_original_untouched: true,
     };
 
-    const existing = getMockCases()[metadata.inspection_id];
+    const mockCases = getMockCases();
+    let existing = mockCases[metadata.inspection_id];
+    if (!existing) {
+      for (const c of Object.values(mockCases)) {
+        if (c.id === metadata.inspection_id || c.inspection_number === metadata.inspection_id || c.sku_demo_id === metadata.inspection_id) {
+          existing = c;
+          break;
+        }
+      }
+    }
     if (existing) {
-      updateMockCase(metadata.inspection_id, {
+      updateMockCase(existing.id, {
         evidence_assets: [...existing.evidence_assets, asset],
         workflow_status: "OPEN",
         overall_status: qualityGate.passed ? "PENDING_REVIEW" : "UNABLE_TO_VERIFY",
@@ -410,16 +423,52 @@ export class MockApiService implements IInspectionApiService {
     scenario?: "PASS" | "FAIL" | "REVIEW" | "UNABLE_TO_VERIFY"
   ): Promise<InspectionCase> {
     const mockCases = getMockCases();
-    const targetCase = inspectionId
-      ? mockCases[inspectionId]
-      : Object.values(mockCases).find((c) => c.evidence_assets.some((a) => a.image_id === imageId)) ||
+    let targetCase: InspectionCase | undefined = undefined;
+    if (inspectionId) {
+      targetCase = mockCases[inspectionId];
+      if (!targetCase) {
+        for (const c of Object.values(mockCases)) {
+          if (c.id === inspectionId || c.inspection_number === inspectionId || c.sku_demo_id === inspectionId) {
+            targetCase = c;
+            break;
+          }
+        }
+      }
+    }
+    if (!targetCase) {
+      targetCase =
+        Object.values(mockCases).find((c) => c.evidence_assets.some((a) => a.image_id === imageId)) ||
         mockCases["SKU-DEMO-01"];
+    }
 
     if (!targetCase) {
       return {
         ...GOLDEN_SKU_CASES["SKU-DEMO-01"],
         pipeline_source: "BACKEND_SIMULATION",
       };
+    }
+
+    if (!targetCase.evidence_assets || targetCase.evidence_assets.length === 0) {
+      const fallbackAsset: EvidenceAsset = {
+        image_id: imageId || `img_${Date.now()}`,
+        inspection_id: targetCase.id,
+        file_path: "/storage/uploads/sku_demo_01_biscuit.jpg",
+        raw_sha256: `sha256_${Date.now()}_sealed`,
+        panel_type: "PDP_FRONT",
+        image_width: 1920,
+        image_height: 1080,
+        quality_gate: {
+          passed: true,
+          blur_variance: 342.18,
+          glare_percentage: 0.84,
+          skew_angle_deg: 1.45,
+          advice: "FRAME_OPTIMAL",
+        },
+        uploaded_at: new Date().toISOString(),
+        is_original_untouched: true,
+      };
+      targetCase.evidence_assets = [fallbackAsset];
+      updateMockCase(targetCase.id, { evidence_assets: [fallbackAsset] });
     }
 
     const activeAsset =
@@ -916,9 +965,20 @@ export class MockApiService implements IInspectionApiService {
     inspectionId: string
   ): Promise<InspectionCase> {
     const mockCases = getMockCases();
-    const targetCase = mockCases[inspectionId] || mockCases["SKU-DEMO-01"];
+    let targetCase: InspectionCase | undefined = mockCases[inspectionId];
+    if (!targetCase) {
+      for (const c of Object.values(mockCases)) {
+        if (c.id === inspectionId || c.inspection_number === inspectionId || c.sku_demo_id === inspectionId) {
+          targetCase = c;
+          break;
+        }
+      }
+    }
+    if (!targetCase) {
+      targetCase = mockCases["SKU-DEMO-01"];
+    }
     const firstImgId = targetCase?.evidence_assets?.[0]?.image_id || "img_mock_01";
-    return await this.executePipeline(firstImgId, inspectionId);
+    return await this.executePipeline(firstImgId, targetCase?.id || inspectionId);
   }
 
   public async submitAdjudication(

@@ -619,7 +619,11 @@ async def upload_inspection_image(
     inspection = None
     target_insp_id = meta.get("inspection_id")
     if target_insp_id:
-        inspection = db.execute(select(Inspection).where(Inspection.id == target_insp_id)).scalar_one_or_none()
+        inspection = db.execute(
+            select(Inspection).where(
+                (Inspection.id == target_insp_id) | (Inspection.inspection_number == target_insp_id)
+            )
+        ).scalar_one_or_none()
 
     if not inspection:
         now_str = datetime.now(timezone.utc).strftime("%Y%m%d")
@@ -1658,13 +1662,21 @@ def execute_batch_pipeline(
     5. Persists per-image bounding boxes tagged with their sub-element image_id.
     6. Updates inspection verdict and cryptographic Merkle DAG under Section 63 BSA 2023.
     """
-    inspection = db.execute(select(Inspection).where(Inspection.id == inspection_id)).scalar_one_or_none()
+    inspection = db.execute(
+        select(Inspection).where(
+            (Inspection.id == inspection_id) | (Inspection.inspection_number == inspection_id)
+        )
+    ).scalar_one_or_none()
     if not inspection:
         raise HTTPException(status_code=404, detail="Inspection not found.")
 
     ev_images = db.execute(
         select(EvidenceImage)
-        .where(EvidenceImage.inspection_id == inspection_id)
+        .where(
+            (EvidenceImage.inspection_id == inspection.id)
+            | (EvidenceImage.inspection_id == inspection.inspection_number)
+            | (EvidenceImage.inspection_id == inspection_id)
+        )
         .order_by(EvidenceImage.created_at.asc())
     ).scalars().all()
     if not ev_images:
@@ -2279,33 +2291,7 @@ def get_inspection_detail(
         )
     ).scalars().first()
     if not insp:
-        import re
-        if re.match(r"^insp_\d+(_\d+)?$", inspection_id) or inspection_id == "insp_1789405692116_3042" or inspection_id.startswith("insp_"):
-            now_dt = datetime.now(timezone.utc)
-            now_str = now_dt.strftime("%Y%m%d")
-            suffix = inspection_id.split("_")[-1].upper() if "_" in inspection_id else uuid.uuid4().hex[:6].upper()
-            insp = Inspection(
-                id=inspection_id,
-                inspection_number=f"INSP-{now_str}-{suffix}",
-                officer_id=user.user_id,
-                jurisdiction_id=user.jurisdiction_id or "CIRCLE_DL_SOUTH_01",
-                capture_source="PHYSICAL_FIELD",
-                product_name="Fortune Sunlite Refined Sunflower Oil 1L",
-                brand_name="Fortune Sunlite",
-                manufacturer_name="Adani Wilmar Limited",
-                category="FOOD_SNACKS",
-                package_type="RECTANGULAR",
-                overall_status="PENDING_REVIEW",
-                ai_verdict="PENDING",
-                device_fingerprint="WEB-SPA-CLIENT-OFFICER-WORKSTATION",
-                clock_source="LOCAL_DEVICE_MONOTONIC",
-                created_at=now_dt,
-            )
-            db.add(insp)
-            db.commit()
-            db.refresh(insp)
-        else:
-            raise HTTPException(status_code=404, detail="Inspection not found.")
+        raise HTTPException(status_code=404, detail="Inspection not found.")
 
     try:
         images = []
@@ -2669,7 +2655,11 @@ def adjudicate_inspection(
     headers: RequestHeaders = Depends(extract_request_headers),
 ):
     """Human officer adjudication approval or override."""
-    insp = db.execute(select(Inspection).where(Inspection.id == inspection_id)).scalar_one_or_none()
+    insp = db.execute(
+        select(Inspection).where(
+            (Inspection.id == inspection_id) | (Inspection.inspection_number == inspection_id)
+        )
+    ).scalar_one_or_none()
     if not insp:
         raise HTTPException(status_code=404, detail="Inspection record not found.")
 
@@ -2731,7 +2721,11 @@ def update_extracted_field(
     headers: RequestHeaders = Depends(extract_request_headers),
 ):
     """Allows inspecting officer to manually edit an extracted declaration's text and measured font size (mm)."""
-    insp = db.execute(select(Inspection).where(Inspection.id == inspection_id)).scalar_one_or_none()
+    insp = db.execute(
+        select(Inspection).where(
+            (Inspection.id == inspection_id) | (Inspection.inspection_number == inspection_id)
+        )
+    ).scalar_one_or_none()
     if not insp:
         raise HTTPException(status_code=404, detail="Inspection record not found.")
 
@@ -2739,7 +2733,7 @@ def update_extracted_field(
     if not bbox:
         bbox = db.execute(
             select(BoundingBox).join(EvidenceImage).where(
-                (EvidenceImage.inspection_id == inspection_id) &
+                ((EvidenceImage.inspection_id == insp.id) | (EvidenceImage.inspection_id == insp.inspection_number)) &
                 ((BoundingBox.id == field_id) | (BoundingBox.field_type == field_id))
             )
         ).scalars().first()
@@ -2831,7 +2825,11 @@ def record_compounding(
     """Records compounding settlement amount under Section 48 LM Act.
     Strictly restricted to CONTROLLER / ADMIN roles per TS-WEB-02.
     """
-    insp = db.execute(select(Inspection).where(Inspection.id == inspection_id)).scalar_one_or_none()
+    insp = db.execute(
+        select(Inspection).where(
+            (Inspection.id == inspection_id) | (Inspection.inspection_number == inspection_id)
+        )
+    ).scalar_one_or_none()
     if not insp:
         raise HTTPException(status_code=404, detail="Inspection record not found.")
 
@@ -2869,11 +2867,23 @@ def analyze_inspection_case(
     headers: RequestHeaders = Depends(extract_request_headers),
 ):
     """Executes live AI pipeline directly on an inspection case."""
-    insp = db.execute(select(Inspection).where(Inspection.id == inspection_id)).scalar_one_or_none()
+    insp = db.execute(
+        select(Inspection).where(
+            (Inspection.id == inspection_id) | (Inspection.inspection_number == inspection_id)
+        )
+    ).scalar_one_or_none()
     if not insp:
         raise HTTPException(status_code=404, detail="Inspection record not found.")
 
-    ev_images = db.execute(select(EvidenceImage).where(EvidenceImage.inspection_id == insp.id).order_by(EvidenceImage.created_at.asc())).scalars().all()
+    ev_images = db.execute(
+        select(EvidenceImage)
+        .where(
+            (EvidenceImage.inspection_id == insp.id)
+            | (EvidenceImage.inspection_id == insp.inspection_number)
+            | (EvidenceImage.inspection_id == inspection_id)
+        )
+        .order_by(EvidenceImage.created_at.asc())
+    ).scalars().all()
     if not ev_images:
         # Create default evidence image record if none attached
         ev_image = EvidenceImage(
@@ -2911,7 +2921,11 @@ def close_inspection(
     headers: RequestHeaders = Depends(extract_request_headers),
 ):
     """Statutory case closure endpoint; seals the case with officer remarks and audit entry."""
-    insp = db.execute(select(Inspection).where(Inspection.id == inspection_id)).scalar_one_or_none()
+    insp = db.execute(
+        select(Inspection).where(
+            (Inspection.id == inspection_id) | (Inspection.inspection_number == inspection_id)
+        )
+    ).scalar_one_or_none()
     if not insp:
         raise HTTPException(status_code=404, detail="Inspection record not found.")
 
@@ -3028,13 +3042,23 @@ def get_inspection_audit_trail(
     db: Session = Depends(get_db_session),
 ):
     """Retrieves chronological Merkle-chained audit trail for an inspection case."""
-    insp = db.execute(select(Inspection).where(Inspection.id == inspection_id)).scalar_one_or_none()
+    insp = db.execute(
+        select(Inspection).where(
+            (Inspection.id == inspection_id) | (Inspection.inspection_number == inspection_id)
+        )
+    ).scalar_one_or_none()
     if not insp:
         raise HTTPException(status_code=404, detail="Inspection not found.")
 
     logs = db.execute(
         select(AuditLog)
-        .where((AuditLog.entity_id == inspection_id) | (AuditLog.payload_json.contains(inspection_id)))
+        .where(
+            (AuditLog.entity_id == insp.id)
+            | (AuditLog.entity_id == insp.inspection_number)
+            | (AuditLog.entity_id == inspection_id)
+            | (AuditLog.payload_json.contains(insp.id))
+            | (AuditLog.payload_json.contains(insp.inspection_number))
+        )
         .order_by(AuditLog.sequence_number.asc())
     ).scalars().all()
 
@@ -3742,7 +3766,11 @@ def export_emaap_standard_json(
     db: Session = Depends(get_db_session),
 ):
     """Exports standardized eMaap JSON package for national DoCA integration (OQ-03)."""
-    insp = db.execute(select(Inspection).where(Inspection.id == inspection_id)).scalar_one_or_none()
+    insp = db.execute(
+        select(Inspection).where(
+            (Inspection.id == inspection_id) | (Inspection.inspection_number == inspection_id)
+        )
+    ).scalar_one_or_none()
     if not insp:
         raise HTTPException(status_code=404, detail="Inspection not found.")
 

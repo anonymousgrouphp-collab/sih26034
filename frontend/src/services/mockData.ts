@@ -4831,9 +4831,22 @@ export function updateMockCase(id: string, updates: Partial<InspectionCase>): In
     ...existing,
     ...updates,
   };
+  // Synchronize all keys and aliases in dynamicCases
   dynamicCases.set(targetKey, updated);
-  if (updated.id && updated.id !== targetKey) {
+  if (updated.id) {
     dynamicCases.set(updated.id, updated);
+  }
+  if (updated.inspection_number) {
+    dynamicCases.set(updated.inspection_number, updated);
+  }
+  if (updated.sku_demo_id) {
+    dynamicCases.set(updated.sku_demo_id, updated);
+  }
+  if (existing.id && existing.id !== updated.id) {
+    dynamicCases.set(existing.id, updated);
+  }
+  if (existing.inspection_number && existing.inspection_number !== updated.inspection_number) {
+    dynamicCases.set(existing.inspection_number, updated);
   }
   savePersistedCases(dynamicCases);
   return updated;

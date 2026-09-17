@@ -201,12 +201,19 @@ export const NewInspection: React.FC = () => {
   const [createdCaseId, setCreatedCaseId] = useState<string | null>(null);
   const createdCaseIdRef = useRef<string | null>(null);
   const [rejectedFiles, setRejectedFiles] = useState<Map<number, string>>(new Map());
+  const [countdownSeconds, setCountdownSeconds] = useState<number | null>(null);
+  const [isCountdownPaused, setIsCountdownPaused] = useState(false);
 
   // Dashboard "E-Commerce Listing Audit" quick action deep-links here with
   // ?mode=ecommerce — preset the packaging type to the canonical Rule 6(10) value.
   const [searchParams] = useSearchParams();
   
   useEffect(() => {
+    // Reset operating mode if it was previously set to DEMO_FIXTURE to ensure clean statutory intake
+    if (ApiService.getOperatingMode() === "DEMO_FIXTURE") {
+      ApiService.setOperatingMode("LIVE");
+    }
+
     // Load draft on mount
     const draft = StorageService.getDraft();
     if (draft) {
@@ -222,6 +229,34 @@ export const NewInspection: React.FC = () => {
       setPackageType("ECOMMERCE_LISTING");
     }
   }, [searchParams]);
+
+  // 4-Second Auto-Proceed Countdown when 6-stage statutory pipeline completes
+  useEffect(() => {
+    if (!isPipelineComplete || !isModalOpen || isCountdownPaused) {
+      return;
+    }
+
+    if (countdownSeconds === null) {
+      setCountdownSeconds(4);
+      return;
+    }
+
+    if (countdownSeconds <= 0) {
+      const targetId = createdCaseId || createdCaseIdRef.current;
+      if (targetId) {
+        setIsModalOpen(false);
+        resetScrollToTop();
+        navigate(`/inspections/${targetId}?view=OVERVIEW`);
+      }
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setCountdownSeconds((prev) => (prev !== null ? prev - 1 : null));
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [isPipelineComplete, isModalOpen, isCountdownPaused, countdownSeconds, createdCaseId, navigate]);
 
   useEffect(() => {
     // Save draft when form fields change
@@ -504,6 +539,8 @@ export const NewInspection: React.FC = () => {
     setIsModalOpen(true);
     setIsPipelineComplete(false);
     setIsPipelineFailed(false);
+    setCountdownSeconds(null);
+    setIsCountdownPaused(false);
 
     const freshStages: PipelineStageInfo[] = INITIAL_MODAL_STAGES.map((s, idx) => ({
       ...s,
@@ -851,6 +888,51 @@ export const NewInspection: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Top Banner: Statutory Pipeline Completed & Ready for Adjudication */}
+      {isPipelineComplete && !isModalOpen && (createdCaseId || createdCaseIdRef.current) && (
+        <div className="bg-emerald-50 border-2 border-emerald-400 rounded-xl p-5 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3.5">
+            <div className="p-2.5 bg-emerald-600 text-white rounded-lg shrink-0 mt-0.5 shadow-xs">
+              <CheckCircle2 size={22} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">
+                  {language === "hi" ? "6-चरण विधिक सत्यापन पूर्ण" : "6-Stage Statutory Verification Complete"}
+                </span>
+                <span className="text-xs text-emerald-600 font-mono font-bold">
+                  {createdCaseId || createdCaseIdRef.current}
+                </span>
+              </div>
+              <h3 className="text-base font-bold text-emerald-950 mt-1">
+                {language === "hi"
+                  ? "पैकेजिंग साक्ष्य एवं नियम 6 अनुपालन का विश्लेषण पूर्ण"
+                  : "Packaging Evidence & Rule 6 Statutory Analysis Fully Processed"}
+              </h3>
+              <p className="text-xs text-emerald-800 mt-0.5">
+                {language === "hi"
+                  ? "सभी 6 विधिक चरण (छवि अधिग्रहण, गुणवत्ता जांच, अरूको अंशांकन, ओसीआर टोकन, नियम 6 schedule, और साक्ष्य DAG) सफलतापूर्वक निष्पादित हो चुके हैं। केस फ़ाइल अधिकारी अधिनिर्णय के लिए तैयार है।"
+                  : "All 6 statutory stages (Evidence Capture, Optical Quality Gate, ArUco Metrology, PP-OCRv4 Declarations, Rule 6 Schedules, and Merkle Evidence DAG) have completed. Case file is ready for officer adjudication."}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              const targetId = createdCaseId || createdCaseIdRef.current;
+              if (targetId) {
+                resetScrollToTop();
+                navigate(`/inspections/${targetId}?view=OVERVIEW`);
+              }
+            }}
+            className="w-full sm:w-auto px-5 py-2.5 text-xs font-bold text-white bg-[#1B365D] hover:bg-[#132742] rounded-lg shadow-sm flex items-center justify-center gap-2 cursor-pointer shrink-0 transition-all"
+          >
+            <span>{language === "hi" ? "केस अवलोकन एवं अधिनिर्णय खोलें" : "Open Case Overview & Adjudication"}</span>
+            <ArrowRight size={15} />
+          </button>
+        </div>
+      )}
 
       {/* Statutory Verification Pipeline Rail (Compact, Animated, Single-line Stepper) */}
       <StatutoryPipelineRail steps={steps} language={language} />
@@ -1960,12 +2042,14 @@ export const NewInspection: React.FC = () => {
           setIsModalOpen(false);
           setIsPipelineFailed(false);
         }}
+        countdownSeconds={countdownSeconds}
+        onPauseCountdown={() => setIsCountdownPaused(true)}
         onProceed={() => {
           const targetId = createdCaseId || createdCaseIdRef.current;
           if (targetId) {
             setIsModalOpen(false);
             resetScrollToTop();
-            navigate(`/inspections/${targetId}?view=CANVAS`);
+            navigate(`/inspections/${targetId}?view=OVERVIEW`);
           }
         }}
       />
